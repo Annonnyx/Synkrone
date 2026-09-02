@@ -8,31 +8,27 @@
     <style>
         /* Base & Mosaïque[cite: 1] */
         :root {
-            --bg: #181a1b;
-            --panel: #242729;
-            --text: #e8e6e3;
-            --accent: #d32f2f;
-            --border: #3a3f44;
-            --brand-red: #e11d2e;
-            --brand-violet: #8b5cf6;
+            --bg: var(--sk-bg);
+            --panel: var(--sk-surface);
+            --text: var(--sk-text);
+            --accent: var(--sk-accent);
+            --border: var(--sk-border);
+            --brand-red: var(--sk-accent);
+            --brand-violet: #9b8cff;
         }
-        * { box-sizing: border-box; -ms-overflow-style: none; scrollbar-width: none; }
-        ::-webkit-scrollbar { display: none; }
-        body { min-height: 100vh; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: system-ui, sans-serif; font-size: 0.85rem; overflow-x: hidden; }
+        * { box-sizing: border-box; -ms-overflow-style: none; scrollbar-width: thin; }
+        body { min-height: 100vh; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: var(--sk-font); font-size: 13px; overflow-x: hidden; }
         body::before {
-            content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
-            background-color: var(--bg);
-            background-image: url('logo.png'); background-size: 60px 60px; background-repeat: repeat;
-            transform: rotate(45deg); opacity: 0.08; pointer-events: none;
+            content: ""; position: fixed; inset: 0; z-index: -1;
+            background-image: url('logo.png'); background-size: 72px 72px; background-repeat: repeat;
+            transform: rotate(45deg); opacity: 0.025; pointer-events: none;
             width: 200vw; height: 200vh; left: -50vw; top: -50vh;
-            filter: sepia(1) saturate(5) hue-rotate(20deg) brightness(0.7) grayscale(0.2);
+            filter: grayscale(0.6) brightness(0.5);
         }
-
-        /* Layout Global */
         #app { display: none; flex-direction: column; min-height: 100vh; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--panel); border-bottom: 1px solid var(--border); width: 100%; }
-        main { flex: 1; padding: 15px 20px; width: 100%; max-width: 100%; margin: 0; }
-        footer { padding: 8px 20px; background: var(--panel); border-top: 1px solid var(--border); text-align: center; font-size: 0.75rem; width: 100%; }
+        header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; background: var(--sk-bg-elevated); border-bottom: 1px solid var(--border); width: 100%; min-height: 52px; }
+        main { flex: 1; padding: 14px 16px; width: 100%; max-width: 100%; margin: 0; }
+        footer { padding: 8px 16px; background: var(--sk-bg-elevated); border-top: 1px solid var(--border); text-align: center; font-size: 12px; width: 100%; }
         
         /* Composants & Compacité */
         h1, h2, h3 { margin: 0; font-size: 1.1rem; font-weight: 600; }
@@ -146,8 +142,9 @@
         .nav-btn:last-child { border-right: none; }
         .nav-btn:hover { background: #2f3539; color: #ffffff; }
         .nav-btn.active {
-            background: #f5f5f5;
-            color: #181a1b;
+            background: var(--sk-accent-soft);
+            color: #fff;
+            box-shadow: inset 0 -2px 0 var(--sk-accent);
         }
         .tool-btn {
             border: 1px solid var(--border);
@@ -193,9 +190,7 @@
             border-radius: 999px;
             text-decoration: none;
         }
-        .app-nav a:hover { background: #2a3136; }
-            background: transparent;
-        }
+        .app-nav a:hover { background: var(--sk-surface-hover); }
         .view-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
         .view-list { display: none; flex-direction: column; gap: 4px; }
         .view-folder { display: none; flex-direction: column; gap: 15px; }
@@ -613,8 +608,10 @@
         .viewer-nav.next { right: 14px; }
         
         /* Login */
-        #login-view { display: flex; height: 100vh; justify-content: center; align-items: center; }
-        .login-box { background: var(--panel); padding: 20px; border: 1px solid var(--border); border-radius: 6px; text-align: center; width: 280px; }
+        #login-view { display: flex; height: 100vh; justify-content: center; align-items: center; padding: 16px; }
+        .login-box { background: var(--sk-surface); padding: 24px; border: 1px solid var(--sk-border); border-radius: var(--sk-radius-lg); text-align: center; width: min(100%, 340px); }
+        .login-box p { color: var(--sk-text-muted); }
+        .login-box input { margin: 12px 0; min-height: 40px; }
         
         /* Responsiveness */
         @media (max-width: 600px) {
@@ -634,6 +631,7 @@
             .viewer-nav.next { right: 8px; }
         }
     </style>
+    <link rel="stylesheet" href="/design/synkrone.css">
 </head>
 <body>
 
@@ -644,10 +642,15 @@
                 <img src="/ui/logo.png" alt="Logo Synkrone">
                 <span><span class="brand-ui">ui.</span><span class="brand-synkrone">Synkrone.app</span></span>
             </h2>
-            <p style="font-size: 0.8rem; color: #aaa;">Authentification requise</p>
-            <input type="password" id="passInput" placeholder="Mot de passe">
-            <button class="primary" onclick="login()" style="width: 100%;">Connexion</button>
-            <p style="margin-top: 12px;"><a href="/hub" style="color:#8b5cf6; font-size:0.75rem;">Retour au hub</a></p>
+            <p class="sk-meta">Authentification requise</p>
+            <label class="sk-label" for="passInput" style="text-align:left;margin-top:14px;">Mot de passe</label>
+            <input type="password" id="passInput" placeholder="Mot de passe" autocomplete="current-password">
+            <button class="primary" onclick="login()" style="width: 100%; min-height: 40px;">Connexion</button>
+            <p class="sk-app-nav" style="margin-top:14px;justify-content:center;">
+                <a href="/">Site</a>
+                <a href="/hub">Hub</a>
+                <a href="/sharing/">Sharing</a>
+            </p>
         </div>
     </div>
 
@@ -657,7 +660,8 @@
             <h1 class="brand-title">
                 <img src="/ui/logo.png" alt="Logo Synkrone">
                 <span><span class="brand-ui">ui.</span><span class="brand-synkrone">Synkrone.app</span></span>
-                <nav class="app-nav">
+                <nav class="app-nav sk-app-nav">
+                    <a href="/">Site</a>
                     <a href="/hub">Hub</a>
                     <a href="/sharing/">Sharing</a>
                 </nav>

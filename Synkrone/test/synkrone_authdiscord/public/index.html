@@ -5,413 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone.app</title>
     <link rel="icon" type="image/jpeg" href="assets/images/logo.jpg">
-    <link rel="stylesheet" href="assets/mosaique.css">
-    <script src="assets/mosaique.js" defer></script>
+    <link rel="stylesheet" href="/design/synkrone.css">
     <style>
-        /* --- RESET & COMPACITÉ EXTRÊME --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        /* Masquage des scrollbars et paramètres de base */
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden; 
-            background-color: #181a1b;
-            color: #e1e3e6;
-            font-size: 11px;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        ::-webkit-scrollbar { display: none; }
-        
-        /* --- LAYOUT FULL-WIDTH --- */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-        }
-        
-        /* --- HEADER BORD À BORD --- */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            height: 52px;
-            padding: 0 16px;
-            background: rgba(24, 26, 27, 0.94);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-        .header-top {
-            display: flex;
-            align-items: center;
-            min-width: 0;
-        }
-        .header-bottom {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            min-width: 0;
-            flex: 1; 
-        }
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: #ffffff;
-            letter-spacing: -0.4px;
-            white-space: nowrap;
-        }
-        .brand-title {
-            font-style: italic;
-        }
-        .header-brand img {
-            width: 26px;
-            height: 26px;
-            border-radius: 5px;
-            object-fit: cover;
-        }
-        
-        /* STRUCTURE HEADER-USER */
-        .header-user { 
-            display: flex; 
-            align-items: center; 
-            justify-content: flex-end;
-            gap: 12px;
-            width: 100%; 
-        }
-        
-        .user-left-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 1;
-            min-width: 0;
-        }
-        
-        /* Conteneur de l'avatar */
-        .avatar-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        /* Avatar standard */
-        .user-avatar { 
-            width: 32px; 
-            height: 32px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 1.5px solid rgba(255, 255, 255, 0.3); 
-        }
-        
-        .user-name { 
-            font-weight: 600; 
-            font-size: 0.9rem; 
-            color: #f0f2f5; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis;
-        }
-        
-        /* Badges de base */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            font-weight: 700;
-            line-height: 1;
-            white-space: nowrap;
-        }
-        .badge-role, .badge-admin {
-            padding: 3px 6px; 
-            border-radius: 4px;
-            font-size: 0.7rem;
-        }
-        .badge-role { background: rgba(163, 230, 53, 0.15); border: 1px solid rgba(163, 230, 53, 0.35); color: #a3e635; }
-        .badge-admin { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #ef4444; }
-        
-        /* Spécifique aux krones */
-        .badge-krone { 
-            gap: 5px; 
-            background: rgba(230, 204, 118, 0.18); 
-            border: 1px solid rgba(230, 204, 118, 0.35); 
-            color: #f3e5ab; 
-            padding: 5px 10px; 
-            font-size: 0.78rem;
-            border-radius: 6px;
-        }
-        .currency-icon { font-size: 0.9rem; }
-        
-        .krones-center-section {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-actions { display: flex; gap: 6px; flex-shrink: 0; }
-        
-        .btn-symbol {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .btn-symbol.logout { color: #f87171; }
-        .btn-symbol.logout:hover { background: rgba(239, 68, 68, 0.25); transform: scale(1.05); }
-        
-        .btn-roulette {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 7px 11px;
-            border: 1px solid rgba(250, 204, 21, 0.28);
-            border-radius: 999px;
-            background: linear-gradient(135deg, rgba(250, 204, 21, 0.22), rgba(56, 189, 248, 0.16));
-            color: #fef3c7;
-            font-size: 0.78rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease, background 0.2s ease;
-            white-space: nowrap;
-        }
-        .btn-roulette:hover { transform: translateY(-1px); background: linear-gradient(135deg, rgba(250, 204, 21, 0.3), rgba(56, 189, 248, 0.24)); }
-        
-        .btn-login-small {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            background: #5865F2;
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s ease;
-        }
-        .btn-login-small:hover { background: #4752C4; }
-        .discord-icon { width: 14px; height: 14px; display: inline-block; object-fit: contain; }
-        
-        /* --- NAVBAR HORIZONTALE PRINCIPALE --- */
-        nav {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            height: 38px;
-            background: rgba(20, 22, 23, 0.85);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 0 16px;
-            overflow-x: auto;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-            z-index: 5;
-        }
-        nav::-webkit-scrollbar { display: none; }
-        .nav-tabs { display: flex; align-items: center; gap: 4px; height: 100%; }
-        .nav-tab {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            height: 100%;
-            padding: 0 16px;
-            color: #8a8f9d;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .nav-tab:hover { color: #ffffff; background: rgba(255, 255, 255, 0.04); }
-        .nav-tab.active { color: #a3e635; border-bottom-color: #a3e635; background: rgba(163, 230, 53, 0.08); }
-        
-        .nav-tab-icon { width: 16px; height: 16px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
-        .nav-tab-emoji { font-size: 0.95rem; line-height: 1; flex-shrink: 0; }
-
-        .roulette-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 120;
-            display: none;
-            align-items: stretch;
-            justify-content: stretch;
-            padding: 0;
-            background: rgba(2, 6, 23, 0.82);
-            backdrop-filter: blur(10px);
-        }
-        .roulette-modal.open { display: flex; }
-        .roulette-modal-card {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border-radius: 0;
-            overflow: hidden;
-            border: 0;
-            box-shadow: none;
-            background: #09090f;
-        }
-        .roulette-modal-close {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            z-index: 10;
-            width: 42px;
-            height: 42px;
-            border: 1px solid rgba(148, 163, 184, 0.28);
-            border-radius: 12px;
-            background: linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
-            color: #e2e8f0;
-            font-size: 1.25rem;
-            font-weight: 700;
-            line-height: 1;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 18px rgba(2, 6, 23, 0.45);
-            backdrop-filter: blur(6px);
-            transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
-        }
-        .roulette-modal-close:hover {
-            transform: translateY(-1px);
-            color: #ffffff;
-            border-color: rgba(56, 189, 248, 0.55);
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.94));
-            box-shadow: 0 10px 22px rgba(2, 6, 23, 0.5);
-        }
-        .roulette-modal-close:active {
-            transform: scale(0.96);
-        }
-        .roulette-modal-close:focus-visible {
-            outline: 2px solid rgba(56, 189, 248, 0.75);
-            outline-offset: 2px;
-        }
-        .roulette-modal-frame { width: 100%; height: 100%; border: 0; background: #09090f; }
-        
-        /* --- SOUS-NAVIGATION --- */
-        #section-menu-container { min-height: 0; }
-        #section-menu-container .sub-nav {
-            display: flex; align-items: center; gap: 4px; width: 100%; height: 38px;
-            padding: 0 16px; background: rgba(20, 22, 23, 0.85); backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.08); border-bottom: none; border-radius: 0;
-            overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
-        }
-        #section-menu-container .sub-nav::-webkit-scrollbar { display: none; }
-        #section-menu-container .sub-nav-tab {
-            display: flex; align-items: center; justify-content: center; height: 100%;
-            padding: 0 16px; color: #8a8f9d; font-size: 0.8rem; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
-            border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap;
-        }
-        #section-menu-container .sub-nav-tab:hover { color: #ffffff; background: rgba(255, 255, 255, 0.04); }
-        #section-menu-container .sub-nav-tab.active { color: #a3e635; border-bottom-color: #a3e635; background: rgba(163, 230, 53, 0.08); }
-        
-        /* --- CONTENU --- */
-        main {
-            flex: 1;
-            width: 100vw;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            overflow: hidden;
-        }
-        .content-frame {
-            display: block; width: 100%; height: 100%; border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 0; background: rgba(20, 22, 23, 0.75);
-        }
-        .content-frame.with-section-menu {
-            height: calc(100% - 38px); border-top: none; border-top-left-radius: 0; border-top-right-radius: 0;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* --- FOOTER --- */
-        footer {
-            display: flex; align-items: center; justify-content: center; gap: 16px;
-            height: 26px; width: 100vw; background: rgba(24, 26, 27, 0.9);
-            border-top: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0;
-        }
-        .footer-brand { display: none; align-items: center; gap: 6px; font-weight: 700; color: #fff; font-size: 0.8rem; font-style: italic; opacity: 0.7; }
-        .footer-brand img { width: 14px; height: 14px; border-radius: 3px; }
-        .footer-links { display: flex; align-items: center; gap: 16px; }
-        .footer-link { color: rgba(255, 255, 255, 0.65); text-decoration: none; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.3px; transition: color 0.15s ease; }
-        .footer-link:hover { color: #a3e635; }
-        .footer-separator { color: rgba(255, 255, 255, 0.2); font-size: 0.65rem; }
-        .hidden { display: none !important; }
-        
-        /* --- AJUSTEMENTS MOBILES --- */
-        @media (max-width: 768px) {
-            header {
-                padding: 0 8px;
-                gap: 4px;
-            }
-            .header-brand {
-                font-size: 0.85rem;
-                gap: 6px;
-            }
-            .header-brand img {
-                width: 20px;
-                height: 20px;
-            }
-            .header-user {
-                gap: 6px;
-            }
-            .roulette-text { 
-                display: none; 
-            }
-            .btn-roulette { 
-                padding: 6px 8px; 
-                font-size: 1rem;
-            }
-            .roulette-modal-close {
-                top: 10px;
-                right: 10px;
-                width: 40px;
-                height: 40px;
-                border-radius: 10px;
-                font-size: 1.15rem;
-            }
-            .user-name {
-                max-width: 90px;
-                font-size: 0.8rem;
-            }
-            footer { justify-content: space-between; padding: 0 16px; }
-            .footer-brand { display: flex; }
-            .footer-links { gap: 12px; }
-            body.hide-brand-mobile #app-header .header-top {
-                display: none;
-            }
-        }
+        html, body { width: 100%; height: 100%; overflow: hidden; }
     </style>
 </head>
-<body class="mosaic-bg">
+<body>
     <div class="app-container">
-        <header id="app-header"></header>
-        
-        <div id="menu-container"></div>
+        <div class="chrome" id="app-chrome">
+            <header id="app-header"></header>
+            <div id="menu-container"></div>
+        </div>
         <main>
             <div id="section-menu-container"></div>
             <iframe
@@ -421,16 +25,17 @@
                 src="about:blank"
             ></iframe>
         </main>
-        
         <footer>
             <div class="footer-brand">
-                <img src="/assets/images/logo.jpg" alt="Logo">
-                <span class="brand-title">Synkrone.app</span>
+                <img src="/assets/images/logo.jpg" alt="">
+                <span>Synkrone.app</span>
             </div>
             <div class="footer-links">
                 <a href="/cgu" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('cgu', { updateUrl: true });">CGU</a>
-                <span class="footer-separator">/</span>
-                <a href="/contact" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('contact', { updateUrl: true });">NOUS CONTACTER</a>
+                <span class="footer-separator">·</span>
+                <a href="/contact" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('contact', { updateUrl: true });">Contact</a>
+                <span class="footer-separator">·</span>
+                <a href="/vux/" class="footer-link">Vux</a>
             </div>
         </footer>
     </div>
@@ -484,6 +89,14 @@
         function loginDiscord() {
             window.location.href = '/auth/discord';
         }
+        function internalNavHtml() {
+            return `<nav class="sk-app-nav" aria-label="Outils internes">
+                <a href="/hub">hub</a>
+                <a href="/ui/">ui</a>
+                <a href="/sharing/">sharing</a>
+                <a href="/vux/">vux</a>
+            </nav>`;
+        }
         async function loadMenu() {
             const menuContainer = document.getElementById('menu-container');
             if (!menuContainer) return;
@@ -491,6 +104,7 @@
                 const res = await fetch('/menu.html');
                 if (!res.ok) return;
                 menuContainer.innerHTML = await res.text();
+                bindNavToggle();
             } catch (e) {
                 console.error("Erreur lors du chargement du menu", e);
             }
@@ -566,17 +180,21 @@
                 pages: {
                     bots: '/discord/bots/index.html',
                     publicbot: '/discord/publicbot/index.html',
-                    dashbot: '/discord/dashbot/index.html',
-                    me: '/discord/me/index.html',
-                    bump: '/discord/bump/index.html'
+                    dashbot: '/discord/dashbot/index.html'
                 },
                 routes: {
                     bots: '/discord/bots',
                     publicbot: '/discord/publicbot',
-                    dashbot: '/discord/dashbot',
-                    me: '/discord/me',
-                    bump: '/discord/bump'
+                    dashbot: '/discord/dashbot'
                 }
+            },
+            bump: {
+                route: '/discord/bump',
+                page: '/discord/bump/index.html'
+            },
+            me: {
+                route: '/discord/me',
+                page: '/discord/me/index.html'
             },
             minecraft: {
                 route: '/minecraft',
@@ -716,8 +334,8 @@
             const cleanPath = currentPath.replace(/^\//, '');
             if (cleanPath && !cleanPath.includes('/')) {
                 return { 
-                    mainSection: 'discord', 
-                    subTab: 'me', 
+                    mainSection: 'me', 
+                    subTab: null, 
                     profileTab: currentPath, 
                     canonical: currentPath
                 };
@@ -816,11 +434,19 @@
                 return;
             }
             setActiveMainTab(mainSection);
+            document.body.classList.toggle('is-home', mainSection === 'accueil');
             await loadSectionMenu(mainSection);
             if (!section.pages) {
-                setFrameSrc(section.page);
+                let leafPath = section.page;
+                if (mainSection === 'me' && profileTab) {
+                    leafPath = `${section.page}?profile=${encodeURIComponent(profileTab.replace(/^\//, ''))}`;
+                }
+                setFrameSrc(leafPath);
                 if (updateUrl) {
-                    syncBrowserPath(section.route || section.page, replaceHistory);
+                    const leafRoute = (mainSection === 'me' && profileTab)
+                        ? profileTab
+                        : (section.route || section.page);
+                    syncBrowserPath(leafRoute, replaceHistory);
                 }
                 return;
             }
@@ -838,9 +464,6 @@
             if (mainSection === 'equipe' && resolvedSubTab === 'cloud' && cloudPath) {
                 framePath = `${framePath}?cloudPath=${encodeURIComponent(cloudPath)}`;
             }
-            if (mainSection === 'discord' && resolvedSubTab === 'me' && profileTab) {
-                framePath = `${framePath}?profile=${encodeURIComponent(profileTab.replace(/^\//, ''))}`;
-            }
 
             setFrameSrc(framePath);
             
@@ -856,18 +479,31 @@
                 if (mainSection === 'equipe' && resolvedSubTab === 'cloud' && cloudPath) {
                     targetRoute = `/equipe/cloud/${cloudPath}`;
                 }
-                if (mainSection === 'discord' && resolvedSubTab === 'me' && profileTab) {
-                    targetRoute = profileTab; 
-                }
                 syncBrowserPath(targetRoute, replaceHistory);
             }
         }
 
+        function bindNavToggle() {
+            const toggle = document.getElementById('nav-toggle');
+            const container = document.getElementById('menu-container');
+            if (!toggle || !container) return;
+            toggle.onclick = () => {
+                const open = container.classList.toggle('nav-open');
+                toggle.setAttribute('aria-expanded', String(open));
+            };
+        }
+        function closeMobileNav() {
+            const container = document.getElementById('menu-container');
+            const toggle = document.getElementById('nav-toggle');
+            if (container) container.classList.remove('nav-open');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        }
         function initMainNavigation() {
             const mainTabs = document.querySelectorAll('.nav-tab');
             mainTabs.forEach(tab => {
                 tab.addEventListener('click', async (e) => {
                     const mainSection = e.currentTarget.getAttribute('data-target');
+                    closeMobileNav();
                     await navigateToMainSection(mainSection, { updateUrl: true });
                 });
             });
@@ -887,10 +523,11 @@
             if (!user) {
                 header.innerHTML = `
                     <div class="header-top">
-                        <div class="header-brand">
-                            <img src="/assets/images/logo.jpg" alt="Logo">
-                            <span class="brand-title">Synkrone.app</span>
-                        </div>
+                        <button type="button" class="header-brand" onclick="navigateToMainSection('accueil', { updateUrl: true })" aria-label="Synkrone accueil">
+                            <img src="/assets/images/logo.jpg" alt="">
+                            <span class="brand-title">Synkrone</span><span class="brand-tld">.app</span>
+                            ${internalNavHtml()}
+                        </button>
                     </div>
                     <div class="header-bottom">
                         <div class="header-user">
@@ -912,10 +549,11 @@
                 
                 header.innerHTML = `
                     <div class="header-top">
-                        <div class="header-brand">
-                            <img src="/assets/images/logo.jpg" alt="Logo">
-                            <span class="brand-title">Synkrone.app</span>
-                        </div>
+                        <button type="button" class="header-brand" onclick="navigateToMainSection('accueil', { updateUrl: true })" aria-label="Synkrone accueil">
+                            <img src="/assets/images/logo.jpg" alt="">
+                            <span class="brand-title">Synkrone</span><span class="brand-tld">.app</span>
+                            ${internalNavHtml()}
+                        </button>
                     </div>
                     <div class="header-bottom">
                         <div class="header-user">

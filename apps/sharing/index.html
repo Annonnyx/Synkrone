@@ -8,172 +8,138 @@
     <!-- JSZip pour le téléchargement du dossier complet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* --- Base et Compacité --- */
         html, body {
             width: 100%; height: 100%; margin: 0; padding: 0;
-            background-color: #121415; color: #d1d5db;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; font-size: 11px; display: flex; flex-direction: column;
+            overflow: hidden; font-size: 13px; display: flex; flex-direction: column;
         }
-
-        /* --- Motif Mosaïque avec Fallback --- */
         body::before {
-            content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            z-index: -1; background-color: #121415;
-            background-image: url('logo.jpg');
-            background-size: 60px 60px; background-repeat: repeat;
-            transform: rotate(45deg); opacity: 0.08; pointer-events: none;
+            content: ""; position: fixed; inset: 0; z-index: -1;
+            background-image: url('logo.jpg'); background-size: 72px 72px; background-repeat: repeat;
+            transform: rotate(45deg); opacity: 0.025; pointer-events: none;
             width: 200vw; height: 200vh; left: -50vw; top: -50vh;
-            filter: sepia(0.5) saturate(3) hue-rotate(-10deg) brightness(0.6);
+            filter: grayscale(0.6) brightness(0.5);
         }
-
-        /* --- En-tête & Pied de page --- */
         header, footer {
-            background: rgba(18, 20, 21, 0.95); padding: 8px 16px;
+            background: var(--sk-bg-elevated); padding: 0 16px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #2a2e33; width: 100%; box-sizing: border-box;
+            border-bottom: 1px solid var(--sk-border); width: 100%;
+            min-height: 48px;
         }
-        footer { border-bottom: none; border-top: 1px solid #2a2e33; color: #888; font-size: 10px; }
-
-        /* --- Navigation par Onglets --- */
+        footer { border-bottom: none; border-top: 1px solid var(--sk-border); color: var(--sk-text-faint); font-size: 12px; min-height: 32px; }
         .tabs {
-            display: flex; gap: 4px; background: rgba(20, 22, 24, 0.6);
-            padding: 4px 16px 0 16px; border-bottom: 1px solid #2a2e33;
+            display: flex; gap: 2px; background: var(--sk-bg);
+            padding: 0 12px; border-bottom: 1px solid var(--sk-border); min-height: 40px;
         }
         .tab-btn {
-            background: transparent; color: #888; border: none; padding: 6px 14px;
-            cursor: pointer; font-size: 11px; font-weight: 600; text-transform: uppercase;
-            border-bottom: 2px solid transparent; transition: 0.2s;
+            background: transparent; color: var(--sk-text-muted); border: none; padding: 0 14px;
+            min-height: 40px; cursor: pointer; font-size: 13px; font-weight: 600;
+            border-bottom: 2px solid transparent;
         }
-        .tab-btn.active { color: #f87171; border-bottom: 2px solid #f87171; background: rgba(255,255,255,0.02); }
-
-        /* --- Corps Principal --- */
-        main { flex: 1; display: flex; padding: 12px 16px; gap: 15px; overflow: hidden; position: relative; }
-        .tab-content { display: none; flex: 1; gap: 15px; height: 100%; }
+        .tab-btn.active { color: #fff; border-bottom-color: var(--sk-accent); background: var(--sk-accent-soft); }
+        main { flex: 1; display: flex; padding: 12px 16px; gap: 12px; overflow: hidden; }
+        .tab-content { display: none; flex: 1; gap: 12px; height: 100%; }
         .tab-content.active { display: flex; }
-
-        /* --- Panneaux & UI --- */
         .panel {
-            background: rgba(24, 27, 30, 0.85); border: 1px solid #2a2e33;
-            border-radius: 6px; padding: 14px; flex: 1; display: flex;
-            flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
+            background: var(--sk-surface); border: 1px solid var(--sk-border);
+            border-radius: var(--sk-radius-lg); padding: 14px; flex: 1; display: flex;
+            flex-direction: column;
         }
         .panel-title {
-            color: #fff; margin: 0 0 10px 0; font-size: 12px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            border-bottom: 1px solid #2a2e33; padding-bottom: 6px;
-            display: flex; justify-content: space-between; align-items: center;
+            color: #fff; margin: 0 0 10px 0; font-size: 12px; font-weight: 700;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            border-bottom: 1px solid var(--sk-border); padding-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center; gap: 8px;
         }
         .code-block {
-            background: #0d0f11; border: 1px solid #23272c; border-radius: 4px;
-            padding: 10px; color: #34d399; font-family: 'Consolas', monospace;
-            font-size: 11px; user-select: all; margin: 6px 0; white-space: pre-wrap;
-            line-height: 1.4;
+            background: var(--sk-bg); border: 1px solid var(--sk-border); border-radius: var(--sk-radius);
+            padding: 10px; color: var(--sk-success); font-family: var(--sk-mono);
+            font-size: 12px; user-select: all; margin: 6px 0; white-space: pre-wrap; line-height: 1.45;
         }
-        .btn {
-            background: #ef4444; color: #fff; border: none; padding: 6px 14px;
-            font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 4px;
-            text-transform: uppercase; transition: background 0.2s; display: inline-flex;
-            align-items: center; gap: 5px;
-        }
-        .btn:hover { background: #dc2626; }
-
-        /* --- Explorateur Style VS Code --- */
         .explorer-container {
-            background: #0d0f11; border: 1px solid #23272c; border-radius: 4px;
-            flex: 1; overflow-y: auto; padding: 6px; font-family: 'Consolas', monospace;
+            background: var(--sk-bg); border: 1px solid var(--sk-border); border-radius: var(--sk-radius);
+            flex: 1; overflow-y: auto; padding: 6px; font-family: var(--sk-mono);
         }
         .tree-node { margin: 2px 0; }
         .tree-item {
-            display: flex; align-items: center; padding: 4px 8px; cursor: pointer;
-            border-radius: 3px; color: #d1d5db; gap: 6px; user-select: none;
+            display: flex; align-items: center; padding: 6px 8px; cursor: pointer;
+            border-radius: var(--sk-radius); color: var(--sk-text); gap: 6px; user-select: none; min-height: 32px;
         }
-        .tree-item:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
+        .tree-item:hover { background: var(--sk-surface-hover); color: #fff; }
         .tree-children { padding-left: 15px; display: none; }
         .tree-children.open { display: block; }
-        
-        /* Icônes spécifiques par extension */
-        .icon-dir { color: #dcb67a; font-weight: bold; }
-        .icon-py { color: #3b82f6; }
-        .icon-js { color: #facc15; }
-        .icon-env { color: #f59e0b; }
-        .icon-txt { color: #9ca3af; }
-        .icon-json { color: #eab308; }
+        .icon-dir { color: var(--sk-gold); font-weight: bold; }
+        .icon-py { color: var(--sk-info); }
+        .icon-js { color: var(--sk-warning); }
+        .icon-env { color: var(--sk-warning); }
+        .icon-txt { color: var(--sk-text-muted); }
+        .icon-json { color: var(--sk-gold); }
         .icon-img { color: #ec4899; }
-        .icon-default { color: #6b7280; }
-
-        /* --- Overlay d'Authentification --- */
+        .icon-default { color: var(--sk-text-faint); }
         #auth-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(18, 20, 21, 0.95); backdrop-filter: blur(6px);
-            z-index: 2000; display: flex; justify-content: center; align-items: center;
+            position: fixed; inset: 0;
+            background: rgba(8, 10, 12, 0.88); backdrop-filter: blur(8px);
+            z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 16px;
         }
-        .auth-box {
-            background: #181b1e; border: 1px solid #2a2e33; padding: 25px;
-            border-radius: 6px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            width: 280px;
-        }
+        .auth-box { width: min(100%, 340px); padding: 24px; text-align: center; }
         .auth-box input {
-            background: #0d0f11; border: 1px solid #333; color: #fff;
-            padding: 8px; text-align: center; letter-spacing: 4px; font-family: monospace;
-            border-radius: 4px; width: 100%; box-sizing: border-box; margin: 12px 0; outline: none;
+            text-align: center; letter-spacing: 4px; font-family: var(--sk-mono);
+            margin: 12px 0; min-height: 40px;
         }
-
-        /* --- Modal de Code --- */
         #code-modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px);
+            position: fixed; inset: 0;
+            background: rgba(8, 10, 12, 0.8); backdrop-filter: blur(6px);
             z-index: 1000; display: none; justify-content: center; align-items: center;
-            padding: 30px;
+            padding: 24px;
         }
         .modal-box {
-            background: #181b1e; border: 1px solid #333; border-radius: 6px;
             width: 100%; max-width: 750px; height: 80%; display: flex;
-            flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            flex-direction: column;
         }
         .modal-header {
-            background: #1e2227; padding: 10px 15px; display: flex;
+            background: var(--sk-surface-2); padding: 10px 15px; display: flex;
             justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #2a2e33; border-radius: 6px 6px 0 0;
+            border-bottom: 1px solid var(--sk-border);
         }
         .modal-body {
-            flex: 1; padding: 15px; overflow: auto; background: #0d0f11;
-            color: #e5e7eb; font-family: 'Consolas', monospace; font-size: 12px;
+            flex: 1; padding: 15px; overflow: auto; background: var(--sk-bg);
+            color: var(--sk-text); font-family: var(--sk-mono); font-size: 12px;
             white-space: pre-wrap; line-height: 1.5; margin: 0;
         }
-        .close-btn { background: transparent; border: none; color: #aaa; font-size: 16px; cursor: pointer; }
+        .close-btn { background: transparent; border: none; color: var(--sk-text-muted); font-size: 16px; cursor: pointer; min-height: 36px; min-width: 36px; }
         .close-btn:hover { color: #fff; }
-
-        /* Scrollbars fines */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #444; }
+        @media (max-width: 720px) {
+            .tab-content.active { flex-direction: column; }
+            header { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 8px; }
+        }
     </style>
+    <link rel="stylesheet" href="/design/synkrone.css">
 </head>
 <body>
 
     <!-- Écran de Sécurité -->
     <div id="auth-overlay">
         <div class="auth-box">
-            <h3 style="margin: 0 0 5px 0; color: #fff; letter-spacing: 1px;">SYNKRONE SHARING</h3>
-            <p style="color: #888; font-size: 10px; margin-bottom: 15px;">Entrez le mot de passe du serveur</p>
+            <h3 class="sk-title" style="font-size:16px;">Synkrone Sharing</h3>
+            <p class="sk-meta">Entrez le mot de passe du serveur</p>
+            <label class="sk-label" for="pass-input" style="text-align:left;margin-top:12px;">Mot de passe</label>
             <input type="password" id="pass-input" placeholder="••••" maxlength="6" autocomplete="off">
-            <button class="btn" style="width: 100%; justify-content: center;" onclick="verifyAuth()">Valider</button>
-            <div id="auth-err" style="color: #f87171; font-size: 10px; margin-top: 10px; display: none;">Accès refusé</div>
+            <button class="btn sk-btn-primary" style="width: 100%; justify-content: center;" onclick="verifyAuth()">Valider</button>
+            <div id="auth-err" class="sk-error" style="margin-top: 10px; display: none;">Accès refusé</div>
         </div>
     </div>
 
     <header>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <img src="logo.jpg" alt="Logo" style="width: 20px; height: 20px; border-radius: 3px; object-fit: cover;">
-            <strong style="color: #f87171; letter-spacing: 0.5px;">Synkrone Sharing</strong>
+        <div class="sk-brand">
+            <img src="logo.jpg" alt="Logo">
+            <strong>sharing.Synkrone.app</strong>
         </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="/hub" style="color:#9ca3af; text-decoration:none; font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">Hub</a>
-            <a href="/ui/" style="color:#9ca3af; text-decoration:none; font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">ui</a>
-            <span style="font-size: 10px; color: #9ca3af;" id="status-text">Statut : En attente</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <nav class="sk-app-nav" aria-label="Applications">
+                <a href="/">Site</a>
+                <a href="/hub">Hub</a>
+                <a href="/ui/">ui</a>
+            </nav>
+            <span class="sk-meta" id="status-text">Statut : En attente</span>
         </div>
     </header>
 
@@ -204,7 +170,7 @@ python main.py</div>
             <div class="panel" style="flex: 2;">
                 <h3 class="panel-title">
                     <span>Catalogue templates/discord</span>
-                    <button class="btn" onclick="downloadFolderZip()">Télécharger le dossier (.ZIP)</button>
+                    <button class="btn sk-btn-primary" onclick="downloadFolderZip()">Télécharger le dossier (.ZIP)</button>
                 </h3>
                 <div class="explorer-container" id="file-tree-view">
                     <div style="color: #6b7280; padding: 10px; text-align: center;">Chargement de l'arborescence...</div>

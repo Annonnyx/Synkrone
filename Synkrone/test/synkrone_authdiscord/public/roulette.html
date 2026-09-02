@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roulette Synkrone</title>
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+        <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            50: '#f4f5f7', 100: '#e8eaed', 200: '#c5cad1', 300: '#9aa3ae',
+                            400: '#9aa3ae', 500: '#6b7380', 600: '#3d4450', 700: '#2a3139',
+                            800: '#22272e', 900: '#171a1e', 950: '#0f1114'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/assets/mosaique.css">
     <script src="/assets/mosaique.js" defer></script>
@@ -114,7 +130,7 @@
             height: 0;
             border-left: 20px solid transparent;
             border-right: 20px solid transparent;
-            border-top: 35px solid #e14f4f;
+            border-top: 35px solid #ff0013;
             z-index: 10;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
         }
@@ -246,6 +262,7 @@
         }
         .toast.show { transform: translateY(0); opacity: 1; }
     </style>
+    <link rel="stylesheet" href="/design/synkrone.css">
 </head>
 <body class="p-4 mosaic-bg">
     
@@ -704,7 +721,7 @@
                 historyData = Array.isArray(payload?.history) ? payload.history : [];
                 if(rankingData.length > 0) renderHistory();
             } catch (error) {
-                historyPanel.innerHTML = '<div class="p-3 text-center text-[#e14f4f] text-xs col-span-full">Erreur chargement historique.</div>';
+                historyPanel.innerHTML = '<div class="p-3 text-center text-[#ff0013] text-xs col-span-full">Erreur chargement historique.</div>';
             }
         }
 

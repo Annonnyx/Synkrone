@@ -1,7 +1,7 @@
 {
   "name": "synkrone",
   "private": true,
-  "description": "synkrone.app — hub, ui et sharing en un processus local",
+  "description": "synkrone.app — site public + hub/ui/sharing en un processus local",
   "scripts": {
     "start": "node apps/www/server.js",
     "dev": "node apps/www/server.js"

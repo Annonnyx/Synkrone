@@ -1,41 +1,12 @@
-<style>
-    @media (max-width: 768px) {
-        #app-nav {
-            padding: 0 6px;
-            overflow-x: hidden;
-        }
-
-        #app-nav .nav-tabs {
-            width: 100%;
-            gap: 0;
-        }
-
-        #app-nav .nav-tab {
-            flex: 1 1 0;
-            min-width: 0;
-            padding: 0 4px;
-            gap: 4px;
-            font-size: 0.66rem;
-            letter-spacing: 0.2px;
-        }
-
-        #app-nav .nav-tab-icon {
-            width: 14px;
-            height: 14px;
-        }
-
-        #app-nav .nav-tab-emoji {
-            font-size: 0.82rem;
-        }
-    }
-</style>
-
-<nav id="app-nav">
+<button type="button" class="sk-nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="menu-tabs">Menu</button>
+<nav id="app-nav" aria-label="Navigation">
     <div class="nav-tabs" id="menu-tabs">
-        <div class="nav-tab active" data-target="accueil"><img class="nav-tab-icon" src="/assets/images/logo.jpg" alt="Logo Synkrone">Accueil</div>
-        <div class="nav-tab" data-target="discord"><img class="nav-tab-icon" src="/assets/images/discord.png" alt="Discord">Discord</div>
-        <div class="nav-tab" data-target="minecraft"><img class="nav-tab-icon" src="/assets/images/minecraft.png" alt="Minecraft">Minecraft</div>
-        <div class="nav-tab" data-target="admin"><span class="nav-tab-emoji" aria-hidden="true">🛠️</span>Admin</div>
-        <div class="nav-tab" data-target="equipe"><span class="nav-tab-emoji" aria-hidden="true">👥</span>Équipe</div>
+        <button type="button" class="nav-tab active" data-target="accueil">Accueil</button>
+        <button type="button" class="nav-tab" data-target="discord">Bots</button>
+        <button type="button" class="nav-tab" data-target="minecraft">Minecraft</button>
+        <button type="button" class="nav-tab" data-target="bump">Bump</button>
+        <button type="button" class="nav-tab" data-target="me">Me</button>
+        <button type="button" class="nav-tab" data-target="admin">Admin</button>
+        <button type="button" class="nav-tab" data-target="equipe">Équipe</button>
     </div>
 </nav>

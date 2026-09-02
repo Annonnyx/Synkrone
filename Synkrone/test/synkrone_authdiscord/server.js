@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const axios = require('axios');
@@ -13,11 +12,11 @@ const registerMeRoutes = require('./routes/meRoutes');
 const registerPublicbotRoutes = require('./routes/publicbotRoutes');
 const registerBumpRoutes = require('./routes/bumpRoutes');
 
-const app = express();
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
-const PORT = process.env.PORT || 2000;
+const DEFAULT_PORT = 3668;
+const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/design'];
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
 const CONTACT_COOLDOWN_MS = 10 * 60 * 1000;
 const DEFAULT_SUPPORT_GUILD_ID = '1368235294192570520';
@@ -348,15 +347,37 @@ async function syncSessionUserWithDb(sessionUser, options = {}) {
     return sessionUser;
 }
 
-app.use(express.json({ limit: '500mb' }));
-app.use(express.urlencoded({ limit: '500mb', extended: true }));
+function isDiscordOAuthConfigured() {
+    return Boolean(
+        String(process.env.DISCORD_CLIENT_ID || '').trim()
+        && String(process.env.DISCORD_CLIENT_SECRET || '').trim()
+        && String(process.env.DISCORD_REDIRECT_URI || '').trim()
+    );
+}
 
-app.use(express.json({ limit: '300mb' }));
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'synkrone_secret',
-    resave: false, saveUninitialized: false, rolling: true,
-    cookie: { maxAge: SESSION_MAX_AGE_MS, httpOnly: true, sameSite: 'lax' }
-}));
+function isReservedPublicPath(pathname) {
+    const normalized = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+    return RESERVED_PATH_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`));
+}
+
+function mountPublic(app, options = {}) {
+    const skipBodyParser = Boolean(options.skipBodyParser);
+    const skipSession = Boolean(options.skipSession);
+
+    if (!skipBodyParser) {
+        app.use(express.json({ limit: '500mb' }));
+        app.use(express.urlencoded({ limit: '500mb', extended: true }));
+    }
+    if (!skipSession) {
+        app.use(session({
+            secret: process.env.SESSION_SECRET || 'synkrone_secret',
+            resave: false, saveUninitialized: false, rolling: true,
+            cookie: { maxAge: SESSION_MAX_AGE_MS, httpOnly: true, sameSite: 'lax' }
+        }));
+    }
+
+    const designDir = path.join(__dirname, '..', '..', '..', 'apps', 'www', 'design');
+    app.use('/design', express.static(designDir));
 
 async function getBotOwnerIds() {
     const token = String(process.env.DISCORD_BOT_TOKEN || '').trim();
@@ -404,11 +425,13 @@ async function resolveAdminAccessForSessionUser(user) {
 }
 
 app.get('/auth/discord', (req, res) => {
+    if (!isDiscordOAuthConfigured()) return res.redirect('/');
     const discordUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify`;
     res.redirect(discordUrl);
 });
 
 app.get('/auth/discord/callback', async (req, res) => {
+    if (!isDiscordOAuthConfigured()) return res.redirect('/');
     const code = req.query.code;
     if (!code) return res.redirect('/');
     try {
@@ -441,13 +464,13 @@ app.get('/auth/guest', (req, res) => {
 });
 
 app.get('/api/me', async (req, res) => {
-    if (!req.session.user) return res.json({ authenticated: false });
+    if (!req.session.user) return res.json({ authenticated: false, oauthConfigured: isDiscordOAuthConfigured() });
     await resolveAdminAccessForSessionUser(req.session.user);
     const syncedUser = await syncSessionUserWithDb(req.session.user);
     
     const db = await readUsersDb();
     const fullUser = db.users[syncedUser.id];
-    return res.json({ authenticated: true, user: fullUser || syncedUser });
+    return res.json({ authenticated: true, oauthConfigured: isDiscordOAuthConfigured(), user: fullUser || syncedUser });
 });
 
 app.post('/api/me/profile', async (req, res) => {
@@ -861,6 +884,7 @@ app.get(/^\/(.*)$/i, async (req, res, next) => {
     if (normalizedPath.length > 1 && normalizedPath.endsWith('/')) {
         normalizedPath = normalizedPath.slice(0, -1);
     }
+    if (isReservedPublicPath(normalizedPath)) return next();
     if (normalizedPath.endsWith('.html') && !SHELL_ROUTES.has(normalizedPath)) {
         return next();
     }
@@ -874,5 +898,20 @@ app.get(/^\/(.*)$/i, async (req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.get(/^(.*)$/, (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.listen(PORT, () => console.log(`[Synkrone.app] Serveur actif sur le port ${PORT}`));
+app.get(/^(.*)$/, (req, res, next) => {
+    if (isReservedPublicPath(req.path)) return next();
+    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+}
+
+module.exports = { mountPublic, isDiscordOAuthConfigured };
+
+if (require.main === module) {
+    require('dotenv').config();
+    const standalone = express();
+    mountPublic(standalone);
+    const port = Number(process.env.PORT || DEFAULT_PORT);
+    standalone.listen(port, '127.0.0.1', () => {
+        console.log(`[Synkrone.app] Site public http://127.0.0.1:${port}/`);
+    });
+}

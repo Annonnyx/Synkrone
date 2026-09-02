@@ -12,9 +12,9 @@
                 extend: {
                     colors: {
                         brand: {
-                            bg: '#121315',
+                            bg: '#0f1114',
                             surface: 'rgba(30, 32, 34, 0.78)',
-                            accentRed: '#e14f4f',
+                            accentRed: '#ff0013',
                             accentBlue: '#6d8cff',
                             success: '#3ba55c',
                             warning: '#faa61a',
@@ -23,7 +23,7 @@
                             tier1: '#a3a3a3', // Standard
                             tier2: '#3ba55c', // Soutien
                             tier3: '#faa61a', // VIP
-                            tier4: '#e14f4f'  // Premium
+                            tier4: '#ff0013'  // Premium
                         }
                     },
                     fontFamily: {
@@ -41,7 +41,7 @@
             background: 
                 radial-gradient(circle at 15% 0%, rgba(109, 140, 255, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 85% 100%, rgba(225, 79, 79, 0.05) 0%, transparent 50%),
-                #121315;
+                #0f1114;
             scrollbar-width: thin;
             scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
         }
@@ -102,6 +102,7 @@
             bottom: 20px;
         }
     </style>
+    <link rel="stylesheet" href="/design/synkrone.css">
 </head>
 <body class="text-white h-screen flex flex-col md:flex-row overflow-hidden font-sans">
 
@@ -153,7 +154,7 @@
             <div class="flex items-center gap-2 p-2 rounded-lg bg-brand-accentBlue/10 border border-brand-accentBlue/40 cursor-pointer transition-colors hover:bg-brand-accentBlue/20">
                 <div class="relative shrink-0">
                     <img src="https://placehold.co/30x30/1a1c1e/ffffff?text=SB" alt="Bot" class="w-8 h-8 rounded-full border border-brand-border">
-                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-brand-success border-2 border-[#181a1b]"></div>
+                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-brand-success border-2 border-[#0f1114]"></div>
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="font-bold text-xs truncate text-white">Synkrone Bot</div>
@@ -164,7 +165,7 @@
             <div class="flex items-center gap-2 p-2 rounded-lg border border-transparent hover:bg-white/5 cursor-pointer text-gray-400 transition-colors">
                 <div class="relative shrink-0">
                     <img src="https://placehold.co/30x30/1a1c1e/ffffff?text=VM" alt="Bot" class="w-8 h-8 rounded-full border border-brand-border opacity-70">
-                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-500 border-2 border-[#181a1b]"></div>
+                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-500 border-2 border-[#0f1114]"></div>
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="font-bold text-xs truncate">Vex Moderation</div>
@@ -384,7 +385,7 @@
 
     <!-- MODAL: AJOUTER UN BOT -->
     <div id="addBotModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-2xl bg-[#181a1b] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="modal-content w-full max-w-2xl bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
             <div class="p-5 border-b border-brand-border flex justify-between items-center bg-black/20 shrink-0">
                 <h3 class="text-lg font-bold flex items-center gap-2">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
@@ -455,7 +456,7 @@
 
     <!-- MODAL: CHANGER DE PLAN -->
     <div id="changePlanModal" class="modal-overlay fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-4xl bg-[#181a1b] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="modal-content w-full max-w-4xl bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
             <div class="p-5 border-b border-brand-border flex justify-between items-center bg-black/20 shrink-0">
                 <h3 class="text-lg font-bold">Gérer l'abonnement du Bot</h3>
                 <button onclick="closeModal('changePlanModal')" class="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
@@ -498,7 +499,7 @@
 
     <!-- MODAL: BIBLIOTHÈQUE DE MODULES (Format Liste CurseForge) -->
     <div id="moduleManagerModal" class="modal-overlay fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 md:p-4">
-        <div class="modal-content w-full max-w-[1200px] h-[95vh] bg-[#121315] border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div class="modal-content w-full max-w-[1200px] h-[95vh] bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
             
             <div class="p-4 border-b border-brand-border flex flex-wrap justify-between items-center bg-black/20 shrink-0 gap-3">
                 <div class="flex items-center gap-4 w-full sm:w-auto">
@@ -530,7 +531,7 @@
 
     <!-- MODAL VERSIONS DE MODULES -->
     <div id="moduleVersionsModal" class="modal-overlay fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-4xl bg-[#181a1b] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[85vh]">
+        <div class="modal-content w-full max-w-4xl bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[85vh]">
             <div class="p-4 border-b border-brand-border flex justify-between items-center bg-black/20">
                 <h3 class="text-lg font-bold" id="versionsModalTitle">Versions</h3>
                 <button onclick="closeModal('moduleVersionsModal')" class="text-gray-400 hover:text-white">
@@ -545,7 +546,7 @@
 
     <!-- MODAL DETAILS MODULE -->
     <div id="moduleDetailsModal" class="modal-overlay fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-lg bg-[#181a1b] border border-brand-border rounded-2xl shadow-2xl p-6">
+        <div class="modal-content w-full max-w-lg bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl p-6">
             <h3 class="text-xl font-bold mb-2 text-brand-accentBlue" id="detailModalTitle">Titre Module</h3>
             <p class="text-xs text-gray-400 mb-4 font-mono" id="detailModalMeta">Par Dev • v1.0 • Slash</p>
             <div class="bg-black/50 p-4 rounded-xl text-sm text-gray-300 border border-brand-border/50 mb-6" id="detailModalDesc">
@@ -559,7 +560,7 @@
 
     <!-- MODAL GERER COMMANDES GROUPE -->
     <div id="manageCommandsModal" class="modal-overlay fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-md bg-[#181a1b] border border-brand-border rounded-2xl shadow-2xl p-6">
+        <div class="modal-content w-full max-w-md bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl p-6">
             <h3 class="text-lg font-bold mb-2">Gérer les commandes du groupe</h3>
             <p class="text-xs text-gray-400 mb-4">Désactivez les sous-commandes dont vous n'avez pas besoin.</p>
             
@@ -575,7 +576,7 @@
 
     <!-- MODAL: SOUMETTRE SCRIPT DEV -->
     <div id="devShareModal" class="modal-overlay fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-3xl bg-[#121315] border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[95vh]">
+        <div class="modal-content w-full max-w-3xl bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[95vh]">
             <div class="p-5 border-b border-brand-border flex justify-between items-center bg-black/20">
                 <h3 class="text-lg md:text-xl font-bold flex items-center gap-2">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-accentBlue"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
@@ -648,7 +649,7 @@
 
     <!-- MODAL CONFIRMATION SUPPRESSION MODULE -->
     <div id="confirmDeleteModal" class="modal-overlay fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-sm bg-[#181a1b] border border-brand-accentRed/30 rounded-2xl shadow-2xl p-6 text-center">
+        <div class="modal-content w-full max-w-sm bg-[#0f1114] border border-brand-accentRed/30 rounded-2xl shadow-2xl p-6 text-center">
             <div class="w-16 h-16 bg-brand-accentRed/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-accentRed/30">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-accentRed"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </div>
@@ -663,7 +664,7 @@
 
     <!-- MODAL ACHAT POINTS MODULES -->
     <div id="buyPointsModal" class="modal-overlay fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-sm bg-[#181a1b] border border-brand-border rounded-2xl shadow-2xl p-6 text-center">
+        <div class="modal-content w-full max-w-sm bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl p-6 text-center">
             <h3 class="text-lg font-bold mb-2">Étendre les limites de Modules</h3>
             <p class="text-sm text-gray-400 mb-6">Achetez 10 points de modules supplémentaires universels pour 40 ₭. Utilisables sur n'importe quel bot.</p>
             <button onclick="simulateAction('Points de modules achetés !'); closeModal('buyPointsModal')" class="w-full px-4 py-2.5 rounded-xl text-sm font-bold bg-brand-accentBlue text-white hover:bg-blue-600 shadow-[0_0_15px_rgba(109,140,255,0.3)]">
@@ -754,7 +755,7 @@
             <div class="flex items-center gap-2 p-2 rounded-lg border border-transparent hover:bg-white/5 cursor-pointer text-gray-400 transition-colors">
                 <div class="relative shrink-0">
                     <img src="https://placehold.co/30x30/1a1c1e/ffffff?text=NB" alt="Bot" class="w-8 h-8 rounded-full border border-brand-border opacity-70">
-                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-500 border-2 border-[#181a1b]"></div>
+                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-500 border-2 border-[#0f1114]"></div>
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="font-bold text-xs truncate">Nouveau Bot Dev</div>
@@ -891,7 +892,7 @@
                 : `<button onclick="handleModuleAction(this, ${m.price})" class="px-4 py-1.5 rounded-lg text-xs font-bold ${m.price > 0 ? 'bg-white/5 border border-brand-border hover:bg-white/10' : 'bg-brand-accentBlue/10 text-brand-accentBlue border border-brand-accentBlue/30 hover:bg-brand-accentBlue/20'} transition-colors">${m.price > 0 ? 'Acheter' : 'Ajouter'}</button>`;
             
             return `
-                <div class="bg-[#181a1b] border border-brand-border rounded-xl p-3 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between hover:bg-white/[0.02] transition-colors group">
+                <div class="bg-[#0f1114] border border-brand-border rounded-xl p-3 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between hover:bg-white/[0.02] transition-colors group">
                     <div class="flex items-center gap-4 w-full md:w-auto">
                         <div class="w-12 h-12 rounded-xl bg-black/50 border border-brand-border flex items-center justify-center shrink-0">
                             <span class="font-bold text-gray-500 text-sm">${m.name.substring(0,2).toUpperCase()}</span>

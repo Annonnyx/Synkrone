@@ -1,334 +1,338 @@
 <!DOCTYPE html>
-<html lang="fr" class="h-full">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone.app | Hub</title>
-    <link id="dynamicFavicon" rel="icon" type="image/png" href="logo/Synk_FF0013.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="/logo/Synk_FF0013.png">
+    <link rel="stylesheet" href="/design/synkrone.css">
     <style>
-        ::-webkit-scrollbar { display: none; }
-        body { background-color: #141719; color: #e5e7eb; overflow-x: hidden; width: 100vw; min-height: 100vh; box-sizing: border-box; margin: 0; }
-        .bg-mosaic {
-            position: fixed; inset: -50vw; z-index: -1; width: 200vw; height: 200vw;
-            background-size: 60px; opacity: 0.12;
-            transform: rotate(45deg);
-            transition: background-image 1s ease-in-out;
-            filter: drop-shadow(0 0 3px rgba(255,255,255,0.5)) brightness(1.3);
+        html, body { min-height: 100%; }
+        body { padding: 20px 16px 32px; }
+        .hub {
+            max-width: 980px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
-        .theme-transition { transition: color 1s ease, border-color 1s ease, background-color 1s ease, background 1s ease; }
-        
-        /* Conteneur infrastructure en thème beige */
-        .glass-beige {
-            background: rgba(245, 240, 232, 0.05);
-            border: 1px solid rgba(245, 240, 232, 0.12);
-            backdrop-filter: blur(10px);
+        .hub-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
         }
-
-        .logo-container {
-            position: relative;
-            width: 44px;
-            height: 44px;
+        .hub-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .logo-container img {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: opacity 1s ease-in-out;
+        .hub-brand img { width: 32px; height: 32px; object-fit: contain; }
+        .hub-brand h1 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: -0.03em;
+        }
+        .hub-brand h1 span { color: var(--sk-text-muted); font-weight: 500; }
+        .hub-clock {
+            text-align: right;
+            font-family: var(--sk-mono);
+        }
+        #clock { font-size: 14px; color: var(--sk-text); }
+        #date { font-size: 11px; color: var(--sk-text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+        .hub-search-head, .fav-head, .infra-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .hub-kicker {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sk-text-muted);
+        }
+        .engine-switch {
+            display: flex;
+            gap: 2px;
+            padding: 2px;
+            background: var(--sk-bg);
+            border: 1px solid var(--sk-border);
+            border-radius: var(--sk-radius);
+        }
+        .engine-switch button {
+            min-height: 32px;
+            padding: 0 10px;
+            border: 0;
+            background: transparent;
+            color: var(--sk-text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .engine-switch button.is-on {
+            background: var(--sk-accent);
+            color: #fff;
+        }
+        #searchForm { display: flex; gap: 8px; }
+        #query { flex: 1; min-height: 40px; }
+        .fav-groups { display: grid; gap: 10px; }
+        .fav-group {
+            display: grid;
+            grid-template-columns: 88px 1fr;
+            gap: 8px;
+            align-items: start;
+        }
+        .fav-group b {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--sk-text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding-top: 8px;
+        }
+        .fav-links { display: flex; flex-wrap: wrap; gap: 6px; }
+        .fav-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--sk-border);
+            border-radius: var(--sk-radius);
+            background: var(--sk-bg);
+            color: var(--sk-text);
+            text-decoration: none;
+            font-size: 12px;
+        }
+        .fav-links a:hover { border-color: var(--sk-border-strong); background: var(--sk-surface-hover); }
+        .fav-links img { width: 16px; height: 16px; object-fit: contain; border-radius: 3px; }
+        #infrastructureGrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+        }
+        .infra-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            min-height: 44px;
+            padding: 8px 10px;
+            border: 1px solid var(--sk-border);
+            border-radius: var(--sk-radius);
+            background: var(--sk-bg);
+            text-decoration: none;
+            color: var(--sk-text);
+        }
+        .infra-link:hover { border-color: var(--sk-border-strong); background: var(--sk-surface-hover); }
+        .infra-link.is-off { opacity: 0.55; cursor: pointer; }
+        .infra-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .infra-left img { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+        .infra-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .infra-badge {
+            font-family: var(--sk-mono);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        #toastModal {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translate(-50%, -12px);
+            z-index: 50;
             opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
-        .logo-container img.active {
+        #toastModal.show {
             opacity: 1;
+            transform: translate(-50%, 0);
         }
-
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-4px); }
-            40%, 80% { transform: translateX(4px); }
+            20%, 60% { transform: translateX(-3px); }
+            40%, 80% { transform: translateX(3px); }
         }
         .shake { animation: shake 0.3s ease-in-out; }
+        @media (max-width: 720px) {
+            .hub-header { flex-wrap: wrap; }
+            .fav-group { grid-template-columns: 1fr; }
+            #infrastructureGrid { grid-template-columns: 1fr; }
+            .sk-app-nav { flex-wrap: wrap; }
+        }
     </style>
 </head>
-<body class="h-full p-4 md:p-8 flex flex-col items-center justify-center relative">
-    <div id="mosaic" class="bg-mosaic"></div>
+<body>
+    <div id="toastModal" class="sk-toast" role="status">Ce service n'est pas encore disponible pour le moment.</div>
 
-    <!-- Notification Modal / Toast pour services indisponibles -->
-    <div id="toastModal" class="fixed top-8 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-        <div class="glass px-5 py-3 rounded-xl border border-red-500/30 bg-black/80 shadow-2xl flex items-center gap-3">
-            <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
-            <span class="text-xs font-medium text-gray-200">Ce service n'est pas encore disponible pour le moment.</span>
-        </div>
-    </div>
-
-    <div class="w-full max-w-5xl space-y-4">
-        <header class="flex justify-between items-center mb-2">
-            <div class="flex items-center gap-3.5">
-                <div class="logo-container" id="logoContainer"></div>
-                <h1 class="text-2xl font-bold tracking-tighter theme-transition" id="brandTitle">Synkrone<span class="text-white font-light">.app</span></h1>
-                <nav class="flex items-center gap-1 ml-2">
-                    <a href="/hub" class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-white/10">Hub</a>
-                    <a href="/ui/" class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider opacity-70 hover:opacity-100 hover:bg-white/10">ui</a>
-                    <a href="/sharing/" class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider opacity-70 hover:opacity-100 hover:bg-white/10">sharing</a>
-                </nav>
+    <div class="hub">
+        <header class="hub-header">
+            <div class="hub-brand">
+                <img src="/logo/Synk_FF0013.png" alt="Synkrone">
+                <div>
+                    <h1>Synkrone<span>.app</span></h1>
+                    <p class="sk-meta">Console interne</p>
+                </div>
             </div>
-            <div class="text-right">
-                <div id="clock" class="text-sm font-mono opacity-80"></div>
-                <div id="date" class="text-[10px] font-mono uppercase opacity-40 tracking-wider"></div>
+            <nav class="sk-app-nav" aria-label="Applications">
+                <a href="/">Site</a>
+                <a href="/hub" class="is-active">Hub</a>
+                <a href="/ui/">ui</a>
+                <a href="/sharing/">sharing</a>
+                <a href="/vux/">vux</a>
+            </nav>
+            <div class="hub-clock">
+                <div id="clock"></div>
+                <div id="date"></div>
             </div>
         </header>
 
-        <section class="glass p-4 rounded-2xl shadow-2xl space-y-2.5">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <img src="https://yt3.googleusercontent.com/bAseQlKvNmjdLQrvYWm_q3QDp8C8YKyYI-nYJewgOkPi0JU1_3X9oFgjrEdzkOlXzLGFxFbnsw=s900-c-k-c0x00ffffff-no-rj" alt="Google" class="w-4 h-4 object-contain">
-                    <span class="text-[10px] uppercase font-bold tracking-widest opacity-60">Recherche</span>
-                </div>
-                <div class="flex bg-black/40 p-1 rounded-xl border border-white/5 gap-1">
-                    <button type="button" onclick="setEngineMode('web')" id="btnWeb" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all text-white shadow-sm">Simple</button>
-                    <button type="button" onclick="setEngineMode('image')" id="btnImage" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all opacity-50 hover:opacity-100">Images</button>
+        <section class="sk-card" style="padding: 14px;">
+            <div class="hub-search-head">
+                <span class="hub-kicker">Recherche</span>
+                <div class="engine-switch">
+                    <button type="button" id="btnWeb" class="is-on" onclick="setEngineMode('web')">Simple</button>
+                    <button type="button" id="btnImage" onclick="setEngineMode('image')">Images</button>
                 </div>
             </div>
-
-            <form id="searchForm" class="flex items-center gap-2 pt-1" onsubmit="handleSearch(event)">
-                <input type="text" id="query" placeholder="Rechercher sur Google..." class="flex-grow bg-transparent outline-none text-sm placeholder:opacity-30">
-                <button type="submit"><i class="fa-solid fa-magnifying-glass opacity-50 theme-transition hover-icon" id="searchIcon"></i></button>
+            <form id="searchForm" onsubmit="handleSearch(event)">
+                <input type="text" id="query" placeholder="Rechercher sur Google…">
+                <button type="submit" class="sk-btn-primary">Rechercher</button>
             </form>
         </section>
 
-        <!-- Barre horizontale des favoris (rangés par thèmes) -->
-        <section class="glass px-4 py-3 rounded-xl flex items-center justify-between gap-4 overflow-x-auto">
-            <span class="text-[9px] uppercase tracking-widest opacity-40 font-bold shrink-0">Favoris</span>
-            <div class="flex items-center gap-6 md:gap-8">
-                <!-- Thème Google -->
-                <a href="https://gemini.google.com/app" target="_blank" title="Gemini" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Google_Gemini_icon_2025.svg/500px-Google_Gemini_icon_2025.svg.png" alt="Gemini" class="w-5 h-5 object-contain rounded">
-                </a>
-                <a href="https://gmail.com" target="_blank" title="Gmail" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgxyJcKCFf08MBodXkOpG_wBv1MZCQk3VTGCFpI8Hy6w&s" alt="Gmail" class="w-5 h-5 object-contain rounded">
-                </a>
-                <a href="https://drive.google.com" target="_blank" title="Google Drive" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdtgUSpfqaiq5OVwiuBSCQwpbpdO7kY107W3QQ_aNQkw&s=10" alt="Google Drive" class="w-5 h-5 object-contain">
-                </a>
-                <a href="https://translate.google.com" target="_blank" title="Google Traduction" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9GWaIWwtZINigwMUSrwILvANebKJIUSkwTVlxb0NO4w&s" alt="Google Traduction" class="w-5 h-5 object-contain">
-                </a>
-
-                <div class="w-[1px] h-4 bg-white/10 shrink-0"></div>
-
-                <!-- Thème Streaming / Vidéo -->
-                <a href="https://youtube.com" target="_blank" title="YouTube" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1280px-YouTube_full-color_icon_%282017%29.svg.png" alt="YouTube" class="w-5 h-5 object-contain">
-                </a>
-                <a href="https://twitch.tv" target="_blank" title="Twitch" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvIR0c6TlmdcMIFdx7olX3YOpSiD5nsZg2LOumXTvsig&s=10" alt="Twitch" class="w-5 h-5 object-contain rounded">
-                </a>
-                <a href="https://netflix.com" target="_blank" title="Netflix" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ91gke83AgsjipPMZmrsDP0-K7oWgm4ZCkxZNh9Exo3Q&s=10" alt="Netflix" class="w-5 h-5 object-contain rounded">
-                </a>
-                <a href="https://primevideo.com" target="_blank" title="Prime Video" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSowpcXA4JAMw0PPpQPQox389iRicV_rOTiiOa0q4_D3A&s=10" alt="Prime Video" class="w-5 h-5 object-contain rounded">
-                </a>
-                <a href="https://disneyplus.com" target="_blank" title="Disney+" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://static.vecteezy.com/system/resources/previews/073/495/217/non_2x/disney-plus-logo-circular-glossy-icon-with-transparent-background-free-png.png" alt="Disney+" class="w-5 h-5 object-contain rounded">
-                </a>
-
-                <div class="w-[1px] h-4 bg-white/10 shrink-0"></div>
-
-                <!-- Thème Dev / Outils & Gaming -->
-                <a href="https://github.com" target="_blank" title="GitHub" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQblkhBDCixhdGaP_B21didlIi1nkX4waw9wkGBKIevXg&s" alt="GitHub" class="w-5 h-5 object-contain rounded">
-                </a>
-                <a href="https://discord.com/developers/applications" target="_blank" title="Discord Developer Portal" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://media.licdn.com/dms/image/v2/D560BAQEj5DryL5O_7g/company-logo_200_200/B56Zi.iuHcHkAI-/0/1755543429939/discord_developers_logo?e=2147483647&v=beta&t=mDfN874nMC5IC2_pq1VXhbbj2YHEr3OB1ruQK7h1nG4" alt="Discord Dev" class="w-5 h-5 object-contain rounded">
-                </a>
-                <a href="https://curseforge.com" target="_blank" title="CurseForge" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://cdn.apexminecrafthosting.com/img/uploads/2021/05/21163117/curseforge-logo.png" alt="CurseForge" class="w-5 h-5 object-contain">
-                </a>
-                <a href="https://top.gg" target="_blank" title="Top.gg" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZcGCxK-2YqDB5FF5FG7qCiVnkqPyfh_-IRpQHxKMD8g&s" alt="Top.gg" class="w-5 h-5 object-contain">
-                </a>
-                <a href="https://trello.com" target="_blank" title="Trello" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2504/2504834.png" alt="Trello" class="w-5 h-5 object-contain">
-                </a>
-                <a href="https://amazon.fr" target="_blank" title="Amazon" class="hover:opacity-100 opacity-70 transition-opacity flex items-center">
-                    <img src="https://images.icon-icons.com/2429/PNG/512/amazon_logo_icon_147320.png" alt="Amazon" class="w-5 h-5 object-contain">
-                </a>
+        <section class="sk-card" style="padding: 14px;">
+            <div class="fav-head"><span class="hub-kicker">Favoris</span></div>
+            <div class="fav-groups">
+                <div class="fav-group">
+                    <b>Google</b>
+                    <div class="fav-links">
+                        <a href="https://gemini.google.com/app" target="_blank" rel="noopener"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Google_Gemini_icon_2025.svg/500px-Google_Gemini_icon_2025.svg.png" alt="">Gemini</a>
+                        <a href="https://gmail.com" target="_blank" rel="noopener"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgxyJcKCFf08MBodXkOpG_wBv1MZCQk3VTGCFpI8Hy6w&s" alt="">Gmail</a>
+                        <a href="https://drive.google.com" target="_blank" rel="noopener"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdtgUSpfqaiq5OVwiuBSCQwpbpdO7kY107W3QQ_aNQkw&s=10" alt="">Drive</a>
+                        <a href="https://translate.google.com" target="_blank" rel="noopener"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9GWaIWwtZINigwMUSrwILvANebKJIUSkwTVlxb0NO4w&s" alt="">Traduction</a>
+                    </div>
+                </div>
+                <div class="fav-group">
+                    <b>Streaming</b>
+                    <div class="fav-links">
+                        <a href="https://youtube.com" target="_blank" rel="noopener"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1280px-YouTube_full-color_icon_%282017%29.svg.png" alt="">YouTube</a>
+                        <a href="https://twitch.tv" target="_blank" rel="noopener"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvIR0c6TlmdcMIFdx7olX3YOpSiD5nsZg2LOumXTvsig&s=10" alt="">Twitch</a>
+                        <a href="https://netflix.com" target="_blank" rel="noopener"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ91gke83AgsjipPMZmrsDP0-K7oWgm4ZCkxZNh9Exo3Q&s=10" alt="">Netflix</a>
+                        <a href="https://primevideo.com" target="_blank" rel="noopener"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSowpcXA4JAMw0PPpQPQox389iRicV_rOTiiOa0q4_D3A&s=10" alt="">Prime Video</a>
+                        <a href="https://disneyplus.com" target="_blank" rel="noopener"><img src="https://static.vecteezy.com/system/resources/previews/073/495/217/non_2x/disney-plus-logo-circular-glossy-icon-with-transparent-background-free-png.png" alt="">Disney+</a>
+                    </div>
+                </div>
+                <div class="fav-group">
+                    <b>Outils</b>
+                    <div class="fav-links">
+                        <a href="https://github.com" target="_blank" rel="noopener"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQblkhBDCixhdGaP_B21didlIi1nkX4waw9wkGBKIevXg&s" alt="">GitHub</a>
+                        <a href="https://discord.com/developers/applications" target="_blank" rel="noopener"><img src="https://media.licdn.com/dms/image/v2/D560BAQEj5DryL5O_7g/company-logo_200_200/B56Zi.iuHcHkAI-/0/1755543429939/discord_developers_logo?e=2147483647&v=beta&t=mDfN874nMC5IC2_pq1VXhbbj2YHEr3OB1ruQK7h1nG4" alt="">Discord Dev</a>
+                        <a href="https://curseforge.com" target="_blank" rel="noopener"><img src="https://cdn.apexminecrafthosting.com/img/uploads/2021/05/21163117/curseforge-logo.png" alt="">CurseForge</a>
+                        <a href="https://top.gg" target="_blank" rel="noopener"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZcGCxK-2YqDB5FF5FG7qCiVnkqPyfh_-IRpQHxKMD8g&s" alt="">Top.gg</a>
+                        <a href="https://trello.com" target="_blank" rel="noopener"><img src="https://cdn-icons-png.flaticon.com/512/2504/2504834.png" alt="">Trello</a>
+                        <a href="https://amazon.fr" target="_blank" rel="noopener"><img src="https://images.icon-icons.com/2429/PNG/512/amazon_logo_icon_147320.png" alt="">Amazon</a>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Infrastructure (Grille 4 colonnes & 3 lignes avec fond beige) -->
-        <section class="glass-beige p-3.5 rounded-xl">
-            <h2 class="text-[9px] uppercase tracking-widest mb-3 text-[#E3D5C0] opacity-65 font-bold">Infrastructure</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs" id="infrastructureGrid">
-                <!-- Généré dynamiquement -->
+        <section class="sk-card" style="padding: 14px;">
+            <div class="infra-head">
+                <span class="hub-kicker">Infrastructure</span>
             </div>
+            <div id="infrastructureGrid"></div>
         </section>
     </div>
 
     <script>
         const themes = [
-            { name: 'Rouge', hex: '#FF0013', file: 'logo/Synk_FF0013.png', prefix: '', siteName: 'Synkrone.app', url: '/hub' },
-            { name: 'Or', hex: '#FAB319', file: 'logo/Synk_FAB319.png', prefix: 'Gestion', siteName: 'PM2', url: '#', category: 'ADMIN' },
-            { name: 'Bleu Clair', hex: '#005CFF', file: 'logo/Synk_005CFF.png', prefix: 'VPS', siteName: 'Code', url: '#', category: 'ADMIN' },
-            { name: 'Violet', hex: '#8000A8', file: 'logo/Synk_8000A8.png', prefix: 'ui', siteName: 'Synkrone.app', url: '/ui/', category: 'ADMIN' },
-            { name: 'Vert', hex: '#2B9348', file: 'logo/Synk_2B9348.png', prefix: 'sharing', siteName: 'Synkrone.app', url: '/sharing/', category: 'ADMIN' },
-            { name: 'Rose', hex: '#D6007A', file: 'logo/Synk_D6007A.png', prefix: 'me', siteName: 'Synkrone.app', url: '#' },
-            { name: 'Orange', hex: '#F25C05', file: 'logo/Synk_F25C05.png', prefix: 'dashbot', siteName: 'Synkrone.app', url: '#' },
-            { name: 'Bleu Foncé', hex: '#0026C8', file: 'logo/Synk_0026C8.png', prefix: 'bump', siteName: 'Synkrone.app', url: '#' },
-            { name: 'Marron', hex: '#4A2E1B', file: 'logo/Synk_4A2E1B.png', prefix: 'app', siteName: 'Synkrone.app', url: '#' },
-            { name: 'Gris', hex: '#707273', file: 'logo/Synk_707273.png', prefix: 'cloud', siteName: 'Synkrone.app', url: '#' },
-            { name: 'Noir', hex: '#1A1A1A', file: 'logo/Synk_1A1A1A.png', prefix: 'status', siteName: 'Synkrone.app', url: '#' }
+            { name: 'Rouge', hex: '#FF0013', file: '/logo/Synk_FF0013.png', prefix: '', siteName: 'Synkrone.app', url: '/' },
+            { name: 'Or', hex: '#FAB319', file: '/logo/Synk_FAB319.png', prefix: 'Gestion', siteName: 'PM2', url: '#', category: 'ADMIN' },
+            { name: 'Bleu Clair', hex: '#005CFF', file: '/logo/Synk_005CFF.png', prefix: 'VPS', siteName: 'Code', url: '#', category: 'ADMIN' },
+            { name: 'Violet', hex: '#8000A8', file: '/logo/Synk_8000A8.png', prefix: 'ui', siteName: 'Synkrone.app', url: '/ui/', category: 'ADMIN' },
+            { name: 'Vert', hex: '#2B9348', file: '/logo/Synk_2B9348.png', prefix: 'sharing', siteName: 'Synkrone.app', url: '/sharing/', category: 'ADMIN' },
+            { name: 'Rose', hex: '#D6007A', file: '/logo/Synk_D6007A.png', prefix: 'me', siteName: 'Synkrone.app', url: '/discord/me' },
+            { name: 'Orange', hex: '#F25C05', file: '/logo/Synk_F25C05.png', prefix: 'dashbot', siteName: 'Synkrone.app', url: '/discord/dashbot' },
+            { name: 'Bleu Foncé', hex: '#0026C8', file: '/logo/Synk_0026C8.png', prefix: 'bump', siteName: 'Synkrone.app', url: '/discord/bump' },
+            { name: 'Marron', hex: '#4A2E1B', file: '/logo/Synk_4A2E1B.png', prefix: 'app', siteName: 'Synkrone.app', url: '/' },
+            { name: 'Gris', hex: '#707273', file: '/logo/Synk_707273.png', prefix: 'cloud', siteName: 'Synkrone.app', url: '/equipe/cloud' },
+            { name: 'Noir', hex: '#1A1A1A', file: '/logo/Synk_1A1A1A.png', prefix: 'status', siteName: 'Synkrone.app', url: '#' }
         ];
 
-        let currentIndex = 0;
         let currentEngineMode = 'web';
-        const logoContainer = document.getElementById('logoContainer');
         const infraGrid = document.getElementById('infrastructureGrid');
         let toastTimeout = null;
 
         function showUnavailableModal(element) {
             const modal = document.getElementById('toastModal');
-            modal.style.transform = 'translateY(0)';
-            modal.style.opacity = '1';
-
+            modal.classList.add('show');
             element.classList.add('shake');
             setTimeout(() => element.classList.remove('shake'), 300);
-
             if (toastTimeout) clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                modal.style.transform = 'translateY(-20px)';
-                modal.style.opacity = '0';
-            }, 2000);
+            toastTimeout = setTimeout(() => modal.classList.remove('show'), 2000);
         }
 
-        themes.forEach((theme, index) => {
-            const img = document.createElement('img');
-            img.src = theme.file;
-            img.alt = theme.name;
-            if (index === 0) img.classList.add('active');
-            logoContainer.appendChild(img);
-
+        themes.forEach((theme) => {
             const infraLink = document.createElement('a');
-            
             if (theme.url === '#') {
                 infraLink.href = 'javascript:void(0);';
+                infraLink.className = 'infra-link is-off';
                 infraLink.onclick = (e) => {
                     e.preventDefault();
                     showUnavailableModal(infraLink);
                 };
-                infraLink.className = 'flex items-center justify-between p-2 rounded-xl bg-[#2a2723]/30 hover:bg-[#2a2723]/60 border border-[#f5f0e8]/10 transition-all group cursor-pointer opacity-70 hover:opacity-100';
             } else {
                 infraLink.href = theme.url;
-                if (!theme.url.startsWith('/')) {
-                    infraLink.target = '_blank';
-                }
-                infraLink.className = 'flex items-center justify-between p-2 rounded-xl bg-[#2a2723]/30 hover:bg-[#2a2723]/60 border border-[#f5f0e8]/10 transition-all group';
-            }
-            
-            let nameHtml = '';
-            if (theme.prefix) {
-                nameHtml = `<span style="color: ${theme.hex};" class="font-bold">${theme.prefix}.</span><span class="font-medium text-[#f5f0e8]/90 group-hover:text-[#f5f0e8]">${theme.siteName}</span>`;
-            } else {
-                nameHtml = `<span class="font-medium text-[#f5f0e8]/90 group-hover:text-[#f5f0e8]">${theme.siteName}</span>`;
+                infraLink.className = 'infra-link';
+                if (!theme.url.startsWith('/')) infraLink.target = '_blank';
             }
 
-            let badgeHtml = theme.category ? `<span class="text-[7px] px-1 py-0.2 rounded font-mono font-bold" style="background-color: ${theme.hex}25; color: ${theme.hex}; border: 1px solid ${theme.hex}50;">${theme.category}</span>` : '';
-
+            const prefix = theme.prefix
+                ? `<span style="color:${theme.hex};font-weight:700">${theme.prefix}.</span>`
+                : '';
+            const badge = theme.category
+                ? `<span class="infra-badge" style="background:${theme.hex}22;color:${theme.hex};border:1px solid ${theme.hex}55">${theme.category}</span>`
+                : '';
             infraLink.innerHTML = `
-                <div class="flex items-center gap-2 truncate">
-                    <div class="w-5 h-5 flex items-center justify-center shrink-0">
-                        <img src="${theme.file}" alt="${theme.name}" class="w-full h-full object-contain filter drop-shadow(0 0 1px rgba(255,255,255,0.5))">
-                    </div>
-                    <div class="truncate text-[11px]">${nameHtml}</div>
+                <div class="infra-left">
+                    <img src="${theme.file}" alt="${theme.name}">
+                    <div class="infra-name">${prefix}${theme.siteName}</div>
                 </div>
-                ${badgeHtml}
+                ${badge}
             `;
             infraGrid.appendChild(infraLink);
         });
 
-        const logoImages = logoContainer.querySelectorAll('img');
-
         function setEngineMode(mode) {
             currentEngineMode = mode;
-            const btnWeb = document.getElementById('btnWeb');
-            const btnImage = document.getElementById('btnImage');
-            const currentTheme = themes[currentIndex];
-
-            if (mode === 'web') {
-                btnWeb.style.backgroundColor = currentTheme.hex;
-                btnWeb.classList.remove('opacity-50');
-                btnWeb.classList.add('opacity-100');
-                
-                btnImage.style.backgroundColor = 'transparent';
-                btnImage.classList.add('opacity-50');
-                btnImage.classList.remove('opacity-100');
-            } else {
-                btnImage.style.backgroundColor = currentTheme.hex;
-                btnImage.classList.remove('opacity-50');
-                btnImage.classList.add('opacity-100');
-                
-                btnWeb.style.backgroundColor = 'transparent';
-                btnWeb.classList.add('opacity-50');
-                btnWeb.classList.remove('opacity-100');
-            }
+            document.getElementById('btnWeb').classList.toggle('is-on', mode === 'web');
+            document.getElementById('btnImage').classList.toggle('is-on', mode === 'image');
         }
-
-        function applyTheme(index) {
-            const theme = themes[index];
-
-            document.getElementById('mosaic').style.backgroundImage = `url('${theme.file}')`;
-            document.getElementById('dynamicFavicon').href = theme.file;
-
-            logoImages.forEach((img, i) => {
-                if (i === index) {
-                    img.classList.add('active');
-                } else {
-                    img.classList.remove('active');
-                }
-            });
-
-            document.getElementById('brandTitle').style.color = theme.hex;
-            setEngineMode(currentEngineMode);
-
-            let styleTag = document.getElementById('dynamic-hover-style');
-            if (!styleTag) {
-                styleTag = document.createElement('style');
-                styleTag.id = 'dynamic-hover-style';
-                document.head.appendChild(styleTag);
-            }
-            styleTag.innerHTML = `
-                .hover-accent:hover { color: ${theme.hex} !important; }
-                .hover-icon:hover { color: ${theme.hex} !important; }
-            `;
-        }
-
-        function rotateTheme() {
-            currentIndex = (currentIndex + 1) % themes.length;
-            applyTheme(currentIndex);
-        }
-
-        setInterval(rotateTheme, 2000);
-        applyTheme(0);
 
         function handleSearch(e) {
             e.preventDefault();
             const query = document.getElementById('query').value;
-            if(query) {
-                let url = currentEngineMode === 'web' 
-                    ? `https://google.com/search?q=${encodeURIComponent(query)}`
-                    : `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`;
-                window.open(url, '_blank');
-            }
+            if (!query) return;
+            const url = currentEngineMode === 'web'
+                ? `https://google.com/search?q=${encodeURIComponent(query)}`
+                : `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
         }
 
         function updateDateTime() {
             const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-            document.getElementById('date').innerText = now.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'});
+            document.getElementById('clock').innerText = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('date').innerText = now.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
         }
         setInterval(updateDateTime, 1000);
         updateDateTime();
