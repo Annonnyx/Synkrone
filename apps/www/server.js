@@ -14,6 +14,13 @@ const WWW_DIR = __dirname;
 const UI_DIR = path.join(__dirname, '..', 'ui');
 const SHARING_DIR = path.join(__dirname, '..', 'sharing');
 
+if (!process.env.PASSWORD) {
+    console.warn('[local] PASSWORD manquant (apps/ui/.env ou apps/www/.env) — /ui/ refuse les connexions');
+}
+if (!process.env.MDP) {
+    console.warn('[local] MDP manquant (apps/sharing/.env ou apps/www/.env) — /sharing/ refuse les connexions');
+}
+
 app.use(express.json());
 
 mountUi(app);
@@ -39,9 +46,10 @@ app.use('/ui', express.static(UI_DIR));
 app.use('/sharing', express.static(SHARING_DIR));
 app.use(express.static(WWW_DIR));
 
-app.listen(PORT, () => {
-    console.log(`synkrone.app : http://localhost:${PORT}/hub`);
-    console.log(`  ui       : http://localhost:${PORT}/ui/`);
-    console.log(`  sharing  : http://localhost:${PORT}/sharing/`);
+app.listen(PORT, '127.0.0.1', () => {
+    console.log(`local (fichiers JSON + disque, aucune base distante)`);
+    console.log(`  hub      : http://127.0.0.1:${PORT}/hub`);
+    console.log(`  ui       : http://127.0.0.1:${PORT}/ui/`);
+    console.log(`  sharing  : http://127.0.0.1:${PORT}/sharing/`);
     console.log(`  catalogue: ${DATA_DIR}`);
 });

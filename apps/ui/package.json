@@ -1,7 +1,8 @@
 {
   "name": "ui",
   "scripts": {
-    "start": "node server.js"
+    "start": "echo 'Un seul processus : npm start à la racine du dépôt' && exit 1",
+    "dev": "echo 'Un seul processus : npm start à la racine du dépôt' && exit 1"
   },
   "dependencies": {
     "archiver": "^8.0.0",

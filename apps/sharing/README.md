@@ -1,5 +1,5 @@
 # apps/sharing
 
-Explorateur du catalogue [`templates/discord`](../../templates/discord/), servi par [www](../www/) sur `/sharing/`.
+Explorateur du dossier local `templates/discord/`, servi par www sur `/sharing/`.
 
-Ne plus lancer `npm start` ici. Mot de passe : `MDP` (`.env` sharing ou www).
+Ne pas lancer `npm start` ici. Mot de passe : `MDP` dans `.env`.
