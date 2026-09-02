@@ -1,5 +1,5 @@
 # apps/ui
 
-Médiathèque, servie par le processus [www](../www/) sur `/ui/`.
+Médiathèque locale (`data.json` + `uploads/`), servie par www sur `/ui/`.
 
-Ne plus lancer `npm start` ici. Mot de passe : `PASSWORD` (`.env` ui ou www).
+Ne pas lancer `npm start` ici. Mot de passe : `PASSWORD` dans `.env`.

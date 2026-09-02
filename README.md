@@ -2,32 +2,34 @@
 
 **synkrone.app** héberge et facilite la création de projets, et les présente.
 
-Premier chantier prévu ensuite : des bots Discord. **Le builder n’est pas dans ce dépôt pour l’instant.**
+Tout le site se teste **en local**, un seul processus Node. Pas de Docker, pas de Postgres/Mongo/Redis, pas de VPS.
 
-Un seul processus Node sert le hub, la médiathèque et l’explorateur du catalogue.
+Les données restent sur le disque :
 
-## Carte
+- médiathèque → `apps/ui/data.json` + `apps/ui/uploads/`
+- catalogue → fichiers de `templates/discord/`
 
-| Chemin | Rôle |
-|---|---|
-| [apps/www](apps/www/) | Processus unique (`npm start`, port **3668**) — hub `/hub` |
-| `/ui/` | Médiathèque |
-| `/sharing/` | Explorateur du catalogue Discord |
-| [templates/discord](templates/discord/) | Catalogue de commandes (Python, à part) |
+## Lancer (local)
 
-Tuiles `dashbot` / `me` / `bump` / `app` / `cloud` / `status` : toujours placeholders.
-
-## Lancer
-
-Les `.env` de `apps/www`, `apps/ui` et `apps/sharing` sont lus au démarrage (www ne remplace pas `PORT` s’il est déjà défini). Voir [apps/www/.env.example](apps/www/.env.example).
+Il faut **Node.js** (v22 va). Puis, à la racine du dépôt :
 
 ```bash
-cd apps/www && npm install && npm start
-# http://localhost:3668/hub
-# http://localhost:3668/ui/
-# http://localhost:3668/sharing/
-
-cd templates/discord && pip install -r requirements.txt && python main.py
+npm install --prefix apps/www
+npm start
 ```
 
-Les secrets déjà poussés dans d’anciens commits git sont à considérer comme exposés.
+→ [http://127.0.0.1:3668/hub](http://127.0.0.1:3668/hub)  
+→ [http://127.0.0.1:3668/ui/](http://127.0.0.1:3668/ui/)  
+→ [http://127.0.0.1:3668/sharing/](http://127.0.0.1:3668/sharing/)
+
+Mots de passe ui / sharing : `PASSWORD` dans `apps/ui/.env`, `MDP` dans `apps/sharing/.env` (sinon les remplir dans `apps/www/.env`, voir `.env.example`).
+
+Le hub charge Tailwind / Font Awesome depuis internet (CSS uniquement). Le reste ne sort pas de la machine.
+
+Tuiles PM2 / Code / dashbot / etc. : pas branchées en local.
+
+## Bot Discord (optionnel, pas besoin pour tester le site)
+
+Le catalogue se parcourt dans `/sharing/` sans lancer Python.
+
+Pour faire tourner le bot, il parle **à Discord** (inévitable) : `templates/discord/.env` avec `DISCORD_TOKEN`, puis `pip install -r requirements.txt && python main.py`.
