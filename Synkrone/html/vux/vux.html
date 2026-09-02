@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vux</title>
+    <link rel="icon" type="image/x-icon" href="vux.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { darkbg: '#121216', cardbg: '#1a1a20', accent: '#3498db', } } }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #121216; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 5px; border: 2px solid #121216; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-100 font-sans antialiased min-h-screen selection:bg-blue-500 selection:text-white text-sm">
+
+    <div class="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-darkbg md:hidden">
+        <div class="w-16 h-16 mb-4 bg-slate-900 rounded-2xl flex items-center justify-center border border-slate-800 shadow-xl">
+            <img src="vux.ico" alt="Logo Vux" class="w-10 h-10 object-contain opacity-60 grayscale">
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">Résolution non supportée</h2>
+        <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
+            L'application <span class="text-white font-semibold">Vux</span> est conçue pour un PC.
+        </p>
+    </div>
+
+    <div class="hidden md:block">
+        
+        <div class="sticky top-0 z-50 shadow-sm flex flex-col">
+            <header class="bg-darkbg/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-2.5 flex items-center justify-between">
+                <div class="flex items-center space-x-2 w-1/4">
+                    <img src="vux.ico" alt="Logo Vux" class="w-5 h-5 object-contain drop-shadow-md">
+                    <span class="text-sm font-black tracking-wider bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">VUX</span>
+                </div>
+                
+                <div class="w-2/4 text-center">
+                    <h1 class="text-lg md:text-xl font-black tracking-tight text-white m-0">
+                        Le navigateur qui s'adapte à <span class="text-[#84a5ff]">votre espace</span>
+                    </h1>
+                </div>
+
+                <div class="flex items-center space-x-3 w-1/4 justify-end">
+                    <button id="like-btn" class="flex items-center gap-1.5 text-slate-400 hover:text-pink-500 transition">
+                        <i class="fa-solid fa-heart text-xs"></i>
+                        <span id="like-counter" class="text-xs font-bold">0</span>
+                    </button>
+                    <div class="flex items-center bg-blue-600/20 rounded-md border border-blue-600/30 overflow-hidden scale-95 transform origin-right">
+                        <a href="vux.exe" download id="download-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-3 py-1 text-xs transition inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-download"></i> Télécharger
+                        </a>
+                        <button id="stats-btn" class="px-2.5 py-1.5 text-xs font-bold text-blue-400 border-l border-blue-600/30 hover:bg-blue-600/30 transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-chart-pie text-[10px]"></i> <span id="download-counter">0</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="bg-[#16161a]/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-2 flex items-center justify-center text-xs text-slate-300">
+                <p class="font-medium">
+                    Minimaliste, transparent, avec un mode clic traversant et une ergonomie pensée pour le multitâche.
+                </p>
+            </div>
+        </div>
+
+        <section class="relative pt-6 pb-4 overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+            
+            <div class="max-w-4xl mx-auto px-4 text-center relative z-10 flex flex-col items-center">
+                <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#1a1512] border border-orange-900/50 rounded-full shadow-sm text-xs text-slate-300">
+                        <i class="fa-solid fa-code-merge text-orange-400"></i>
+                        Version Finale : <strong class="text-white font-semibold">L'application ne recevra pas de mise à jour</strong>
+                    </div>
+                </div>
+
+                <div class="w-full rounded-xl border border-slate-800/80 bg-[#121216] shadow-2xl overflow-hidden relative">
+                    <div class="p-1 flex justify-center bg-[#121216]">
+                        <video autoplay loop muted playsinline class="w-full h-auto max-h-[55vh] object-contain rounded-md shadow-md border border-slate-800/50 bg-transparent relative z-10">
+                            <source src="assets/demo-principale.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-6 bg-[#121216]">
+            <div class="max-w-6xl mx-auto px-4">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-[#1a1a20] rounded-2xl border border-slate-800/60 p-5 shadow-xl flex flex-col text-center">
+                        <h3 class="text-lg font-bold text-white mb-2"><i class="fa-solid fa-palette text-blue-500 mr-2"></i>Gestion de l'Opacité</h3>
+                        <p class="text-xs text-slate-400 mb-4 flex-grow">Ajustez instantanément la visibilité via le curseur intégré.</p>
+                        <div class="flex justify-center mt-auto">
+                            <video autoplay loop muted playsinline class="w-full h-auto max-h-[35vh] object-contain rounded-md shadow-lg border border-slate-700/50 bg-transparent"><source src="assets/demo-transparence.mp4" type="video/mp4"></video>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#1a1a20] rounded-2xl border border-slate-800/60 p-5 shadow-xl flex flex-col text-center">
+                        <h3 class="text-lg font-bold text-white mb-2"><i class="fa-solid fa-lock-open text-emerald-500 mr-2"></i>Le Clic Traversant</h3>
+                        <p class="text-xs text-slate-400 mb-4 flex-grow">La souris traverse le web pour interagir avec les logiciels en dessous.</p>
+                        <div class="flex justify-center mt-auto">
+                            <video autoplay loop muted playsinline class="w-full h-auto max-h-[35vh] object-contain rounded-md shadow-lg border border-slate-700/50 bg-transparent"><source src="assets/demo-clic-traversant.mp4" type="video/mp4"></video>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#1a1a20] rounded-2xl border border-slate-800/60 p-5 shadow-xl flex flex-col text-center">
+                        <h3 class="text-lg font-bold text-white mb-2"><i class="fa-solid fa-circle-dot text-purple-500 mr-2"></i>Mode Bulle Flottante</h3>
+                        <p class="text-xs text-slate-400 mb-4 flex-grow">Réduisez le navigateur en une pastille ronde miniature et déplaçable.</p>
+                        <div class="flex justify-center mt-auto">
+                            <video autoplay loop muted playsinline class="w-full h-auto max-h-[35vh] object-contain rounded-md shadow-lg border border-slate-700/50 bg-transparent"><source src="assets/demo-bulle.mp4" type="video/mp4"></video>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#1a1a20] rounded-2xl border border-slate-800/60 p-5 shadow-xl flex flex-col text-center">
+                        <h3 class="text-lg font-bold text-white mb-2"><i class="fa-solid fa-sliders text-indigo-500 mr-2"></i>Personnalisation Visuelle</h3>
+                        <p class="text-xs text-slate-400 mb-4 flex-grow">Modifiez la couleur de l'interface et appliquez vos thèmes favoris.</p>
+                        <div class="flex justify-center mt-auto">
+                            <video autoplay loop muted playsinline class="w-full h-auto max-h-[35vh] object-contain rounded-md shadow-lg border border-slate-700/50 bg-transparent"><source src="assets/demo-themes.mp4" type="video/mp4"></video>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-[#1a1112] rounded-2xl border border-red-900/50 p-6 shadow-xl flex flex-col text-left">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-thumbtack text-lg"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Ancrage au Premier Plan</h3>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed mt-2">
+                            L'application est configurée pour être <strong class="text-red-400 font-semibold">par défaut toujours en 1er plan & non retirable</strong>. 
+                            Cette conception garantit que votre navigateur reste visible sans disparaître en arrière-plan.
+                        </p>
+                    </div>
+
+                    <div class="bg-[#16161a] rounded-2xl border border-slate-700/60 p-6 shadow-xl flex flex-col text-left bg-gradient-to-br from-[#1a1a20] to-[#121216]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-floppy-disk text-lg"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Sauvegarde Automatique</h3>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-4 leading-relaxed mt-2">Vux mémorise automatiquement votre configuration :</p>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-xs text-slate-300 mt-auto">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Historique de navigation</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Dernier niveau de Zoom</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Opacité de l'interface</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Taille & position</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Couleur du thème</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Clic Traversant</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- MODAL DES STATISTIQUES -->
+    <div id="stats-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 p-4">
+        <div class="bg-[#16161a] border border-slate-700 rounded-xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col" id="stats-content">
+            
+            <div class="bg-[#1a1a20] p-4 border-b border-slate-800 flex justify-between items-center z-10 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600/20 text-blue-500 rounded-lg flex items-center justify-center"><i class="fa-solid fa-chart-pie text-lg"></i></div>
+                    <div>
+                        <h2 class="text-xl font-black text-white">Statistiques</h2>
+                        <p class="text-slate-400 text-xs">Données de téléchargement en temps réel</p>
+                    </div>
+                </div>
+                <button id="close-modal" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-5 overflow-y-auto space-y-4">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gradient-to-br from-blue-600/10 to-indigo-600/10 border border-blue-500/20 rounded-lg p-4 flex flex-col justify-center items-center text-center">
+                        <p class="text-blue-400 font-bold uppercase tracking-widest text-[10px] mb-1">Total Absolu</p>
+                        <div id="stat-total" class="text-4xl font-black text-white mb-2">0</div>
+                        <p class="text-xs text-slate-400">Téléchargements cumulés</p>
+                    </div>
+
+                    <div class="bg-[#1a1a20] rounded-lg border border-slate-800 p-4">
+                        <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-clock text-slate-400"></i> Période Actuelle</h3>
+                        <ul class="space-y-2">
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Cette année</span> <span id="stat-current-year" class="font-bold text-white">0</span></li>
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Ce mois</span> <span id="stat-current-month" class="font-bold text-white">0</span></li>
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Cette semaine</span> <span id="stat-current-week" class="font-bold text-white">0</span></li>
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Ce jour</span> <span id="stat-current-day" class="font-bold text-white">0</span></li>
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Cette heure</span> <span id="stat-current-hour" class="font-bold text-white">0</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-[#1a1a20] rounded-lg border border-slate-800 p-4 relative overflow-hidden">
+                        <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-trophy text-yellow-500"></i> Records Max</h3>
+                        <ul class="space-y-2 relative z-10">
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Année</span> <div class="text-right"><span id="stat-record-year" class="font-bold text-yellow-400">0</span> <span id="stat-label-year" class="text-[9px] text-slate-500 block"></span></div></li>
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Mois</span> <div class="text-right"><span id="stat-record-month" class="font-bold text-yellow-400">0</span> <span id="stat-label-month" class="text-[9px] text-slate-500 block"></span></div></li>
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Semaine</span> <div class="text-right"><span id="stat-record-week" class="font-bold text-yellow-400">0</span> <span id="stat-label-week" class="text-[9px] text-slate-500 block"></span></div></li>
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Jour</span> <div class="text-right"><span id="stat-record-day" class="font-bold text-yellow-400">0</span> <span id="stat-label-day" class="text-[9px] text-slate-500 block"></span></div></li>
+                            <li class="flex justify-between items-center text-xs"><span class="text-slate-400">Heure</span> <div class="text-right"><span id="stat-record-hour" class="font-bold text-yellow-400">0</span> <span id="stat-label-hour" class="text-[9px] text-slate-500 block"></span></div></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-[#1a1a20] rounded-lg border border-slate-800 p-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
+                        <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-chart-line text-blue-500"></i> Évolution</h3>
+                        
+                        <div class="flex flex-wrap bg-[#121216] border border-slate-800 p-1 rounded-md text-[10px] font-bold uppercase tracking-wider gap-1">
+                            <button class="chart-tab px-2 py-1.5 rounded bg-blue-600 text-white transition" data-period="today">Heure (Auj.)</button>
+                            <button class="chart-tab px-2 py-1.5 rounded text-slate-400 hover:text-white transition" data-period="week">Jour (Sem.)</button>
+                            <button class="chart-tab px-2 py-1.5 rounded text-slate-400 hover:text-white transition" data-period="month">Jour (Mois)</button>
+                            <button class="chart-tab px-2 py-1.5 rounded text-slate-400 hover:text-white transition" data-period="yearWeeks">Sem. (Année)</button>
+                            <button class="chart-tab px-2 py-1.5 rounded text-slate-400 hover:text-white transition" data-period="yearMonths">Mois (Année)</button>
+                            <button class="chart-tab px-2 py-1.5 rounded text-slate-400 hover:text-white transition" data-period="global">Global</button>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full h-52 relative">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+        let currentChartData = null;
+        
+        async function fetchGlobalStats() {
+            try {
+                const res = await fetch(`${API_URL}/stats`);
+                const data = await res.json();
+                
+                document.getElementById('download-counter').innerText = data.totalDownloads;
+                document.getElementById('like-counter').innerText = data.totalLikes;
+                
+                document.getElementById('stat-total').innerText = data.totalDownloads;
+                document.getElementById('stat-current-year').innerText = data.current.year;
+                document.getElementById('stat-current-month').innerText = data.current.month;
+                document.getElementById('stat-current-week').innerText = data.current.week;
+                document.getElementById('stat-current-day').innerText = data.current.day;
+                document.getElementById('stat-current-hour').innerText = data.current.hour;
+                
+                document.getElementById('stat-record-year').innerText = data.records.year.count;
+                document.getElementById('stat-label-year').innerText = data.records.year.label;
+                
+                document.getElementById('stat-record-month').innerText = data.records.month.count;
+                document.getElementById('stat-label-month').innerText = data.records.month.label;
+                
+                document.getElementById('stat-record-week').innerText = data.records.week.count;
+                document.getElementById('stat-label-week').innerText = data.records.week.label;
+                
+                document.getElementById('stat-record-day').innerText = data.records.day.count;
+                document.getElementById('stat-label-day').innerText = data.records.day.label;
+                
+                document.getElementById('stat-record-hour').innerText = data.records.hour.count;
+                document.getElementById('stat-label-hour').innerText = data.records.hour.label;
+
+                currentChartData = data.chartData;
+                return data.chartData;
+            } catch (error) {
+                console.error("Le serveur Node.js n'est pas lancé.");
+                return null;
+            }
+        }
+
+        fetchGlobalStats();
+
+        const dlBtn = document.getElementById('download-btn');
+        dlBtn.addEventListener('click', async () => {
+            try {
+                const res = await fetch(`${API_URL}/download`, { method: 'POST' });
+                if(res.ok) fetchGlobalStats(); 
+            } catch (error) { console.error("Erreur serveur"); }
+        });
+
+        const likeBtn = document.getElementById('like-btn');
+        likeBtn.addEventListener('click', async () => {
+            if(localStorage.getItem('vux_has_liked')) return;
+            try {
+                const res = await fetch(`${API_URL}/like`, { method: 'POST' });
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('like-counter').innerText = data.totalLikes;
+                    likeBtn.classList.add('text-pink-500');
+                    likeBtn.classList.remove('text-slate-400');
+                    localStorage.setItem('vux_has_liked', 'true');
+                }
+            } catch (error) { console.error("Erreur serveur"); }
+        });
+
+        const modal = document.getElementById('stats-modal');
+        const modalContent = document.getElementById('stats-content');
+        const statsBtn = document.getElementById('stats-btn');
+        const closeModal = document.getElementById('close-modal');
+
+        statsBtn.addEventListener('click', async () => {
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => modal.classList.remove('opacity-0'));
+            const data = await fetchGlobalStats();
+            if (data && !window.chartInstance) {
+                initChart('today');
+            }
+        });
+
+        closeModal.addEventListener('click', close);
+        modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+
+        function close() {
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        const chartTabs = document.querySelectorAll('.chart-tab');
+        chartTabs.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                chartTabs.forEach(b => { b.classList.remove('bg-blue-600', 'text-white'); b.classList.add('text-slate-400'); });
+                e.target.classList.add('bg-blue-600', 'text-white');
+                e.target.classList.remove('text-slate-400');
+                initChart(e.target.getAttribute('data-period'));
+            });
+        });
+
+        function initChart(period) {
+            if (!currentChartData) return;
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            if (window.chartInstance) window.chartInstance.destroy();
+
+            const chartData = currentChartData[period];
+
+            const config = {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: chartData.label,
+                        data: chartData.data,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#1e293b',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4,
+                        borderColor: function(context) {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) return null;
+                            let gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                            gradient.addColorStop(0, '#ef4444');    
+                            gradient.addColorStop(0.5, '#3b82f6');  
+                            gradient.addColorStop(1, '#22c55e');    
+                            return gradient;
+                        },
+                        backgroundColor: function(context) {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) return null;
+                            let gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+                            gradient.addColorStop(0.5, 'rgba(59, 130, 246, 0.2)');
+                            gradient.addColorStop(1, 'rgba(34, 197, 94, 0.2)');
+                            return gradient;
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(51, 65, 85, 0.2)', drawBorder: false }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false, drawBorder: false }, ticks: { color: '#64748b' } }
+                    }
+                }
+            };
+            window.chartInstance = new Chart(ctx, config);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+{
+  "users": {
+    "1366780122891419784": {
+      "id": "1366780122891419784",
+      "username": "Vex",
+      "avatar": "https://cdn.discordapp.com/avatars/1366780122891419784/4531a58f9bb198bd42d4274b386435a3.png",
+      "role": "Admin",
+      "grade": "Kronix",
+      "krone": 8571,
+      "isTeamOwner": true,
+      "isGuest": false,
+      "createdAt": 1786313462772,
+      "updatedAt": 1788376673996,
+      "lastSeenAt": 1788376673996,
+      "lastLoginAt": 1788364455073,
+      "customUrl": "vex",
+      "subtitle": "Développement du site Synkrone",
+      "banner": "https://cdn.discordapp.com/banners/1366780122891419784/d172043890474b9a0146ad4b2bbce554.png?size=512",
+      "privacy": "public",
+      "unlockedPrivacies": [
+        "private",
+        "unlisted",
+        "public"
+      ],
+      "links": [
+        {
+          "reseau": "custom",
+          "titre": "Synkrone.app",
+          "sousTitre": "",
+          "valeur": "https://synkrone.app/assets/images/logo.jpg",
+          "type": "url",
+          "display_name": "Synkrone.app",
+          "custom_icon": "https://synkrone.app/assets/images/logo.jpg"
+        },
+        {
+          "reseau": "custom",
+          "titre": "Support Synkrone",
+          "sousTitre": "",
+          "valeur": "https://discord.gg/p768u2Pgp3",
+          "type": "url",
+          "custom_icon": "https://synkrone.app/assets/images/logo.jpg",
+          "display_name": "Support Synkrone"
+        },
+        {
+          "reseau": "custom",
+          "titre": "",
+          "sousTitre": "",
+          "valeur": "",
+          "type": "url"
+        }
+      ],
+      "customTheme": {
+        "active": true,
+        "bg": "#181a1b",
+        "text": "#fd3f3f",
+        "border": "#bc14eb",
+        "panelBg": "#393838"
+      },
+      "extraLinkSlots": 15,
+      "hasCustomization": true,
+      "likedProfiles": [
+        "1122092101459517481"
+      ],
+      "stats": {
+        "visitsTotal": 0,
+        "visitsMonth": 0,
+        "likesTotal": 0,
+        "likesMonth": 0
+      }
+    },
+    "723720252134785057": {
+      "id": "723720252134785057",
+      "username": "Grue",
+      "avatar": "https://cdn.discordapp.com/avatars/723720252134785057/44ecdda92bb2cb54d9ebda45a398e744.png",
+      "role": "Krobi",
+      "grade": "Aucun",
+      "krone": 0,
+      "isTeamOwner": false,
+      "isGuest": false,
+      "createdAt": 1786313478513,
+      "updatedAt": 1787244709972,
+      "lastSeenAt": 1786995133650,
+      "lastLoginAt": 1786994213269,
+      "customUrl": "",
+      "subtitle": "Nouveau membre.",
+      "banner": "https://placehold.co/800x200/181a1b/2d3033?text=Ma+Bannière",
+      "privacy": "private",
+      "unlockedPrivacies": [
+        "private"
+      ],
+      "links": [],
+      "customTheme": {
+        "active": false,
+        "bg": "#181a1b",
+        "text": "#ffffff",
+        "border": "#e14f4f",
+        "panelBg": "rgba(0,0,0,0.2)"
+      },
+      "extraLinkSlots": 0,
+      "hasCustomization": false,
+      "likedProfiles": [],
+      "stats": {
+        "visitsTotal": 0,
+        "visitsMonth": 0,
+        "likesTotal": 0,
+        "likesMonth": 0
+      }
+    },
+    "1122092101459517481": {
+      "id": "1122092101459517481",
+      "username": "༺ 𝕺𝖓𝖞𝖝 ༻",
+      "avatar": "https://cdn.discordapp.com/avatars/1122092101459517481/cfc023d8e7d75131ec0378e15a31a896.png",
+      "role": "Admin",
+      "grade": "Aucun",
+      "krone": 691,
+      "isTeamOwner": true,
+      "isGuest": false,
+      "createdAt": 1786395649581,
+      "updatedAt": 1787600495764,
+      "lastSeenAt": 1787600495764,
+      "lastLoginAt": 1787599743385,
+      "customUrl": "onyx",
+      "subtitle": "Nouveau membre.",
+      "banner": "https://placehold.co/800x200/181a1b/2d3033?text=Ma+Banni re",
+      "privacy": "public",
+      "unlockedPrivacies": [
+        "private",
+        "unlisted",
+        "public"
+      ],
+      "links": [],
+      "customTheme": {
+        "active": false,
+        "bg": "#181a1b",
+        "text": "#ffffff",
+        "border": "#e14f4f",
+        "panelBg": "#333333"
+      },
+      "extraLinkSlots": 0,
+      "hasCustomization": true,
+      "likedProfiles": [
+        "1366780122891419784"
+      ],
+      "stats": {
+        "visitsTotal": 0,
+        "visitsMonth": 0,
+        "likesTotal": 0,
+        "likesMonth": 0
+      }
+    },
+    "269086990794752002": {
+      "id": "269086990794752002",
+      "username": "Kheyzen",
+      "avatar": "https://cdn.discordapp.com/avatars/269086990794752002/224e5d66927c42b5bdb9a8e53bb5fac0.png",
+      "role": "Krobi",
+      "grade": "Aucun",
+      "krone": 0,
+      "isTeamOwner": false,
+      "isGuest": false,
+      "createdAt": 1787147107425,
+      "updatedAt": 1787240628820,
+      "lastSeenAt": 1787157874141,
+      "lastLoginAt": 1787147107425,
+      "customUrl": "",
+      "subtitle": "Nouveau membre.",
+      "banner": "https://placehold.co/800x200/181a1b/2d3033?text=Ma+Bannière",
+      "privacy": "private",
+      "unlockedPrivacies": [
+        "private"
+      ],
+      "links": [],
+      "customTheme": {
+        "active": false,
+        "bg": "#181a1b",
+        "text": "#ffffff",
+        "border": "#e14f4f",
+        "panelBg": "rgba(0,0,0,0.2)"
+      },
+      "extraLinkSlots": 0,
+      "hasCustomization": false,
+      "likedProfiles": [],
+      "stats": {
+        "visitsTotal": 0,
+        "visitsMonth": 0,
+        "likesTotal": 0,
+        "likesMonth": 0
+      }
+    },
+    "537650216023752746": {
+      "id": "537650216023752746",
+      "username": ".Satoku",
+      "avatar": "https://cdn.discordapp.com/avatars/537650216023752746/0835c393835fbb28aba70544c6f9558d.png",
+      "role": "Équipe",
+      "grade": "Kronix",
+      "krone": 10000,
+      "isTeamOwner": false,
+      "isGuest": false,
+      "createdAt": 1787232469250,
+      "updatedAt": 1787398490728,
+      "lastSeenAt": 1787250477452,
+      "lastLoginAt": 1787250474412,
+      "customUrl": "",
+      "subtitle": "Nouveau membre.",
+      "banner": "https://placehold.co/800x200/181a1b/2d3033?text=Ma+Bannière",
+      "privacy": "private",
+      "unlockedPrivacies": [
+        "private"
+      ],
+      "links": [],
+      "customTheme": {
+        "active": false,
+        "bg": "#181a1b",
+        "text": "#ffffff",
+        "border": "#e14f4f",
+        "panelBg": "rgba(0,0,0,0.2)"
+      },
+      "extraLinkSlots": 0,
+      "hasCustomization": false,
+      "likedProfiles": [],
+      "stats": {
+        "visitsTotal": 0,
+        "visitsMonth": 0,
+        "likesTotal": 0,
+        "likesMonth": 0
+      }
+    },
+    "1440128069246652558": {
+      "id": "1440128069246652558",
+      "username": "NeufRT",
+      "avatar": "https://cdn.discordapp.com/avatars/1440128069246652558/a_7fca1ec9da86660f0d612c403dfb644f.png",
+      "role": "Krobi",
+      "grade": "Aucun",
+      "krone": 0,
+      "isTeamOwner": false,
+      "isGuest": false,
+      "createdAt": 1787455902639,
+      "updatedAt": 1787455956057,
+      "lastSeenAt": 1787455956057,
+      "lastLoginAt": 1787455902639,
+      "customUrl": "",
+      "subtitle": "Nouveau membre.",
+      "banner": "https://placehold.co/800x200/181a1b/2d3033?text=Ma+Banni re",
+      "privacy": "private",
+      "unlockedPrivacies": [
+        "private"
+      ],
+      "links": [],
+      "customTheme": {
+        "active": false,
+        "bg": "#181a1b",
+        "text": "#ffffff",
+        "border": "#e14f4f",
+        "panelBg": "rgba(0,0,0,0.2)"
+      },
+      "extraLinkSlots": 0,
+      "hasCustomization": false,
+      "likedProfiles": [],
+      "stats": {
+        "visitsTotal": 0,
+        "visitsMonth": 0,
+        "likesTotal": 0,
+        "likesMonth": 0
+      }
+    },
+    "1041716902122233856": {
+      "id": "1041716902122233856",
+      "username": "K4izzeur",
+      "avatar": "https://cdn.discordapp.com/avatars/1041716902122233856/647101f0cd61d3087f30373ec66e56ec.png",
+      "role": "Krobi",
+      "grade": "Aucun",
+      "krone": 5,
+      "isTeamOwner": false,
+      "isGuest": false,
+      "createdAt": 1787929232357,
+      "updatedAt": 1787931065076,
+      "lastSeenAt": 1787931065076,
+      "lastLoginAt": 1787929232357,
+      "customUrl": "",
+      "subtitle": "Nouveau membre.",
+      "banner": "https://placehold.co/800x200/181a1b/2d3033?text=Ma+Banni re",
+      "privacy": "private",
+      "unlockedPrivacies": [
+        "private"
+      ],
+      "links": [],
+      "customTheme": {
+        "active": false,
+        "bg": "#181a1b",
+        "text": "#ffffff",
+        "border": "#e14f4f",
+        "panelBg": "rgba(0,0,0,0.2)"
+      },
+      "extraLinkSlots": 0,
+      "hasCustomization": false,
+      "likedProfiles": [],
+      "stats": {
+        "visitsTotal": 0,
+        "visitsMonth": 0,
+        "likesTotal": 0,
+        "likesMonth": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xenus - Modpack</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+    <style>
+        :root { --bg-main:#181a1b; --bg-panel:rgba(24,27,29,.78); --text-main:#d1cdc7; --text-muted:#8b8f92; --accent:#7ac943; --border:#383c3f; --font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+        * { box-sizing:border-box; margin:0; padding:0; scrollbar-width:none; }
+        *::-webkit-scrollbar { display:none; }
+        body { background:var(--bg-main); color:var(--text-main); font-family:var(--font-family); min-height:100vh; padding:18px; }
+        .wrap { max-width:980px; margin:0 auto; display:grid; gap:12px; }
+        .panel { background:var(--bg-panel); border:1px solid var(--border); border-radius:10px; padding:14px; }
+        .pack-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .pack-head img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.22); }
+        h1 { color:#fff; font-size:24px; margin-bottom:8px; }
+        p { color:var(--text-muted); font-size:13px; line-height:1.45; }
+        .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+        .grid-3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+        h3 { color:#fff; font-size:14px; margin-bottom:8px; }
+        ul { padding-left:18px; display:grid; gap:6px; }
+        li { font-size:12px; color:var(--text-main); }
+        .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .chip {
+            font-size: 11px;
+            color: #f2f8ec;
+            background: rgba(54, 85, 34, 0.78);
+            border: 1px solid rgba(122, 201, 67, 0.5);
+            border-radius: 999px;
+            padding: 5px 10px;
+        }
+        .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 220px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            color: #f5f7f4;
+            background: rgba(43, 48, 52, 0.92);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: 0.18s ease;
+        }
+        .btn:hover { background: rgba(255, 255, 255, 0.08); border-color: #5d6469; }
+        .btn.primary { background: rgba(64, 101, 39, 0.88); border-color: rgba(122, 201, 67, 0.55); color: #f4ffe8; }
+        .btn.primary:hover { background: rgba(76, 118, 47, 0.95); }
+        .muted { color: var(--text-muted); font-size: 12px; }
+        .section-title { font-size: 16px; color: #fff; margin-bottom: 10px; }
+        .banner {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            margin-bottom: 10px;
+            max-height: 220px;
+            object-fit: cover;
+        }
+        .owner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .owner img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .stats dt { color: #b9c0c4; font-size: 11px; margin-bottom: 4px; }
+        .stats dd { color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        .text-block p { color: #cdd1d4; margin-bottom: 10px; }
+        @media (max-width:980px){ .grid-3 { grid-template-columns:1fr; } }
+        @media (max-width:860px){ .grid{ grid-template-columns:1fr; } }
+    </style>
+</head>
+<body class="mosaic-bg">
+    <div class="wrap">
+        <section class="panel">
+            <div class="pack-head">
+                <img src="https://media.forgecdn.net/avatars/thumbnails/1346/250/64/64/638874907456203025.png" alt="Xenus">
+                <h1>Xenus</h1>
+            </div>
+            <p>Version 1.1.0 / Quetes FR / Skyblock / 1.19.2 / +200 mods / Equipe Mod In French</p>
+            <div class="summary">
+                <span class="chip">Forge</span>
+                <span class="chip">Tres grand</span>
+                <span class="chip">Skyblock</span>
+                <span class="chip">Magie</span>
+                <span class="chip">Technologie</span>
+                <span class="chip">Quetes</span>
+            </div>
+            <div class="cta-row">
+                <a class="btn primary" href="https://www.curseforge.com/minecraft/modpacks/xenus/download/6889261" target="_blank" rel="noopener noreferrer">Telecharger le modpack</a>
+                <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/xenus" target="_blank" rel="noopener noreferrer">Voir le profil CurseForge</a>
+            </div>
+        </section>
+
+        <section class="panel text-block">
+            <h2 class="section-title">Presentation</h2>
+            <p>Bienvenue sur Xenus, un skyblock en 1.19.2 ou la magie ancestrale et la technologie futuriste se rencontrent dans les nuages. Tu commences sur une ile flottante ou chaque bloc compte.</p>
+            <p>Utilise Ars Nouveau, Botania et Mystical Agriculture pour construire une progression magique, puis automatise tes ressources avec Mekanism, Thermal Expansion, Create, Immersive Engineering et Industrial Foregoing.</p>
+            <p>Cote stockage et puissance, Xenus repose notamment sur Applied Energistics 2, Refined Storage, ProjectE et Blood Magic. Le pack vise une aventure complete, avec personnalisation de base et quetes guidees.</p>
+        </section>
+    </div>
+</body>
+</html>

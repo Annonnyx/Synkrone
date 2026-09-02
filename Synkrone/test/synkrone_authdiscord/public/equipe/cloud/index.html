@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud File Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function toggleFullscreen() {
+            if (window.parent && window.parent.document) {
+                const header = window.parent.document.getElementById('app-header');
+                const menu = window.parent.document.getElementById('menu-container');
+                const appNav = window.parent.document.getElementById('app-nav');
+                const equipeMenu = window.parent.document.getElementById('equipe-menu');
+                
+                if (header) {
+                    if (header.style.display === 'none') {
+                        header.style.display = '';
+                        if (menu) menu.style.display = '';
+                        if (appNav) appNav.style.display = '';
+                        if (equipeMenu) equipeMenu.style.display = '';
+                    } else {
+                        header.style.display = 'none';
+                        if (menu) menu.style.display = 'none';
+                        if (appNav) appNav.style.display = 'none';
+                        if (equipeMenu) equipeMenu.style.display = 'none';
+                    }
+                }
+            }
+        }
+        
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        base: '#1e1f22',
+                        panel: '#2b2d31',
+                        border: 'rgba(255,255,255,0.1)',
+                        accent: '#4e5058',
+                        accentHover: '#6d6f78',
+                        card: '#313338'
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        
+        body { user-select: none; }
+        
+        .checkbox-custom {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #4b5563;
+            border-radius: 4px;
+            background-color: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .checkbox-custom:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        .checkbox-custom:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .grid-list {
+            display: grid;
+            grid-template-columns: 40px 40px minmax(220px, 1fr) 260px 150px 170px;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .grid-list {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+            }
+            .grid-list > div {
+                flex-shrink: 0;
+            }
+            .col-name { flex-grow: 1; min-width: 150px; }
+            .hide-mobile { display: none !important; }
+        }
+        .drag-over { background-color: rgba(59, 130, 246, 0.2) !important; border: 1px dashed #3b82f6; }
+    </style>
+</head>
+<body class="mosaic-bg h-screen flex flex-col font-sans overflow-hidden text-sm bg-base text-gray-200">
+    <header class="h-14 flex items-center justify-between px-4 border-b border-border bg-panel backdrop-blur" id="cloud-header">
+        <div class="flex items-center space-x-2">
+            <span class="font-bold text-gray-200 tracking-wider text-xs uppercase hidden sm:inline"></span>
+        </div>
+        <div class="flex items-center space-x-2 sm:space-x-3 overflow-x-auto py-1">
+            <button onclick="toggleFullscreen()" class="px-2.5 py-1.5 rounded bg-card hover:bg-accent text-gray-300 border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Plein écran">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+            </button>
+            <button onclick="document.getElementById('fileImport').click()" class="px-2.5 py-1.5 rounded bg-card hover:bg-accent text-gray-300 border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" id="btn-import-file" title="Importer des fichiers">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            </button>
+            <input type="file" id="fileImport" multiple class="hidden" onchange="handleFileImport(event)">
+
+            <button onclick="document.getElementById('folderImport').click()" class="px-2.5 py-1.5 rounded bg-card hover:bg-accent text-gray-300 border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" id="btn-import-folder" title="Importer un dossier">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+            </button>
+            <input type="file" id="folderImport" webkitdirectory directory multiple class="hidden" onchange="handleFolderImport(event)">
+
+            <button onclick="openModal('historyModal')" class="px-2.5 py-1.5 rounded bg-card hover:bg-accent text-gray-300 border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Historique">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+            
+            <div id="batchActionsContainer" class="hidden items-center gap-2">
+                <button onclick="batchDownload()" class="px-2.5 py-1.5 rounded bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white border border-indigo-600/50 transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Télécharger la sélection">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+                <button onclick="batchMoveModal()" class="px-2.5 py-1.5 rounded bg-amber-600/20 text-amber-400 hover:bg-amber-600 hover:text-white border border-amber-600/50 transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Déplacer la sélection">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                </button>
+                <button onclick="batchDelete()" class="px-2.5 py-1.5 rounded bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-600/50 transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Supprimer la sélection">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>
+            
+            <button onclick="triggerAction('addFolder')" class="px-2.5 py-1.5 rounded bg-card hover:bg-accent text-gray-300 border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" id="btn-add-folder" title="Nouveau dossier">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </button>
+            <button onclick="triggerAction('addFile')" class="px-2.5 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white shadow transition flex items-center justify-center gap-1 text-xs shrink-0 border border-blue-700 h-8 w-8 sm:w-auto sm:px-2.5" id="btn-add-file" title="Nouveau fichier">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </button>
+        </div>
+    </header>
+    <div class="h-10 flex items-center justify-between px-4 bg-panel/50 border-b border-border text-gray-400">
+        <div class="flex items-center space-x-4 overflow-hidden">
+            <div id="breadcrumb" class="flex items-center overflow-x-auto text-xs whitespace-nowrap"></div>
+            <span id="status-text" class="text-xs text-gray-500 whitespace-nowrap hidden sm:inline-block border-l border-border pl-4">0 Élément(s)</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="storage-text" class="text-xs text-gray-500 hidden sm:inline-block">Stockage : <span id="storage-used">0 KB</span> / <span class="text-gray-400">100 GB</span></span>
+            <div class="sm:hidden flex items-center">
+                <button onclick="openMobileActionsMenu(event)" class="p-1.5 rounded bg-card text-gray-300 border border-border">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <main class="flex-1 overflow-auto relative" id="mainContainer">
+        <div class="grid-list sticky top-0 bg-panel border-b border-border py-2 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider z-10">
+            <div class="flex justify-center">
+                <input type="checkbox" id="selectAll" class="checkbox-custom" onclick="toggleSelectAll(this.checked)">
+            </div>
+            <div class="hide-mobile"></div>
+            <div class="col-name">Nom</div>
+            <div class="hide-mobile">Droits / Taille</div>
+            <div class="hide-mobile text-center">Ajouté</div>
+            <div class="hide-mobile">Dernière Modif.</div>
+        </div>
+        <div id="list-body" class="pb-20"></div>
+    </main>
+    
+    <!-- Context Menu -->
+    <div id="contextMenu" class="hidden absolute bg-card border border-border rounded-lg shadow-2xl py-1 z-50 w-48 text-gray-200 text-sm max-h-[80vh] overflow-y-auto">
+        <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('addFolder')">Ajouter Dossier</button>
+        <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('addFile')">Ajouter Fichier</button>
+        <div class="h-px bg-border my-1"></div>
+        <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('selectAll')">Sélectionner tout</button>
+        <div id="itemSpecificActions" class="hidden">
+            <div class="h-px bg-border my-1"></div>
+            <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('rename')">Renommer</button>
+            <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('move')">Déplacer</button>
+            <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('download')">Télécharger</button>
+            <div id="adminMenuDivider" class="h-px bg-border my-1"></div>
+            <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('duplicate')">Dupliquer</button>
+            <button id="adminPermissionsBtn" class="w-full text-left px-4 py-2 hover:bg-purple-600 hover:text-white transition text-purple-300 font-semibold" onclick="triggerContextMenuAction('permissions')">Admin : Droits d'accès</button>
+            <div class="h-px bg-border my-1"></div>
+            <button class="w-full text-left px-4 py-2 hover:bg-red-600 hover:text-white transition text-red-400" onclick="triggerContextMenuAction('delete')">Supprimer</button>
+        </div>
+    </div>
+    
+    <!-- Modals Containers -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/80 flex flex-col items-center justify-center z-[200] backdrop-blur-sm">
+        <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div id="loadingText" class="text-white text-lg font-semibold mb-2">Traitement en cours...</div>
+        <div class="w-64 bg-gray-700 rounded-full h-2.5 mt-2">
+            <div id="loadingProgress" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+        </div>
+        <div id="loadingCount" class="text-gray-400 text-sm mt-2">0 / 0</div>
+    </div>
+    <div id="importProgressToast" class="hidden fixed bottom-4 right-4 z-[250] px-4 py-3 rounded-lg border border-border bg-card/90 backdrop-blur text-xs text-gray-200 shadow-2xl">
+        <div id="importProgressText" class="font-semibold">Upload en cours...</div>
+        <div id="importProgressCount" class="text-gray-400 mt-1">0 / 0</div>
+        <div id="importProgressFile" class="text-[11px] text-gray-500 mt-1 max-w-[260px] truncate"></div>
+    </div>
+    <div id="inputModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] backdrop-blur-sm">
+        <div class="bg-card border border-border rounded-xl p-5 w-96 shadow-2xl">
+            <h3 id="inputModalTitle" class="text-lg font-semibold mb-4 text-white">Titre</h3>
+            <input type="text" id="inputModalField" class="w-full bg-base border border-border rounded p-2 text-white mb-4 focus:outline-none focus:border-gray-500" placeholder="Entrez le nom...">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('inputModal')" class="px-4 py-2 rounded bg-panel hover:bg-accent text-white transition border border-border">Annuler</button>
+                <button id="inputModalSubmit" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition">Valider</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editorModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100] backdrop-blur-sm">
+        <div class="bg-card border border-border rounded-xl flex flex-col shadow-2xl w-11/12 h-5/6 max-w-4xl">
+            <div class="flex items-center justify-between p-4 border-b border-border">
+                <div class="flex items-center gap-2">
+                    <button onclick="navigateFile(-1)" class="p-1.5 rounded bg-panel hover:bg-accent text-white border border-border" title="Précédent (Flèche gauche)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                    <button onclick="navigateFile(1)" class="p-1.5 rounded bg-panel hover:bg-accent text-white border border-border" title="Suivant (Flèche droite)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+                    <h3 id="editorModalTitle" class="text-lg font-semibold text-white ml-2">Fichier</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="resetZoomBtn" onclick="resetZoom()" class="hidden px-2 py-1 text-xs bg-panel hover:bg-accent text-white border border-border rounded">Recentrer</button>
+                    <button onclick="closeModal('editorModal')" class="text-gray-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                </div>
+            </div>
+            <div class="flex-1 p-4 overflow-auto flex justify-center items-center bg-base relative" id="editorModalContent">
+                <!-- Dynamique -->
+            </div>
+            <div class="p-4 border-t border-border flex justify-between items-center bg-panel rounded-b-xl">
+                <span id="editorInfoText" class="text-xs text-gray-400"></span>
+                <div class="flex gap-2">
+                    <button onclick="closeModal('editorModal')" class="px-4 py-2 rounded bg-base hover:bg-accent text-white transition border border-border">Fermer</button>
+                    <button id="editorModalSave" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition hidden">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="permissionsModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] backdrop-blur-sm">
+        <div class="bg-card border border-border rounded-xl p-6 w-[900px] max-w-[95vw] shadow-2xl flex flex-col max-h-[90vh]">
+            <h3 class="text-lg font-semibold mb-2 text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                Gestion des accès & Sécurité
+            </h3>
+            <p id="permItemName" class="text-xs text-gray-400 mb-4 truncate font-mono bg-base p-1.5 rounded border border-border shrink-0"></p>
+            
+            <div class="mb-4 shrink-0 bg-base p-3 rounded border border-border">
+                <div class="flex items-center justify-between">
+                    <span class="font-medium text-gray-200 text-sm">Par défaut (Tous)</span>
+                    <select id="perm_select_default" class="bg-card text-gray-200 border border-border rounded px-2 py-1 text-xs focus:outline-none focus:border-purple-500">
+                        <option value="full">Admin</option>
+                        <option value="limited">Limité</option>
+                        <option value="write">Modification</option>
+                        <option value="read">Lecture seulement</option>
+                        <option value="restricted">Bloqué</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-6 overflow-y-auto pr-2" id="permissionsListContainer">
+                <!-- Dynamique -->
+            </div>
+            <div class="flex justify-end gap-2 shrink-0">
+                <button onclick="closeModal('permissionsModal')" class="px-4 py-2 rounded bg-panel hover:bg-accent border border-border text-white transition">Fermer</button>
+                <button onclick="savePermissions()" class="px-4 py-2 rounded bg-purple-600 hover:bg-purple-500 text-white transition">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[100] backdrop-blur-sm">
+        <div class="bg-card border border-border rounded-xl flex flex-col shadow-2xl w-11/12 h-5/6 max-w-5xl">
+            <div class="flex items-center justify-between p-4 border-b border-border">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Historique & Journaux d'actions
+                </h3>
+                <button onclick="closeModal('historyModal')" class="text-gray-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="flex flex-wrap gap-3 p-4 bg-panel border-b border-border shrink-0">
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs text-gray-400">Date début</label>
+                    <input type="date" id="histFilterStart" class="bg-base border border-border text-gray-200 text-xs rounded px-2 py-1" onchange="renderHistory()">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs text-gray-400">Date fin</label>
+                    <input type="date" id="histFilterEnd" class="bg-base border border-border text-gray-200 text-xs rounded px-2 py-1" onchange="renderHistory()">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs text-gray-400">Utilisateur</label>
+                    <select id="histFilterUser" class="bg-base border border-border text-gray-200 text-xs rounded px-2 py-1" onchange="renderHistory()">
+                        <option value="all">Tous</option>
+                        <!-- Rempli dynamiquement -->
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs text-gray-400">Action</label>
+                    <select id="histFilterAction" class="bg-base border border-border text-gray-200 text-xs rounded px-2 py-1" onchange="renderHistory()">
+                        <option value="all">Toutes</option>
+                        <option value="create">Création</option>
+                        <option value="modify">Modification</option>
+                        <option value="rename">Renommage</option>
+                        <option value="delete">Suppression</option>
+                        <option value="move">Déplacement</option>
+                        <option value="permissions">Permissions</option>
+                    </select>
+                </div>
+                <div class="flex items-end ml-auto">
+                    <button onclick="document.getElementById('histFilterStart').value=''; document.getElementById('histFilterEnd').value=''; document.getElementById('histFilterUser').value='all'; document.getElementById('histFilterAction').value='all'; renderHistory();" class="text-xs px-3 py-1 bg-card hover:bg-accent text-gray-300 rounded border border-border">Réinitialiser</button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-auto bg-base p-2">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-gray-500 border-b border-border text-xs uppercase sticky top-0 bg-base z-10">
+                            <th class="p-2">Action</th>
+                            <th class="p-2">Élément</th>
+                            <th class="p-2 hide-mobile">Détails</th>
+                            <th class="p-2">Utilisateur</th>
+                            <th class="p-2 hide-mobile">Date</th>
+                            <th class="p-2 text-right">Restauration</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="moveModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[100] backdrop-blur-sm">
+        <div class="bg-card border border-border rounded-xl p-5 w-96 shadow-2xl">
+            <h3 class="text-lg font-semibold mb-4 text-white">Déplacer vers...</h3>
+            <div class="max-h-60 overflow-auto bg-base border border-border rounded p-2 mb-4" id="moveFolderList"></div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('moveModal')" class="px-4 py-2 rounded bg-panel hover:bg-accent border border-border text-white transition">Annuler</button>
+                <button id="moveModalSubmit" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition">Déplacer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = {};
+        let currentUserData = null;
+        let currentUser = null; // Contiendra l'ID
+
+        let state = {
+            currentFolderId: 'root',
+            selectedIds: new Set(),
+            contextMenuTarget: null,
+            draggedItemIds: [],
+            history: [],
+            items: []
+        };
+
+        // --- Plein écran via parent ---
+        function setIframeFullscreen(isFullscreen) {
+            try {
+                if (window.parent && window.parent.document) {
+                    const frame = window.parent.document.getElementById('content-frame');
+                    if (frame) {
+                        if (isFullscreen) {
+                            frame.style.position = 'fixed';
+                            frame.style.top = '0';
+                            frame.style.left = '0';
+                            frame.style.width = '100vw';
+                            frame.style.height = '100vh';
+                            frame.style.zIndex = '9999';
+                        } else {
+                            frame.style.position = '';
+                            frame.style.top = '';
+                            frame.style.left = '';
+                            frame.style.width = '100%';
+                            frame.style.height = '100%';
+                            frame.style.zIndex = '';
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+
+        const CLOUD_ROUTE_PREFIX = '/equipe/cloud';
+
+        function isEmbeddedInShell() {
+            try {
+                return Boolean(window.parent && window.parent !== window && window.parent.document && window.parent.document.getElementById('content-frame'));
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function encodeCloudSegment(name) {
+            return encodeURIComponent(String(name || '').trim().replace(/\s+/g, '_'));
+        }
+
+        function decodeCloudSegment(segment) {
+            try {
+                return decodeURIComponent(segment);
+            } catch (e) {
+                return String(segment || '');
+            }
+        }
+
+        function getNameCandidatesFromSegment(segment) {
+            const decoded = decodeCloudSegment(segment).trim();
+            if (!decoded) return [];
+            const candidates = [decoded];
+            const withSpaces = decoded.replace(/_/g, ' ');
+            if (withSpaces !== decoded) candidates.push(withSpaces);
+            return candidates;
+        }
+
+        function getFolderPathItems(folderId) {
+            const folders = [];
+            let currentId = folderId;
+            while (currentId && currentId !== 'root') {
+                const folder = state.items.find(i => i.id === currentId && !i.deleted && i.type === 'folder');
+                if (!folder) break;
+                folders.unshift(folder);
+                currentId = folder.parentId;
+            }
+            return folders;
+        }
+
+        function getFolderPathNames(folderId) {
+            return getFolderPathItems(folderId).map(folder => folder.name);
+        }
+
+        function buildCloudRoutePath(includeOpenFile = true) {
+            const folderSegments = getFolderPathItems(state.currentFolderId).map(folder => encodeCloudSegment(folder.name));
+            if (includeOpenFile && currentEditingItemId) {
+                const fileItem = state.items.find(i => i.id === currentEditingItemId && !i.deleted && i.type !== 'folder');
+                if (fileItem) {
+                    folderSegments.push(encodeCloudSegment(fileItem.name));
+                }
+            }
+            if (!folderSegments.length) return CLOUD_ROUTE_PREFIX;
+            return `${CLOUD_ROUTE_PREFIX}/${folderSegments.join('/')}`;
+        }
+
+        function syncCloudRoute(options = {}) {
+            const replace = options.replace !== false;
+            const includeOpenFile = options.includeOpenFile !== false;
+            const nextPath = buildCloudRoutePath(includeOpenFile);
+
+            if (isEmbeddedInShell()) {
+                let parentPathUpdated = false;
+                try {
+                    const parentPath = String(window.parent.location.pathname || '');
+                    if (parentPath !== nextPath) {
+                        if (replace) window.parent.history.replaceState({}, '', nextPath);
+                        else window.parent.history.pushState({}, '', nextPath);
+                    }
+                    parentPathUpdated = true;
+                } catch (e) {
+                    parentPathUpdated = false;
+                }
+
+                if (!parentPathUpdated) {
+                    window.parent.postMessage({
+                        type: 'synkrone:cloud-route',
+                        path: nextPath,
+                        replaceHistory: replace
+                    }, window.location.origin);
+                }
+                return;
+            }
+
+            const currentPath = window.location.pathname;
+            if (currentPath === nextPath) return;
+            if (replace) window.history.replaceState({}, '', nextPath);
+            else window.history.pushState({}, '', nextPath);
+        }
+
+        function findFolderByPath(pathValue) {
+            const raw = String(pathValue || '').trim();
+            if (!raw) return 'root';
+            const segments = raw.split('/').map(s => s.trim()).filter(Boolean);
+            let currentParent = 'root';
+            for (let i = 0; i < segments.length; i++) {
+                const segment = segments[i];
+                const candidates = getNameCandidatesFromSegment(segment);
+                const nextFolder = state.items.find((item) => (
+                    !item.deleted &&
+                    item.type === 'folder' &&
+                    item.parentId === currentParent &&
+                    candidates.includes(item.name)
+                ));
+                if (!nextFolder) return null;
+                currentParent = nextFolder.id;
+            }
+            return currentParent;
+        }
+
+        function findItemInFolderBySegment(parentId, segment, type) {
+            const candidates = getNameCandidatesFromSegment(segment);
+            return state.items.find((item) => (
+                !item.deleted &&
+                item.parentId === parentId &&
+                item.type === type &&
+                candidates.includes(item.name)
+            )) || null;
+        }
+
+        function getCloudPathFromLocation() {
+            const params = new URLSearchParams(window.location.search);
+            const cloudPathFromQuery = params.get('cloudPath');
+            if (cloudPathFromQuery) return cloudPathFromQuery;
+
+            const pathname = String(window.location.pathname || '');
+            const lowerPathname = pathname.toLowerCase();
+            if (lowerPathname.startsWith('/equipe/cloud/index.html')) return '';
+            if (lowerPathname.startsWith('/equipe/cloud/')) return pathname.slice('/equipe/cloud/'.length);
+            return '';
+        }
+
+        function resolveNavigationFromCloudPath(cloudPath) {
+            const clean = String(cloudPath || '').trim().replace(/^\/+|\/+$/g, '');
+            if (!clean) return { folderId: 'root', fileItem: null };
+
+            const segments = clean.split('/').filter(Boolean);
+            let currentFolderId = 'root';
+            let consumedFolders = 0;
+
+            for (let i = 0; i < segments.length; i++) {
+                const nextFolder = findItemInFolderBySegment(currentFolderId, segments[i], 'folder');
+                if (!nextFolder) break;
+                currentFolderId = nextFolder.id;
+                consumedFolders++;
+            }
+
+            if (consumedFolders === segments.length) {
+                return { folderId: currentFolderId, fileItem: null };
+            }
+
+            const remaining = segments.slice(consumedFolders);
+            if (remaining.length === 1) {
+                const fileItem = state.items.find((item) => (
+                    !item.deleted &&
+                    item.parentId === currentFolderId &&
+                    item.type !== 'folder' &&
+                    getNameCandidatesFromSegment(remaining[0]).includes(item.name)
+                )) || null;
+                if (fileItem) return { folderId: currentFolderId, fileItem };
+            }
+
+            return { folderId: currentFolderId, fileItem: null };
+        }
+
+        function applyLegacyQueryState() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const folderParam = urlParams.get('folder');
+            const pathParam = urlParams.get('path');
+            const fileParam = urlParams.get('file');
+            const fileNameParam = urlParams.get('fileName');
+
+            if (folderParam && state.items.some(i => i.id === folderParam && i.type === 'folder' && !i.deleted)) {
+                state.currentFolderId = folderParam;
+            } else if (pathParam) {
+                const resolvedFolderId = findFolderByPath(pathParam);
+                if (resolvedFolderId) state.currentFolderId = resolvedFolderId;
+            }
+
+            render();
+
+            if (fileParam) {
+                const item = state.items.find(i => i.id === fileParam && !i.deleted && i.type !== 'folder');
+                if (item) openEditorModal(item, { replaceHistory: true });
+                return true;
+            }
+            if (fileNameParam) {
+                const namedItem = state.items.find(i => (
+                    !i.deleted &&
+                    i.parentId === state.currentFolderId &&
+                    i.type !== 'folder' &&
+                    i.name === fileNameParam
+                ));
+                if (namedItem) {
+                    openEditorModal(namedItem, { replaceHistory: true });
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // --- Fetch initial des vrais utilisateurs et données du Cloud ---
+        async function init() {
+            try {
+                const staffRes = await fetch('/api/staff/users');
+                if (staffRes.ok) {
+                    const staffData = await staffRes.json();
+                    if (staffData.users) {
+                        staffData.users.forEach(u => {
+                            users[u.id] = { name: u.username, avatar: u.avatar || '/assets/images/logo.jpg', id: u.id, role: u.role, isTeamOwner: u.isTeamOwner };
+                        });
+                    }
+                }
+
+                const meRes = await fetch('/api/me');
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    if (meData.authenticated) {
+                        currentUserData = meData.user;
+                        currentUser = meData.user.id;
+                        if (!users[currentUser]) {
+                            users[currentUser] = { name: meData.user.username, avatar: meData.user.avatar || '/assets/images/logo.jpg', id: meData.user.id, role: meData.user.role, isTeamOwner: meData.user.isTeamOwner };
+                        }
+                    }
+                }
+
+                const cloudRes = await fetch('/api/cloud');
+                if (cloudRes.ok) {
+                    const cloudData = await cloudRes.json();
+                    if (cloudData.items) state.items = cloudData.items;
+                    if (cloudData.history) state.history = cloudData.history;
+                }
+            } catch (e) {
+                console.error("Erreur de chargement", e);
+            }
+
+            const cloudPath = getCloudPathFromLocation();
+            if (cloudPath) {
+                const resolved = resolveNavigationFromCloudPath(cloudPath);
+                state.currentFolderId = resolved.folderId || 'root';
+                render();
+                if (resolved.fileItem) {
+                    openEditorModal(resolved.fileItem, { replaceHistory: true });
+                }
+                return;
+            }
+
+            applyLegacyQueryState();
+        }
+
+        let saveDebounceTimer = null;
+        let saveInFlightPromise = null;
+        let saveRetryAfterFlight = false;
+
+        async function saveCloudSnapshot() {
+            const response = await fetch('/api/cloud', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: state.items, history: state.history })
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status} - ${errorText || 'Erreur inconnue'}`);
+            }
+        }
+
+        async function flushCloudSaveQueue() {
+            if (saveInFlightPromise) {
+                saveRetryAfterFlight = true;
+                return saveInFlightPromise;
+            }
+
+            saveInFlightPromise = (async () => {
+                do {
+                    saveRetryAfterFlight = false;
+                    await saveCloudSnapshot();
+                } while (saveRetryAfterFlight);
+            })();
+
+            try {
+                await saveInFlightPromise;
+            } finally {
+                saveInFlightPromise = null;
+            }
+        }
+
+        function scheduleCloudSave(delayMs = 50) {
+            return new Promise((resolve, reject) => {
+                if (saveDebounceTimer) {
+                    clearTimeout(saveDebounceTimer);
+                }
+                saveDebounceTimer = setTimeout(() => {
+                    saveDebounceTimer = null;
+                    flushCloudSaveQueue().then(resolve).catch(reject);
+                }, delayMs);
+            });
+        }
+
+        async function saveCloudData(options = {}) {
+            const immediate = options.immediate !== false;
+            const delayMs = Number.isFinite(Number(options.delayMs)) ? Math.max(0, Number(options.delayMs)) : 450;
+
+            try {
+                if (!immediate) {
+                    return await scheduleCloudSave(delayMs);
+                }
+                if (saveDebounceTimer) {
+                    clearTimeout(saveDebounceTimer);
+                    saveDebounceTimer = null;
+                }
+                await flushCloudSaveQueue();
+            } catch (e) {
+                console.error("Erreur de sauvegarde", e);
+                throw e;
+            }
+        }
+
+        async function saveImportedItem(item, historyEntry) {
+            const response = await fetch('/api/cloud/import-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item, historyEntry })
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status} - ${errorText || 'Erreur import item'}`);
+            }
+        }
+
+        function getFileTypeAndIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'py') return { type: 'py', icon: '<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>' };
+            if (ext === 'html' || ext === 'htm') return { type: 'html', icon: '<svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>' };
+            if (ext === 'json') return { type: 'json', icon: '<svg class="w-5 h-5 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>' };
+            if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext)) return { type: 'image', icon: '<svg class="w-5 h-5 text-teal-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg>' };
+            return { type: 'text', icon: '<svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path></svg>' };
+        }
+
+        function generateId() { return Math.random().toString(36).substr(2, 9); }
+        function getCurrentDate() {
+            const d = new Date();
+            return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        }
+
+        function isUserAdmin(userId) {
+            const u = users[userId];
+            if (!u) return false;
+            return Boolean(u.isTeamOwner || (String(u.role).toLowerCase() === 'admin'));
+        }
+
+        function getFolderSize(folderId) {
+            let total = 0;
+            const children = state.items.filter(i => i.parentId === folderId && !i.deleted);
+            for (const child of children) {
+                if (child.type === 'folder') {
+                    total += getFolderSize(child.id);
+                } else {
+                    if (child.content) {
+                        total += child.content.length;
+                    } else if (child.size && typeof child.size === 'string') {
+                        const match = child.size.match(/(\d+(?:\.\d+)?)\s*(KB|MB|GB|B)/);
+                        if (match) {
+                            let val = parseFloat(match[1]);
+                            if (match[2] === 'KB') val *= 1024;
+                            if (match[2] === 'MB') val *= 1024 * 1024;
+                            if (match[2] === 'GB') val *= 1024 * 1024 * 1024;
+                            total += val;
+                        }
+                    }
+                }
+            }
+            return total;
+        }
+
+        function formatSize(bytes) {
+            if (bytes === 0 || !bytes) return '0 KB';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function hasAccess(item, userId, permissionNeeded = 'read') {
+            if (isUserAdmin(userId)) return true;
+            
+            const defaultPerm = (item.permissions && item.permissions.default) ? item.permissions.default : 'read';
+            const userPermRaw = (item.permissions && item.permissions[userId]) ? item.permissions[userId] : 'default';
+            const effectivePerm = (userPermRaw === 'default') ? defaultPerm : userPermRaw;
+
+            if (effectivePerm === 'full') return true;
+            
+            // Limit: write only if I am the author
+            if (effectivePerm === 'limited') {
+                if (permissionNeeded === 'read') return true;
+                if (permissionNeeded === 'write' || permissionNeeded === 'full') {
+                    return item.author === userId;
+                }
+                return false;
+            }
+
+            if (permissionNeeded === 'read' && (effectivePerm === 'read' || effectivePerm === 'write')) return true;
+            if (permissionNeeded === 'write' && effectivePerm === 'write') return true;
+            return false;
+        }
+
+        const ALLOWED_PERMISSION_VALUES = new Set(['default', 'full', 'limited', 'write', 'read', 'restricted']);
+
+        function normalizePermissionValue(value, fallback = 'default') {
+            const normalized = String(value || '').trim().toLowerCase();
+            return ALLOWED_PERMISSION_VALUES.has(normalized) ? normalized : fallback;
+        }
+
+        function clonePermissions(permissions) {
+            const source = permissions && typeof permissions === 'object' ? permissions : {};
+            const next = {};
+            next.default = normalizePermissionValue(source.default, 'read');
+            Object.keys(source).forEach((key) => {
+                if (key === 'default') return;
+                next[key] = normalizePermissionValue(source[key], 'default');
+            });
+            return next;
+        }
+
+        function getInheritedPermissions(parentId) {
+            const parentItem = state.items.find(i => i.id === parentId && !i.deleted);
+            if (parentItem && parentItem.permissions) {
+                return clonePermissions(parentItem.permissions);
+            }
+            return { default: 'read' };
+        }
+
+        function applyPermissionsToDescendants(folderId, inheritedPermissions) {
+            const nextPermissions = clonePermissions(inheritedPermissions);
+            const stack = [folderId];
+            while (stack.length > 0) {
+                const currentParentId = stack.pop();
+                const children = state.items.filter(i => i.parentId === currentParentId && !i.deleted);
+                children.forEach((child) => {
+                    child.permissions = clonePermissions(nextPermissions);
+                    if (child.type === 'folder') stack.push(child.id);
+                });
+            }
+        }
+
+        function renderBreadcrumb() {
+            const breadcrumbEl = document.getElementById('breadcrumb');
+            const path = [];
+            let currentId = state.currentFolderId;
+            while (currentId !== 'root') {
+                const folder = state.items.find(i => i.id === currentId);
+                if (!folder) { state.currentFolderId = 'root'; break; }
+                path.unshift(folder);
+                currentId = folder.parentId;
+            }
+            path.unshift({ id: 'root', name: 'Accueil' });
+            breadcrumbEl.innerHTML = path.map((item, index) => {
+                const isLast = index === path.length - 1;
+                return `
+                    ${index ? '<span class="mx-2 text-gray-600">/</span>' : ''}
+                    <span class="${isLast ? 'text-gray-100 font-semibold' : 'hover:text-white cursor-pointer transition'}"
+                           onclick="navigateTo('${item.id}')">${item.name}</span>
+                `;
+            }).join('');
+        }
+
+        function navigateTo(folderId) {
+            state.currentFolderId = folderId;
+            state.selectedIds.clear();
+            currentEditingItemId = null;
+            syncCloudRoute({ replace: false, includeOpenFile: false });
+            render();
+        }
+
+        function renderList() {
+            const container = document.getElementById('list-body');
+            
+            if (state.currentFolderId === 'root' && !isUserAdmin(currentUser)) {
+                document.getElementById('btn-add-folder').classList.add('hidden');
+                document.getElementById('btn-add-file').classList.add('hidden');
+                document.getElementById('btn-import-file').classList.add('hidden');
+                document.getElementById('btn-import-folder').classList.add('hidden');
+            } else {
+                document.getElementById('btn-add-folder').classList.remove('hidden');
+                document.getElementById('btn-add-file').classList.remove('hidden');
+                document.getElementById('btn-import-file').classList.remove('hidden');
+                document.getElementById('btn-import-folder').classList.remove('hidden');
+            }
+
+            const items = state.items
+                .filter(item => item.parentId === state.currentFolderId && !item.deleted)
+                .sort((a, b) => {
+                    if (a.type === 'folder' && b.type !== 'folder') return -1;
+                    if (a.type !== 'folder' && b.type === 'folder') return 1;
+                    return a.name.localeCompare(b.name, 'fr');
+                });
+            if (!items.length) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-20 text-gray-500">
+                        <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                        <p>Ce dossier est vide</p>
+                    </div>`;
+                document.getElementById('selectAll').checked = false;
+                updateBatchActions();
+                return;
+            }
+            container.innerHTML = items.map(item => {
+                const isSelected = state.selectedIds.has(item.id);
+                const authorData = users[item.author] || { name: 'Utilisateur', avatar: '/assets/images/logo.jpg' };
+                const modifierData = users[item.modifiedBy] || { name: 'Utilisateur', avatar: '/assets/images/logo.jpg' };
+                let iconHtml = item.type === 'folder' ? 
+                    `<svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>` : 
+                    getFileTypeAndIcon(item.name).icon;
+                if (item.type === 'image' && item.content) {
+                    iconHtml = `<img src="${item.content}" class="w-8 h-8 object-cover rounded border border-border">`;
+                }
+                const hasAccessFlag = hasAccess(item, currentUser, 'read');
+                return `
+                    <div class="grid-list py-2.5 px-2 hover:bg-card border-b border-border transition group cursor-pointer ${isSelected ? 'bg-card/80' : ''} ${!hasAccessFlag ? 'opacity-40' : ''}"
+                          data-id="${item.id}"
+                         draggable="true"
+                         ondragstart="handleDragStart(event, '${item.id}')"
+                         ondragover="handleDragOver(event, '${item.type}')"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event, '${item.id}', '${item.type}')"
+                         onclick="toggleSelection(event, '${item.id}')"
+                         ondblclick="handleDoubleClick('${item.id}')"
+                         oncontextmenu="showContextMenu(event, '${item.id}')">
+                        
+                        <div class="flex justify-center" onclick="event.stopPropagation()">
+                            <input type="checkbox" class="checkbox-custom"
+                                    ${isSelected ? 'checked' : ''}
+                                    onchange="toggleSelectionDirect('${item.id}', this.checked)">
+                        </div>
+                        <div class="flex justify-center hide-mobile">${iconHtml}</div>
+                        <div class="col-name pr-4 text-gray-200 group-hover:text-blue-400 transition flex items-center gap-2 min-w-0">
+                            <span class="sm:hidden">${iconHtml}</span>
+                            <span class="truncate">${item.name}</span>
+                            ${!hasAccessFlag ? '<span class="text-[10px] bg-red-900 text-red-300 px-1 rounded">Restreint</span>' : ''}
+                        </div>
+                        <div class="hide-mobile flex items-center justify-between gap-2 pr-4 min-w-0">
+                            <div class="flex flex-col text-[10px] text-gray-500 max-w-[70px] truncate leading-tight" title="Accès par défaut">
+                                <span>Défaut :</span>
+                                <span class="text-blue-400 font-semibold">${(item.permissions && item.permissions.default) ? (item.permissions.default === 'full' ? 'Plein' : item.permissions.default === 'limited' ? 'Limité' : item.permissions.default === 'write' ? 'Modif' : item.permissions.default === 'restricted' ? 'Bloqué' : 'Lecture') : 'Lecture'}</span>
+                            </div>
+                            <div class="flex items-center space-x-[-8px] pr-2 flex-1 justify-end min-w-0">
+                                ${Object.keys(users)
+                                    .filter(uid => {
+                                        const userPerm = (item.permissions && item.permissions[uid]) ? item.permissions[uid] : 'default';
+                                        if (userPerm === 'default') return false;
+                                        return userPerm === 'read' || userPerm === 'write' || userPerm === 'limited' || userPerm === 'full';
+                                    })
+                                    .slice(0, 3)
+                                    .map(uid => `<img src="${users[uid].avatar}" class="w-5 h-5 rounded-full border border-base relative z-10 shrink-0" title="${users[uid].name}">`)
+                                    .join('')}
+                                ${Object.keys(users).filter(uid => {
+                                    const userPerm = (item.permissions && item.permissions[uid]) ? item.permissions[uid] : 'default';
+                                    return userPerm !== 'default' && (userPerm === 'read' || userPerm === 'write' || userPerm === 'limited' || userPerm === 'full');
+                                }).length > 3 ? `<div class="w-5 h-5 rounded-full border border-base relative z-10 bg-panel text-[9px] flex items-center justify-center text-gray-300 font-bold shrink-0">+${Object.keys(users).filter(uid => {
+                                    const userPerm = (item.permissions && item.permissions[uid]) ? item.permissions[uid] : 'default';
+                                    return userPerm !== 'default' && (userPerm === 'read' || userPerm === 'write' || userPerm === 'limited' || userPerm === 'full');
+                                }).length - 3}</div>` : ''}
+                            </div>
+                            <div class="text-gray-400 text-right whitespace-nowrap min-w-[64px]">${item.type === 'folder' ? formatSize(getFolderSize(item.id)) : item.size}</div>
+                        </div>
+                          
+                        <div class="hide-mobile flex items-center justify-center gap-2">
+                            <img src="${authorData.avatar}" class="w-7 h-7 rounded-full border border-border" title="${authorData.name}" alt="${authorData.name}">
+                            <div class="flex flex-col text-xs text-gray-400">
+                                <span>${(item.addedDate || '').split(' ')[0]}</span>
+                                ${(item.addedDate || '').split(' ')[1] ? `<span class="text-gray-500" style="font-size: 0.65rem;">${(item.addedDate || '').split(' ')[1]}</span>` : ''}
+                            </div>
+                        </div>
+                          
+                        <div class="hide-mobile text-gray-400 truncate pr-2 flex items-center gap-2">
+                            ${item.modifiedDate && item.modifiedDate !== item.addedDate ? `
+                            <img src="${modifierData.avatar}" class="w-5 h-5 rounded-full border border-border" title="${modifierData.name}" alt="${modifierData.name}">
+                            <div class="flex flex-col text-xs text-gray-400">
+                                <span>${(item.modifiedDate || '').split(' ')[0]}</span>
+                                ${(item.modifiedDate || '').split(' ')[1] ? `<span class="text-gray-500" style="font-size: 0.65rem;">${(item.modifiedDate || '').split(' ')[1]}</span>` : ''}
+                            </div>
+                            ` : '<span class="text-gray-600 italic text-xs">---</span>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            updateSelectAllState();
+            updateBatchActions();
+        }
+
+        function updateBatchActions() {
+            const batchContainer = document.getElementById('batchActionsContainer');
+            if (state.selectedIds.size > 0) {
+                batchContainer.classList.remove('hidden');
+                batchContainer.classList.add('flex');
+            } else {
+                batchContainer.classList.remove('flex');
+                batchContainer.classList.add('hidden');
+            }
+        }
+
+        function toggleSelection(event, id) {
+            if (event.ctrlKey || event.metaKey || event.shiftKey) {
+                if (state.selectedIds.has(id)) state.selectedIds.delete(id);
+                else state.selectedIds.add(id);
+            } else {
+                state.selectedIds.clear();
+                state.selectedIds.add(id);
+            }
+            render();
+        }
+
+        function toggleSelectionDirect(id, isChecked) {
+            if (isChecked) state.selectedIds.add(id);
+            else state.selectedIds.delete(id);
+            render();
+        }
+
+        function toggleSelectAll(isChecked) {
+            const items = state.items.filter(i => i.parentId === state.currentFolderId && !i.deleted);
+            if (isChecked) {
+                items.forEach(i => state.selectedIds.add(i.id));
+            } else {
+                state.selectedIds.clear();
+            }
+            render();
+        }
+
+        function updateSelectAllState() {
+            const items = state.items.filter(i => i.parentId === state.currentFolderId && !i.deleted);
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (items.length === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+                return;
+            }
+            const selectedCount = items.filter(i => state.selectedIds.has(i.id)).length;
+            selectAllCheckbox.checked = selectedCount === items.length;
+            selectAllCheckbox.indeterminate = selectedCount > 0 && selectedCount < items.length;
+        }
+
+        function updateStatus() {
+            const items = state.items.filter(i => i.parentId === state.currentFolderId && !i.deleted);
+            const folders = items.filter(i => i.type === 'folder').length;
+            const files = items.length - folders;
+            const selCount = state.selectedIds.size;
+            let status = `${files} fichier(s), ${folders} dossier(s)`;
+            if (selCount > 0) status += ` | ${selCount} sélectionné(s)`;
+            const statusEl = document.getElementById('status-text');
+            if (statusEl) statusEl.textContent = status;
+            
+            const storageEl = document.getElementById('storage-used');
+            if (storageEl) storageEl.textContent = formatSize(getFolderSize('root'));
+        }
+
+        function handleDoubleClick(id) {
+            const item = state.items.find(i => i.id === id);
+            if (!item) return;
+            if (!hasAccess(item, currentUser, 'read')) {
+                showNotification("Accès restreint par l'administrateur.", "error");
+                return;
+            }
+            if (item.type === 'folder') {
+                navigateTo(id);
+            } else {
+                openEditorModal(item);
+            }
+        }
+
+        const contextMenu = document.getElementById('contextMenu');
+        const mainContainer = document.getElementById('mainContainer');
+        function showContextMenu(event, id = null) {
+            event.preventDefault();
+            
+            if (id && !state.selectedIds.has(id)) {
+                state.selectedIds.clear();
+                state.selectedIds.add(id);
+                render();
+            }
+            
+            state.contextMenuTarget = id;
+            
+            if (id || state.selectedIds.size > 0) {
+                document.getElementById('itemSpecificActions').classList.remove('hidden');
+                const isAdmin = isUserAdmin(currentUser);
+                document.getElementById('adminPermissionsBtn').style.display = isAdmin ? 'block' : 'none';
+                document.getElementById('adminMenuDivider').style.display = isAdmin ? 'block' : 'none';
+            } else {
+                document.getElementById('itemSpecificActions').classList.add('hidden');
+            }
+            contextMenu.classList.remove('hidden');
+            
+            let x = event.clientX;
+            let y = event.clientY;
+            const menuRect = contextMenu.getBoundingClientRect();
+            
+            if (x + menuRect.width > window.innerWidth) x = window.innerWidth - menuRect.width - 10;
+            if (y + menuRect.height > window.innerHeight) y = window.innerHeight - menuRect.height - 10;
+            
+            contextMenu.style.left = `${x}px`;
+            contextMenu.style.top = `${y}px`;
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!contextMenu.contains(e.target)) contextMenu.classList.add('hidden');
+        });
+
+        mainContainer.addEventListener('contextmenu', (e) => {
+            if (!e.target.closest('.grid-list') || e.target.closest('.grid-list').classList.contains('sticky')) {
+                showContextMenu(e, null);
+            }
+        });
+
+        function openMobileActionsMenu(event) {
+            event.stopPropagation();
+            const firstSelectedId = Array.from(state.selectedIds)[0] || null;
+            showContextMenu({ clientX: window.innerWidth / 2 - 100, clientY: 150, preventDefault: ()=>{} }, firstSelectedId);
+        }
+
+        function triggerContextMenuAction(action) {
+            contextMenu.classList.add('hidden');
+            triggerAction(action);
+        }
+
+        function createHistoryEntry(actionData) {
+            const now = new Date();
+            const dateStr = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            return {
+                id: generateId(),
+                date: dateStr,
+                user: currentUser,
+                restored: false,
+                ...actionData
+            };
+        }
+
+        function logHistory(actionData, skipSave = false) {
+            state.history.unshift(createHistoryEntry(actionData));
+            if (!skipSave) {
+                saveCloudData({ immediate: false, delayMs: 450 }).catch((err) => {
+                    console.error('Erreur de sauvegarde automatique', err);
+                    showNotification("Impossible de sauvegarder les données cloud.", "error");
+                });
+            }
+        }
+
+        function triggerAction(action) {
+            if (state.currentFolderId === 'root' && !isUserAdmin(currentUser)) {
+                if (['addFolder', 'addFile', 'rename', 'delete', 'duplicate'].includes(action)) {
+                    showNotification("Seul un admin peut modifier la racine.", "error");
+                    return;
+                }
+            }
+            if (action === 'addFolder') {
+                openInputModal("Nouveau dossier", "Nom du dossier", (val) => {
+                    if(!val.trim()) return;
+                    const newId = generateId();
+                    const inheritedPermissions = getInheritedPermissions(state.currentFolderId);
+                    state.items.push({ 
+                        id: newId, type: 'folder', name: val.trim(), parentId: state.currentFolderId, 
+                        size: '-', addedDate: getCurrentDate(), author: currentUser, modifiedBy: currentUser, 
+                        modifiedDate: getCurrentDate(), deleted: false, 
+                        permissions: inheritedPermissions
+                    });
+                    logHistory({ type: 'create', itemId: newId, itemName: val.trim(), itemType: 'folder' });
+                    render();
+                });
+            } else if (action === 'addFile') {
+                openInputModal("Nouveau fichier", "Nom du fichier (ex: script.py, txt)", (val) => {
+                    if(!val.trim()) return;
+                    let name = val.trim();
+                    const detected = getFileTypeAndIcon(name);
+                    const newId = generateId();
+                    const inheritedPermissions = getInheritedPermissions(state.currentFolderId);
+                    state.items.push({ 
+                        id: newId, type: detected.type, name: name, parentId: state.currentFolderId, 
+                        size: '0 KB', addedDate: getCurrentDate(), author: currentUser, modifiedBy: currentUser, 
+                        modifiedDate: getCurrentDate(), deleted: false, content: '',
+                        permissions: inheritedPermissions
+                    });
+                    logHistory({ type: 'create', itemId: newId, itemName: name, itemType: detected.type });
+                    render();
+                });
+            } else if (action === 'selectAll') {
+                toggleSelectAll(true);
+            } else if (action === 'rename') {
+                if (state.selectedIds.size !== 1) return;
+                const id = Array.from(state.selectedIds)[0];
+                const item = state.items.find(i => i.id === id);
+                if (!hasAccess(item, currentUser, 'write')) {
+                    showNotification("Droits insuffisants pour renommer cet élément.", "error");
+                    return;
+                }
+                openInputModal("Renommer", "Nouveau nom", (val) => {
+                    if(!val.trim() || val.trim() === item.name) return;
+                    const oldName = item.name;
+                    item.name = val.trim();
+                    if (item.type !== 'folder') {
+                        item.type = getFileTypeAndIcon(item.name).type;
+                    }
+                    item.modifiedDate = getCurrentDate();
+                    item.modifiedBy = currentUser;
+                    logHistory({ type: 'rename', itemId: item.id, itemName: item.name, itemType: item.type, oldName: oldName, newName: item.name });
+                    render();
+                }, item.name);
+            } else if (action === 'delete') {
+                batchDelete();
+            } else if (action === 'move') {
+                batchMoveModal();
+            } else if (action === 'download') {
+                batchDownload();
+            } else if (action === 'duplicate') {
+                batchDuplicate();
+            } else if (action === 'permissions') {
+                if (state.selectedIds.size !== 1) return;
+                const id = Array.from(state.selectedIds)[0];
+                const item = state.items.find(i => i.id === id);
+                openPermissionsModal(item);
+            }
+        }
+
+        function duplicateItem(itemId, newParentId) {
+            const item = state.items.find(i => i.id === itemId);
+            if (!item) return;
+            const newId = generateId();
+            let newName = item.name;
+            if (newParentId === item.parentId) {
+                const extIndex = newName.lastIndexOf('.');
+                if (item.type !== 'folder' && extIndex !== -1) {
+                    newName = newName.substring(0, extIndex) + "_copy" + newName.substring(extIndex);
+                } else {
+                    newName = newName + "_copy";
+                }
+            }
+            
+            const copy = { ...item, id: newId, name: newName, parentId: newParentId, addedDate: getCurrentDate(), modifiedDate: getCurrentDate(), author: currentUser, modifiedBy: currentUser, permissions: JSON.parse(JSON.stringify(item.permissions || { default: 'read' })) };
+            state.items.push(copy);
+            logHistory({ type: 'create', itemId: newId, itemName: newName, itemType: item.type });
+            
+            if (item.type === 'folder') {
+                const children = state.items.filter(i => i.parentId === item.id && !i.deleted);
+                for (const child of children) {
+                    duplicateItem(child.id, newId);
+                }
+            }
+        }
+
+        function batchDuplicate() {
+            if (state.selectedIds.size === 0) return;
+            let count = 0;
+            state.selectedIds.forEach(id => {
+                const item = state.items.find(i => i.id === id);
+                if (item && hasAccess(item, currentUser, 'read')) {
+                    duplicateItem(id, item.parentId);
+                    count++;
+                }
+            });
+            if (count > 0) {
+                render();
+                showNotification(`${count} élément(s) dupliqué(s).`, "success");
+            }
+        }
+
+        function batchDelete() {
+            if (state.selectedIds.size === 0) return;
+            if (!confirm('Voulez-vous vraiment supprimer les éléments sélectionnés ?')) return;
+            let count = 0;
+            state.selectedIds.forEach(id => {
+                const item = state.items.find(i => i.id === id);
+                if(item && hasAccess(item, currentUser, 'full')) {
+                    item.deleted = true;
+                    item.deletedBy = currentUser;
+                    item.deletedDate = getCurrentDate();
+                    item.modifiedDate = getCurrentDate();
+                    item.modifiedBy = currentUser;
+                    logHistory({ type: 'delete', itemId: item.id, itemName: item.name, itemType: item.type });
+                    count++;
+                }
+            });
+            state.selectedIds.clear();
+            render();
+            if(count > 0) showNotification(`${count} élément(s) supprimé(s).`, "success");
+        }
+
+        let loadingTotal = 0;
+        function showLoading(text, current = 0, total = 0) {
+            loadingTotal = total;
+            document.getElementById('loadingText').textContent = text;
+            updateLoading(current);
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+        function updateLoading(current) {
+            if (loadingTotal > 0) {
+                const percent = Math.round((current / loadingTotal) * 100);
+                document.getElementById('loadingProgress').style.width = `${percent}%`;
+                document.getElementById('loadingCount').textContent = `${current} / ${loadingTotal} (${percent}%)`;
+            }
+        }
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        function showImportProgress(total, label) {
+            const toast = document.getElementById('importProgressToast');
+            const text = document.getElementById('importProgressText');
+            const count = document.getElementById('importProgressCount');
+            const file = document.getElementById('importProgressFile');
+            if (!toast || !text || !count || !file) return;
+            text.textContent = label;
+            count.textContent = `0 / ${total}`;
+            file.textContent = '';
+            toast.classList.remove('hidden');
+        }
+
+        function updateImportProgress(current, total, label, currentFileName = '') {
+            const text = document.getElementById('importProgressText');
+            const count = document.getElementById('importProgressCount');
+            const file = document.getElementById('importProgressFile');
+            if (!text || !count || !file) return;
+            text.textContent = label;
+            count.textContent = `${current} / ${total}`;
+            file.textContent = currentFileName ? `Envoi : ${currentFileName}` : '';
+        }
+
+        function hideImportProgress() {
+            const toast = document.getElementById('importProgressToast');
+            if (!toast) return;
+            toast.classList.add('hidden');
+        }
+
+        async function batchDownload() {
+            if (state.selectedIds.size === 0) return;
+            showLoading("Préparation du téléchargement...", 0, state.selectedIds.size);
+            
+            let processed = 0;
+            for (const id of state.selectedIds) {
+                const item = state.items.find(i => i.id === id);
+                if (item && hasAccess(item, currentUser, 'read')) {
+                    if (item.type === 'folder') {
+                        await downloadFolderAsZip(item);
+                    } else {
+                        downloadFile(item);
+                    }
+                }
+                processed++;
+                updateLoading(processed);
+                await new Promise(r => setTimeout(r, 10)); // small yield
+            }
+            hideLoading();
+            state.selectedIds.clear();
+            render();
+        }
+
+        async function downloadFolderAsZip(folder) {
+            if (!folder) return;
+            const zip = new JSZip();
+            
+            function addToZip(parentFolderId, zipFolder) {
+                const children = state.items.filter(i => i.parentId === parentFolderId && !i.deleted);
+                for (const child of children) {
+                    if (child.type === 'folder') {
+                        const newZipFolder = zipFolder.folder(child.name);
+                        addToZip(child.id, newZipFolder);
+                    } else if (child.content) {
+                        let content = child.content;
+                        if (content.startsWith('data:')) {
+                            const arr = content.split(',');
+                            content = arr.length > 1 ? arr[1] : arr[0];
+                            zipFolder.file(child.name, content, { base64: true });
+                        } else {
+                            zipFolder.file(child.name, content);
+                        }
+                    }
+                }
+            }
+            
+            addToZip(folder.id, zip);
+            try {
+                const content = await zip.generateAsync({ type: 'blob' });
+                saveAs(content, folder.name + '.zip');
+            } catch (err) {
+                console.error("Erreur de zip", err);
+                showNotification("Erreur lors de la création du ZIP.", "error");
+            }
+        }
+
+        function downloadFile(item) {
+            if (!item) return;
+            
+            let content = item.content || '';
+            let blob;
+            
+            if (content.startsWith('data:')) {
+                const arr = content.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1];
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                blob = new Blob([u8arr], { type: mime });
+            } else {
+                blob = new Blob([content], { type: 'text/plain' });
+            }
+            
+            saveAs(blob, item.name);
+        }
+
+        function batchMoveModal() {
+            if (state.selectedIds.size === 0) return;
+            openMoveModal();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+            if (e.ctrlKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                if (e.shiftKey) triggerAction('addFile');
+                else triggerAction('addFolder');
+            } else if (e.key === 'Delete') {
+                e.preventDefault();
+                batchDelete();
+            } else if (e.ctrlKey && e.key.toLowerCase() === 'a') {
+                e.preventDefault();
+                toggleSelectAll(true);
+            }
+        });
+
+        async function handleFileImport(event) {
+            if (state.currentFolderId === 'root' && !isUserAdmin(currentUser)) {
+                showNotification("Seul un admin peut importer à la racine.", "error");
+                return;
+            }
+            const files = event.target.files;
+            if (!files.length) return;
+            
+            showImportProgress(files.length, "Upload des fichiers...");
+            const inheritedPermissions = getInheritedPermissions(state.currentFolderId);
+
+            let processed = 0;
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        const detected = getFileTypeAndIcon(file.name);
+                        const isImage = detected.type === 'image';
+                        
+                        reader.onload = async (e) => {
+                            const newId = generateId();
+                            const content = e.target.result;
+                            const sizeStr = Math.max(1, Math.round(file.size / 1024)) + ' KB';
+                            const newItem = {
+                                id: newId, type: detected.type, name: file.name, parentId: state.currentFolderId,
+                                size: sizeStr, addedDate: getCurrentDate(), author: currentUser,
+                                modifiedDate: getCurrentDate(), modifiedBy: currentUser, deleted: false,
+                                content: content, permissions: clonePermissions(inheritedPermissions)
+                            };
+                            const historyEntry = createHistoryEntry({ type: 'create', itemId: newId, itemName: file.name, itemType: detected.type });
+                            try {
+                                await saveImportedItem(newItem, historyEntry);
+                                state.items.push(newItem);
+                                state.history.unshift(historyEntry);
+                                resolve();
+                            } catch (err) {
+                                reject(err);
+                            }
+                        };
+                        reader.onerror = () => reject(new Error(`Lecture impossible pour ${file.name}`));
+                        
+                        if (isImage) reader.readAsDataURL(file);
+                        else reader.readAsText(file);
+                    });
+                    processed++;
+                    updateImportProgress(processed, files.length, "Upload des fichiers...", file.name);
+                    
+                    if (processed % 10 === 0) {
+                        await new Promise(r => setTimeout(r, 10));
+                    }
+                }
+                render();
+                showNotification(`${files.length} fichier(s) importé(s).`, "success");
+            } catch (error) {
+                console.error('Erreur import fichiers', error);
+                showNotification("Import interrompu : sauvegarde impossible.", "error");
+            } finally {
+                hideImportProgress();
+                event.target.value = '';
+            }
+        }
+
+        async function handleFolderImport(event) {
+            if (state.currentFolderId === 'root' && !isUserAdmin(currentUser)) {
+                showNotification("Seul un admin peut importer à la racine.", "error");
+                return;
+            }
+            const files = event.target.files;
+            if (!files.length) return;
+            
+            showImportProgress(files.length, "Upload du dossier...");
+            const paths = {};
+            let processed = 0;
+            
+            try {
+                for (let j = 0; j < files.length; j++) {
+                    const file = files[j];
+                    const pathParts = file.webkitRelativePath.split('/');
+                    let currentParent = state.currentFolderId;
+                    
+                    for (let i = 0; i < pathParts.length - 1; i++) {
+                        const folderName = pathParts[i];
+                        const fullPath = pathParts.slice(0, i + 1).join('/');
+                        if (!paths[fullPath]) {
+                            const inheritedPermissions = getInheritedPermissions(currentParent);
+                            const newId = generateId();
+                            const newFolder = { 
+                                id: newId, type: 'folder', name: folderName, parentId: currentParent, 
+                                size: '-', addedDate: getCurrentDate(), author: currentUser, modifiedBy: currentUser, 
+                                modifiedDate: getCurrentDate(), deleted: false, 
+                                permissions: inheritedPermissions
+                            };
+                            const folderHistoryEntry = createHistoryEntry({ type: 'create', itemId: newId, itemName: folderName, itemType: 'folder' });
+                            await saveImportedItem(newFolder, folderHistoryEntry);
+                            state.items.push(newFolder);
+                            state.history.unshift(folderHistoryEntry);
+                            paths[fullPath] = newId;
+                        }
+                        currentParent = paths[fullPath];
+                    }
+                    
+                    await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        const detected = getFileTypeAndIcon(file.name);
+                        const isImage = detected.type === 'image';
+                        
+                        reader.onload = async (e) => {
+                            const newId = generateId();
+                            const content = e.target.result;
+                            const sizeStr = Math.max(1, Math.round(file.size / 1024)) + ' KB';
+                            const inheritedPermissions = getInheritedPermissions(currentParent);
+                            const newItem = {
+                                id: newId, type: detected.type, name: file.name, parentId: currentParent,
+                                size: sizeStr, addedDate: getCurrentDate(), author: currentUser,
+                                modifiedDate: getCurrentDate(), modifiedBy: currentUser, deleted: false,
+                                content: content, permissions: inheritedPermissions
+                            };
+                            const historyEntry = createHistoryEntry({ type: 'create', itemId: newId, itemName: file.name, itemType: detected.type });
+                            try {
+                                await saveImportedItem(newItem, historyEntry);
+                                state.items.push(newItem);
+                                state.history.unshift(historyEntry);
+                                resolve();
+                            } catch (err) {
+                                reject(err);
+                            }
+                        };
+                        reader.onerror = () => reject(new Error(`Lecture impossible pour ${file.webkitRelativePath || file.name}`));
+                        
+                        if (isImage) reader.readAsDataURL(file);
+                        else reader.readAsText(file);
+                    });
+                    processed++;
+                    updateImportProgress(processed, files.length, "Upload du dossier...", file.webkitRelativePath || file.name);
+                    if (processed % 10 === 0) await new Promise(r => setTimeout(r, 10));
+                }
+                
+                render();
+                showNotification(`Dossier importé avec succès.`, "success");
+            } catch (error) {
+                console.error('Erreur import dossier', error);
+                showNotification("Import dossier interrompu : sauvegarde impossible.", "error");
+            } finally {
+                hideImportProgress();
+                event.target.value = '';
+            }
+        }
+
+        function handleDragStart(e, id) {
+            if (!state.selectedIds.has(id)) {
+                state.selectedIds.clear();
+                state.selectedIds.add(id);
+                render();
+            }
+            state.draggedItemIds = Array.from(state.selectedIds);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        function handleDragOver(e, type) {
+            if (type === 'folder') { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('drag-over'); }
+        }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+        function handleDrop(e, targetFolderId, type) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (type !== 'folder') return;
+            if (state.draggedItemIds.includes(targetFolderId)) return;
+            state.draggedItemIds.forEach(id => {
+                const item = state.items.find(i => i.id === id);
+                if (item && isMoveValid(item.id, targetFolderId) && hasAccess(item, currentUser, 'write')) {
+                    const oldParentId = item.parentId;
+                    item.parentId = targetFolderId;
+                    item.modifiedDate = getCurrentDate();
+                    item.modifiedBy = currentUser;
+                    
+                    const targetFolder = state.items.find(i => i.id === targetFolderId);
+                    const oldFolder = state.items.find(i => i.id === oldParentId);
+                    logHistory({ 
+                        type: 'move', itemId: item.id, itemName: item.name, itemType: item.type,
+                        oldParentId: oldParentId, newParentId: targetFolderId,
+                        oldParentName: oldFolder ? oldFolder.name : 'Accueil',
+                        newParentName: targetFolder ? targetFolder.name : 'Accueil'
+                    });
+                }
+            });
+            state.selectedIds.clear();
+            state.draggedItemIds = [];
+            render();
+        }
+
+        function isMoveValid(itemId, targetFolderId) {
+            let current = targetFolderId;
+            while(current !== 'root') {
+                if(current === itemId) return false;
+                const parent = state.items.find(i => i.id === current);
+                if(!parent) break;
+                current = parent.parentId;
+            }
+            return true;
+        }
+
+        function openModal(id) {
+            setIframeFullscreen(true);
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'historyModal') renderHistory();
+        }
+        function closeModal(id, options = {}) {
+            const syncHistory = options.syncHistory !== false;
+            document.getElementById(id).classList.add('hidden');
+            if (id === 'editorModal' && syncHistory) {
+                currentEditingItemId = null;
+                syncCloudRoute({ replace: false, includeOpenFile: false });
+            }
+            setIframeFullscreen(false);
+        }
+
+        let currentInputCallback = null;
+        function openInputModal(title, placeholder, callback, initialValue = "") {
+            document.getElementById('inputModalTitle').textContent = title;
+            const input = document.getElementById('inputModalField');
+            input.placeholder = placeholder;
+            input.value = initialValue;
+            currentInputCallback = callback;
+            
+            document.getElementById('inputModalSubmit').onclick = () => {
+                if(currentInputCallback) currentInputCallback(input.value);
+                closeModal('inputModal');
+            };
+            openModal('inputModal');
+            setTimeout(() => input.focus(), 50);
+        }
+
+        let currentEditingItemId = null;
+        let currentZoom = 1;
+        function resetZoom() {
+            currentZoom = 1;
+            const imgEl = document.getElementById('zoomableImage');
+            if (imgEl) {
+                imgEl.style.transform = `translate(0px, 0px) scale(1)`;
+                const imgContainer = document.getElementById('imageZoomContainer');
+                if (imgContainer) {
+                    imgContainer.dispatchEvent(new Event('reset-zoom'));
+                }
+            }
+        }
+
+        function navigateFile(direction) {
+            if (!currentEditingItemId) return;
+            const currentItem = state.items.find(i => i.id === currentEditingItemId);
+            if (!currentItem) return;
+            
+            // Get all files in the current directory, sorted as they appear in the UI
+            const files = state.items
+                .filter(item => item.parentId === currentItem.parentId && !item.deleted && item.type !== 'folder')
+                .sort((a, b) => a.name.localeCompare(b.name));
+            
+            if (files.length <= 1) return;
+            
+            const currentIndex = files.findIndex(i => i.id === currentEditingItemId);
+            if (currentIndex === -1) return;
+            
+            let nextIndex = currentIndex + direction;
+            if (nextIndex < 0) nextIndex = files.length - 1;
+            if (nextIndex >= files.length) nextIndex = 0;
+            
+            const nextItem = files[nextIndex];
+            if (nextItem) {
+                if (hasAccess(nextItem, currentUser, 'read')) {
+                    openEditorModal(nextItem);
+                } else {
+                    showNotification("Accès restreint au fichier suivant.", "error");
+                }
+            }
+        }
+
+        function openEditorModal(item, options = {}) {
+            document.getElementById('editorModalTitle').textContent = item.name;
+            const modUser = users[item.modifiedBy] ? users[item.modifiedBy].name : item.modifiedBy;
+            const authUser = users[item.author] ? users[item.author].name : item.author;
+            document.getElementById('editorInfoText').textContent = `Auteur : ${authUser} | Modifié par : ${modUser} (${item.modifiedDate})`;
+            const contentContainer = document.getElementById('editorModalContent');
+            const saveBtn = document.getElementById('editorModalSave');
+            currentEditingItemId = item.id;
+            state.currentFolderId = item.parentId || 'root';
+            if (options.replaceHistory) {
+                syncCloudRoute({ replace: true, includeOpenFile: true });
+            } else {
+                syncCloudRoute({ replace: false, includeOpenFile: true });
+            }
+            currentZoom = 1;
+            const isCanWrite = hasAccess(item, currentUser, 'write');
+            if (item.type === 'image') {
+                document.getElementById('resetZoomBtn').classList.remove('hidden');
+                contentContainer.innerHTML = `
+                    <div class="overflow-hidden w-full h-full flex items-center justify-center" id="imageZoomContainer">
+                        <img id="zoomableImage" src="${item.content}" alt="${item.name}" class="max-w-full max-h-full object-contain transition-transform duration-75 rounded shadow-lg bg-base" style="cursor: grab;">
+                    </div>
+                `;
+                saveBtn.classList.add('hidden');
+                const imgContainer = document.getElementById('imageZoomContainer');
+                const imgEl = document.getElementById('zoomableImage');
+                let isDragging = false;
+                let startX, startY, translateX = 0, translateY = 0;
+
+                imgContainer.addEventListener('reset-zoom', () => {
+                    translateX = 0;
+                    translateY = 0;
+                });
+
+                imgContainer.onmousedown = (e) => {
+                    isDragging = true;
+                    startX = e.clientX - translateX;
+                    startY = e.clientY - translateY;
+                    imgEl.style.cursor = 'grabbing';
+                };
+                imgContainer.onmouseup = () => { isDragging = false; imgEl.style.cursor = 'grab'; };
+                imgContainer.onmouseleave = () => { isDragging = false; imgEl.style.cursor = 'grab'; };
+                imgContainer.onmousemove = (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                    translateX = e.clientX - startX;
+                    translateY = e.clientY - startY;
+                    imgEl.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentZoom})`;
+                };
+                imgContainer.onwheel = (e) => {
+                    e.preventDefault();
+                    if (e.deltaY < 0) currentZoom = Math.min(currentZoom + 0.15, 5);
+                    else currentZoom = Math.max(currentZoom - 0.15, 0.4);
+                    imgEl.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentZoom})`;
+                };
+            } else {
+                document.getElementById('resetZoomBtn').classList.add('hidden');
+                contentContainer.innerHTML = `
+                    <textarea id="editorTextarea" ${!isCanWrite ? 'readonly' : ''} class="w-full h-full bg-[#1e1e1e] text-emerald-300 border border-border p-4 rounded focus:outline-none focus:border-blue-500 resize-none font-mono text-xs shadow-inner leading-relaxed">${item.content || ''}</textarea>
+                `;
+                if (isCanWrite) {
+                    saveBtn.classList.remove('hidden');
+                    saveBtn.onclick = async () => {
+                        const newContent = document.getElementById('editorTextarea').value;
+                        if (item.content !== newContent) {
+                            const oldContent = item.content;
+                            item.content = newContent;
+                            item.size = Math.max(1, Math.round(item.content.length / 1024)) + ' KB';
+                            item.modifiedDate = getCurrentDate();
+                            item.modifiedBy = currentUser;
+                            logHistory({ type: 'modify', itemId: item.id, itemName: item.name, itemType: item.type, oldContent: oldContent, newContent: newContent }, true);
+                              
+                            saveBtn.disabled = true;
+                            saveBtn.textContent = 'Enregistrement...';
+                            try {
+                                await saveCloudData();
+                            } catch (error) {
+                                console.error('Erreur enregistrement fichier', error);
+                                showNotification("Impossible d'enregistrer le fichier.", "error");
+                                saveBtn.disabled = false;
+                                saveBtn.textContent = 'Enregistrer';
+                                return;
+                            }
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = 'Enregistrer';
+                        }
+                        render();
+                        closeModal('editorModal');
+                        showNotification("Fichier enregistré avec succès.", "success");
+                    };
+                } else {
+                    saveBtn.classList.add('hidden');
+                }
+            }
+            openModal('editorModal');
+        }
+
+        let currentPermItemId = null;
+        function openPermissionsModal(item) {
+            currentPermItemId = item.id;
+            document.getElementById('permItemName').textContent = `Élément : ${item.name}`;
+            const container = document.getElementById('permissionsListContainer');
+            
+            const userKeys = Object.keys(users);
+            if (!item.permissions) {
+                item.permissions = { default: 'full' };
+                userKeys.forEach(u => item.permissions[u] = 'default');
+            }
+            if (!item.permissions.default) item.permissions.default = 'full';
+
+            const defaultSelect = document.getElementById('perm_select_default');
+            defaultSelect.value = item.permissions.default;
+
+            container.innerHTML = userKeys.map(userId => {
+                const currentVal = item.permissions[userId] || 'default';
+                return `
+                    <div class="flex items-center justify-between bg-base p-2 rounded border border-border">
+                        <div class="flex items-center gap-2">
+                            <img src="${users[userId].avatar}" class="w-6 h-6 rounded-full border border-border">
+                            <span class="font-medium text-gray-200 text-sm truncate max-w-[90px]" title="${users[userId].name}">${users[userId].name}</span>
+                        </div>
+                        <select id="perm_select_${userId}" class="bg-card text-gray-200 border border-border rounded px-1 py-1 text-xs focus:outline-none focus:border-purple-500 max-w-[120px]">
+                            <option value="default" ${currentVal === 'default' ? 'selected' : ''}>Par défaut</option>
+                            <option value="full" ${currentVal === 'full' ? 'selected' : ''}>Admin</option>
+                            <option value="limited" ${currentVal === 'limited' ? 'selected' : ''}>Limité</option>
+                            <option value="write" ${currentVal === 'write' ? 'selected' : ''}>Modification</option>
+                            <option value="read" ${currentVal === 'read' ? 'selected' : ''}>Lecture seule</option>
+                            <option value="restricted" ${currentVal === 'restricted' ? 'selected' : ''}>Bloqué</option>
+                        </select>
+                    </div>
+                `;
+            }).join('');
+            openModal('permissionsModal');
+        }
+
+        function savePermissions() {
+            if (!currentPermItemId) return;
+            const item = state.items.find(i => i.id === currentPermItemId);
+            if (!item) return;
+            
+            item.permissions.default = normalizePermissionValue(document.getElementById('perm_select_default').value, 'read');
+
+            Object.keys(users).forEach(userId => {
+                const selectEl = document.getElementById(`perm_select_${userId}`);
+                if (selectEl) {
+                    item.permissions[userId] = normalizePermissionValue(selectEl.value, 'default');
+                }
+            });
+            item.permissions = clonePermissions(item.permissions);
+            if (item.type === 'folder') {
+                applyPermissionsToDescendants(item.id, item.permissions);
+            }
+            logHistory({ type: 'permissions', itemId: item.id, itemName: item.name, itemType: item.type }, true);
+            saveCloudData().then(() => {
+                closeModal('permissionsModal');
+                showNotification("Droits d'accès mis à jour.", "success");
+                render();
+            }).catch((err) => {
+                console.error('Erreur sauvegarde permissions', err);
+                showNotification("Impossible de sauvegarder les permissions.", "error");
+            });
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const filterStart = document.getElementById('histFilterStart').value;
+            const filterEnd = document.getElementById('histFilterEnd').value;
+            const filterUser = document.getElementById('histFilterUser').value;
+            const filterAction = document.getElementById('histFilterAction').value;
+
+            // Update user select dynamically if not done yet
+            const userSelect = document.getElementById('histFilterUser');
+            if (userSelect.options.length <= 1) {
+                Object.keys(users).forEach(uid => {
+                    const opt = document.createElement('option');
+                    opt.value = uid;
+                    opt.textContent = users[uid].name;
+                    userSelect.appendChild(opt);
+                });
+            }
+
+            let filteredHistory = state.history;
+
+            if (filterAction !== 'all') {
+                filteredHistory = filteredHistory.filter(h => h.type === filterAction);
+            }
+            if (filterUser !== 'all') {
+                filteredHistory = filteredHistory.filter(h => h.user === filterUser);
+            }
+            if (filterStart) {
+                const startDate = new Date(filterStart);
+                filteredHistory = filteredHistory.filter(h => {
+                    const parts = h.date.split(' ')[0].split('/');
+                    const hDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                    return hDate >= startDate;
+                });
+            }
+            if (filterEnd) {
+                const endDate = new Date(filterEnd);
+                filteredHistory = filteredHistory.filter(h => {
+                    const parts = h.date.split(' ')[0].split('/');
+                    const hDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                    return hDate <= endDate;
+                });
+            }
+
+            if(filteredHistory.length === 0) {
+                list.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Aucun historique correspondant disponible</td></tr>`;
+                return;
+            }
+            list.innerHTML = filteredHistory.map(entry => {
+                let actionLabel = "";
+                let details = "";
+                let colorClass = "";
+                
+                switch(entry.type) {
+                    case 'create': 
+                        actionLabel = "Création"; colorClass = "text-green-400"; 
+                        details = "Nouvel élément ajouté"; break;
+                    case 'delete': 
+                        actionLabel = "Suppression"; colorClass = "text-red-400"; 
+                        details = "Élément envoyé à la corbeille"; break;
+                    case 'rename': 
+                        actionLabel = "Renommer"; colorClass = "text-yellow-400"; 
+                        details = `<span class="line-through text-gray-500">${entry.oldName}</span> → ${entry.newName}`;
+                        break;
+                    case 'move': 
+                        actionLabel = "Déplacement"; colorClass = "text-blue-400"; 
+                        details = `<span class="line-through text-gray-500">${entry.oldParentName}</span> → ${entry.newParentName}`;
+                        break;
+                    case 'modify': 
+                        actionLabel = "Modif. Fichier"; colorClass = "text-purple-400"; 
+                        details = "Contenu textuel/code modifié";
+                        break;
+                    case 'permissions':
+                        actionLabel = "Droits d'accès"; colorClass = "text-indigo-400";
+                        details = "Modification de la sécurité Admin";
+                        break;
+                }
+                const userData = users[entry.user] || { name: 'Inconnu', avatar: '/assets/images/logo.jpg' };
+                return `
+                <tr class="border-b border-border hover:bg-card transition text-sm ${entry.restored ? 'opacity-50' : ''}">
+                    <td class="p-2 font-semibold ${colorClass}">${actionLabel}</td>
+                    <td class="p-2 flex items-center gap-2"><span>${entry.itemName}</span></td>
+                    <td class="p-2 text-gray-400 text-xs hide-mobile">${details}</td>
+                    <td class="p-2 text-gray-300 flex items-center gap-2">
+                        <img src="${userData.avatar}" class="w-5 h-5 rounded-full border border-border">
+                        ${userData.name}
+                    </td>
+                    <td class="p-2 text-gray-400 text-xs hide-mobile">${entry.date}</td>
+                    <td class="p-2 text-right">
+                        ${!entry.restored && entry.type !== 'permissions' && isUserAdmin(currentUser) ? `<button onclick="restoreHistoryEntry('${entry.id}')" class="px-3 py-1 bg-panel hover:bg-accent text-white rounded transition text-xs border border-border">Restaurer</button>` : `<span class="text-xs text-gray-500">${entry.restored ? 'Restauré' : '-'}</span>`}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function restoreHistoryEntry(historyId) {
+            const entry = state.history.find(h => h.id === historyId);
+            if(!entry || entry.restored) return;
+            let item = state.items.find(i => i.id === entry.itemId);
+            let success = false;
+            switch(entry.type) {
+                case 'delete':
+                    if(item) {
+                        item.deleted = false;
+                        item.modifiedDate = getCurrentDate();
+                        item.modifiedBy = currentUser;
+                        const parentExists = state.items.some(i => i.id === item.parentId && !i.deleted);
+                        if(item.parentId !== 'root' && !parentExists) item.parentId = 'root';
+                        success = true;
+                    }
+                    break;
+                case 'rename':
+                    if(item && !item.deleted) {
+                        item.name = entry.oldName;
+                        item.type = getFileTypeAndIcon(item.name).type;
+                        item.modifiedDate = getCurrentDate();
+                        item.modifiedBy = currentUser;
+                        success = true;
+                    }
+                    break;
+                case 'move':
+                    if(item && !item.deleted) {
+                        item.parentId = entry.oldParentId;
+                        item.modifiedDate = getCurrentDate();
+                        item.modifiedBy = currentUser;
+                        success = true;
+                    }
+                    break;
+                case 'modify':
+                    if(item && !item.deleted) {
+                        item.content = entry.oldContent;
+                        item.size = Math.max(1, Math.round(item.content.length / 1024)) + ' KB';
+                        item.modifiedDate = getCurrentDate();
+                        item.modifiedBy = currentUser;
+                        success = true;
+                    }
+                    break;
+                case 'create':
+                    if(item && !item.deleted) {
+                        item.deleted = true; 
+                        item.modifiedDate = getCurrentDate();
+                        item.modifiedBy = currentUser;
+                        success = true;
+                    }
+                    break;
+            }
+            if(success) {
+                entry.restored = true;
+                logHistory({ type: 'modify', itemId: entry.itemId, itemName: entry.itemName, itemType: entry.itemType });
+                renderHistory();
+                render();
+                showNotification("Restauration effectuée avec succès.", "success");
+            }
+        }
+
+        function openMoveModal() {
+            const list = document.getElementById('moveFolderList');
+            const folders = [{id: 'root', name: 'Accueil', depth: 0}];
+            
+            function addChildren(parentId, depth) {
+                state.items.filter(i => i.parentId === parentId && i.type === 'folder' && !i.deleted).forEach(f => {
+                    folders.push({ id: f.id, name: f.name, depth: depth });
+                    addChildren(f.id, depth + 1);
+                });
+            }
+            addChildren('root', 1);
+            const firstSelectedId = Array.from(state.selectedIds)[0];
+            list.innerHTML = folders.map(f => {
+                const indent = '&nbsp;'.repeat(f.depth * 4);
+                const isInvalid = state.selectedIds.has(f.id) || (firstSelectedId && !isMoveValid(firstSelectedId, f.id));
+                return `
+                    <div class="py-1.5 px-2 hover:bg-card cursor-pointer ${isInvalid ? 'opacity-40 pointer-events-none' : ''} flex items-center gap-2 rounded transition"
+                         onclick="selectMoveDestination(this, '${f.id}')">
+                        ${indent} <span class="text-yellow-500">📁</span> ${f.name}
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('moveModalSubmit').onclick = null;
+            openModal('moveModal');
+        }
+
+        let selectedMoveTarget = null;
+        function selectMoveDestination(element, folderId) {
+            const list = document.getElementById('moveFolderList');
+            Array.from(list.children).forEach(c => c.classList.remove('bg-blue-600/30', 'border', 'border-blue-500'));
+            
+            element.classList.add('bg-blue-600/30', 'border', 'border-blue-500');
+            selectedMoveTarget = folderId;
+            document.getElementById('moveModalSubmit').onclick = () => {
+                if(selectedMoveTarget) {
+                    let count = 0;
+                    state.selectedIds.forEach(id => {
+                        const item = state.items.find(i => i.id === id);
+                        if(item && hasAccess(item, currentUser, 'write')) {
+                            const oldParentId = item.parentId;
+                            item.parentId = selectedMoveTarget;
+                            item.modifiedDate = getCurrentDate();
+                            item.modifiedBy = currentUser;
+                            
+                            const targetFolder = state.items.find(i => i.id === selectedMoveTarget);
+                            const oldFolder = state.items.find(i => i.id === oldParentId);
+                            logHistory({ 
+                                type: 'move', itemId: item.id, itemName: item.name, itemType: item.type,
+                                oldParentId: oldParentId, newParentId: selectedMoveTarget,
+                                oldParentName: oldFolder ? oldFolder.name : 'Accueil',
+                                newParentName: targetFolder ? targetFolder.name : 'Accueil'
+                            });
+                            count++;
+                        }
+                    });
+                    state.selectedIds.clear();
+                    render();
+                    closeModal('moveModal');
+                    if(count > 0) showNotification(`${count} élément(s) déplacé(s).`, "success");
+                }
+            };
+        }
+
+        function showNotification(message, type = 'success') {
+            const notif = document.createElement('div');
+            notif.className = `fixed bottom-10 right-4 z-[200] px-4 py-2.5 rounded-lg shadow-2xl text-xs font-semibold text-white transition-all transform translate-y-2 opacity-0 ${type === 'error' ? 'bg-red-600' : 'bg-emerald-600'}`;
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            setTimeout(() => {
+                notif.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+            setTimeout(() => {
+                notif.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
+        }
+
+        function render() {
+            renderBreadcrumb();
+            renderList();
+            updateStatus();
+            syncCloudRoute({ replace: true });
+        }
+
+        function applyUrlStateFromLocation() {
+            const cloudPath = getCloudPathFromLocation();
+            if (cloudPath) {
+                const resolved = resolveNavigationFromCloudPath(cloudPath);
+                state.currentFolderId = resolved.folderId || 'root';
+                render();
+                if (resolved.fileItem) {
+                    openEditorModal(resolved.fileItem, { replaceHistory: true });
+                    return;
+                }
+            } else {
+                applyLegacyQueryState();
+                return;
+            }
+
+            if (!document.getElementById('editorModal').classList.contains('hidden')) {
+                closeModal('editorModal', { syncHistory: false });
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('editorModal').classList.contains('hidden')) {
+                if (e.key === 'ArrowLeft') {
+                    // Check if it's not a text area being actively edited
+                    if (document.activeElement.id !== 'editorTextarea') {
+                        navigateFile(-1);
+                    }
+                } else if (e.key === 'ArrowRight') {
+                    if (document.activeElement.id !== 'editorTextarea') {
+                        navigateFile(1);
+                    }
+                }
+            }
+        });
+
+        window.addEventListener('popstate', applyUrlStateFromLocation);
+
+        // Démarrage initial
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

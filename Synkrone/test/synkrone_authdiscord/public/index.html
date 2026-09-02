@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone.app</title>
+    <link rel="icon" type="image/jpeg" href="assets/images/logo.jpg">
+    <link rel="stylesheet" href="assets/mosaique.css">
+    <script src="assets/mosaique.js" defer></script>
+    <style>
+        /* --- RESET & COMPACITÉ EXTRÊME --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        /* Masquage des scrollbars et paramètres de base */
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; 
+            background-color: #181a1b;
+            color: #e1e3e6;
+            font-size: 11px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        ::-webkit-scrollbar { display: none; }
+        
+        /* --- LAYOUT FULL-WIDTH --- */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        /* --- HEADER BORD À BORD --- */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 52px;
+            padding: 0 16px;
+            background: rgba(24, 26, 27, 0.94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        .header-top {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+        }
+        .header-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            min-width: 0;
+            flex: 1; 
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #ffffff;
+            letter-spacing: -0.4px;
+            white-space: nowrap;
+        }
+        .brand-title {
+            font-style: italic;
+        }
+        .header-brand img {
+            width: 26px;
+            height: 26px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        
+        /* STRUCTURE HEADER-USER */
+        .header-user { 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-end;
+            gap: 12px;
+            width: 100%; 
+        }
+        
+        .user-left-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 1;
+            min-width: 0;
+        }
+        
+        /* Conteneur de l'avatar */
+        .avatar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Avatar standard */
+        .user-avatar { 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 1.5px solid rgba(255, 255, 255, 0.3); 
+        }
+        
+        .user-name { 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: #f0f2f5; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
+        }
+        
+        /* Badges de base */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .badge-role, .badge-admin {
+            padding: 3px 6px; 
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+        .badge-role { background: rgba(163, 230, 53, 0.15); border: 1px solid rgba(163, 230, 53, 0.35); color: #a3e635; }
+        .badge-admin { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #ef4444; }
+        
+        /* Spécifique aux krones */
+        .badge-krone { 
+            gap: 5px; 
+            background: rgba(230, 204, 118, 0.18); 
+            border: 1px solid rgba(230, 204, 118, 0.35); 
+            color: #f3e5ab; 
+            padding: 5px 10px; 
+            font-size: 0.78rem;
+            border-radius: 6px;
+        }
+        .currency-icon { font-size: 0.9rem; }
+        
+        .krones-center-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        
+        .btn-symbol {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-symbol.logout { color: #f87171; }
+        .btn-symbol.logout:hover { background: rgba(239, 68, 68, 0.25); transform: scale(1.05); }
+        
+        .btn-roulette {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border: 1px solid rgba(250, 204, 21, 0.28);
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.22), rgba(56, 189, 248, 0.16));
+            color: #fef3c7;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-roulette:hover { transform: translateY(-1px); background: linear-gradient(135deg, rgba(250, 204, 21, 0.3), rgba(56, 189, 248, 0.24)); }
+        
+        .btn-login-small {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #5865F2;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .btn-login-small:hover { background: #4752C4; }
+        .discord-icon { width: 14px; height: 14px; display: inline-block; object-fit: contain; }
+        
+        /* --- NAVBAR HORIZONTALE PRINCIPALE --- */
+        nav {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 38px;
+            background: rgba(20, 22, 23, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0 16px;
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            z-index: 5;
+        }
+        nav::-webkit-scrollbar { display: none; }
+        .nav-tabs { display: flex; align-items: center; gap: 4px; height: 100%; }
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            height: 100%;
+            padding: 0 16px;
+            color: #8a8f9d;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .nav-tab:hover { color: #ffffff; background: rgba(255, 255, 255, 0.04); }
+        .nav-tab.active { color: #a3e635; border-bottom-color: #a3e635; background: rgba(163, 230, 53, 0.08); }
+        
+        .nav-tab-icon { width: 16px; height: 16px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
+        .nav-tab-emoji { font-size: 0.95rem; line-height: 1; flex-shrink: 0; }
+
+        .roulette-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: none;
+            align-items: stretch;
+            justify-content: stretch;
+            padding: 0;
+            background: rgba(2, 6, 23, 0.82);
+            backdrop-filter: blur(10px);
+        }
+        .roulette-modal.open { display: flex; }
+        .roulette-modal-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            overflow: hidden;
+            border: 0;
+            box-shadow: none;
+            background: #09090f;
+        }
+        .roulette-modal-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 10;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 12px;
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
+            color: #e2e8f0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(2, 6, 23, 0.45);
+            backdrop-filter: blur(6px);
+            transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+        }
+        .roulette-modal-close:hover {
+            transform: translateY(-1px);
+            color: #ffffff;
+            border-color: rgba(56, 189, 248, 0.55);
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.94));
+            box-shadow: 0 10px 22px rgba(2, 6, 23, 0.5);
+        }
+        .roulette-modal-close:active {
+            transform: scale(0.96);
+        }
+        .roulette-modal-close:focus-visible {
+            outline: 2px solid rgba(56, 189, 248, 0.75);
+            outline-offset: 2px;
+        }
+        .roulette-modal-frame { width: 100%; height: 100%; border: 0; background: #09090f; }
+        
+        /* --- SOUS-NAVIGATION --- */
+        #section-menu-container { min-height: 0; }
+        #section-menu-container .sub-nav {
+            display: flex; align-items: center; gap: 4px; width: 100%; height: 38px;
+            padding: 0 16px; background: rgba(20, 22, 23, 0.85); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-bottom: none; border-radius: 0;
+            overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+        }
+        #section-menu-container .sub-nav::-webkit-scrollbar { display: none; }
+        #section-menu-container .sub-nav-tab {
+            display: flex; align-items: center; justify-content: center; height: 100%;
+            padding: 0 16px; color: #8a8f9d; font-size: 0.8rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+            border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap;
+        }
+        #section-menu-container .sub-nav-tab:hover { color: #ffffff; background: rgba(255, 255, 255, 0.04); }
+        #section-menu-container .sub-nav-tab.active { color: #a3e635; border-bottom-color: #a3e635; background: rgba(163, 230, 53, 0.08); }
+        
+        /* --- CONTENU --- */
+        main {
+            flex: 1;
+            width: 100vw;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            overflow: hidden;
+        }
+        .content-frame {
+            display: block; width: 100%; height: 100%; border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0; background: rgba(20, 22, 23, 0.75);
+        }
+        .content-frame.with-section-menu {
+            height: calc(100% - 38px); border-top: none; border-top-left-radius: 0; border-top-right-radius: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* --- FOOTER --- */
+        footer {
+            display: flex; align-items: center; justify-content: center; gap: 16px;
+            height: 26px; width: 100vw; background: rgba(24, 26, 27, 0.9);
+            border-top: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0;
+        }
+        .footer-brand { display: none; align-items: center; gap: 6px; font-weight: 700; color: #fff; font-size: 0.8rem; font-style: italic; opacity: 0.7; }
+        .footer-brand img { width: 14px; height: 14px; border-radius: 3px; }
+        .footer-links { display: flex; align-items: center; gap: 16px; }
+        .footer-link { color: rgba(255, 255, 255, 0.65); text-decoration: none; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.3px; transition: color 0.15s ease; }
+        .footer-link:hover { color: #a3e635; }
+        .footer-separator { color: rgba(255, 255, 255, 0.2); font-size: 0.65rem; }
+        .hidden { display: none !important; }
+        
+        /* --- AJUSTEMENTS MOBILES --- */
+        @media (max-width: 768px) {
+            header {
+                padding: 0 8px;
+                gap: 4px;
+            }
+            .header-brand {
+                font-size: 0.85rem;
+                gap: 6px;
+            }
+            .header-brand img {
+                width: 20px;
+                height: 20px;
+            }
+            .header-user {
+                gap: 6px;
+            }
+            .roulette-text { 
+                display: none; 
+            }
+            .btn-roulette { 
+                padding: 6px 8px; 
+                font-size: 1rem;
+            }
+            .roulette-modal-close {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                font-size: 1.15rem;
+            }
+            .user-name {
+                max-width: 90px;
+                font-size: 0.8rem;
+            }
+            footer { justify-content: space-between; padding: 0 16px; }
+            .footer-brand { display: flex; }
+            .footer-links { gap: 12px; }
+            body.hide-brand-mobile #app-header .header-top {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="mosaic-bg">
+    <div class="app-container">
+        <header id="app-header"></header>
+        
+        <div id="menu-container"></div>
+        <main>
+            <div id="section-menu-container"></div>
+            <iframe
+                id="content-frame"
+                class="content-frame"
+                title="Contenu de la section"
+                src="about:blank"
+            ></iframe>
+        </main>
+        
+        <footer>
+            <div class="footer-brand">
+                <img src="/assets/images/logo.jpg" alt="Logo">
+                <span class="brand-title">Synkrone.app</span>
+            </div>
+            <div class="footer-links">
+                <a href="/cgu" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('cgu', { updateUrl: true });">CGU</a>
+                <span class="footer-separator">/</span>
+                <a href="/contact" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('contact', { updateUrl: true });">NOUS CONTACTER</a>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // --- ETAT SESSION FRONTEND ---
+        const store = {
+            user: null
+        };
+        const SUPPORT_GRADE_ORDER = {
+            Aucun: 0,
+            Kronium: 1,
+            Synkral: 2,
+            Kronalloy: 3,
+            Synkronite: 4,
+            Kronix: 5
+        };
+        function isManualStaffRole(roleValue) {
+            const normalized = String(roleValue || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            return ['staff', 'equipe', 'equipes'].includes(normalized);
+        }
+        function resolveSupportGradeLabel(user) {
+            const gradeFromProfile = String(user?.grade || 'Aucun');
+            const roleFromProfile = String(user?.role || 'Krobi');
+            const gradeRank = SUPPORT_GRADE_ORDER[gradeFromProfile] || 0;
+            const roleRank = SUPPORT_GRADE_ORDER[roleFromProfile] || 0;
+            const topRank = Math.max(gradeRank, roleRank);
+            if (topRank <= 0) return 'Krobi';
+            return Object.keys(SUPPORT_GRADE_ORDER).find((name) => SUPPORT_GRADE_ORDER[name] === topRank) || 'Krobi';
+        }
+        function resolveHeaderRoleBadge(user) {
+            if (!user) return 'Krobi';
+            const rawRole = String(user.role || 'Krobi').trim() || 'Krobi';
+            const isAdminProfile = Boolean(user.isTeamOwner);
+            const isStaffProfile = !isAdminProfile && isManualStaffRole(rawRole);
+            if (isAdminProfile) {
+                return 'Admin';
+            }
+            if (isStaffProfile) {
+                return 'Équipes';
+            }
+            return resolveSupportGradeLabel(user);
+        }
+        
+        function formatKrones(value) {
+            if (value >= 1e9) return (value / 1e9).toFixed(1).replace(/\.0$/, '') + ' MM';
+            if (value >= 1e6) return (value / 1e6).toFixed(1).replace(/\.0$/, '') + ' M';
+            if (value >= 1e3) return (value / 1e3).toFixed(1).replace(/\.0$/, '') + ' K';
+            return value.toString();
+        }
+        function loginDiscord() {
+            window.location.href = '/auth/discord';
+        }
+        async function loadMenu() {
+            const menuContainer = document.getElementById('menu-container');
+            if (!menuContainer) return;
+            try {
+                const res = await fetch('/menu.html');
+                if (!res.ok) return;
+                menuContainer.innerHTML = await res.text();
+            } catch (e) {
+                console.error("Erreur lors du chargement du menu", e);
+            }
+        }
+        async function loadSessionUser() {
+            try {
+                const res = await fetch('/api/me');
+                if (!res.ok) {
+                    store.user = null;
+                    return;
+                }
+                const data = await res.json();
+                store.user = data.authenticated ? data.user : null;
+            } catch (e) {
+                console.error("Erreur lors du chargement de la session", e);
+                store.user = null;
+            }
+        }
+        function mergeSessionUserUpdate(incomingUser) {
+            if (!incomingUser || typeof incomingUser !== 'object') return;
+            const currentId = String(store.user?.id || '').trim();
+            const incomingId = String(incomingUser?.id || '').trim();
+            if (currentId && incomingId && currentId !== incomingId) {
+                return;
+            }
+            store.user = {
+                ...(store.user || {}),
+                ...incomingUser
+            };
+            renderUI();
+        }
+        async function refreshSessionUserSilently() {
+            try {
+                const res = await fetch('/api/me');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data?.authenticated || !data.user) return;
+                mergeSessionUserUpdate(data.user);
+            } catch {
+                // no-op
+            }
+        }
+        function canAccessAdmin() {
+            return Boolean(store.user && store.user.isTeamOwner);
+        }
+        function canAccessEquipe() {
+            if (!store.user) return false;
+            if (store.user.isTeamOwner) return true;
+            return isManualStaffRole(store.user.role) || store.user.role === 'Admin';
+        }
+        function applyMenuVisibility() {
+            const adminTab = document.querySelector('.nav-tab[data-target="admin"]');
+            if (adminTab) adminTab.classList.toggle('hidden', !canAccessAdmin());
+
+            const equipeTab = document.querySelector('.nav-tab[data-target="equipe"]');
+            if (equipeTab) equipeTab.classList.toggle('hidden', !canAccessEquipe());
+        }
+        async function logout() {
+            await fetch('/logout');
+            store.user = null;
+            renderUI();
+        }
+        
+        const APP_STRUCTURE = {
+            accueil: {
+                route: '/accueil',
+                page: '/accueil/index.html'
+            },
+            discord: {
+                route: '/discord',
+                menu: '/discord/menu.html',
+                defaultSubTab: 'bots',
+                pages: {
+                    bots: '/discord/bots/index.html',
+                    publicbot: '/discord/publicbot/index.html',
+                    dashbot: '/discord/dashbot/index.html',
+                    me: '/discord/me/index.html',
+                    bump: '/discord/bump/index.html'
+                },
+                routes: {
+                    bots: '/discord/bots',
+                    publicbot: '/discord/publicbot',
+                    dashbot: '/discord/dashbot',
+                    me: '/discord/me',
+                    bump: '/discord/bump'
+                }
+            },
+            minecraft: {
+                route: '/minecraft',
+                menu: '/minecraft/menu.html',
+                defaultSubTab: 'serveur',
+                pages: {
+                    serveur: '/minecraft/serveur/index.html',
+                    modpack: '/minecraft/modpack/index.html'
+                },
+                routes: {
+                    serveur: '/minecraft/serveur',
+                    modpack: '/minecraft/modpack'
+                }
+            },
+            admin: {
+                route: '/admin',
+                menu: '/admin/menu.html',
+                defaultSubTab: 'utilisateur',
+                pages: {
+                    utilisateur: '/admin/utilisateur/index.html',
+                    annonce: '/admin/annonce/index.html',
+                    pm2: '/admin/pm2/index.html'
+                },
+                routes: {
+                    utilisateur: '/admin/utilisateur',
+                    annonce: '/admin/annonce',
+                    pm2: '/admin/pm2'
+                }
+            },
+            equipe: {
+                route: '/equipe',
+                menu: '/equipe/menu.html',
+                defaultSubTab: 'espace-travail',
+                pages: {
+                    'espace-travail': '/equipe/espace-travail/index.html',
+                    cloud: '/equipe/cloud/index.html'
+                },
+                routes: {
+                    'espace-travail': '/equipe/espace-travail',
+                    cloud: '/equipe/cloud'
+                }
+            },
+            cgu: {
+                route: '/cgu',
+                page: '/cgu.html'
+            },
+            contact: {
+                route: '/contact',
+                page: '/contact.html'
+            }
+        };
+
+        function normalizePath(pathname) {
+            if (!pathname) return '/';
+            if (pathname.length > 1 && pathname.endsWith('/')) {
+                return pathname.slice(0, -1);
+            }
+            return pathname;
+        }
+
+        function parseRoute(pathname) {
+            const currentPath = normalizePath(pathname || '/');
+            
+            if (currentPath === '/') {
+                return { mainSection: 'accueil', subTab: null, canonical: '/accueil' };
+            }
+            if (currentPath === '/discord/bots') {
+                return {
+                    mainSection: 'discord',
+                    subTab: 'bots',
+                    botsTab: 'discord',
+                    canonical: '/discord/bots/discord'
+                };
+            }
+            if (currentPath === '/minecraft/modpack') {
+                return {
+                    mainSection: 'minecraft',
+                    subTab: 'modpack',
+                    modpackTab: 'accueil',
+                    canonical: '/minecraft/modpack/accueil'
+                };
+            }
+            
+            const botsPrefix = '/discord/bots/';
+            if (currentPath.startsWith(botsPrefix)) {
+                const botsTab = currentPath.slice(botsPrefix.length);
+                return {
+                    mainSection: 'discord',
+                    subTab: 'bots',
+                    botsTab,
+                    canonical: currentPath
+                };
+            }
+            
+            const modpackPrefix = '/minecraft/modpack/';
+            if (currentPath.startsWith(modpackPrefix)) {
+                const modpackTab = currentPath.slice(modpackPrefix.length);
+                return {
+                    mainSection: 'minecraft',
+                    subTab: 'modpack',
+                    modpackTab,
+                    canonical: currentPath
+                };
+            }
+            
+            const cloudPrefix = '/equipe/cloud/';
+            if (currentPath.startsWith(cloudPrefix)) {
+                const cloudPath = currentPath.slice(cloudPrefix.length);
+                return {
+                    mainSection: 'equipe',
+                    subTab: 'cloud',
+                    cloudPath,
+                    canonical: currentPath
+                };
+            }
+            
+            for (const [mainSection, section] of Object.entries(APP_STRUCTURE)) {
+                if (!section.pages) {
+                    if (currentPath === section.route) {
+                        return { mainSection, subTab: null, canonical: section.route };
+                    }
+                    continue;
+                }
+                if (currentPath === section.route) {
+                    const defaultPath = section.routes ? section.routes[section.defaultSubTab] : section.route;
+                    return { mainSection, subTab: section.defaultSubTab, canonical: defaultPath };
+                }
+                const sectionRoutes = section.routes || {};
+                for (const [subTab, routePath] of Object.entries(sectionRoutes)) {
+                    if (currentPath === routePath) {
+                        return { mainSection, subTab, canonical: routePath };
+                    }
+                }
+            }
+            
+            // Si la route n'a correspondu à rien d'autre, on part du principe que c'est un profil (ex: /vex)
+            const cleanPath = currentPath.replace(/^\//, '');
+            if (cleanPath && !cleanPath.includes('/')) {
+                return { 
+                    mainSection: 'discord', 
+                    subTab: 'me', 
+                    profileTab: currentPath, 
+                    canonical: currentPath
+                };
+            }
+
+            return { mainSection: 'accueil', subTab: null, canonical: '/accueil' };
+        }
+
+        function syncBrowserPath(nextPath, replaceHistory = false) {
+            const targetPath = normalizePath(nextPath);
+            const currentPath = normalizePath(window.location.pathname);
+            if (targetPath === currentPath) return;
+            if (replaceHistory) {
+                window.history.replaceState({}, '', targetPath);
+                return;
+            }
+            window.history.pushState({}, '', targetPath);
+        }
+
+        function setFrameSrc(path) {
+            const frame = document.getElementById('content-frame');
+            if (!frame || !path) return;
+            frame.src = path;
+        }
+
+        function setActiveMainTab(mainSection) {
+            const mainTabs = document.querySelectorAll('.nav-tab');
+            mainTabs.forEach(tab => {
+                const target = tab.getAttribute('data-target');
+                tab.classList.toggle('active', target === mainSection);
+            });
+        }
+
+        function setActiveSubTab(activeTabName) {
+            const subTabs = document.querySelectorAll('#section-menu-container .sub-nav-tab');
+            subTabs.forEach(tab => {
+                const target = tab.getAttribute('data-target');
+                tab.classList.toggle('active', target === activeTabName);
+            });
+        }
+
+        async function loadSectionMenu(mainSection) {
+            const sectionMenuContainer = document.getElementById('section-menu-container');
+            const frame = document.getElementById('content-frame');
+            const section = APP_STRUCTURE[mainSection];
+            if (!sectionMenuContainer || !frame || !section) return;
+            if (!section.menu) {
+                sectionMenuContainer.innerHTML = '';
+                frame.classList.remove('with-section-menu');
+                return;
+            }
+            try {
+                const res = await fetch(`${section.menu}?v=2`, { cache: 'no-store' });
+                if (!res.ok) {
+                    sectionMenuContainer.innerHTML = '';
+                    frame.classList.remove('with-section-menu');
+                    return;
+                }
+                sectionMenuContainer.innerHTML = await res.text();
+                frame.classList.add('with-section-menu');
+            } catch (e) {
+                console.error("Erreur lors du chargement du menu de section", e);
+                sectionMenuContainer.innerHTML = '';
+                frame.classList.remove('with-section-menu');
+            }
+        }
+
+        function bindSectionMenuEvents(mainSection) {
+            const section = APP_STRUCTURE[mainSection];
+            if (!section || !section.pages) return;
+            const subTabs = document.querySelectorAll('#section-menu-container .sub-nav-tab');
+            subTabs.forEach(tab => {
+                tab.onclick = (e) => {
+                    const subTarget = e.currentTarget.getAttribute('data-target');
+                    const pagePath = e.currentTarget.getAttribute('data-page') || section.pages[subTarget];
+                    if (!pagePath) return;
+                    e.preventDefault();
+                    setActiveSubTab(subTarget);
+                    setFrameSrc(pagePath);
+                    const targetRoute = section.routes?.[subTarget] || section.route;
+                    syncBrowserPath(targetRoute);
+                };
+            });
+        }
+
+        async function navigateToMainSection(mainSection, options = {}) {
+            const { subTab = null, updateUrl = true, replaceHistory = false, botsTab = null, modpackTab = null, cloudPath = null, profileTab = null } = options;
+            const section = APP_STRUCTURE[mainSection];
+            if (!section) return;
+            if (mainSection === 'admin' && !canAccessAdmin()) {
+                await navigateToMainSection('accueil', { updateUrl: true, replaceHistory: true });
+                return;
+            }
+            if (mainSection === 'equipe' && !canAccessEquipe()) {
+                await navigateToMainSection('accueil', { updateUrl: true, replaceHistory: true });
+                return;
+            }
+            setActiveMainTab(mainSection);
+            await loadSectionMenu(mainSection);
+            if (!section.pages) {
+                setFrameSrc(section.page);
+                if (updateUrl) {
+                    syncBrowserPath(section.route || section.page, replaceHistory);
+                }
+                return;
+            }
+            bindSectionMenuEvents(mainSection);
+            const resolvedSubTab = subTab && section.pages[subTab] ? subTab : section.defaultSubTab;
+            setActiveSubTab(resolvedSubTab);
+            let framePath = section.pages[resolvedSubTab];
+            
+            if (mainSection === 'discord' && resolvedSubTab === 'bots' && botsTab) {
+                framePath = `${framePath}?tab=${encodeURIComponent(botsTab)}`;
+            }
+            if (mainSection === 'minecraft' && resolvedSubTab === 'modpack' && modpackTab) {
+                framePath = `${framePath}?tab=${encodeURIComponent(modpackTab)}`;
+            }
+            if (mainSection === 'equipe' && resolvedSubTab === 'cloud' && cloudPath) {
+                framePath = `${framePath}?cloudPath=${encodeURIComponent(cloudPath)}`;
+            }
+            if (mainSection === 'discord' && resolvedSubTab === 'me' && profileTab) {
+                framePath = `${framePath}?profile=${encodeURIComponent(profileTab.replace(/^\//, ''))}`;
+            }
+
+            setFrameSrc(framePath);
+            
+            if (updateUrl) {
+                const sectionRoutes = section.routes || {};
+                let targetRoute = sectionRoutes[resolvedSubTab] || section.route;
+                if (mainSection === 'discord' && resolvedSubTab === 'bots') {
+                    targetRoute = `/discord/bots/${botsTab || 'discord'}`;
+                }
+                if (mainSection === 'minecraft' && resolvedSubTab === 'modpack') {
+                    targetRoute = `/minecraft/modpack/${modpackTab || 'accueil'}`;
+                }
+                if (mainSection === 'equipe' && resolvedSubTab === 'cloud' && cloudPath) {
+                    targetRoute = `/equipe/cloud/${cloudPath}`;
+                }
+                if (mainSection === 'discord' && resolvedSubTab === 'me' && profileTab) {
+                    targetRoute = profileTab; 
+                }
+                syncBrowserPath(targetRoute, replaceHistory);
+            }
+        }
+
+        function initMainNavigation() {
+            const mainTabs = document.querySelectorAll('.nav-tab');
+            mainTabs.forEach(tab => {
+                tab.addEventListener('click', async (e) => {
+                    const mainSection = e.currentTarget.getAttribute('data-target');
+                    await navigateToMainSection(mainSection, { updateUrl: true });
+                });
+            });
+        }
+
+        function applyMobileHeaderBrandVisibility() {
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+            const username = String(store.user?.username || '').trim();
+            const shouldHideBrand = Boolean(store.user) && isMobile && username.length > 6;
+            document.body.classList.toggle('hide-brand-mobile', shouldHideBrand);
+        }
+        
+        // --- RENDU DYNAMIQUE DE L'INTERFACE ---
+        function renderUI() {
+            const header = document.getElementById('app-header');
+            const user = store.user;
+            if (!user) {
+                header.innerHTML = `
+                    <div class="header-top">
+                        <div class="header-brand">
+                            <img src="/assets/images/logo.jpg" alt="Logo">
+                            <span class="brand-title">Synkrone.app</span>
+                        </div>
+                    </div>
+                    <div class="header-bottom">
+                        <div class="header-user">
+                            <button class="btn-login-small" onclick="loginDiscord()">
+                                <img class="discord-icon" src="https://cdn.simpleicons.org/discord/FFFFFF" alt="Discord">
+                                <span>Se connecter</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const safeKrone = typeof user.krone === 'number' ? user.krone : 0;
+                const safeRole = resolveHeaderRoleBadge(user);
+                const safeAvatar = user.avatar || '/assets/images/logo.jpg';
+                const kroneLabel = safeKrone <= 1 ? "Krône" : "Krônes";
+                
+                const formattedKrone = formatKrones(safeKrone);
+                const badgeClass = safeRole === 'Admin' ? 'badge badge-admin' : 'badge badge-role';
+                
+                header.innerHTML = `
+                    <div class="header-top">
+                        <div class="header-brand">
+                            <img src="/assets/images/logo.jpg" alt="Logo">
+                            <span class="brand-title">Synkrone.app</span>
+                        </div>
+                    </div>
+                    <div class="header-bottom">
+                        <div class="header-user">
+                            
+                            <button class="btn-roulette" onclick="openRouletteModal()" title="Roulette">
+                                🎰<span class="roulette-text"> Roulette</span>
+                            </button>
+                            
+                            <div class="user-left-section">
+                                <div class="avatar-wrapper">
+                                    <img class="user-avatar" src="${safeAvatar}" alt="Avatar" onerror="this.src='/assets/images/logo.jpg';">
+                                    <div class="${badgeClass}"><span>${safeRole}</span></div>
+                                </div>
+                                <span class="user-name">${user.username}</span>
+                            </div>
+                            
+                            <div class="krones-center-section">
+                                <div class="badge badge-krone" title="${safeKrone.toLocaleString('fr-FR')} ${kroneLabel}">
+                                    <span class="currency-icon">🪙</span>
+                                    <span>${formattedKrone} ${kroneLabel}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="header-actions">
+                                <button class="btn-symbol logout" title="Déconnexion" onclick="logout()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                        </div>
+                    </div>
+                `;
+            }
+            applyMenuVisibility();
+            applyMobileHeaderBrandVisibility();
+        }
+        
+        function openRouletteModal() {
+            const modal = document.getElementById('roulette-modal');
+            if (!modal) return;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeRouletteModal() {
+            const modal = document.getElementById('roulette-modal');
+            if (!modal) return;
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        
+        // --- DÉMARRAGE ---
+        (async function init() {
+            await loadMenu();
+            await loadSessionUser();
+            renderUI();
+            initMainNavigation();
+            
+            const rouletteModal = document.getElementById('roulette-modal');
+            if (rouletteModal) {
+                rouletteModal.addEventListener('click', (event) => {
+                    if (event.target === rouletteModal) closeRouletteModal();
+                });
+            }
+            const route = parseRoute(window.location.pathname);
+            await navigateToMainSection(route.mainSection, {
+                subTab: route.subTab,
+                botsTab: route.botsTab || null,
+                modpackTab: route.modpackTab || null,
+                cloudPath: route.cloudPath || null,
+                profileTab: route.profileTab || null,
+                updateUrl: true,
+                replaceHistory: normalizePath(window.location.pathname) !== normalizePath(route.canonical)
+            });
+            window.addEventListener('popstate', async () => {
+                const popRoute = parseRoute(window.location.pathname);
+                await navigateToMainSection(popRoute.mainSection, {
+                    subTab: popRoute.subTab,
+                    botsTab: popRoute.botsTab || null,
+                    modpackTab: popRoute.modpackTab || null,
+                    cloudPath: popRoute.cloudPath || null,
+                    profileTab: popRoute.profileTab || null,
+                    updateUrl: false
+                });
+            });
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) return;
+                const payload = event.data;
+                if (!payload || payload.type !== 'synkrone:bots-route') return;
+                const rawTab = typeof payload.tab === 'string' ? payload.tab.trim().toLowerCase() : '';
+                if (!rawTab) return;
+                const targetPath = `/discord/bots/${rawTab}`;
+                syncBrowserPath(targetPath, Boolean(payload.replaceHistory));
+            });
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) return;
+                const payload = event.data;
+                if (!payload || payload.type !== 'synkrone:modpack-route') return;
+                const rawTab = typeof payload.tab === 'string' ? payload.tab.trim().toLowerCase() : '';
+                if (!rawTab) return;
+                const targetPath = `/minecraft/modpack/${rawTab}`;
+                syncBrowserPath(targetPath, Boolean(payload.replaceHistory));
+            });
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) return;
+                const payload = event.data;
+                if (!payload || payload.type !== 'synkrone:cloud-route') return;
+                const rawPath = typeof payload.path === 'string' ? payload.path.trim() : '';
+                if (!rawPath) return;
+                syncBrowserPath(rawPath, Boolean(payload.replaceHistory));
+            });
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) return;
+                const payload = event.data;
+                if (!payload || payload.type !== 'synkrone:user-updated') return;
+                mergeSessionUserUpdate(payload.user || null);
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    refreshSessionUserSilently();
+                }
+            });
+            window.setInterval(() => {
+                refreshSessionUserSilently();
+            }, 15000);
+            window.addEventListener('resize', applyMobileHeaderBrandVisibility);
+        })();
+    </script>
+    <div id="roulette-modal" class="roulette-modal" aria-hidden="true">
+        <div class="roulette-modal-card">
+            <button class="roulette-modal-close" onclick="closeRouletteModal()" aria-label="Fermer la roulette">×</button>
+            <iframe class="roulette-modal-frame" src="/roulette.html"></iframe>
+        </div>
+    </div>
+</body>
+</html>

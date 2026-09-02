@@ -1,0 +1,119 @@
+{
+  "columns": [
+    {
+      "id": "todo",
+      "title": "À faire",
+      "color": "#eab308",
+      "collapsed": false
+    },
+    {
+      "id": "doing",
+      "title": "En cours",
+      "color": "#3b82f6",
+      "collapsed": false
+    },
+    {
+      "id": "done",
+      "title": "Terminé",
+      "color": "#22c55e",
+      "collapsed": false
+    }
+  ],
+  "projectRoles": {
+    "p_1787436043899_1366780122891419784": "",
+    "p_1787436043899_537650216023752746": ""
+  },
+  "projects": [
+    {
+      "id": "p_1787436043899",
+      "name": "Synkrone Site",
+      "desc": "",
+      "members": [
+        "1366780122891419784",
+        "537650216023752746",
+        "1122092101459517481"
+      ],
+      "createdAt": 1787436043899
+    }
+  ],
+  "versions": [
+    {
+      "id": "v_1787436067403",
+      "projectId": "p_1787436043899",
+      "name": "V0",
+      "desc": "",
+      "createdAt": 1787436067403
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t_1787436107218",
+      "versionId": "v_1787436067403",
+      "title": "Onglet me",
+      "desc": "",
+      "status": "todo",
+      "author": "1366780122891419784",
+      "comments": []
+    },
+    {
+      "id": "t_1787436117939",
+      "versionId": "v_1787436067403",
+      "title": "Onglet bump",
+      "desc": "",
+      "status": "todo",
+      "author": "1366780122891419784",
+      "comments": []
+    },
+    {
+      "id": "t_1787436133011",
+      "versionId": "v_1787436067403",
+      "title": "Onglet bots",
+      "desc": "",
+      "status": "todo",
+      "author": "1366780122891419784",
+      "comments": []
+    },
+    {
+      "id": "t_1787436145475",
+      "versionId": "v_1787436067403",
+      "title": "onglet dashbot",
+      "desc": "",
+      "status": "todo",
+      "author": "1366780122891419784",
+      "comments": []
+    }
+  ],
+  "notes": [],
+  "polls": [
+    {
+      "id": "poll_1786992563931",
+      "versionId": "v_1786992406251",
+      "question": "fd",
+      "author": "723720252134785057",
+      "options": [
+        {
+          "id": "opt_0",
+          "text": "f",
+          "voters": [
+            "723720252134785057",
+            "1366780122891419784"
+          ]
+        },
+        {
+          "id": "opt_1",
+          "text": "g",
+          "voters": []
+        }
+      ]
+    }
+  ],
+  "chat": [
+    {
+      "id": "m_1786992499772",
+      "versionId": "v_1786992406251",
+      "author": "1366780122891419784",
+      "text": "yo ça va",
+      "timestamp": 1786992499772
+    }
+  ]
+}

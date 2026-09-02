@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone Modpacks</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <style>
+        :root {
+            --bg-main: #181a1b;
+            --bg-panel: rgba(34, 37, 39, 0.85);
+            --bg-panel-hover: rgba(42, 46, 48, 0.95);
+            --text-main: #d1cdc7;
+            --text-muted: #8b8f92;
+            --accent: #7ac943;
+            --border: #383c3f;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            color-scheme: dark;
+        }
+
+        nav.tabs {
+            display: flex;
+            gap: 6px;
+            background-color: rgba(24, 26, 27, 0.9);
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--border);
+            width: 100%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }
+
+        button.tab-btn {
+            flex: 1;
+            min-width: 135px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--bg-panel);
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        button.tab-btn img {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        button.tab-btn:hover {
+            background-color: var(--bg-panel-hover);
+            color: var(--text-main);
+            border-color: var(--border);
+        }
+
+        button.tab-btn.active {
+            background-color: rgba(66, 108, 38, 0.55);
+            color: #f4ffe8;
+            border: 1px solid var(--accent);
+        }
+
+        main {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        iframe#content-frame {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: transparent;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .fade-out { opacity: 0 !important; }
+    </style>
+</head>
+<body>
+    <nav class="tabs">
+        <button class="tab-btn" id="btn-accueil" onclick="loadTab('accueil')">
+            <img src="/assets/images/minecraft.png" alt="Accueil"> Accueil
+        </button>
+        <button class="tab-btn" id="btn-xenus" onclick="loadTab('xenus')">
+            <img src="https://media.forgecdn.net/avatars/thumbnails/1346/250/64/64/638874907456203025.png" alt="Xenus"> Xenus
+        </button>
+        <button class="tab-btn" id="btn-thefrenchbaguette" onclick="loadTab('thefrenchbaguette')">
+            <img src="https://media.forgecdn.net/attachments/description/1217771/description_a8235a90-2120-414c-a3cf-fe8c61285724.png" alt="The French Baguette"> The French Baguette
+        </button>
+        <button class="tab-btn" id="btn-vanipack" onclick="loadTab('vanipack')">
+            <img src="https://media.forgecdn.net/avatars/thumbnails/1401/657/64/64/638908553901119098.png" alt="Vanipack"> Vanipack
+        </button>
+    </nav>
+
+    <main>
+        <iframe id="content-frame" title="Contenu Modpack"></iframe>
+    </main>
+
+    <script>
+        function resolveInitialTab() {
+            const params = new URLSearchParams(window.location.search);
+            const queryTab = (params.get('tab') || '').trim().toLowerCase();
+            const knownRoutes = new Set(['accueil', 'xenus', 'thefrenchbaguette', 'vanipack']);
+            return knownRoutes.has(queryTab) ? queryTab : 'accueil';
+        }
+
+        function notifyParentRoute(routeName, replaceHistory = false) {
+            if (window.parent === window) return;
+
+            window.parent.postMessage(
+                {
+                    type: 'synkrone:modpack-route',
+                    tab: routeName,
+                    replaceHistory
+                },
+                window.location.origin
+            );
+        }
+
+        function loadTab(routeName, options = {}) {
+            const { notifyParent = true, replaceParentHistory = false } = options;
+            const iframe = document.getElementById('content-frame');
+            const btnId = 'btn-' + routeName;
+
+            if (notifyParent) {
+                notifyParentRoute(routeName, replaceParentHistory);
+            }
+
+            iframe.classList.add('fade-out');
+            setTimeout(() => {
+                iframe.src = `/minecraft/modpack/${routeName}.html`;
+                iframe.onload = () => {
+                    iframe.classList.remove('fade-out');
+                };
+            }, 120);
+
+            document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(btnId);
+            if (activeBtn && activeBtn.classList.contains('tab-btn')) {
+                activeBtn.classList.add('active');
+                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const initialTab = resolveInitialTab();
+            loadTab(initialTab, { notifyParent: true, replaceParentHistory: true });
+        });
+    </script>
+</body>
+</html>

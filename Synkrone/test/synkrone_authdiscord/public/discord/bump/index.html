@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone | Plateforme Serveurs & Bots</title>
+    <!-- Ajout de FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #181a1b;
+            --surface: rgba(30, 32, 34, 0.78);
+            --surface-hover: rgba(45, 48, 51, 0.9);
+            --surface-active: rgba(109, 140, 255, 0.15);
+            --border: rgba(255, 255, 255, 0.12);
+            --border-hover: rgba(255, 255, 255, 0.28);
+            
+            --accent: #e14f4f;
+            --accent-2: #6d8cff;
+            --accent-gold: #ffd700;
+            --krones: #4ade80;
+            
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            
+            --radius: 14px;
+            --radius-sm: 10px;
+            --transition: all 0.22s ease;
+            
+            --role-owner: #e14f4f;
+            --role-admin: #6d8cff;
+            --role-member: #a0a0a0;
+        }
+
+        /* Reset strict pour supprimer absolument toutes les marges */
+        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+        *::-webkit-scrollbar { width: 6px; height: 6px; }
+        *::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            display: flex;
+            background: var(--bg);
+        }
+
+        /* Couche dynamique pour le background personnalisé du profil */
+        #dynamic-bg {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at 15% 0%, rgba(109, 140, 255, 0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 85% 100%, rgba(225, 79, 79, 0.05) 0%, transparent 40%);
+            background-size: cover;
+            background-position: center;
+            transition: var(--transition);
+        }
+
+        #app-layout { 
+            display: flex; 
+            width: 100%; 
+            height: 100%; 
+            margin: 0; 
+            padding: 0; 
+            flex-direction: column;
+            z-index: 1;
+        }
+
+        #main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 20px; position: relative; }
+        .page-container { max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+        
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); backdrop-filter: blur(12px); padding: 20px; }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; padding: 10px 18px; font-size: 14px; transition: var(--transition); }
+        .btn-primary { background: var(--accent-2); color: #fff; }
+        .btn-primary:hover { background: #5c7ae6; }
+        .btn-join { background: #5865F2; color: #fff; font-weight: bold; width: 100%; padding: 12px; font-size: 16px; margin-top: 15px;}
+        .btn-join:hover { background: #4752C4; }
+        .btn-success { background: var(--krones); color: #000; }
+        .btn-success:hover { background: #3cb868; }
+        .btn-danger { background: rgba(225, 79, 79, 0.2); border: 1px solid var(--accent); color: var(--accent); }
+        .btn-danger:hover { background: rgba(225, 79, 79, 0.4); }
+        .btn-outline { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--border-hover); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+        .tab-btn { background: none; border: none; color: var(--text-dim); padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: var(--transition); white-space: nowrap; }
+        .tab-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .tab-btn.active { background: var(--surface-active); color: var(--accent-2); border: 1px solid rgba(109, 140, 255, 0.4); }
+
+        .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: var(--text-dim); }
+        .form-control { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px 14px; border-radius: 8px; font-family: inherit; width: 100%; transition: var(--transition);}
+        .form-control:focus { outline: none; border-color: var(--accent-2); background: rgba(0,0,0,0.5);}
+        .color-picker { padding: 0; height: 40px; cursor: pointer; border-radius: 8px; border: 1px solid var(--border); background: transparent; width: 100%; overflow: hidden; }
+
+        .marquee-container { padding: 10px; overflow: hidden; display: flex; align-items: center; border-radius: var(--radius); }
+        .marquee-track { display: flex; align-items: center; gap: 12px; width: max-content; animation: marquee-right 30s linear infinite; }
+        .marquee-track:hover { animation-play-state: paused; }
+        .marquee-item { display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px 6px 6px; cursor: pointer; transition: var(--transition); }
+        .marquee-item:hover { border-color: var(--accent-gold); background: rgba(255, 215, 0, 0.1); }
+        .marquee-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+        @keyframes marquee-right { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        
+        .server-card { background: rgba(20, 22, 24, 0.6); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; gap: 12px; position: relative; }
+        .server-card:hover { transform: translateY(-3px); border-color: var(--border-hover); background: var(--surface-hover); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .server-card.featured { border-color: rgba(255, 215, 0, 0.4); background: linear-gradient(145deg, rgba(30,32,34,0.9), rgba(50,40,10,0.8)); box-shadow: 0 0 15px rgba(255,215,0,0.1); }
+        
+        .server-top { display: flex; align-items: center; gap: 12px; }
+        .server-icon { width: 54px; height: 54px; border-radius: var(--radius-sm); object-fit: cover; border: 1px solid var(--border); }
+        .server-info { flex: 1; min-width: 0; }
+        .server-name { font-weight: 700; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px;}
+        
+        .role-badge { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; margin-bottom: 5px;}
+        .role-owner { background: rgba(225, 79, 79, 0.15); color: var(--role-owner); border: 1px solid rgba(225, 79, 79, 0.3); }
+        .role-admin { background: rgba(109, 140, 255, 0.15); color: var(--role-admin); border: 1px solid rgba(109, 140, 255, 0.3); }
+        .role-member { background: rgba(160, 160, 160, 0.15); color: var(--role-member); border: 1px solid rgba(160, 160, 160, 0.3); }
+
+        .profile-wrapper { border-radius: var(--radius); overflow: hidden; transition: var(--transition); display: flex; flex-direction: column; border: 1px solid var(--border); background: var(--surface); }
+        .profile-banner { width: 100%; height: 200px; position: relative; }
+        .profile-content { padding: 24px; flex: 1; position: relative; display: flex; flex-direction: column; }
+        
+        .hero-profile { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-top: -80px; margin-bottom: 20px; }
+        .avatar-wrap { width: 120px; height: 120px; border-radius: var(--radius-sm); padding: 4px; background: var(--bg); position: relative; z-index: 2; border: 1px solid var(--border); }
+        .avatar-wrap img { width: 100%; height: 100%; border-radius: calc(var(--radius-sm) - 4px); object-fit: cover; }
+        
+        .profile-controls { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 10; }
+        .nav-controls { display: flex; gap: 10px; margin-bottom: 15px; justify-content: space-between;}
+        .nav-controls-left { display: flex; gap: 10px; }
+        .nav-controls-right { display: flex; gap: 10px; margin-left: auto; }
+        
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
+        .shop-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 15px; display: flex; flex-direction: column; gap: 10px; justify-content: space-between; }
+        
+        .synkrone-warning { background: rgba(225, 79, 79, 0.1); border: 1px solid var(--accent); color: var(--text); padding: 15px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 15px; margin-bottom: 20px;}
+        
+        .list-section { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; margin-top: 20px; }
+        .data-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .data-chip { background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px;}
+
+        /* Modal Classique */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; width: 90%; max-width: 420px; transform: scale(0.95); transition: transform 0.2s; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 12px; color: #fff; }
+        .modal-text { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+        /* Modal Liste Complète */
+        #listModalBox { max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; }
+        #listModalContent { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-right: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="dynamic-bg"></div>
+
+    <!-- Modal Classique de confirmation -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-box">
+            <div class="modal-title" id="modalTitle">Titre</div>
+            <div class="modal-text" id="modalText">Texte</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="modalCancelBtn" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" id="modalConfirmBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal d'affichage de la liste complète -->
+    <div class="modal-overlay" id="listModal">
+        <div class="modal-box" id="listModalBox">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                <div class="modal-title" style="margin:0;" id="listModalTitle">Liste Complète</div>
+                <button class="btn btn-outline" style="padding: 5px 10px;" onclick="closeListModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="listModalContent">
+                <!-- Contenu injecté -->
+            </div>
+        </div>
+    </div>
+
+    <div id="app-layout">
+        <!-- Main Content -->
+        <main id="main-content">
+            <div class="page-container" id="view-container">
+                <!-- Vues injectées par JS -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let store = { user: null };
+        let MonProfil = { likedServers: [] };
+        let AllServers = [];
+
+        const ShopItems = {
+            featured: { id: 'featured', name: 'Mise en avant (2 Heures)', desc: 'Apparaître en haut de l\'explorateur. Durée limitée.', cost: 50 },
+            theme: { id: 'theme', name: 'Personnalisation Thème', desc: 'Modifier l\'apparence, l\'URL et le fond de page.', cost: 50 },
+            owners: { id: 'owners', name: 'Afficher Owner', desc: 'Montrer le fondateur sur la bannière.', cost: 10 },
+            admins: { id: 'admins', name: 'Afficher Admins', desc: 'Montrer l\'équipe de modération.', cost: 10 },
+            bots: { id: 'bots', name: 'Afficher Bots', desc: 'Lister les bots présents.', cost: 10 },
+            roles: { id: 'roles', name: 'Afficher Rôles', desc: 'Montrer les rôles principaux.', cost: 10 },
+            channels: { id: 'channels', name: 'Afficher Salons', desc: 'Aperçu de la structure du serveur.', cost: 10 }
+        };
+
+        const viewContainer = document.getElementById('view-container');
+        
+        let currentExplorerTab = 'featured';
+        let currentMyServersFilter = 'all';
+        let modalCallback = null;
+
+        // Fonction pour gérer le background de fond de page (Global)
+        function updateGlobalBackground(theme) {
+            const dynBg = document.getElementById('dynamic-bg');
+            if(theme && theme.active) {
+                if (theme.bgImg) {
+                    dynBg.style.background = `url('${theme.bgImg}') center/cover fixed`;
+                } else if (theme.bg) {
+                    dynBg.style.background = theme.bg;
+                }
+            } else {
+                dynBg.style.background = `radial-gradient(circle at 15% 0%, rgba(109, 140, 255, 0.08) 0%, transparent 40%), radial-gradient(circle at 85% 100%, rgba(225, 79, 79, 0.05) 0%, transparent 40%), var(--bg)`;
+            }
+        }
+
+        // Système de Modals
+        function showModal(title, text, confirmLabel, onConfirm, showCancel = true) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').innerHTML = text;
+            const btnConfirm = document.getElementById('modalConfirmBtn');
+            const btnCancel = document.getElementById('modalCancelBtn');
+            
+            btnConfirm.textContent = confirmLabel;
+            btnCancel.style.display = showCancel ? 'inline-flex' : 'none';
+            modalCallback = onConfirm;
+            
+            document.getElementById('customModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.remove('active');
+            modalCallback = null;
+        }
+
+        function showListModal(serverId, featureKey, title) {
+            let server = AllServers.find(s => s.id === serverId);
+            let data = server.internalData[featureKey];
+            
+            document.getElementById('listModalTitle').textContent = title;
+            
+            // On réutilise la même logique d'affichage que renderPublicSection, mais pour tous les éléments
+            let html = data.map(item => {
+                if (featureKey === 'roles' || featureKey === 'channels') {
+                    return `<div class="data-chip w-full" style="justify-content: flex-start; padding: 10px;">${item}</div>`;
+                } else {
+                    return `
+                        <div class="data-chip w-full" style="justify-content: flex-start; padding: 10px; gap:12px;">
+                            <img src="${item.avatar || 'https://placehold.co/40x40/313338/FFF?text=?'}" style="width:28px; height:28px; border-radius:50%;">
+                            <span style="font-weight:bold;">${item.name}</span>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            document.getElementById('listModalContent').innerHTML = html;
+            document.getElementById('listModal').classList.add('active');
+        }
+
+        function closeListModal() {
+            document.getElementById('listModal').classList.remove('active');
+        }
+
+        document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+            if(modalCallback) modalCallback();
+            closeModal();
+        });
+
+        // Navigation
+        async function navigate(view, params = null) {
+            viewContainer.innerHTML = '';
+            
+            if (view === 'explorer') {
+                updateGlobalBackground(null); // Reset background
+                renderExplorer();
+            }
+            else if (view === 'myservers') {
+                updateGlobalBackground(null);
+                renderMyServers();
+            }
+            else if (view === 'server_profile') {
+                await fetchRealServerData(params); 
+                renderServerProfile(params);
+            }
+            else if (view === 'server_edit') {
+                updateGlobalBackground(null);
+                await fetchRealServerData(params);
+                renderServerEdit(params);
+            }
+        }
+
+        // --- Fetch des Vraies Données API Discord & Options achetées ---
+        async function fetchRealServerData(serverId) {
+            let server = AllServers.find(s => s.id === serverId);
+            if (!server) return;
+            
+            try {
+                const resMod = await fetch(`/api/discord/bump/server/${serverId}/modules`);
+                if (resMod.ok) {
+                    const dataMod = await resMod.json();
+                    server.unlockedFeatures = dataMod.purchasedModules || [];
+                    server.disabledFeatures = dataMod.disabledModules || [];
+                    
+                    if (dataMod.featuredUntil && new Date(dataMod.featuredUntil) > new Date()) {
+                        server.isFeatured = true;
+                    } else {
+                        server.isFeatured = false;
+                    }
+                }
+            } catch (e) {
+                console.error("Impossible de récupérer les modules", e);
+            }
+
+            try {
+                const resDet = await fetch(`/api/discord/bump/server/${serverId}/details`);
+                if (resDet.ok) {
+                    const discordData = await resDet.json();
+                    
+                    server.stats.members = discordData.members || server.stats.members;
+                    server.stats.online = discordData.online || server.stats.online;
+                    
+                    if (discordData.owner) server.internalData.owners = [discordData.owner];
+                    server.internalData.admins = discordData.admins || [];
+                    server.internalData.bots = discordData.bots || [];
+                    server.internalData.roles = discordData.roles || [];
+                    server.internalData.channels = discordData.channels || [];
+                    
+                    server.hasSynkrone = true;
+                } else {
+                    server.hasSynkrone = false;
+                }
+            } catch (e) {
+                console.error("Bot non présent ou erreur API", e);
+                server.hasSynkrone = false;
+            }
+        }
+
+        // --- Vue Explorateur ---
+        function renderExplorer() {
+            let totalServers = AllServers.length;
+            let totalMembers = AllServers.reduce((acc, s) => acc + s.stats.members, 0);
+            
+            const featuredServers = AllServers.filter(s => s.isFeatured);
+            const marqueeServers = featuredServers.length > 0 ? featuredServers : AllServers.slice(0, 10);
+            
+            let html = `
+                <div class="nav-controls">
+                    <div class="nav-controls-right">
+                        ${store.user ? `
+                            <button class="btn btn-primary" style="background: var(--krones); color: #000;" onclick="navigate('myservers')">
+                                <i class="fa-solid fa-shield-halved"></i> Accéder à mes serveurs
+                            </button>
+                        ` : `
+                            <button class="btn btn-outline" onclick="window.parent && window.parent.loginDiscord ? window.parent.loginDiscord() : window.location.href='/auth/discord'">
+                                Connexion requise pour vos serveurs
+                            </button>
+                        `}
+                    </div>
+                </div>
+
+                <section class="panel marquee-container">
+                    <div class="marquee-track">
+                        ${[...marqueeServers, ...marqueeServers, ...marqueeServers].map(s => `
+                            <div class="marquee-item" onclick="navigate('server_profile', '${s.id}')">
+                                <img class="marquee-avatar" src="${s.icon}" alt="Serveur" onerror="this.src='https://placehold.co/100x100/1e2022/6d8cff?text=S'">
+                                <span style="font-size:13px; font-weight:700; color:var(--text);">${s.name}</span>
+                                ${s.isFeatured ? '<span style="font-size:12px;">⭐</span>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+
+                <div class="panel" style="background: linear-gradient(135deg, rgba(109, 140, 255, 0.08), transparent);">
+                    <div>
+                        <h1 style="font-size: 26px; font-weight: 800; margin-bottom: 15px;">Explorateur Synkrone</h1>
+                        <div style="display:flex; gap: 20px; font-size: 13px; color: var(--text-dim); font-weight: 600; margin-bottom: 20px;">
+                            <span>🌍 ${totalServers.toLocaleString()} Serveurs listés</span>
+                            <span>👥 ${totalMembers.toLocaleString()} Membres touchés</span>
+                        </div>
+                    </div>
+                    
+                    <div class="tabs" style="margin-bottom: 0; border:none;">
+                        <button class="tab-btn ${currentExplorerTab === 'featured' ? 'active' : ''}" onclick="setExplorerTab('featured')"><i class="fa-solid fa-star"></i> Mis en avant</button>
+                        <button class="tab-btn ${currentExplorerTab === 'top' ? 'active' : ''}" onclick="setExplorerTab('top')"><i class="fa-solid fa-trophy"></i> Top Classement</button>
+                        <button class="tab-btn ${currentExplorerTab === 'all' ? 'active' : ''}" onclick="setExplorerTab('all')">Tous les serveurs</button>
+                    </div>
+                </div>
+                
+                <div id="explorer-content"></div>
+            `;
+            viewContainer.innerHTML = html;
+            renderExplorerContent();
+        }
+
+        window.setExplorerTab = function(tab) { currentExplorerTab = tab; renderExplorer(); }
+
+        function renderExplorerContent() {
+            const content = document.getElementById('explorer-content');
+            let list = [];
+
+            if(currentExplorerTab === 'featured') {
+                list = AllServers.filter(s => s.isFeatured);
+            } else if(currentExplorerTab === 'top') {
+                list = [...AllServers].sort((a,b) => b.stats.views - a.stats.views);
+            } else {
+                list = AllServers;
+            }
+
+            if(list.length === 0) {
+                content.innerHTML = `<div class="panel" style="text-align:center; padding: 40px; color:var(--text-dim);">Aucun serveur trouvé dans cette catégorie.</div>`;
+                return;
+            }
+
+            content.innerHTML = `<div class="grid-cards">${list.map(s => createServerCard(s)).join('')}</div>`;
+        }
+
+        function createServerCard(server) {
+            let roleHtml = '';
+            if(server.userRole === 'owner') roleHtml = `<span class="role-badge role-owner">Owner</span>`;
+            else if(server.userRole === 'admin') roleHtml = `<span class="role-badge role-admin">Admin</span>`;
+            else if(server.userRole === 'member') roleHtml = `<span class="role-badge role-member">Membre</span>`;
+
+            return `
+                <div class="server-card ${server.isFeatured ? 'featured' : ''}" onclick="navigate('server_profile', '${server.id}')">
+                    ${server.isFeatured ? '<span class="role-badge" style="background:rgba(255,215,0,0.2); color:var(--accent-gold); border:1px solid rgba(255,215,0,0.4); margin-bottom:8px; width:fit-content;"><i class="fa-solid fa-star"></i> Mis en avant</span>' : ''}
+                    <div class="server-top">
+                        <img src="${server.icon}" class="server-icon" alt="Icon" onerror="this.src='https://placehold.co/100x100/1e2022/6d8cff?text=S'">
+                        <div class="server-info">
+                            <div class="server-name">${server.name}</div>
+                            ${roleHtml}
+                            <div style="font-size:12px; color:var(--text-dim); display:flex; gap:10px; margin-top:2px;">
+                                <span><i class="fa-solid fa-users"></i> ${server.stats.members}</span>
+                                <span><i class="fa-solid fa-circle text-green-500"></i> ${server.stats.online}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-dim); margin-top:8px; line-height:1.4;">${server.desc.substring(0,70)}...</p>
+                </div>
+            `;
+        }
+
+        // --- Vue Mes Serveurs ---
+        function renderMyServers() {
+            let myServers = AllServers.filter(s => s.userRole !== 'none');
+            
+            let html = `
+                <div class="nav-controls">
+                    <div class="nav-controls-left">
+                        <button class="btn btn-outline" onclick="navigate('explorer')"><i class="fa-solid fa-house"></i> Retour à l'accueil</button>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 20px;">Mes Serveurs</h1>
+                    
+                    <div class="tabs">
+                        <button class="tab-btn ${currentMyServersFilter === 'all' ? 'active' : ''}" onclick="setMyServersFilter('all')">Tous</button>
+                        <button class="tab-btn ${currentMyServersFilter === 'owner' ? 'active' : ''}" onclick="setMyServersFilter('owner')">Mes Propriétés</button>
+                        <button class="tab-btn ${currentMyServersFilter === 'admin' ? 'active' : ''}" onclick="setMyServersFilter('admin')">Administration</button>
+                    </div>
+
+                    <div id="myservers-content"></div>
+                </div>
+            `;
+            viewContainer.innerHTML = html;
+            renderMyServersContent(myServers);
+        }
+
+        window.setMyServersFilter = function(filter) {
+            currentMyServersFilter = filter;
+            renderMyServers();
+        }
+
+        function renderMyServersContent(myServers) {
+            const content = document.getElementById('myservers-content');
+            let list = myServers;
+            
+            if(currentMyServersFilter === 'owner') list = list.filter(s => s.userRole === 'owner');
+            if(currentMyServersFilter === 'admin') list = list.filter(s => s.userRole === 'admin' || s.userRole === 'owner');
+
+            if(list.length === 0) {
+                content.innerHTML = `<p style="color:var(--text-dim); text-align:center; padding: 20px;">Aucun serveur trouvé. Vérifiez que vous êtes bien admin sur les serveurs possédant le bot.</p>`;
+                return;
+            }
+
+            content.innerHTML = `<div class="grid-cards">${list.map(s => createServerCardEdit(s)).join('')}</div>`;
+        }
+
+        function createServerCardEdit(server) {
+            let roleHtml = '';
+            if(server.userRole === 'owner') roleHtml = `<span class="role-badge role-owner">Owner</span>`;
+            else if(server.userRole === 'admin') roleHtml = `<span class="role-badge role-admin">Admin</span>`;
+
+            let canEdit = server.userRole === 'owner' || server.userRole === 'admin';
+            let actionBtn = canEdit 
+                ? `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px;" onclick="event.stopPropagation(); navigate('server_edit', '${server.id}')"><i class="fa-solid fa-gear"></i> Gérer le profil</button>`
+                : `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px;" onclick="event.stopPropagation(); navigate('server_profile', '${server.id}')"><i class="fa-solid fa-users"></i> Voir profil</button>`;
+
+            return `
+                <div class="server-card" onclick="navigate('server_profile', '${server.id}')">
+                    <div class="server-top">
+                        <img src="${server.icon}" class="server-icon" alt="Icon" onerror="this.src='https://placehold.co/100x100/1e2022/6d8cff?text=S'">
+                        <div class="server-info">
+                            <div class="server-name">${server.name}</div>
+                            ${roleHtml}
+                        </div>
+                    </div>
+                    ${actionBtn}
+                </div>
+            `;
+        }
+
+        // --- Vue Profil du Serveur (Public) ---
+        function renderServerProfile(serverId) {
+            let server = AllServers.find(s => s.id === serverId);
+            if(!server) return;
+
+            server.stats.views++;
+            
+            let isLiked = MonProfil.likedServers.includes(server.id);
+            let canEdit = server.userRole === 'owner' || server.userRole === 'admin';
+            
+            let isThemeActive = server.unlockedFeatures.includes('theme') && server.customTheme.active && !server.disabledFeatures.includes('theme');
+            let th = isThemeActive 
+                ? server.customTheme 
+                : { bg: 'var(--bg)', bgImg: '', text: 'var(--text)', border: 'var(--border)', panelBg: 'rgba(0,0,0,0.2)', bannerBg: '#2b2d31', inviteType: 'auto', customInviteUrl: '' };
+
+            // Mise à jour du background global
+            updateGlobalBackground(th);
+
+            // Gestion de la bannière dynamique (Image ou Couleur unie)
+            let bannerStyle = '';
+            if (server.banner) {
+                bannerStyle = `background: url('${server.banner}') center/cover;`;
+            } else {
+                bannerStyle = `background: ${th.bannerBg || '#2b2d31'};`;
+            }
+
+            // Gestion de l'affichage du Owner sur la bannière (si option activée)
+            let ownerHtml = '';
+            if (server.unlockedFeatures.includes('owners') && !server.disabledFeatures.includes('owners') && server.internalData.owners.length > 0) {
+                let owner = server.internalData.owners[0];
+                ownerHtml = `
+                    <div style="position:absolute; bottom:15px; left:15px; display:flex; align-items:center; gap:10px; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); padding:6px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
+                        <i class="fa-solid fa-crown" style="color: var(--accent-gold); font-size:12px;"></i>
+                        <img src="${owner.avatar || 'https://placehold.co/40x40/313338/FFF?text=O'}" style="width:30px; height:30px; border-radius:50%; border:1px solid rgba(255,255,255,0.2);">
+                        <div>
+                            <div style="font-size:10px; color:#ccc; line-height:1;">Propriétaire</div>
+                            <div style="font-size:13px; font-weight:bold; color:#fff;">${owner.name || 'Inconnu'}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Lien d'invitation
+            let inviteLink = (th.inviteType === 'custom' && th.customInviteUrl) ? th.customInviteUrl : "https://discord.gg/p768u2Pgp3";
+
+            let html = `
+                <div class="nav-controls">
+                    <div class="nav-controls-left">
+                        <button class="btn btn-outline" onclick="navigate('explorer')"><i class="fa-solid fa-house"></i> Accueil</button>
+                        ${store.user ? `<button class="btn btn-outline" onclick="navigate('myservers')"><i class="fa-solid fa-shield-halved"></i> Mes Serveurs</button>` : ''}
+                    </div>
+                </div>
+                
+                <div class="profile-wrapper" style="background: ${th.panelBg || 'var(--surface)'}; color: ${th.text}; border-color: ${th.border}; backdrop-filter: blur(12px);">
+                    
+                    <div class="profile-banner" style="${bannerStyle}">
+                        ${ownerHtml}
+                    </div>
+                    
+                    <div class="profile-content">
+                        <div class="profile-controls">
+                            ${canEdit ? `<button class="btn btn-outline" style="background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); color:#fff; border-color:rgba(255,255,255,0.2);" onclick="navigate('server_edit', '${server.id}')"><i class="fa-solid fa-gear"></i> Gérer</button>` : ''}
+                            <button class="btn ${isLiked ? 'btn-primary' : 'btn-outline'}" style="background:${isLiked ? 'var(--accent)' : 'rgba(0,0,0,0.6)'}; backdrop-filter:blur(5px); color:#fff; border-color:${isLiked ? 'var(--accent)' : 'rgba(255,255,255,0.2)'};" onclick="toggleServerLike('${server.id}')">
+                                <i class="fa-solid fa-heart"></i> ${isLiked ? 'Liké' : 'Liker'} (${server.stats.likes})
+                            </button>
+                        </div>
+
+                        <div class="hero-profile">
+                            <div class="avatar-wrap" style="background: ${th.bg || 'var(--bg)'}; border-color: ${th.border};">
+                                <img src="${server.icon}" alt="Icône" onerror="this.src='https://placehold.co/100x100/1e2022/6d8cff?text=S'">
+                            </div>
+                            <h1 style="font-size: 26px; font-weight: 800; color: ${th.text}; margin-top:5px;">${server.name}</h1>
+                            
+                            <div style="display:flex; gap: 15px; margin-top: 5px; font-size: 13px; opacity: 0.8; flex-wrap: wrap; justify-content: center;">
+                                <span><i class="fa-solid fa-users"></i> ${server.stats.members.toLocaleString()} Membres</span>
+                                <span style="color: #4ade80;"><i class="fa-solid fa-circle text-xs"></i> ${server.stats.online.toLocaleString()} Connectés</span>
+                                <span><i class="fa-solid fa-eye"></i> ${server.stats.views.toLocaleString()} Vues</span>
+                            </div>
+                            
+                            <p style="margin-top:15px; max-width:600px; line-height:1.6; opacity:0.9;">${server.desc}</p>
+                            
+                            <button onclick="window.open('${inviteLink}', '_blank')" class="btn-join" style="max-width: 300px;">
+                                <i class="fa-solid fa-right-to-bracket"></i> Rejoindre le serveur
+                            </button>
+                        </div>
+                        
+                        <div style="display:flex; flex-wrap: nowrap; overflow-x: auto; gap:20px; margin-top:20px; padding-bottom:10px;">
+                            ${renderPublicSection(server, 'admins', '🛡️ Administration', th.panelBg, (data) => data.map(u => `<div class="data-chip"><img src="${u.avatar}" style="width:20px; height:20px; border-radius:50%;">${u.name}</div>`).join(''))}
+                            ${renderPublicSection(server, 'bots', '🤖 Bots', th.panelBg, (data) => data.map(b => `<div class="data-chip"><img src="${b.avatar}" style="width:20px; height:20px; border-radius:50%;">${b.name}</div>`).join(''))}
+                            ${renderPublicSection(server, 'roles', '🎭 Rôles Principaux', th.panelBg, (data) => data.map(r => `<div class="data-chip">${r}</div>`).join(''))}
+                            ${renderPublicSection(server, 'channels', '💬 Salons Actifs', th.panelBg, (data) => data.map(c => `<div class="data-chip"><i class="fa-solid fa-hashtag text-gray-400"></i> ${c}</div>`).join(''))}
+                        </div>
+                    </div>
+                </div>
+            `;
+            viewContainer.innerHTML = html;
+        }
+
+        // Modifie la génération des sections pour n'afficher que les 5 premiers, avec bouton "Voir la suite", et permet de s'aligner côte à côte
+        function renderPublicSection(server, featureKey, title, panelBg, renderFn) {
+            if(!server.unlockedFeatures.includes(featureKey) || server.disabledFeatures.includes(featureKey)) return '';
+            let data = server.internalData[featureKey];
+            if(!data || data.length === 0) return '';
+            
+            let displayData = data.slice(0, 5);
+            let contentHtml = renderFn(displayData);
+            
+            let btnHtml = '';
+            if (data.length > 5) {
+                btnHtml = `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px; background:rgba(0,0,0,0.2);" onclick="showListModal('${server.id}', '${featureKey}', '${title}')">
+                                <i class="fa-solid fa-plus"></i> Voir les ${data.length - 5} autres
+                           </button>`;
+            }
+            
+            return `
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 15px; flex: 1; min-width: 200px; display: flex; flex-direction: column;">
+                    <h3 style="font-size:14px; font-weight:700; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; white-space: nowrap;">${title}</h3>
+                    <div class="data-list" style="display:flex; flex-direction:column; flex: 1;">${contentHtml}</div>
+                    ${btnHtml}
+                </div>
+            `;
+        }
+
+        window.toggleServerLike = function(serverId) {
+            let idx = MonProfil.likedServers.indexOf(serverId);
+            let server = AllServers.find(s => s.id === serverId);
+            if(idx === -1) {
+                MonProfil.likedServers.push(serverId);
+                server.stats.likes++;
+            } else {
+                MonProfil.likedServers.splice(idx, 1);
+                server.stats.likes--;
+            }
+            renderServerProfile(serverId);
+        }
+
+        // --- Vue Édition du Serveur ---
+        function renderServerEdit(serverId) {
+            let server = AllServers.find(s => s.id === serverId);
+            if(!server || (server.userRole !== 'owner' && server.userRole !== 'admin')) {
+                viewContainer.innerHTML = `<div class="panel">Accès refusé.</div>`;
+                return;
+            }
+
+            let html = `
+                <div class="nav-controls">
+                    <div class="nav-controls-left">
+                        <button class="btn btn-outline" onclick="navigate('explorer')"><i class="fa-solid fa-house"></i> Accueil</button>
+                        <button class="btn btn-outline" onclick="navigate('server_profile', '${server.id}')"><i class="fa-solid fa-play"></i> Retour au profil public</button>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 5px;">Gérer : ${server.name}</h1>
+                    <p style="color:var(--text-dim); font-size:13px; margin-bottom: 24px;">Paramétrez le profil public de votre serveur et gérez vos fonctionnalités.</p>
+
+                    ${!server.hasSynkrone ? `
+                        <div class="synkrone-warning">
+                            <span style="font-size:24px;">🚫</span>
+                            <div>
+                                <strong style="display:block; margin-bottom:4px;">Le bot Synkrone n'est pas sur ce serveur.</strong>
+                                <span style="font-size:13px; opacity:0.8;">Vous ne pouvez pas activer de fonctionnalités internes tant que le bot n'est pas invité.</span>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="synkrone-warning" style="background:rgba(74, 222, 128, 0.1); border-color:rgba(74, 222, 128, 0.4);">
+                            <span style="font-size:24px;">✅</span>
+                            <div>
+                                <strong style="display:block; margin-bottom:4px; color:var(--krones)">Bot Synkrone détecté !</strong>
+                                <span style="font-size:13px; opacity:0.8;">Les statistiques en direct et listes dynamiques sont opérationnelles via l'API.</span>
+                            </div>
+                        </div>
+                    `}
+
+                    <div class="list-section">
+                        <h3 style="margin-bottom:15px;">Informations Générales</h3>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="editDesc" class="form-control" rows="3">${server.desc}</textarea>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                            <div class="form-group"><label>Lien Icône</label><input type="text" id="editIcon" class="form-control" value="${server.icon}"></div>
+                            <div class="form-group"><label>Lien Bannière (Image)</label><input type="text" id="editBanner" class="form-control" value="${server.banner}"></div>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top:10px;" onclick="saveServerBasic('${server.id}')">Sauvegarder les infos</button>
+                    </div>
+
+                    <h2 style="font-size: 20px; font-weight: 700; margin-top: 30px; margin-bottom: 10px;">Boutique Modules & Visibilité</h2>
+                    <p style="color:var(--text-dim); font-size:13px; margin-bottom: 15px;">Achetez des fonctionnalités pour améliorer la page de votre serveur et désactivez-les au besoin.</p>
+                    
+                    <div class="shop-grid">
+                        ${Object.values(ShopItems).map(item => createShopItem(server, item)).join('')}
+                    </div>
+
+                    ${server.unlockedFeatures.includes('theme') ? `
+                        <div class="list-section">
+                            <h3 style="margin-bottom:15px; display:flex; justify-content:space-between;">
+                                Configuration Avancée (Thème & URL) 
+                                <label style="font-size:13px; font-weight:normal; display:flex; align-items:center; gap:8px;">
+                                    <input type="checkbox" id="themeActive" ${server.customTheme.active ? 'checked' : ''}> Activer la customisation
+                                </label>
+                            </h3>
+                            
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>URL Personnalisée (ex: /me/...)</label>
+                                    <input type="text" id="themeCustomUrl" class="form-control" value="${server.customTheme.customUrl || ''}" placeholder="mon-super-serveur">
+                                </div>
+                                <div class="form-group">
+                                    <label>Type d'invitation</label>
+                                    <select id="themeInviteType" class="form-control" onchange="document.getElementById('themeInviteLinkBox').style.display = this.value === 'custom' ? 'block' : 'none'">
+                                        <option value="auto" ${server.customTheme.inviteType !== 'custom' ? 'selected' : ''}>Automatique</option>
+                                        <option value="custom" ${server.customTheme.inviteType === 'custom' ? 'selected' : ''}>Personnalisé</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" id="themeInviteLinkBox" style="display: ${server.customTheme.inviteType === 'custom' ? 'block' : 'none'};">
+                                <label>Lien d'invitation personnalisé</label>
+                                <input type="text" id="themeCustomInviteUrl" class="form-control" value="${server.customTheme.customInviteUrl || ''}" placeholder="https://discord.gg/...">
+                            </div>
+
+                            <hr style="border:0; border-top:1px solid var(--border); margin: 20px 0;">
+
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label>Couleur de Fond Globale</label>
+                                    <input type="color" id="themeBg" class="color-picker" value="${server.customTheme.bg || '#181a1b'}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Image de fond (Prioritaire, URL)</label>
+                                    <input type="text" id="themeBgImg" class="form-control" value="${server.customTheme.bgImg || ''}" placeholder="https://...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Couleur du Texte</label>
+                                    <input type="color" id="themeText" class="color-picker" value="${server.customTheme.text || '#ffffff'}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Couleur d'Accentuation (Bordures)</label>
+                                    <input type="color" id="themeBorder" class="color-picker" value="${server.customTheme.border || '#e14f4f'}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fond des Panneaux (Couleur) </label>
+                                    <input type="text" id="themePanelBg" class="form-control" value="${server.customTheme.panelBg || 'rgba(0,0,0,0.2)'}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Couleur Unie de la Bannière</label>
+                                    <input type="color" id="themeBannerBg" class="color-picker" value="${server.customTheme.bannerBg || '#2b2d31'}">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="margin-top:15px;" onclick="saveServerTheme('${server.id}')">Sauvegarder les paramètres</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            viewContainer.innerHTML = html;
+        }
+
+        function createShopItem(server, item) {
+            let isUnlocked = server.unlockedFeatures.includes(item.id) || (item.id === 'featured' && server.isFeatured);
+            let isDisabled = server.disabledFeatures.includes(item.id);
+            let needsBot = ['owners', 'admins', 'bots', 'roles', 'channels'].includes(item.id);
+            let disabledStr = (!server.hasSynkrone && needsBot) ? 'disabled title="Nécessite le bot"' : '';
+
+            let actionHtml = '';
+
+            if (item.id === 'featured') {
+                if (server.isFeatured) {
+                    actionHtml = `<button class="btn" style="width:100%; font-size:12px; background:rgba(255,215,0,0.1); border:1px solid var(--accent-gold); color:var(--accent-gold);" disabled>Déjà mis en avant</button>`;
+                } else {
+                    actionHtml = `<button class="btn btn-outline" style="width:100%; font-size:12px; border-color:rgba(74,222,128,0.5); color:var(--krones);" onclick="buyServerFeature('${server.id}', '${item.id}')">Acheter (${item.cost} Kr)</button>`;
+                }
+            } else {
+                if (isUnlocked) {
+                    if (isDisabled) {
+                        actionHtml = `<button class="btn btn-outline" style="width:100%; font-size:12px; border-color:var(--krones); color:var(--krones);" onclick="toggleServerFeature('${server.id}', '${item.id}', 'enable')">Activer</button>`;
+                    } else {
+                        actionHtml = `<button class="btn btn-danger" style="width:100%; font-size:12px;" onclick="toggleServerFeature('${server.id}', '${item.id}', 'disable')">Désactiver</button>`;
+                    }
+                } else {
+                    actionHtml = `<button class="btn btn-outline" style="width:100%; font-size:12px; border-color:rgba(74,222,128,0.5); color:var(--krones);" ${disabledStr} onclick="buyServerFeature('${server.id}', '${item.id}')">Acheter (${item.cost} Kr)</button>`;
+                }
+            }
+
+            return `
+                <div class="shop-item ${isUnlocked && !isDisabled ? 'unlocked' : ''}">
+                    <div>
+                        <div style="font-weight:700; font-size:15px; margin-bottom:5px;">${item.name}</div>
+                        <div style="font-size:12px; color:var(--text-dim); line-height:1.4;">${item.desc}</div>
+                    </div>
+                    <div style="margin-top:15px;">${actionHtml}</div>
+                </div>
+            `;
+        }
+
+        // --- Logique Actions Config ---
+        window.saveServerBasic = function(serverId) {
+            let server = AllServers.find(s => s.id === serverId);
+            server.desc = document.getElementById('editDesc').value;
+            server.icon = document.getElementById('editIcon').value;
+            server.banner = document.getElementById('editBanner').value;
+            showModal("Succès", "Informations du serveur enregistrées.", "OK", null, false);
+        }
+
+        window.saveServerTheme = function(serverId) {
+            let server = AllServers.find(s => s.id === serverId);
+            server.customTheme = {
+                active: document.getElementById('themeActive').checked,
+                bg: document.getElementById('themeBg').value,
+                bgImg: document.getElementById('themeBgImg').value,
+                text: document.getElementById('themeText').value,
+                border: document.getElementById('themeBorder').value,
+                panelBg: document.getElementById('themePanelBg').value,
+                bannerBg: document.getElementById('themeBannerBg').value,
+                customUrl: document.getElementById('themeCustomUrl').value,
+                inviteType: document.getElementById('themeInviteType').value,
+                customInviteUrl: document.getElementById('themeCustomInviteUrl').value
+            };
+            showModal("Succès", "La configuration personnalisée a été appliquée.", "OK", null, false);
+        }
+
+        window.buyServerFeature = async function(serverId, featureId) {
+            let server = AllServers.find(s => s.id === serverId);
+            let item = ShopItems[featureId];
+
+            showModal(
+                "Confirmation", 
+                `Voulez-vous acquérir <b>${item.name}</b> pour <b>${server.name}</b> ?<br><br>Coût : ${item.cost} Kr.`,
+                "Confirmer l'achat", 
+                async () => {
+                    try {
+                        const res = await fetch(`/api/discord/bump/server/${server.id}/buy`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ itemId: featureId, cost: item.cost })
+                        });
+                        if (res.ok) {
+                            if(featureId === 'featured') {
+                                server.isFeatured = true;
+                            } else {
+                                server.unlockedFeatures.push(featureId);
+                                if(featureId === 'theme' && !server.customTheme.bg) {
+                                    server.customTheme = { active: false, bg: '#181a1b', bgImg: '', text: '#ffffff', border: '#e14f4f', panelBg: 'rgba(0,0,0,0.3)', bannerBg: '#2b2d31', customUrl: '', inviteType: 'auto', customInviteUrl: '' };
+                                }
+                            }
+                            if (window.parent && window.parent.refreshSessionUserSilently) {
+                                window.parent.refreshSessionUserSilently();
+                            }
+                            renderServerEdit(serverId);
+                        } else {
+                            showModal("Erreur", "Fonds insuffisants ou erreur API.", "Fermer", null, false);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            );
+        }
+
+        window.toggleServerFeature = async function(serverId, featureId, action) {
+            let server = AllServers.find(s => s.id === serverId);
+            try {
+                const res = await fetch(`/api/discord/bump/server/${serverId}/toggle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemId: featureId, action })
+                });
+                if (res.ok) {
+                    if (action === 'disable') server.disabledFeatures.push(featureId);
+                    else server.disabledFeatures = server.disabledFeatures.filter(id => id !== featureId);
+                    renderServerEdit(serverId);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function initApp() { 
+            try { 
+                const r = await fetch("/api/me"); 
+                const d = await r.json(); 
+                store.user = d.authenticated ? d.user : null; 
+                
+                const srv = await fetch("/api/discord/bump/servers"); 
+                if(srv.ok) { 
+                    const sd = await srv.json(); 
+                    AllServers = (sd.servers || []).map(x=>({
+                        id: x.id, 
+                        name: x.name, 
+                        desc: "Serveur synchronisé avec l'infrastructure Synkrone.", 
+                        icon: x.icon ? ("https://cdn.discordapp.com/icons/" + x.id + "/" + x.icon + ".png") : "https://placehold.co/100x100/1e2022/6d8cff?text=S", 
+                        banner: "", 
+                        stats: {views:0, likes:0, members: 0, online: 0}, 
+                        userRole: x.role, 
+                        hasSynkrone: false, 
+                        isFeatured: false, 
+                        unlockedFeatures: [], 
+                        disabledFeatures: [],
+                        customTheme: {active: false}, 
+                        internalData: { owners: [], admins: [], bots: [], roles: [], channels: [] }
+                    })); 
+                }
+            } catch (e) { console.error(e); } 
+            
+            navigate("explorer"); 
+        } 
+        
+        initApp();
+    </script>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone | Nous contacter</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+    <script src="/assets/contact.js" defer></script>
+    <style>
+        :root {
+            --bg-main: #1e1f22;
+            --bg-alt: #2b2d31;
+            --panel: #313338;
+            --panel-soft: #2f3136;
+            --line: rgba(255, 255, 255, 0.1);
+            --line-strong: rgba(255, 255, 255, 0.18);
+            --text: #f2f3f5;
+            --muted: #b5bac1;
+            --accent: #5865f2;
+            --accent-hover: #4f5bd5;
+            --success: #57f287;
+            --error: #ed4245;
+            --mosaic-opacity: 0.12;
+            --mosaic-tile-size: 56px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            background: transparent;
+            padding: 0;
+        }
+
+        .contact-card {
+            width: 100%;
+            min-height: 100vh;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            border-bottom: 1px solid var(--line);
+            background: rgba(16, 18, 22, 0.28);
+            box-shadow: none;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: minmax(340px, 860px);
+            justify-content: center;
+            gap: 0;
+            padding: 16px;
+        }
+
+        .bloc {
+            border: 1px solid var(--line);
+            background: rgba(49, 51, 56, 0.54);
+            padding: 16px;
+        }
+
+        .bloc h2 {
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .bloc p,
+        label {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.52;
+        }
+
+        .form {
+            display: grid;
+            gap: 10px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 700;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line-strong);
+            background: rgba(31, 33, 37, 0.62);
+            color: var(--text);
+            font: inherit;
+            padding: 10px 11px;
+            outline: none;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: rgba(88, 101, 242, 0.75);
+            box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.2);
+        }
+
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .submit {
+            border: 1px solid transparent;
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            padding: 11px 14px;
+            cursor: pointer;
+            transition: background 0.16s ease;
+        }
+
+        .submit:hover {
+            background: var(--accent-hover);
+        }
+
+        .status {
+            min-height: 21px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .status.success {
+            color: var(--success);
+        }
+
+        .status.error {
+            color: #ff9d9f;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .state-card {
+            border: 1px solid var(--line-strong);
+            background: rgba(31, 33, 37, 0.56);
+            padding: 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .server-preview {
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid var(--line);
+            background: rgba(47, 49, 54, 0.55);
+            padding: 10px;
+        }
+
+        .server-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .server-name {
+            font-size: 0.95rem;
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        .server-subtext {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .state-title {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .state-text {
+            font-size: 0.86rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .inline-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line-strong);
+            background: #2a2d35;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 8px 11px;
+        }
+
+        /* --- NOUVEAUX STYLES POUR LES CATEGORIES --- */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .category-card {
+            cursor: pointer;
+            display: block;
+            user-select: none;
+        }
+
+        .category-card input[type="radio"] {
+            display: none;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 14px 8px;
+            background: rgba(31, 33, 37, 0.62);
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            height: 100%;
+            gap: 8px;
+        }
+
+        .card-icon {
+            font-size: 1.6rem;
+        }
+
+        .card-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--muted);
+            line-height: 1.3;
+            transition: color 0.2s ease;
+        }
+
+        .category-card:hover .card-content {
+            background: rgba(49, 51, 56, 0.8);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .category-card input[type="radio"]:checked + .card-content {
+            background: rgba(88, 101, 242, 0.15);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3);
+        }
+
+        .category-card input[type="radio"]:checked + .card-content .card-title {
+            color: #ffffff;
+        }
+        /* ------------------------------------------- */
+
+        @media (max-width: 980px) {
+            .content {
+                grid-template-columns: 1fr;
+                justify-content: stretch;
+            }
+        }
+
+        @media (max-width: 740px) {
+            .content { padding: 10px; gap: 10px; }
+
+            .field-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="mosaic-bg">
+    <article class="contact-card">
+        <div class="content">
+            <section class="bloc">
+                <h2>Contacter le support</h2>
+                
+                <div id="contact-loading" class="state-card">
+                    <p class="state-title">Vérification en cours</p>
+                    <p class="state-text">Nous vérifions votre compte Discord et votre présence sur le serveur.</p>
+                </div>
+
+                <div id="contact-login-card" class="state-card hidden">
+                    <p class="state-title">Connexion requise</p>
+                    <p id="contact-login-text" class="state-text">Pour contacter le support, connectez-vous avec le bouton Discord du header principal.</p>
+                </div>
+
+                <div id="contact-join-card" class="state-card hidden">
+                    <p class="state-title">Rejoindre le serveur requis</p>
+                    <p id="contact-join-text" class="state-text">Vous devez rejoindre le serveur Discord avant de contacter le support.</p>
+                    <div class="server-preview">
+                        <img id="contact-guild-icon" class="server-icon" src="/assets/images/logo.jpg" alt="Icône serveur">
+                        <div>
+                            <p id="contact-guild-name" class="server-name">Serveur Synkrone</p>
+                            <p class="server-subtext">ID serveur : 1368235294192570520</p>
+                        </div>
+                    </div>
+                    <div class="inline-actions">
+                        <a data-discord-link class="btn-link" href="https://discord.gg/p768u2Pgp3" target="_blank" rel="noopener noreferrer">Rejoindre le serveur</a>
+                    </div>
+                </div>
+
+                <div id="contact-ticket-wrap" class="hidden">
+                    <form id="contact-form" class="form">
+                        
+                        <!-- Remplacement du select par la grille de catégories -->
+                        <div class="field">
+                            <label>Catégorie de la demande</label>
+                            <div class="category-grid">
+                                <label class="category-card">
+                                    <input type="radio" name="theme" value="technique" required>
+                                    <span class="card-content">
+                                        <span class="card-icon">🛠️</span>
+                                        <span class="card-title">Technique & Bug</span>
+                                    </span>
+                                </label>
+                                
+                                <label class="category-card">
+                                    <input type="radio" name="theme" value="boutique">
+                                    <span class="card-content">
+                                        <span class="card-icon">💳</span>
+                                        <span class="card-title">Boutique & Paiements</span>
+                                    </span>
+                                </label>
+
+                                <label class="category-card">
+                                    <input type="radio" name="theme" value="moderation">
+                                    <span class="card-content">
+                                        <span class="card-icon">🛡️</span>
+                                        <span class="card-title">Modération & Sécurité</span>
+                                    </span>
+                                </label>
+
+                                <label class="category-card">
+                                    <input type="radio" name="theme" value="partenariat">
+                                    <span class="card-content">
+                                        <span class="card-icon">🤝</span>
+                                        <span class="card-title">Recrutement & Projets</span>
+                                    </span>
+                                </label>
+
+                                <label class="category-card">
+                                    <input type="radio" name="theme" value="autre">
+                                    <span class="card-content">
+                                        <span class="card-icon">💡</span>
+                                        <span class="card-title">Suggestion & Autre</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Fin du remplacement -->
+
+                        <div class="field">
+                            <label for="message">Votre message</label>
+                            <textarea id="message" name="message" maxlength="1800" placeholder="Décrivez votre demande..." required></textarea>
+                        </div>
+
+                        <button id="contact-submit" class="submit" type="submit">Envoyer au support</button>
+                        <p id="contact-status" class="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </article>
+</body>
+</html>

@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone - Accueil</title>
+    <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg">
+    <link rel="stylesheet" href="../assets/mosaique.css">
+    <script src="../assets/mosaique.js" defer></script>
+
+    <style>
+        :root {
+            --bg-main: #181a1b;
+            --bg-panel: rgba(34, 37, 39, 0.88);
+            --bg-panel-strong: rgba(28, 31, 33, 0.95);
+            --text-main: #d1cdc7;
+            --text-muted: #8b8f92;
+            --accent: #d32f2f;
+            --accent-soft: rgba(211, 47, 47, 0.12);
+            --border: #383c3f;
+            --border-soft: rgba(255, 255, 255, 0.06);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            padding: 0;
+            touch-action: pan-y;
+        }
+
+        .page {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .page-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 14px;
+            align-items: start;
+            padding: 14px;
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+        }
+
+        .krone-bar {
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: var(--bg-panel);
+            position: sticky;
+            top: 0;
+            z-index: 12;
+        }
+
+        .krone-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .krone-title {
+            font-size: 21px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .krone-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .krone-cards {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(130px, 1fr));
+            gap: 8px;
+        }
+
+        .offer-card {
+            background: var(--bg-panel-strong);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 122px;
+        }
+        .offer-card .btn {
+           margin-top: auto;
+        }
+
+        .offer-card:nth-child(1) { border-color: rgba(211, 47, 47, 0.25); }
+        .offer-card:nth-child(2) { border-color: rgba(211, 71, 47, 0.27); }
+        .offer-card:nth-child(3) { border-color: rgba(211, 96, 47, 0.3); }
+        .offer-card:nth-child(4) { border-color: rgba(211, 127, 47, 0.33); }
+        .offer-card:nth-child(5) { border-color: rgba(211, 153, 47, 0.35); }
+        .offer-card:nth-child(6) { border-color: rgba(211, 174, 47, 0.37); }
+        .offer-card:nth-child(7) { border-color: rgba(211, 196, 47, 0.4); }
+
+        .offer-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.35px;
+        }
+
+        .offer-krone {
+            font-size: 27px;
+            font-weight: 900;
+            color: #fff0f0;
+            line-height: 1;
+        }
+
+        .offer-rate {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
+            border-radius: 4px;
+            padding: 7px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: #ffffff;
+        }
+
+        .btn-accent {
+            border-color: rgba(211, 47, 47, 0.45);
+            background: rgba(211, 47, 47, 0.16);
+            color: #ffffff;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            align-items: start;
+        }
+
+        .annonces {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: var(--bg-panel);
+            margin-top: 2px;
+        }
+
+        .annonces-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-soft);
+            position: sticky;
+            top: 146px;
+            z-index: 10;
+            background: var(--bg-panel);
+            padding-top: 4px;
+        }
+
+        .annonces-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .annonces-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-field {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-panel-strong);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 5px 8px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .filter-select {
+            border: 1px solid var(--border);
+            background: #202325;
+            color: #f3f4f6;
+            border-radius: 4px;
+            padding: 5px 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .filter-select option {
+            background: #202325;
+            color: #f3f4f6;
+        }
+
+        .news-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .news-item {
+            background: var(--bg-panel-strong);
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .news-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-expand {
+            border-color: rgba(211, 47, 47, 0.45);
+            background: rgba(211, 47, 47, 0.16);
+            color: #ffffff;
+            min-width: 120px;
+        }
+
+        .btn-expand:hover {
+            background: rgba(211, 47, 47, 0.28);
+        }
+
+        .news-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .news-badge {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 800;
+            color: #fff5f5;
+            border: 1px solid rgba(211, 47, 47, 0.4);
+            background: rgba(120, 20, 20, 0.58);
+            border-radius: 999px;
+            padding: 3px 8px;
+        }
+
+        .news-date {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .news-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .news-summary {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .support {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: sticky;
+            top: 14px;
+            background: var(--bg-panel);
+        }
+
+        .support-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .support-text {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .grade-list {
+            display: grid;
+            gap: 7px;
+        }
+
+        .grade-card {
+            border: 1px solid var(--border-soft);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            padding: 9px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .grade-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .grade-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .grade-price {
+            font-size: 15px;
+            color: #ffe1a3;
+            font-weight: 800;
+        }
+
+        .value-krone {
+            color: #ffd67a;
+            font-style: italic;
+            font-weight: 900;
+            text-shadow: 0 0 10px rgba(255, 184, 61, 0.18);
+        }
+
+        .value-euro {
+            color: #ff8f8f;
+            font-style: italic;
+            font-weight: 800;
+            text-shadow: 0 0 8px rgba(211, 47, 47, 0.2);
+        }
+
+        .grade-perk {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        
+        .grade-card[data-grade="Kronium"] { border-color: rgba(205, 127, 50, 0.35); background: linear-gradient(145deg, rgba(205, 127, 50, 0.05), transparent); }
+        .grade-card[data-grade="Kronium"] .grade-name { color: #cd7f32; text-shadow: 0 0 10px rgba(205, 127, 50, 0.25); }
+
+        .grade-card[data-grade="Synkral"] { border-color: rgba(176, 196, 222, 0.35); background: linear-gradient(145deg, rgba(176, 196, 222, 0.05), transparent); }
+        .grade-card[data-grade="Synkral"] .grade-name { color: #b0c4de; text-shadow: 0 0 10px rgba(176, 196, 222, 0.25); }
+
+        .grade-card[data-grade="Kronalloy"] { border-color: rgba(255, 215, 0, 0.35); background: linear-gradient(145deg, rgba(255, 215, 0, 0.05), transparent); }
+        .grade-card[data-grade="Kronalloy"] .grade-name { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.25); }
+
+        .grade-card[data-grade="Synkronite"] { border-color: rgba(0, 229, 255, 0.35); background: linear-gradient(145deg, rgba(0, 229, 255, 0.05), transparent); }
+        .grade-card[data-grade="Synkronite"] .grade-name { color: #00e5ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.25); }
+
+        .grade-card[data-grade="Kronix"] { border-color: rgba(179, 56, 255, 0.35); background: linear-gradient(145deg, rgba(179, 56, 255, 0.05), transparent); }
+        .grade-card[data-grade="Kronix"] .grade-name { color: #b338ff; text-shadow: 0 0 10px rgba(179, 56, 255, 0.25); }
+
+        .color-kronium { color: #cd7f32 !important; }
+        .color-synkral { color: #b0c4de !important; }
+        .color-kronalloy { color: #ffd700 !important; }
+        .color-synkronite { color: #00e5ff !important; }
+        .color-kronix { color: #b338ff !important; }
+        
+        .support-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-icon {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: #ffffff;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 8px 10px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .comparison-table th {
+            background: rgba(255, 255, 255, 0.03);
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+
+        .comparison-table td.has-perk {
+            text-align: center;
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        .comparison-table td.no-perk {
+            text-align: center;
+            color: var(--border);
+        }
+
+        .toast {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            max-width: 340px;
+            background: rgba(24, 26, 27, 0.96);
+            border: 1px solid rgba(211, 47, 47, 0.4);
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 12px;
+            transform: translateY(18px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            z-index: 40;
+        }
+
+        .toast.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(211, 47, 47, 0.16), rgba(0, 0, 0, 0.82) 44%);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            z-index: 45;
+        }
+
+        .modal.open {
+            display: flex;
+            animation: modalFadeIn 0.22s ease;
+        }
+
+        .modal-content {
+            width: min(760px, 100%);
+            background: linear-gradient(175deg, rgba(32, 35, 37, 0.98), rgba(26, 28, 30, 0.98));
+            border: 1px solid rgba(211, 47, 47, 0.34);
+            border-radius: 14px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 85vh;
+            animation: modalSlideUp 0.24s ease;
+        }
+
+        .modal-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+        }
+
+        .modal-kicker {
+            font-size: 11px;
+            font-weight: 800;
+            color: #ffb2b2;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 3px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .modal-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .modal-body {
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            max-height: 55vh;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            display: block;
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(211, 47, 47, 0.5);
+            border-radius: 999px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px) scale(0.985);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .muted {
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 1160px) {
+            .krone-cards {
+                grid-template-columns: repeat(3, minmax(130px, 1fr));
+            }
+        }
+
+        @media (max-width: 940px) {
+            .page-layout {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+
+            .annonces-header {
+                top: 132px;
+            }
+
+            .support {
+                position: static;
+            }
+
+            .krone-cards {
+                grid-template-columns: repeat(2, minmax(120px, 1fr));
+            }
+
+            .news-item {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            html,
+            body {
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+
+            .page {
+                min-height: 0;
+            }
+
+            .page-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 8px 0;
+                width: 100%;
+            }
+
+            .left-column {
+                display: contents;
+                gap: 10px;
+            }
+
+            .page,
+            .layout,
+            .panel,
+            .krone-bar,
+            .support,
+            .annonces {
+                width: 100%;
+                max-width: 100%;
+                margin-left: 0;
+                margin-right: 0;
+                align-self: stretch;
+            }
+
+            .layout {
+                order: 3;
+            }
+
+            .krone-bar {
+                order: 1;
+                position: static;
+                top: auto;
+                z-index: auto;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .krone-title {
+                font-size: 18px;
+            }
+
+            .krone-subtitle {
+                font-size: 11px;
+                line-height: 1.4;
+            }
+
+            .krone-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px;
+            }
+
+            .offer-card {
+                min-height: 0;
+                padding: 9px;
+                gap: 5px;
+            }
+
+            .offer-krone {
+                font-size: 20px;
+            }
+
+            .annonces {
+                padding: 12px;
+                gap: 9px;
+                margin-top: 0;
+            }
+
+            .annonces-header {
+                position: static;
+                top: auto;
+                padding-top: 0;
+                padding-bottom: 8px;
+            }
+
+            .annonces-title {
+                font-size: 16px;
+            }
+
+            .annonces-desc {
+                font-size: 11px;
+                line-height: 1.4;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-field {
+                width: 100%;
+                justify-content: space-between;
+                padding: 6px 8px;
+            }
+
+            .filter-select {
+                flex: 1;
+                min-width: 0;
+                max-width: none;
+            }
+
+            .news-item {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .news-title {
+                font-size: 14px;
+            }
+
+            .news-summary {
+                font-size: 11px;
+            }
+
+            .news-actions {
+                justify-content: stretch;
+            }
+
+            .btn-expand {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .support {
+                position: static;
+                top: auto;
+                padding: 12px;
+                order: 2;
+            }
+
+            .toast {
+                right: 8px;
+                left: 8px;
+                bottom: 8px;
+                max-width: none;
+            }
+
+            .modal {
+                padding: 8px;
+            }
+
+            .modal-content {
+                padding: 12px;
+                max-height: 90vh;
+                border-radius: 10px;
+            }
+
+            .modal-title {
+                font-size: 17px;
+            }
+
+            .modal-body {
+                max-height: 62vh;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .krone-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-group {
+                gap: 5px;
+            }
+
+            .filter-field {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .filter-select {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body class="mosaic-bg">
+    <div class="page">
+        <div class="page-layout">
+            <div class="left-column">
+                <section class="panel krone-bar">
+                    <div class="krone-header">
+                        <div>
+                            <h1 class="krone-title">Acheter des Krônes</h1>
+                            <p class="krone-subtitle">Plus le pack est élevé, plus le prix par Krône est avantageux.</p>
+                        </div>
+                    </div>
+                    <div id="krone-cards" class="krone-cards"></div>
+                </section>
+
+                <div class="layout">
+                <section class="panel annonces">
+                <div class="annonces-header">
+                    <div>
+                        <h2 class="annonces-title">Annonces Officielles</h2>
+                        <p class="annonces-desc">Retrouvez ici toutes les actualités, mises à jour et événements Synkrone.</p>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-field">
+                            <label class="filter-label" for="scope-filter">Univers</label>
+                            <select id="scope-filter" class="filter-select" onchange="onFilterChange()">
+                                <option value="all">Tous</option>
+                                <option value="synkrone">Synkrone</option>
+                                <option value="bots">Bots</option>
+                                <option value="bump">Bump</option>
+                                <option value="me">Me</option>
+                                <option value="dashbot">Dashbot</option>
+                                <option value="serveur">Serveur</option>
+                                <option value="modpack">Modpack</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label class="filter-label" for="type-filter">Type</label>
+                            <select id="type-filter" class="filter-select" onchange="onFilterChange()">
+                                <option value="all">Tous</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="news-list" class="news-list"></div>
+            </section>
+                </div>
+            </div>
+
+            <aside class="panel support">
+                <div class="support-header">
+                    <h3 class="support-title">Soutenir Synkrone</h3>
+                    <button class="btn-icon" onclick="openGradeInfoModal()" aria-label="Informations sur les grades" title="Détails des grades">?</button>
+                </div>
+                <div id="grade-list" class="grade-list"></div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="announcement-modal" class="modal" aria-hidden="true" aria-labelledby="modal-title">
+        <article class="modal-content">
+            <div class="modal-top">
+                <div>
+                    <p class="modal-kicker">Annonce complète</p>
+                    <h4 id="modal-title" class="modal-title">Annonce</h4>
+                    <p id="modal-meta" class="modal-meta"></p>
+                </div>
+                <button class="btn" onclick="closeModal()" aria-label="Fermer la modale">Fermer</button>
+            </div>
+            <div id="modal-body" class="modal-body"></div>
+        </article>
+    </div>
+
+    <div id="grade-info-modal" class="modal" aria-hidden="true" aria-labelledby="grade-modal-title">
+        <article class="modal-content" style="width: min(850px, 100%);">
+            <div class="modal-top">
+                <div>
+                    <p class="modal-kicker">Détails des avantages</p>
+                    <h4 id="grade-modal-title" class="modal-title">Comparatif des Grades</h4>
+                </div>
+                <button class="btn" onclick="closeGradeInfoModal()" aria-label="Fermer la modale">Fermer</button>
+            </div>
+            <div class="modal-body table-container">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Avantage</th>
+                            <th class="color-kronium">Kronium<br><span style="font-size: 10px; font-weight:normal; color:#8b8f92">150 Krônes</span></th>
+                            <th class="color-synkral">Synkral<br><span style="font-size: 10px; font-weight:normal; color:#8b8f92">750 Krônes</span></th>
+                            <th class="color-kronalloy">Kronalloy<br><span style="font-size: 10px; font-weight:normal; color:#8b8f92">1 500 Krônes</span></th>
+                            <th class="color-synkronite">Synkronite<br><span style="font-size: 10px; font-weight:normal; color:#8b8f92">3 000 Krônes</span></th>
+                            <th class="color-kronix">Kronix<br><span style="font-size: 10px; font-weight:normal; color:#8b8f92">6 000 Krônes</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Réduction Boutique</td>
+                            <td>0.5%</td>
+                            <td>3%</td>
+                            <td>7%</td>
+                            <td>15%</td>
+                            <td>30%</td>
+                        </tr>
+                        <tr>
+                            <td>Rôle Discord</td>
+                            <td>Soutien</td>
+                            <td>Soutien</td>
+                            <td>VIP</td>
+                            <td>VIP</td>
+                            <td>Premium</td>
+                        </tr>
+                        <tr>
+                            <td>Salon dédié contributeurs</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Accès Giveaway mensuel</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Kits spéciaux serveurs MC</td>
+                            <td class="no-perk">-</td>
+                            <td class="no-perk">-</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓ (Premium)</td>
+                        </tr>
+                        <tr>
+                            <td>Cosmétiques/Fonctionnalités Me & Bump</td>
+                            <td class="no-perk">-</td>
+                            <td class="no-perk">-</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓ (Premium)</td>
+                        </tr>
+                        <tr>
+                            <td>Modules Dashbot restreints</td>
+                            <td class="no-perk">-</td>
+                            <td class="no-perk">-</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓</td>
+                            <td class="has-perk">✓ (Premium)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </div>
+
+    <script>
+        const kroneOffers = [
+            { price: 5, krone: 600 },
+            { price: 10, krone: 1250 },
+            { price: 20, krone: 2600 },
+            { price: 30, krone: 4000 },
+            { price: 40, krone: 5500 }
+        ];
+
+        const grades = [
+            { name: 'Kronium', kroneCost: 150, perk: 'Réduction: 0.5% | Discord: Soutien + Salons dédiés + Giveaways' },
+            { name: 'Synkral', kroneCost: 750, perk: 'Réduction: 3% | Discord: Soutien + Avantages Kronium' },
+            { name: 'Kronalloy', kroneCost: 1500, perk: 'Réduction: 7% | Discord: VIP | Kits MC, Avantages Me/Bump, Dashbot' },
+            { name: 'Synkronite', kroneCost: 3000, perk: 'Réduction: 15% | Discord: VIP | Tous les avantages Kronalloy' },
+            { name: 'Kronix', kroneCost: 6000, perk: 'Réduction: 30% | Discord: Premium | Accès complet aux avantages Premium' }
+        ];
+
+        const GRADE_KRONE_COSTS = {
+            Aucun: 0,
+            Kronium: 150,
+            Synkral: 750,
+            Kronalloy: 1500,
+            Synkronite: 3000,
+            Kronix: 6000
+        };
+
+        const STORAGE_TYPES = 'synkroneAnnouncementTypes';
+        const STORAGE_ITEMS = 'synkroneAnnouncements';
+        const ALLOWED_SCOPES = new Set(['synkrone', 'bots', 'bump', 'me', 'dashbot', 'serveur', 'modpack']);
+
+        let announcementsData = [];
+        let currentViewer = null;
+
+        let currentScopeFilter = 'all';
+        let currentTypeFilter = 'all';
+        let toastTimer;
+
+        function euro(value) {
+            return `${value} EUR`;
+        }
+
+        function normalizeTypeLabel(value) {
+            if (!value) return 'Type';
+            const normalized = String(value).replaceAll('-', ' ');
+            return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+        }
+
+        function loadConfiguredTypes() {
+            try {
+                const raw = localStorage.getItem(STORAGE_TYPES);
+                const parsed = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(parsed) || parsed.length === 0) {
+                    return ['maj', 'nerf', 'event', 'boutique'];
+                }
+                return parsed;
+            } catch {
+                return ['maj', 'nerf', 'event', 'boutique'];
+            }
+        }
+
+        function loadEquipeAnnouncements() {
+            try {
+                const raw = localStorage.getItem(STORAGE_ITEMS);
+                const parsed = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(parsed)) return [];
+                return parsed
+                    .filter((item) => item && (item.scope || item.menu) && (item.type || (Array.isArray(item.types) && item.types.length)) && item.title)
+                    .map((item) => ({
+                        ...item,
+                        types: (Array.isArray(item.types) && item.types.length ? item.types : [item.type])
+                            .map((type) => String(type || '').trim().toLowerCase())
+                            .filter(Boolean),
+                        scope: item.scope || item.menu || 'synkrone',
+                        category: item.type,
+                        categoryLabel: normalizeTypeLabel(item.categoryLabel || item.type)
+                    }))
+                    .map((item) => ({
+                        ...item,
+                        type: item.types[0] || item.type
+                    }));
+            } catch {
+                return [];
+            }
+        }
+
+        function refreshAnnouncementSelectors() {
+            const scopeSelect = document.getElementById('scope-filter');
+            const typeSelect = document.getElementById('type-filter');
+            const types = loadConfiguredTypes();
+
+            if (scopeSelect) {
+                scopeSelect.innerHTML = '<option value="all">Tous</option>';
+                Array.from(ALLOWED_SCOPES).forEach((scope) => {
+                    const option = document.createElement('option');
+                    option.value = scope;
+                    option.textContent = normalizeTypeLabel(scope);
+                    scopeSelect.appendChild(option);
+                });
+                scopeSelect.value = ALLOWED_SCOPES.has(currentScopeFilter) ? currentScopeFilter : 'all';
+            }
+
+            if (typeSelect) {
+                typeSelect.innerHTML = '<option value="all">Tous</option>';
+                types.forEach((type) => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = normalizeTypeLabel(type);
+                    typeSelect.appendChild(option);
+                });
+                const knownTypes = new Set(types);
+                typeSelect.value = knownTypes.has(currentTypeFilter) ? currentTypeFilter : 'all';
+            }
+        }
+
+        function refreshAnnouncementsFromEquipe() {
+            announcementsData = loadEquipeAnnouncements().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        }
+
+        async function loadViewerProfile() {
+            try {
+                const res = await fetch('/api/me');
+                if (!res.ok) {
+                    currentViewer = null;
+                    return;
+                }
+
+                const data = await res.json();
+                currentViewer = data?.authenticated ? data.user : null;
+            } catch {
+                currentViewer = null;
+            }
+        }
+
+        function renderKroneOffers() {
+            const container = document.getElementById('krone-cards');
+            container.innerHTML = '';
+
+            kroneOffers.forEach((offer) => {
+                const rate = offer.krone / offer.price;
+                const card = document.createElement('article');
+                card.className = 'offer-card';
+                card.innerHTML = `
+                    <div class="offer-krone"><span class="value-krone">${offer.krone.toLocaleString('fr-FR')} Krônes</span></div>
+                    <div class="offer-price"><span class="value-euro">${euro(offer.price)}</span></div>
+                    <div class="offer-rate">${rate.toFixed(1)} Krones / EUR</div>
+                    <button class="btn" onclick="buyKronePack(${offer.price}, ${offer.krone})">Acheter ce pack</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderAnnouncements() {
+            const list = document.getElementById('news-list');
+            list.innerHTML = '';
+
+            const filtered = announcementsData.filter((item) => {
+                const itemScope = item.scope || item.menu || 'synkrone';
+                const scopeOk = currentScopeFilter === 'all' || itemScope === currentScopeFilter;
+                const itemTypes = Array.isArray(item.types) && item.types.length
+                    ? item.types
+                    : [item.type].filter(Boolean);
+                const typeOk = currentTypeFilter === 'all' || itemTypes.includes(currentTypeFilter);
+                return scopeOk && typeOk;
+            });
+
+            filtered.forEach((item) => {
+                const itemTypes = Array.isArray(item.types) && item.types.length
+                    ? item.types
+                    : [item.type].filter(Boolean);
+                const typeBadges = itemTypes
+                    .map((type) => `<span class="news-badge">${normalizeTypeLabel(type)}</span>`)
+                    .join('');
+                const article = document.createElement('article');
+                article.className = 'news-item';
+                article.innerHTML = `
+                    <div>
+                        <div class="news-meta">
+                            <span class="news-badge">${normalizeTypeLabel(item.scope || item.menu || 'synkrone')}</span>
+                            ${typeBadges}
+                            <span class="news-date">${item.date}</span>
+                        </div>
+                        <h4 class="news-title">${item.title}</h4>
+                        <p class="news-summary">${item.summary}</p>
+                    </div>
+                    <div>
+                        <div class="news-actions">
+                            <button class="btn btn-expand" onclick="openModal(${item.id})">Agrandir</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(article);
+            });
+
+            if (filtered.length === 0) {
+                const empty = document.createElement('p');
+                empty.className = 'muted';
+                empty.textContent = 'Aucune annonce publiée depuis Admin > Annonce pour ce filtre.';
+                list.appendChild(empty);
+            }
+        }
+
+        function renderGrades() {
+            const list = document.getElementById('grade-list');
+            list.innerHTML = '';
+
+            const currentGrade = currentViewer?.grade && Object.hasOwn(GRADE_KRONE_COSTS, currentViewer.grade)
+                ? currentViewer.grade
+                : 'Aucun';
+            const currentGradeCost = Number(GRADE_KRONE_COSTS[currentGrade] || 0);
+            const currentKrone = Math.max(0, Math.trunc(Number(currentViewer?.krone || 0)));
+
+            grades.forEach((grade) => {
+                const upgradeCost = Math.max(0, Number(grade.kroneCost || 0) - currentGradeCost);
+                const alreadyUnlocked = upgradeCost === 0;
+                const canAfford = currentKrone >= upgradeCost;
+                const isDisabled = !currentViewer || alreadyUnlocked || !canAfford;
+                const buttonLabel = !currentViewer
+                    ? 'Connexion requise'
+                    : alreadyUnlocked
+                        ? 'Déjà débloqué'
+                        : canAfford
+                            ? `Obtenir ${grade.name} (${upgradeCost.toLocaleString('fr-FR')} Krônes)`
+                            : `Solde insuffisant (${upgradeCost.toLocaleString('fr-FR')} Krônes)`;
+
+                const item = document.createElement('article');
+                item.className = 'grade-card';
+                item.setAttribute('data-grade', grade.name);
+                item.innerHTML = `
+                    <div class="grade-top">
+                        <span class="grade-name">${grade.name}</span>
+                        <span class="grade-price"><span class="value-krone">${grade.kroneCost.toLocaleString('fr-FR')} Krônes</span></span>
+                    </div>
+                    <p class="grade-perk">${grade.perk}</p>
+                    <button class="btn" onclick="buyGrade('${grade.name}', ${grade.kroneCost})" ${isDisabled ? 'disabled' : ''}>${buttonLabel}</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function onFilterChange() {
+            const scopeSelect = document.getElementById('scope-filter');
+            const typeSelect = document.getElementById('type-filter');
+            currentScopeFilter = scopeSelect ? scopeSelect.value : 'all';
+            currentTypeFilter = typeSelect ? typeSelect.value : 'all';
+            renderAnnouncements();
+        }
+
+        function buyKronePack(price, krone) {
+            showToast('Achat Krone', `Pack ${euro(price)} - ${krone.toLocaleString('fr-FR')} Krones`);
+        }
+
+        async function buyGrade(name, kroneCost) {
+            if (!currentViewer) {
+                showToast('Soutenir Synkrone', 'Connectez-vous avec Discord pour acheter un grade.');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/grades/purchase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ grade: name })
+                });
+
+                let payload = null;
+                try {
+                    payload = await res.json();
+                } catch {
+                    payload = null;
+                }
+
+                if (!res.ok) {
+                    const message = payload?.message || 'Achat impossible pour le moment.';
+                    showToast('Soutenir Synkrone', message);
+                    return;
+                }
+
+                currentViewer = payload?.user || currentViewer;
+                try {
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'synkrone:user-updated',
+                            user: currentViewer
+                        }, window.location.origin);
+                    }
+                } catch {
+                    // no-op: l'achat reste valide meme si le postMessage echoue
+                }
+                renderGrades();
+                const spent = Number(payload?.chargedKrone || kroneCost);
+                const remaining = Number(currentViewer?.krone || 0).toLocaleString('fr-FR');
+                showToast('Soutenir Synkrone', `${name} débloqué (-${spent.toLocaleString('fr-FR')} Krônes). Solde restant: ${remaining} Krônes.`);
+            } catch {
+                showToast('Soutenir Synkrone', 'Erreur réseau pendant l\'achat du grade.');
+            }
+        }
+
+        function openModal(id) {
+            const item = announcementsData.find((news) => news.id === id);
+            if (!item) return;
+
+            document.getElementById('modal-title').textContent = item.title;
+            document.getElementById('modal-meta').textContent = `${normalizeTypeLabel(item.scope || item.menu || 'synkrone')} • ${item.date || 'Date inconnue'}`;
+            document.getElementById('modal-body').textContent = item.content;
+            const modal = document.getElementById('announcement-modal');
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('announcement-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            if(!document.getElementById('grade-info-modal').classList.contains('open')){
+                document.body.classList.remove('modal-open');
+            }
+        }
+        
+        function openGradeInfoModal() {
+            const modal = document.getElementById('grade-info-modal');
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeGradeInfoModal() {
+            const modal = document.getElementById('grade-info-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            if(!document.getElementById('announcement-modal').classList.contains('open')){
+                document.body.classList.remove('modal-open');
+            }
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target.id === 'announcement-modal') {
+                closeModal();
+            }
+            if (event.target.id === 'grade-info-modal') {
+                closeGradeInfoModal();
+            }
+        }
+
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = `${title} - ${message}`;
+            toast.classList.add('visible');
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 2800);
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            renderKroneOffers();
+            refreshAnnouncementSelectors();
+            refreshAnnouncementsFromEquipe();
+            renderAnnouncements();
+            await loadViewerProfile();
+            renderGrades();
+
+            const modal = document.getElementById('announcement-modal');
+            if (modal) {
+                modal.addEventListener('click', closeModalOnOverlay);
+            }
+            
+            const gradeModal = document.getElementById('grade-info-modal');
+            if (gradeModal) {
+                gradeModal.addEventListener('click', closeModalOnOverlay);
+            }
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closeModal();
+                    closeGradeInfoModal();
+                }
+            });
+
+            window.addEventListener('storage', (event) => {
+                if (event.key === STORAGE_TYPES || event.key === STORAGE_ITEMS) {
+                    refreshAnnouncementSelectors();
+                    refreshAnnouncementsFromEquipe();
+                    renderAnnouncements();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

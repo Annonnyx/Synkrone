@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone | Conditions Générales d'Utilisation</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #181a1b;
+            --bg-panel: rgba(30, 33, 36, 0.65);
+            --bg-panel-hover: rgba(43, 47, 51, 0.85);
+            --line: rgba(255, 255, 255, 0.08);
+            --line-strong: rgba(255, 255, 255, 0.15);
+            --text-main: #e1e3e6;
+            --text-muted: #a7b5c4;
+            --accent: #a3e635;
+            --accent-glow: rgba(163, 230, 53, 0.2);
+            --accent-alt: #5865f2;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+        /* Typography */
+        h1, h2, h3 { color: #ffffff; font-weight: 700; }
+        h1 { font-size: 2.2rem; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+        h2 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        p, li { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1rem; }
+        ul { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.5rem; }
+        strong { color: var(--text-main); font-weight: 600; }
+        a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: #ffffff; }
+
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        /* Sidebar / Sommaire (Desktop) */
+        .sidebar {
+            position: sticky;
+            top: 40px;
+            height: fit-content;
+            max-height: calc(100vh - 80px);
+            background: var(--bg-panel);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-nav { display: flex; flex-direction: column; gap: 8px; }
+        .toc-link {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 2px solid transparent;
+        }
+
+        .toc-link:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+        }
+
+        .toc-link.active {
+            background: var(--accent-glow);
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .content {
+            background: var(--bg-panel);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-header { margin-bottom: 40px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+
+        .section-block {
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        /* Highlights & Badges */
+        .highlight-box {
+            background: rgba(88, 101, 242, 0.1);
+            border: 1px solid rgba(88, 101, 242, 0.3);
+            border-left: 4px solid var(--accent-alt);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin: 20px 0;
+        }
+
+        .highlight-box p { margin: 0; color: #e1e3e6; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--accent-glow);
+            color: var(--accent);
+            border: 1px solid rgba(163, 230, 53, 0.3);
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        /* Mobile FAB & Modal */
+        .fab-container {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100;
+        }
+
+        .fab-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #111;
+            border: none;
+            box-shadow: 0 4px 12px rgba(163, 230, 53, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .fab-btn:active { transform: scale(0.92); }
+
+        .mobile-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-modal.open { opacity: 1; pointer-events: auto; }
+
+        .mobile-modal-content {
+            width: 100%;
+            background: #1e1f22;
+            border-top: 1px solid var(--line);
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .mobile-modal.open .mobile-modal-content { transform: translateY(0); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--line);
+        }
+        .close-modal-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .layout { grid-template-columns: 1fr; padding: 20px 16px; }
+            .sidebar { display: none; }
+            .content { padding: 24px; }
+            .fab-container { display: block; }
+        }
+    </style>
+</head>
+<body class="mosaic-bg">
+
+    <div class="layout">
+        <!-- Desktop Sidebar (Sommaire) -->
+        <aside class="sidebar">
+            <div class="sidebar-title">
+                <i class="fa-solid fa-list"></i> Sommaire
+            </div>
+            <nav class="toc-nav">
+                <a href="#intro" class="toc-link active"><i class="fa-solid fa-house fa-fw"></i> Introduction</a>
+                <a href="#definitions" class="toc-link"><i class="fa-solid fa-book fa-fw"></i> 1. Définitions</a>
+                <a href="#inscription" class="toc-link"><i class="fa-brands fa-discord fa-fw"></i> 2. Inscription & Accès</a>
+                <a href="#economie" class="toc-link"><i class="fa-solid fa-coins fa-fw"></i> 3. Krones & Économie</a>
+                <a href="#grades" class="toc-link"><i class="fa-solid fa-gem fa-fw"></i> 4. Grades & Abonnements</a>
+                <a href="#ip" class="toc-link"><i class="fa-solid fa-copyright fa-fw"></i> 5. Propriété Intellectuelle</a>
+                <a href="#privacy" class="toc-link"><i class="fa-solid fa-shield-halved fa-fw"></i> 6. Protection des Données</a>
+                <a href="#sanctions" class="toc-link"><i class="fa-solid fa-gavel fa-fw"></i> 7. Modération & Sanctions</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="page-header" id="intro">
+                <h1>Conditions Générales d'Utilisation</h1>
+            </div>
+
+            <div class="section-block">
+                <p>Bienvenue sur <strong>Synkrone</strong>. Ces Conditions Générales d'Utilisation (CGU) encadrent votre utilisation de notre écosystème, incluant notre plateforme web, nos bots Discord, ainsi que nos modpacks Minecraft.</p>
+                <p>En naviguant sur notre site ou en utilisant nos services (authentification Discord, roulette, etc.), vous acceptez pleinement et sans réserve les présentes conditions. Si vous n'êtes pas d'accord avec ces termes, veuillez ne pas utiliser nos services.</p>
+            </div>
+
+            <div class="section-block" id="definitions">
+                <h2><i class="fa-solid fa-book"></i> 1. Définitions</h2>
+                <ul>
+                    <li><strong>Synkrone :</strong> Désigne l'ensemble de l'écosystème, des applications web, desktop et des bots (Asuna, Vax, Yui, Kayaba, etc.) créés et maintenus par l'équipe fondatrice.</li>
+                    <li><strong>Utilisateur :</strong> Toute personne physique accédant aux services Synkrone, généralement identifiée via son compte Discord.</li>
+                    <li><strong>Krone :</strong> La monnaie virtuelle exclusive à l'écosystème Synkrone. Elle n'a aucune valeur fiduciaire réelle.</li>
+                    <li><strong>Grades :</strong> Paliers de progression et d'abonnement (Kronium, Synkral, Kronalloy, Synkronite, Kronix) débloquant des avantages spécifiques sur la plateforme.</li>
+                </ul>
+            </div>
+
+            <div class="section-block" id="inscription">
+                <h2><i class="fa-brands fa-discord"></i> 2. Inscription et Accès</h2>
+                <p>L'accès complet à nos services (profil personnalisé, économie) nécessite une authentification via l'API OAuth2 de <strong>Discord</strong>. En vous connectant, vous nous autorisez à récupérer vos informations publiques basiques (ID, pseudo, avatar, bannière).</p>
+                <div class="highlight-box">
+                    <p><i class="fa-solid fa-circle-info text-accent-alt"></i> <strong>Note de sécurité :</strong> Nous n'avons jamais accès à votre mot de passe Discord, ni à vos messages privés. La connexion est entièrement gérée par les serveurs sécurisés de Discord.</p>
+                </div>
+            </div>
+
+            <div class="section-block" id="economie">
+                <h2><i class="fa-solid fa-coins"></i> 3. L'Économie Synkrone (Krones & Roulette)</h2>
+                <p>L'écosystème Synkrone repose sur une monnaie virtuelle, le <strong>Krone</strong>.</p>
+                <ul>
+                    <li><span class="badge">Obtention</span> Les Krones peuvent être obtenus via la roulette quotidienne, en participant à nos événements, ou en interagissant avec nos bots (ex: le bot casino <em>Asuna</em>, ou via l'ouverture de <em>Mysteribox</em>).</li>
+                    <li><span class="badge">Utilisation</span> Les Krones servent à acheter des grades, personnaliser votre profil (thèmes, slots de liens), ou acquérir des avantages virtuels in-game.</li>
+                    <li><span class="badge">Valeur</span> Les Krones n'ont <strong>aucune valeur monétaire réelle</strong>. Ils ne peuvent être ni échangés contre de l'argent réel, ni vendus, ni transférés en dehors de l'écosystème Synkrone.</li>
+                </ul>
+            </div>
+
+            <div class="section-block" id="grades">
+                <h2><i class="fa-solid fa-gem"></i> 4. Grades, Achats et Abonnements</h2>
+                <p>Les Utilisateurs peuvent progresser et soutenir la plateforme en acquérant des grades spécifiques : <strong>Kronium, Synkral, Kronalloy, Synkronite et Kronix</strong>.</p>
+                <p>L'acquisition de ces grades se fait principalement via les Krones. Chaque grade débloque des fonctionnalités telles que :</p>
+                <ul>
+                    <li>L'accès à des thèmes de profil exclusifs.</li>
+                    <li>Des emplacements (slots) de liens supplémentaires pour votre profil.</li>
+                    <li>Des options de mise en avant pour les serveurs via nos bots.</li>
+                </ul>
+                <p>S'agissant de biens et services exclusivement numériques et fournis instantanément, <strong>aucun remboursement</strong> n'est possible après l'acquisition d'un grade ou d'une option via vos Krones, conformément à l'exception légale du droit de rétractation pour les contenus numériques.</p>
+            </div>
+
+            <div class="section-block" id="ip">
+                <h2><i class="fa-solid fa-copyright"></i> 5. Propriété Intellectuelle</h2>
+                <p>La structure générale de la plateforme Synkrone, ainsi que les textes, graphismes, images, sons et vidéos la composant, incluant nos bots Discord, nos logiciels desktop et nos modpacks (<em>The French Baguette, Xenus, Vanipack</em>), sont la propriété exclusive de l'équipe fondatrice.</p>
+                <p>Toute représentation, reproduction, ou exploitation partielle ou totale des contenus et services proposés par Synkrone, par quelque procédé que ce soit, sans l'autorisation préalable et par écrit de l'équipe est strictement interdite.</p>
+            </div>
+
+            <div class="section-block" id="privacy">
+                <h2><i class="fa-solid fa-shield-halved"></i> 6. Protection des Données (RGPD)</h2>
+                <p>Nous accordons une grande importance à la confidentialité de vos données :</p>
+                <ul>
+                    <li><strong>Données collectées :</strong> Informations de profil Discord (Identifiant, Pseudo, Avatar, Bannière) et historique des transactions de Krones.</li>
+                    <li><strong>Finalité :</strong> Assurer le fonctionnement de votre profil et de l'économie.</li>
+                    <li><strong>Droits :</strong> Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et d'effacement de vos données. Pour exercer ce droit, vous pouvez utiliser notre système de tickets sur le serveur Discord de support.</li>
+                </ul>
+            </div>
+
+            <div class="section-block" id="sanctions">
+                <h2><i class="fa-solid fa-gavel"></i> 7. Modération et Sanctions</h2>
+                <p>Afin de maintenir un environnement sain, l'équipe d'administration se réserve le droit, à sa seule discrétion, de restreindre, suspendre ou supprimer l'accès d'un utilisateur à la plateforme ou aux bots, notamment en cas de :</p>
+                <ul>
+                    <li>Triche ou exploitation de failles (bug abuse) sur la roulette ou l'économie des bots.</li>
+                    <li>Comportement abusif, harcèlement ou non-respect de l'équipe de modération.</li>
+                </ul>
+            </div>
+            
+            <p class="text-muted" style="margin-top: 40px; font-size: 0.8rem; text-align: center;">
+                Les présentes CGU peuvent être modifiées à tout moment. L'utilisation continue des services Synkrone vaut acceptation des nouvelles conditions.
+            </p>
+        </main>
+    </div>
+
+    <!-- Mobile FAB -->
+    <div class="fab-container">
+        <button class="fab-btn" id="openMobileToc" aria-label="Ouvrir le sommaire">
+            <i class="fa-solid fa-list-ul"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Modal (Sommaire) -->
+    <div class="mobile-modal" id="mobileTocModal">
+        <div class="mobile-modal-content">
+            <div class="modal-header">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-list"></i> Sommaire</h3>
+                <button class="close-modal-btn" id="closeMobileToc"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <nav class="toc-nav" id="mobileNavLinks">
+                <a href="#intro" class="toc-link active"><i class="fa-solid fa-house fa-fw"></i> Introduction</a>
+                <a href="#definitions" class="toc-link"><i class="fa-solid fa-book fa-fw"></i> 1. Définitions</a>
+                <a href="#inscription" class="toc-link"><i class="fa-brands fa-discord fa-fw"></i> 2. Inscription</a>
+                <a href="#economie" class="toc-link"><i class="fa-solid fa-coins fa-fw"></i> 3. Économie</a>
+                <a href="#grades" class="toc-link"><i class="fa-solid fa-gem fa-fw"></i> 4. Grades</a>
+                <a href="#ip" class="toc-link"><i class="fa-solid fa-copyright fa-fw"></i> 5. Propriété Info.</a>
+                <a href="#privacy" class="toc-link"><i class="fa-solid fa-shield-halved fa-fw"></i> 6. Données</a>
+                <a href="#sanctions" class="toc-link"><i class="fa-solid fa-gavel fa-fw"></i> 7. Modération</a>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        // --- Mobile Modal Logic ---
+        const modal = document.getElementById('mobileTocModal');
+        const openBtn = document.getElementById('openMobileToc');
+        const closeBtn = document.getElementById('closeMobileToc');
+        const mobileLinks = document.querySelectorAll('#mobileNavLinks .toc-link');
+
+        function openModal() {
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', closeModal);
+        });
+
+        // --- ScrollSpy Logic ---
+        const sections = document.querySelectorAll('.page-header, .section-block');
+        const desktopLinks = document.querySelectorAll('.sidebar .toc-link');
+        const allLinks = document.querySelectorAll('.toc-link');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    
+                    // Remove active from all
+                    allLinks.forEach(link => link.classList.remove('active'));
+                    
+                    // Add active to current
+                    const activeLinks = document.querySelectorAll(`.toc-link[href="#${id}"]`);
+                    activeLinks.forEach(link => link.classList.add('active'));
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            if (section.getAttribute('id')) {
+                observer.observe(section);
+            }
+        });
+    </script>
+</body>
+</html>

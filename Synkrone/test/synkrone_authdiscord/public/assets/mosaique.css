@@ -1,0 +1,35 @@
+/* Mosaïque unifiée: même rendu sur toutes les pages */
+:root {
+    --mosaic-bg: #181a1b;
+    --mosaic-tile-size: 60px;
+    --mosaic-opacity: 0.08;
+    --mosaic-filter: sepia(0.8) saturate(5) hue-rotate(320deg) brightness(0.8) grayscale(0.1);
+}
+
+body.mosaic-bg {
+    background-color: var(--mosaic-bg);
+    position: relative;
+}
+
+.mosaic-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: var(--mosaic-bg);
+}
+
+.mosaic-tile {
+    position: absolute;
+    width: var(--mosaic-tile-size);
+    height: var(--mosaic-tile-size);
+    object-fit: cover;
+    transform: rotate(45deg);
+    transform-origin: 50% 50%;
+    opacity: var(--mosaic-opacity);
+    filter: var(--mosaic-filter);
+}

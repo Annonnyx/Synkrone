@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centre de Developpement</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+    <style>
+        :root {
+            --bg-main: #181a1b;
+            --bg-panel: rgba(30, 33, 35, 0.46);
+            --bg-panel-soft: rgba(22, 24, 26, 0.58);
+            --text-main: #d1cdc7;
+            --text-muted: #8b8f92;
+            --accent: #d32f2f;
+            --accent-2: #e0b14b;
+            --ok: #9be03f;
+            --border: #383c3f;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --mosaic-opacity: 0.16;
+            --mosaic-filter: sepia(0.7) saturate(4.4) hue-rotate(320deg) brightness(0.95) grayscale(0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            overflow-x: hidden;
+        }
+
+        #mosaic-layer {
+            z-index: 0;
+        }
+
+        .page {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            position: relative;
+            z-index: 1;
+        }
+
+        .frame {
+            width: 100%;
+            min-height: 100vh;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .top-nav {
+            display: flex;
+            gap: 6px;
+            width: 100%;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-panel-soft);
+            justify-content: center;
+            padding: 0 12px;
+        }
+
+        .tab-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.42);
+        }
+
+        .tab-btn.active {
+            color: var(--ok);
+            background: rgba(155, 224, 63, 0.08);
+            border-bottom-color: var(--ok);
+            box-shadow: inset 0 -1px 0 rgba(155, 224, 63, 0.4);
+        }
+
+        .tab-icon {
+            width: 14px;
+            height: 14px;
+            object-fit: contain;
+        }
+
+        .content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #fff;
+            font-weight: 800;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        .section-title.alt {
+            border-left-color: var(--accent-2);
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.45;
+            margin-bottom: 12px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .grid.cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .grid.cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .card {
+            background: rgba(19, 21, 23, 0.62);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.35px;
+            text-transform: uppercase;
+            border: 1px solid var(--border);
+            color: #e9ecef;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar button {
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.45);
+            color: #f3f4f6;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 9px;
+            cursor: pointer;
+        }
+
+        .toolbar button:hover {
+            border-color: var(--accent);
+            background: rgba(211, 47, 47, 0.18);
+        }
+
+        details {
+            background: rgba(19, 21, 23, 0.66);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffdede;
+            background: rgba(24, 27, 29, 0.82);
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .sum-right {
+            color: #9a9ea1;
+            transition: transform 0.2s ease;
+        }
+
+        details[open] .sum-right {
+            transform: rotate(180deg);
+        }
+
+        .details-body {
+            border-top: 1px solid var(--border);
+            padding: 10px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .details-body h4 {
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        pre {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 7px;
+            padding: 10px;
+            overflow-x: auto;
+            font-size: 12px;
+            color: #c9d1d9;
+            line-height: 1.45;
+            white-space: pre;
+        }
+
+        code {
+            font-family: Consolas, 'Courier New', monospace;
+        }
+
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .function { color: #d2a8ff; }
+        .comment { color: #8b949e; font-style: italic; }
+
+        ul.list {
+            padding-left: 16px;
+            display: grid;
+            gap: 7px;
+        }
+
+        ul.list li {
+            color: var(--text-main);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 1020px) {
+            .grid.cols-3,
+            .grid.cols-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="mosaic-bg">
+    <div class="page">
+        <div class="frame">
+            <nav class="top-nav">
+                <button onclick="switchTab('setup')" id="btn-setup" class="tab-btn active">
+                    <span aria-hidden="true">🧭</span>
+                    Setup
+                </button>
+                <button onclick="switchTab('python')" id="btn-python" class="tab-btn">
+                    <img class="tab-icon" src="/assets/images/py.png" alt="Python">
+                    Python
+                </button>
+                <button onclick="switchTab('javascript')" id="btn-javascript" class="tab-btn">
+                    <img class="tab-icon" src="/assets/images/js.png" alt="JavaScript">
+                    JavaScript
+                </button>
+                <button onclick="switchTab('best')" id="btn-best" class="tab-btn">
+                    <span aria-hidden="true">✅</span>
+                    Logiciel
+                </button>
+            </nav>
+
+            <main class="content">
+                <section id="content-setup" class="tab-content active">
+                    <h2 class="section-title">Preparer son Bot sur le Portail Discord</h2>
+                    <p class="section-desc">Suivez ces etapes dans l'ordre pour configurer correctement votre bot sur Discord.</p>
+
+                    <div class="grid cols-3">
+                        <article class="card">
+                            <h3 class="card-title">1Obtenir le Token</h3>
+                            <p>Rendez-vous sur le <a href="https://discord.com/developers/applications" target="_blank" rel="noopener" style="color:#ffaaaa;font-weight:700;text-decoration:none;">Discord Developer Portal</a> et creez une nouvelle application.</p>
+                            <p style="margin-top:8px;">Dans le menu Bot cliquez sur Reset Token. Copiez cette cle secrete dans un endroit sur et ne la partagez sous aucun pretexte.</p>
+                        </article>
+
+                        <article class="card">
+                            <h3 class="card-title">2Activer les Intents</h3>
+                            <p>Les intents autorisent le bot a lire les messages et analyser les membres du serveur.</p>
+                            <p style="margin-top:8px;">Descendez vers Privileged Gateway Intents. Cochez imperativement Presence, Server Members et Message Content puis sauvegardez.</p>
+                        </article>
+
+                        <article class="card">
+                            <h3 class="card-title">3Inviter le Bot</h3>
+                            <p>Generez le lien d'invitation pour joindre votre bot a un serveur Discord.</p>
+                            <p style="margin-top:8px;">Allez dans OAuth2 puis URL Generator. Cochez les cases bot et applications.commands. Donnez-lui la permission Administrator et ouvrez le lien genere.</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section id="content-python" class="tab-content">
+                    <div class="section-head">
+                        <h2 class="section-title">Architecture et Scripts Python</h2>
+                        <div class="toolbar">
+                            <button onclick="toggleDetails('python', true)">Tout afficher</button>
+                            <button onclick="toggleDetails('python', false)">Tout reduire</button>
+                        </div>
+                    </div>
+                    <p class="section-desc">Python utilise <code>discord.py</code> avec une structure en Cogs. Les commandes sont hybrides pour marcher en slash et en prefixe texte.</p>
+
+                    <div id="python-container">
+                        <details open>
+                            <summary>
+                                <span>Configuration initiale et lancement</span>
+                                <span class="sum-right">▼</span>
+                            </summary>
+                            <div class="details-body">
+                                <div>
+                                    <h4>1. Arborescence du dossier</h4>
+                                    <pre><code>mon_bot/
+├── cogs/
+│   ├── ping.py
+│   ├── help.py
+│   ├── profil.py
+│   ├── say.py
+│   ├── embed.py
+│   ├── clear.py
+│   └── ban.py
+├── .env
+└── main.py</code></pre>
+                                </div>
+                                <div>
+                                    <h4>2. Installation et commandes terminal</h4>
+                                    <pre><code><span class="comment"># Installer les dependances requises</span>
+pip install discord.py python-dotenv
+
+<span class="comment"># Demarrer le bot</span>
+python main.py</code></pre>
+                                </div>
+                                <div>
+                                    <h4>3. Fichier .env</h4>
+                                    <pre><code>TOKEN=InserezVotreTokenSecretIci</code></pre>
+                                </div>
+                                <div>
+                                    <h4>4. Fichier principal main.py</h4>
+                                    <pre><code><span class="keyword">import</span> discord
+<span class="keyword">from</span> discord.ext <span class="keyword">import</span> commands
+<span class="keyword">import</span> os
+<span class="keyword">from</span> dotenv <span class="keyword">import</span> load_dotenv
+
+load_dotenv()
+
+<span class="keyword">class</span> <span class="function">MonBot</span>(commands.Bot):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        super().__init__(command_prefix=<span class="string">"!"</span>, intents=discord.Intents.all())
+
+    <span class="keyword">async def</span> <span class="function">setup_hook</span>(self):
+        <span class="keyword">for</span> filename <span class="keyword">in</span> os.listdir(<span class="string">'./cogs'</span>):
+            <span class="keyword">if</span> filename.endswith(<span class="string">'.py'</span>):
+                <span class="keyword">await</span> self.load_extension(<span class="string">f'cogs.{filename[:-3]}'</span>)
+        <span class="keyword">await</span> self.tree.sync()
+
+    <span class="keyword">async def</span> <span class="function">on_ready</span>(self):
+        print(<span class="string">f'Connecte en tant que {self.user}'</span>)
+
+bot = MonBot()
+bot.run(os.getenv(<span class="string">"TOKEN"</span>))</code></pre>
+                                </div>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Ping</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">import</span> discord
+<span class="keyword">from</span> discord.ext <span class="keyword">import</span> commands
+
+<span class="keyword">class</span> <span class="function">PingCog</span>(commands.Cog):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, bot):
+        self.bot = bot
+
+    @commands.hybrid_command(name=<span class="string">"ping"</span>, description=<span class="string">"Affiche la latence du bot"</span>)
+    <span class="keyword">async def</span> <span class="function">ping</span>(self, ctx):
+        latency = round(self.bot.latency * <span class="string">1000</span>)
+        <span class="keyword">await</span> ctx.send(<span class="string">f'Pong ! Latence : {latency}ms'</span>)
+
+<span class="keyword">async def</span> <span class="function">setup</span>(bot):
+    <span class="keyword">await</span> bot.add_cog(PingCog(bot))</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Help</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">import</span> discord
+<span class="keyword">from</span> discord.ext <span class="keyword">import</span> commands
+
+<span class="keyword">class</span> <span class="function">HelpCog</span>(commands.Cog):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, bot):
+        self.bot = bot
+        self.bot.remove_command(<span class="string">"help"</span>)
+
+    @commands.hybrid_command(name=<span class="string">"help"</span>, description=<span class="string">"Affiche la liste des commandes"</span>)
+    <span class="keyword">async def</span> <span class="function">help</span>(self, ctx):
+        embed = discord.Embed(title=<span class="string">"Centre d'aide du Bot"</span>, color=discord.Color.red())
+        embed.add_field(name=<span class="string">"Commandes principales"</span>, value=<span class="string">"ping, profil, say, embed, clear, ban"</span>, inline=<span class="string">False</span>)
+        <span class="keyword">await</span> ctx.send(embed=embed)
+
+<span class="keyword">async def</span> <span class="function">setup</span>(bot):
+    <span class="keyword">await</span> bot.add_cog(HelpCog(bot))</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Profil</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">import</span> discord
+<span class="keyword">from</span> discord.ext <span class="keyword">import</span> commands
+
+<span class="keyword">class</span> <span class="function">ProfilCog</span>(commands.Cog):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, bot):
+        self.bot = bot
+
+    @commands.hybrid_command(name=<span class="string">"profil"</span>, description=<span class="string">"Affiche le profil d'un utilisateur"</span>)
+    <span class="keyword">async def</span> <span class="function">profil</span>(self, ctx, membre: discord.Member = <span class="keyword">None</span>):
+        cible = membre <span class="keyword">if</span> membre <span class="keyword">else</span> ctx.author
+        embed = discord.Embed(title=<span class="string">f"Profil de {cible.display_name}"</span>, color=cible.color)
+        embed.set_thumbnail(url=cible.display_avatar.url)
+        <span class="keyword">await</span> ctx.send(embed=embed)
+
+<span class="keyword">async def</span> <span class="function">setup</span>(bot):
+    <span class="keyword">await</span> bot.add_cog(ProfilCog(bot))</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Say</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">import</span> discord
+<span class="keyword">from</span> discord.ext <span class="keyword">import</span> commands
+
+<span class="keyword">class</span> <span class="function">SayCog</span>(commands.Cog):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, bot):
+        self.bot = bot
+
+    @commands.hybrid_command(name=<span class="string">"say"</span>, description=<span class="string">"Fait parler le bot"</span>)
+    <span class="keyword">async def</span> <span class="function">say</span>(self, ctx, *, message: str):
+        <span class="keyword">await</span> ctx.send(message)
+
+<span class="keyword">async def</span> <span class="function">setup</span>(bot):
+    <span class="keyword">await</span> bot.add_cog(SayCog(bot))</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Embed : Message structure</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">import</span> discord
+<span class="keyword">from</span> discord.ext <span class="keyword">import</span> commands
+
+<span class="keyword">class</span> <span class="function">EmbedCog</span>(commands.Cog):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, bot):
+        self.bot = bot
+
+    @commands.hybrid_command(name=<span class="string">"embed"</span>, description=<span class="string">"Genere un message stylise"</span>)
+    <span class="keyword">async def</span> <span class="function">embed_cmd</span>(self, ctx, titre: str, description: str):
+        embed = discord.Embed(title=titre, description=description, color=discord.Color.red())
+        <span class="keyword">await</span> ctx.send(embed=embed)
+
+<span class="keyword">async def</span> <span class="function">setup</span>(bot):
+    <span class="keyword">await</span> bot.add_cog(EmbedCog(bot))</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Clear : Nettoyage de messages</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">import</span> discord
+<span class="keyword">from</span> discord.ext <span class="keyword">import</span> commands
+
+<span class="keyword">class</span> <span class="function">ClearCog</span>(commands.Cog):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, bot):
+        self.bot = bot
+
+    @commands.hybrid_command(name=<span class="string">"clear"</span>, description=<span class="string">"Supprime un nombre precis de messages"</span>)
+    @commands.has_permissions(manage_messages=<span class="string">True</span>)
+    <span class="keyword">async def</span> <span class="function">clear</span>(self, ctx, nombre: int):
+        <span class="keyword">if</span> nombre &lt; <span class="string">1</span> <span class="keyword">or</span> nombre &gt; <span class="string">100</span>:
+            <span class="keyword">return await</span> ctx.send(<span class="string">"Veuillez choisir un nombre entre 1 et 100."</span>, ephemeral=<span class="string">True</span>)
+
+        <span class="comment"># Si commande textuelle on ajoute 1 pour effacer la commande elle-meme</span>
+        limit = nombre <span class="keyword">if</span> ctx.interaction <span class="keyword">else</span> nombre + <span class="string">1</span>
+
+        <span class="keyword">await</span> ctx.defer(ephemeral=<span class="string">True</span>)
+        deleted = <span class="keyword">await</span> ctx.channel.purge(limit=limit)
+        <span class="keyword">await</span> ctx.send(<span class="string">f"{len(deleted)} messages supprimes !"</span>, ephemeral=<span class="string">True</span>, delete_after=<span class="string">3</span>)
+
+<span class="keyword">async def</span> <span class="function">setup</span>(bot):
+    <span class="keyword">await</span> bot.add_cog(ClearCog(bot))</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Ban : Expulsion definitive</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">import</span> discord
+<span class="keyword">from</span> discord.ext <span class="keyword">import</span> commands
+
+<span class="keyword">class</span> <span class="function">BanCog</span>(commands.Cog):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, bot):
+        self.bot = bot
+
+    @commands.hybrid_command(name=<span class="string">"ban"</span>, description=<span class="string">"Bannir un membre du serveur"</span>)
+    @commands.has_permissions(ban_members=<span class="string">True</span>)
+    <span class="keyword">async def</span> <span class="function">ban</span>(self, ctx, membre: discord.Member, *, raison: str = <span class="string">"Aucune raison specifiee"</span>):
+        <span class="keyword">await</span> membre.ban(reason=raison)
+        <span class="keyword">await</span> ctx.send(<span class="string">f"{membre.name} a ete banni. Raison : {raison}"</span>)
+
+<span class="keyword">async def</span> <span class="function">setup</span>(bot):
+    <span class="keyword">await</span> bot.add_cog(BanCog(bot))</code></pre>
+                            </div>
+                        </details>
+                    </div>
+                </section>
+
+                <section id="content-javascript" class="tab-content">
+                    <div class="section-head">
+                        <h2 class="section-title alt">Architecture et Scripts JavaScript</h2>
+                        <div class="toolbar">
+                            <button onclick="toggleDetails('javascript', true)">Tout afficher</button>
+                            <button onclick="toggleDetails('javascript', false)">Tout reduire</button>
+                        </div>
+                    </div>
+                    <p class="section-desc">JavaScript exploite <code>discord.js</code> avec une architecture modulaire. Les commandes gerent slash + texte avec une logique commune.</p>
+
+                    <div id="javascript-container">
+                        <details open>
+                            <summary><span>Configuration initiale et lancement</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+                                <div>
+                                    <h4>1. Arborescence du dossier</h4>
+                                    <pre><code>mon_bot/
+├── commands/
+│   ├── ping.js
+│   ├── help.js
+│   ├── profil.js
+│   ├── say.js
+│   ├── embed.js
+│   ├── clear.js
+│   └── ban.js
+├── .env
+├── package.json
+└── bot.js</code></pre>
+                                </div>
+                                <div>
+                                    <h4>2. Installation et commandes terminal</h4>
+                                    <pre><code><span class="comment"># Initialiser puis installer</span>
+npm init -y
+npm install discord.js dotenv
+
+<span class="comment"># Demarrer le bot</span>
+node bot.js</code></pre>
+                                </div>
+                                <div>
+                                    <h4>3. Fichier .env</h4>
+                                    <pre><code>TOKEN=InserezVotreTokenSecretIci
+CLIENT_ID=InserezLIdDeLApplication</code></pre>
+                                </div>
+                                <div>
+                                    <h4>4. Fichier principal bot.js</h4>
+                                    <pre><code>require(<span class="string">'dotenv'</span>).config();
+<span class="keyword">const</span> { Client, Collection, REST, Routes } = require(<span class="string">'discord.js'</span>);
+<span class="keyword">const</span> fs = require(<span class="string">'fs'</span>);
+
+<span class="keyword">const</span> client = <span class="keyword">new</span> Client({ intents: <span class="string">3276799</span> });
+client.commands = <span class="keyword">new</span> Collection();
+
+<span class="keyword">const</span> commandFiles = fs.readdirSync(<span class="string">'./commands'</span>).filter(file => file.endsWith(<span class="string">'.js'</span>));
+<span class="keyword">const</span> commandsData = [];
+
+<span class="keyword">for</span> (<span class="keyword">const</span> file <span class="keyword">of</span> commandFiles) {
+    <span class="keyword">const</span> command = require(<span class="string">`./commands/${file}`</span>);
+    client.commands.set(command.name, command);
+    commandsData.push({ name: command.name, description: command.description, options: command.options || [] });
+}
+
+client.once(<span class="string">'ready'</span>, <span class="keyword">async</span> () => {
+    <span class="keyword">const</span> rest = <span class="keyword">new</span> REST({ version: <span class="string">'10'</span> }).setToken(process.env.TOKEN);
+    <span class="keyword">await</span> rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commandsData });
+    console.log(<span class="string">`Connecte en tant que ${client.user.tag}`</span>);
+});
+
+client.login(process.env.TOKEN);</code></pre>
+                                </div>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Ping</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code>module.exports = {
+    name: <span class="string">'ping'</span>,
+    description: <span class="string">'Affiche la latence du bot.'</span>,
+    <span class="keyword">async</span> execute(context) {
+        <span class="keyword">const</span> start = Date.now();
+        <span class="keyword">const</span> reply = <span class="keyword">await</span> context.reply({ content: <span class="string">'Calcul en cours...'</span>, fetchReply: <span class="keyword">true</span> });
+        <span class="keyword">const</span> end = Date.now();
+
+        <span class="keyword">const</span> latency = end - start;
+        <span class="keyword">const</span> text = <span class="string">`Pong ! Latence : ${latency}ms`</span>;
+
+        <span class="keyword">if</span> (context.editReply) {
+            <span class="keyword">await</span> context.editReply(text);
+        } <span class="keyword">else</span> {
+            <span class="keyword">await</span> reply.edit(text);
+        }
+    }
+};</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Help</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">const</span> { EmbedBuilder } = require(<span class="string">'discord.js'</span>);
+
+module.exports = {
+    name: <span class="string">'help'</span>,
+    description: <span class="string">'Liste des commandes.'</span>,
+    <span class="keyword">async</span> execute(context) {
+        <span class="keyword">const</span> user = context.author || context.user;
+        <span class="keyword">const</span> embed = <span class="keyword">new</span> EmbedBuilder()
+            .setTitle(<span class="string">'Centre d\'aide'</span>)
+            .setColor(<span class="string">'#d32f2f'</span>)
+            .addFields(
+                { name: <span class="string">'Commandes'</span>, value: <span class="string">'ping, profil, say, embed, clear, ban'</span> }
+            )
+            .setFooter({ text: <span class="string">`Demande par ${user.username}`</span> });
+
+        <span class="keyword">await</span> context.reply({ embeds: [embed] });
+    }
+};</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Profil</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">const</span> { EmbedBuilder } = require(<span class="string">'discord.js'</span>);
+
+module.exports = {
+    name: <span class="string">'profil'</span>,
+    description: <span class="string">'Voir les informations utilisateur.'</span>,
+    options: [{ name: <span class="string">'membre'</span>, type: <span class="string">6</span>, description: <span class="string">'Membre a inspecter'</span>, required: <span class="keyword">false</span> }],
+    <span class="keyword">async</span> execute(context, args) {
+        <span class="keyword">let</span> targetUser;
+        <span class="keyword">if</span> (context.commandName) {
+            targetUser = context.options.getUser(<span class="string">'membre'</span>) || context.user;
+        } <span class="keyword">else</span> {
+            targetUser = context.mentions.users.first() || context.author;
+        }
+
+        <span class="keyword">const</span> embed = <span class="keyword">new</span> EmbedBuilder()
+            .setTitle(<span class="string">`Profil de ${targetUser.username}`</span>)
+            .setThumbnail(targetUser.displayAvatarURL())
+            .addFields(
+                { name: <span class="string">'ID'</span>, value: targetUser.id },
+                { name: <span class="string">'Creation'</span>, value: <span class="keyword">new</span> Date(targetUser.createdTimestamp).toLocaleDateString(<span class="string">'fr-FR'</span>) }
+            );
+
+        <span class="keyword">await</span> context.reply({ embeds: [embed] });
+    }
+};</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Say</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code>module.exports = {
+    name: <span class="string">'say'</span>,
+    description: <span class="string">'Repeter un texte.'</span>,
+    options: [{ name: <span class="string">'message'</span>, type: <span class="string">3</span>, description: <span class="string">'Texte a envoyer'</span>, required: <span class="keyword">true</span> }],
+    <span class="keyword">async</span> execute(context, args) {
+        <span class="keyword">let</span> texte = <span class="string">''</span>;
+
+        <span class="keyword">if</span> (context.commandName) {
+            texte = context.options.getString(<span class="string">'message'</span>);
+            <span class="keyword">await</span> context.reply({ content: <span class="string">'Message envoye'</span>, ephemeral: <span class="keyword">true</span> });
+            <span class="keyword">await</span> context.channel.send(texte);
+        } <span class="keyword">else</span> {
+            texte = args.join(<span class="string">' '</span>);
+            <span class="keyword">await</span> context.delete();
+            <span class="keyword">await</span> context.channel.send(texte);
+        }
+    }
+};</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Embed</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">const</span> { EmbedBuilder } = require(<span class="string">'discord.js'</span>);
+
+module.exports = {
+    name: <span class="string">'embed'</span>,
+    description: <span class="string">'Creer un embed basique.'</span>,
+    <span class="keyword">async</span> execute(context, args) {
+        <span class="keyword">const</span> embed = <span class="keyword">new</span> EmbedBuilder()
+            .setTitle(<span class="string">'Embed Personnalise'</span>)
+            .setDescription(<span class="string">'Ceci est une description structuree.'</span>)
+            .setColor(<span class="string">'#d32f2f'</span>);
+
+        <span class="keyword">await</span> context.reply({ embeds: [embed] });
+    }
+};</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Clear</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">const</span> { PermissionsBitField } = require(<span class="string">'discord.js'</span>);
+
+module.exports = {
+    name: <span class="string">'clear'</span>,
+    description: <span class="string">'Nettoyer le salon.'</span>,
+    options: [{ name: <span class="string">'nombre'</span>, type: <span class="string">4</span>, description: <span class="string">'Nombre de messages'</span>, required: <span class="keyword">true</span> }],
+    <span class="keyword">async</span> execute(context, args) {
+        <span class="keyword">if</span> (!context.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+            <span class="keyword">return</span> context.reply({ content: <span class="string">'Permissions insuffisantes.'</span>, ephemeral: <span class="keyword">true</span> });
+        }
+
+        <span class="keyword">let</span> amount = context.commandName ? context.options.getInteger(<span class="string">'nombre'</span>) : parseInt(args[0]);
+        <span class="keyword">if</span> (!context.commandName) amount++;
+
+        <span class="keyword">if</span> (amount &gt; <span class="string">100</span> || amount &lt; <span class="string">1</span>) <span class="keyword">return</span> context.reply(<span class="string">'Nombre invalide.'</span>);
+
+        <span class="keyword">await</span> context.channel.bulkDelete(amount, <span class="keyword">true</span>);
+
+        <span class="keyword">const</span> msg = <span class="keyword">await</span> context.channel.send(<span class="string">`Messages supprimes.`</span>);
+        setTimeout(() => msg.delete(), <span class="string">3000</span>);
+    }
+};</code></pre>
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary><span>Commande Ban</span><span class="sum-right">▼</span></summary>
+                            <div class="details-body">
+<pre><code><span class="keyword">const</span> { PermissionsBitField } = require(<span class="string">'discord.js'</span>);
+
+module.exports = {
+    name: <span class="string">'ban'</span>,
+    description: <span class="string">'Bannir un utilisateur.'</span>,
+    options: [{ name: <span class="string">'membre'</span>, type: <span class="string">6</span>, description: <span class="string">'Membre a bannir'</span>, required: <span class="keyword">true</span> }],
+    <span class="keyword">async</span> execute(context, args) {
+        <span class="keyword">if</span> (!context.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
+            <span class="keyword">return</span> context.reply({ content: <span class="string">'Permissions insuffisantes.'</span>, ephemeral: <span class="keyword">true</span> });
+        }
+
+        <span class="keyword">const</span> target = context.commandName
+            ? context.options.getUser(<span class="string">'membre'</span>)
+            : context.mentions.users.first();
+
+        <span class="keyword">if</span> (!target) <span class="keyword">return</span> context.reply(<span class="string">'Membre introuvable.'</span>);
+
+        <span class="keyword">await</span> context.guild.members.ban(target.id, { reason: <span class="string">'Banni via commande'</span> });
+        <span class="keyword">await</span> context.reply(<span class="string">` ${target.username} a ete banni definitivement.`</span>);
+    }
+};</code></pre>
+                            </div>
+                        </details>
+                    </div>
+                </section>
+
+                <section id="content-best" class="tab-content">
+                    <h2 class="section-title">Logiciel</h2>
+                    <p class="section-desc">Checklist utile pour garder un bot propre, stable et maintenable, avec les infos IDE que tu utilisais avant.</p>
+
+                    <div class="grid cols-3" style="margin-bottom:10px;">
+                        <article class="card">
+                            <h3 class="card-title">Visual Studio Code <span class="tag">Le standard</span></h3>
+                            <p>L'editeur le plus stable pour coder des bots. Ecosysteme massif d'extensions, terminal integre efficace et controle complet du projet.</p>
+                            <ul class="list" style="margin-top:8px;">
+                                <li>Tres bonne stabilite pour les gros projets.</li>
+                                <li>Personnalisation complete (themes, raccourcis, snippets).</li>
+                                <li>Ideal pour garder un controle manuel sur chaque fichier.</li>
+                            </ul>
+                        </article>
+
+                        <article class="card">
+                            <h3 class="card-title">Cursor <span class="tag">Le rapide</span></h3>
+                            <p>Base sur VS Code, avec une experience acceleree pour l'ecriture et la navigation. Pratique quand tu enchaines les iterations rapidement.</p>
+                            <ul class="list" style="margin-top:8px;">
+                                <li>Interface familiere si tu viens de VS Code.</li>
+                                <li>Autocompletion et generation plus agressives.</li>
+                                <li>Ideal pour reduire les taches repetitives.</li>
+                            </ul>
+                        </article>
+
+                        <article class="card">
+                            <h3 class="card-title">Windsurf <span class="tag">Le contextuel</span></h3>
+                            <p>Oriente comprehension globale du codebase. Adapté aux projets modules avec beaucoup de fichiers et dependances croisées.</p>
+                            <ul class="list" style="margin-top:8px;">
+                                <li>Bonne lecture du contexte projet global.</li>
+                                <li>Flux de travail pratique pour refactoriser.</li>
+                                <li>Ideal pour les architectures lourdes.</li>
+                            </ul>
+                        </article>
+                    </div>
+
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach((el) => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach((el) => el.classList.remove('active'));
+
+            const content = document.getElementById(`content-${tabId}`);
+            const button = document.getElementById(`btn-${tabId}`);
+            if (content) content.classList.add('active');
+            if (button) button.classList.add('active');
+        }
+
+        function toggleDetails(tabId, state) {
+            const container = document.getElementById(`${tabId}-container`);
+            if (!container) return;
+
+            container.querySelectorAll('details').forEach((detail) => {
+                if (state) {
+                    detail.setAttribute('open', '');
+                } else {
+                    detail.removeAttribute('open');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

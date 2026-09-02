@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone.app</title>
+    <!-- Utilisation de logo.jpg pour le favicon -->
+    <link rel="icon" type="image/jpeg" href="../../assets/images/logo.jpg">
+    
+    <style>
+        /* =========================================
+           VARIABLES & RÉINITIALISATION
+           ========================================= */
+        :root {
+            --bg-main: #181a1b;
+            --bg-panel: rgba(34, 37, 39, 0.85);
+            --bg-panel-hover: rgba(42, 46, 48, 0.95);
+            --text-main: #d1cdc7;
+            --text-muted: #8b8f92;
+            --accent: #d32f2f;
+            --border: #383c3f;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; 
+        }
+
+        /* =========================================
+           FOND UNI (Mosaïque supprimée)
+           ========================================= */
+        body {
+            background-color: var(--bg-main);
+            font-family: var(--font-family);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            color-scheme: dark; /* Force le rendu sombre natif pour éviter les flashs blancs */
+        }
+
+        /* =========================================
+           NAVIGATION (SCROLLABLE MOBILE)
+           ========================================= */
+        nav.tabs {
+            display: flex;
+            gap: 6px;
+            background-color: rgba(24, 26, 27, 0.90);
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--border);
+            width: 100%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        button.tab-btn {
+            flex: 1;
+            min-width: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--bg-panel);
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        button.tab-btn img {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        button.tab-btn:hover {
+            background-color: var(--bg-panel-hover);
+            color: var(--text-main);
+            border-color: var(--border);
+        }
+
+        button.tab-btn.active {
+            background-color: rgba(211, 47, 47, 0.15);
+            color: #fff;
+            border: 1px solid var(--accent);
+        }
+
+        /* =========================================
+           ZONE DE CONTENU IFRAME
+           ========================================= */
+        main {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        iframe#content-frame {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: transparent;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .fade-out { opacity: 0 !important; }
+    </style>
+</head>
+<body>
+
+    <nav class="tabs">
+        <button class="tab-btn" id="btn-discord" onclick="loadTab('discord')">
+            <img src="../../assets/images/discord.png" alt="Discord" onerror="this.src='../../assets/images/logo.jpg'"> Discord
+        </button>
+        <button class="tab-btn" id="btn-asuna" onclick="loadTab('asuna')">
+            <img src="../../assets/images/asuna.png" alt="Asuna" onerror="this.src='../../assets/images/logo.jpg'"> Asuna
+        </button>
+        <button class="tab-btn" id="btn-vax" onclick="loadTab('vax')">
+            <img src="../../assets/images/vax.png" alt="Vax" onerror="this.src='../../assets/images/logo.jpg'"> Vax
+        </button>
+        <button class="tab-btn" id="btn-yui" onclick="loadTab('yui')">
+            <img src="../../assets/images/yui.png" alt="Yui" onerror="this.src='../../assets/images/logo.jpg'"> Yui
+        </button>
+        <button class="tab-btn" id="btn-kayaba" onclick="loadTab('kayaba')">
+            <img src="../../assets/images/kayaba.png" alt="Kayaba" onerror="this.src='../../assets/images/logo.jpg'"> Kayaba
+        </button>
+        <button class="tab-btn" id="btn-arceus" onclick="loadTab('arceus')">
+            <img src="../../assets/images/arceus.png" alt="Arceus" onerror="this.src='../../assets/images/logo.jpg'"> Arceus
+        </button>
+        <!-- ONGLET TUTO -->
+        <button class="tab-btn" id="btn-bot" onclick="loadTab('bot')">
+            <img id="img-tuto" src="../../assets/images/js.png" alt="Tuto" onerror="this.src='../../assets/images/logo.jpg'"> Tuto
+        </button>
+    </nav>
+
+    <main>
+        <iframe id="content-frame" title="Contenu Synkrone"></iframe>
+    </main>
+
+    <script>
+        function resolveInitialTab() {
+            const params = new URLSearchParams(window.location.search);
+            const queryTab = (params.get('tab') || '').trim().toLowerCase();
+            const knownRoutes = new Set(['discord', 'asuna', 'vax', 'yui', 'kayaba', 'arceus', 'bot']);
+            return knownRoutes.has(queryTab) ? queryTab : 'discord';
+        }
+
+        function notifyParentRoute(routeName, replaceHistory = false) {
+            if (window.parent === window) return;
+
+            window.parent.postMessage(
+                {
+                    type: 'synkrone:bots-route',
+                    tab: routeName,
+                    replaceHistory
+                },
+                window.location.origin
+            );
+        }
+
+        function loadTab(routeName, options = {}) {
+            const { notifyParent = true, replaceParentHistory = false } = options;
+
+            // Compatibilité avec les anciens liens: accueil devient discord.
+            if (routeName === 'accueil') {
+                routeName = 'discord';
+            }
+
+            const iframe = document.getElementById('content-frame');
+            const btnId = 'btn-' + routeName;
+
+            if (notifyParent) {
+                notifyParentRoute(routeName, replaceParentHistory);
+            }
+
+            // Animation et chargement du fichier
+            iframe.classList.add('fade-out');
+            setTimeout(() => {
+                iframe.src = `/discord/bots/${routeName}.html`;
+                iframe.onload = () => {
+                    iframe.classList.remove('fade-out');
+                };
+            }, 150);
+
+            // Mise à jour visuelle des onglets standards
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(btnId);
+            
+            if (activeBtn && activeBtn.classList.contains('tab-btn')) {
+                activeBtn.classList.add('active');
+                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+
+        // Chargement automatique au démarrage & gestion du timer d'icône
+        window.addEventListener('DOMContentLoaded', () => {
+            const initialTab = resolveInitialTab();
+            loadTab(initialTab, { notifyParent: true, replaceParentHistory: true });
+
+            // Alternance d'image pour l'onglet Tuto (1 seconde)
+            const tutoImg = document.getElementById('img-tuto');
+            const tutoImages = ['../../assets/images/js.png', '../../assets/images/py.png'];
+            let imgIndex = 0;
+
+            if (tutoImg) {
+                setInterval(() => {
+                    imgIndex = (imgIndex + 1) % tutoImages.length;
+                    tutoImg.src = tutoImages[imgIndex];
+                }, 1000);
+            }
+        });
+
+    </script>
+</body>
+</html>

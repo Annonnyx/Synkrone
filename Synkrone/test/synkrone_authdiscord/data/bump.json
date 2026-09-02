@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "1368235294192570520": {
+      "purchasedModules": [
+        "auto_bump",
+        "custom_embed",
+        "theme",
+        "owners",
+        "bots",
+        "roles",
+        "admins",
+        "channels"
+      ],
+      "visibilityLevel": "featured",
+      "featuredUntil": 1787451999554
+    }
+  }
+}

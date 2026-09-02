@@ -1,0 +1,80 @@
+{
+  "bots": {
+    "1461504021771845665": {
+      "id": "1461504021771845665",
+      "ownerId": "1366780122891419784",
+      "status": "approved",
+      "name": "𝑺𝒚𝒏𝒌𝒓𝒐𝒏𝒆",
+      "avatar": "https://cdn.discordapp.com/avatars/1461504021771845665/8478185919a6c6c386a06e8c263c349d.png",
+      "prefix": "²",
+      "description": "t",
+      "tags": [
+        "Musique"
+      ],
+      "servers": 1,
+      "featured": true,
+      "addedAt": 1787448047908,
+      "lastBump": 1787448070782,
+      "customUrl": "test",
+      "visits": 17,
+      "likes": [
+        "1366780122891419784"
+      ],
+      "invites": 1,
+      "banner": "https://ui.synkrone.app/uploads/Synkrone/complet.png"
+    },
+    "1428865683986452640": {
+      "id": "1428865683986452640",
+      "ownerId": "1366780122891419784",
+      "status": "needs_edit",
+      "name": "𝑨𝒔𝒖𝒏𝒂",
+      "avatar": "https://cdn.discordapp.com/avatars/1428865683986452640/f9728b726fbf41c597958468ff6e0af3.png",
+      "banner": "",
+      "prefix": "²",
+      "description": "sdfsdfsdfsdfsdfsdf",
+      "longDescription": "sdfsdfsdfsdfsdfsdfsdfs",
+      "customUrl": "asuna",
+      "tags": [
+        "Modération",
+        "Util",
+        "Staff"
+      ],
+      "servers": 0,
+      "featured": true,
+      "addedAt": 1787450410919,
+      "lastBump": 0,
+      "views": 0,
+      "invites": 0,
+      "likes": [],
+      "feedback": "manque le bot"
+    },
+    "1460012999912853810": {
+      "id": "1460012999912853810",
+      "ownerId": "1366780122891419784",
+      "status": "approved",
+      "name": "𝒀𝒖𝒊",
+      "avatar": "https://cdn.discordapp.com/avatars/1460012999912853810/4d7b9ecede5864f2f9cd1efa67a7eca8.png",
+      "banner": "",
+      "prefix": "²",
+      "description": "ffsdfsdfsdfsdf",
+      "longDescription": "fsdfsdfsdfsdfsdfs",
+      "customUrl": "yui",
+      "tags": [
+        "Modération",
+        "Util",
+        "Staff"
+      ],
+      "servers": 0,
+      "featured": false,
+      "addedAt": 1787450438586,
+      "lastBump": 1787450492937,
+      "views": 0,
+      "invites": 0,
+      "likes": [
+        "1366780122891419784"
+      ],
+      "feedback": null,
+      "visits": 1
+    }
+  }
+}

@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone | Espace de travail collaboratif</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        base: '#1e1f22',
+                        panel: '#2b2d31',
+                        border: 'rgba(255,255,255,0.1)',
+                        accent: '#4e5058',
+                        accentHover: '#6d6f78',
+                        card: '#313338'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; color: #f8fafc; overflow: hidden; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.2); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        .glass-panel { background: rgba(43, 45, 49, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--tw-colors-border); }
+        .kanban-column { min-height: 200px; transition: background-color 0.2s, outline 0.2s; }
+        .kanban-column.drag-over { background-color: rgba(255, 255, 255, 0.05); outline: 2px dashed rgba(255,255,255,0.4); outline-offset: -2px; }
+        .task-card { cursor: grab; transition: transform 0.2s, box-shadow 0.2s; }
+        .task-card:active { cursor: grabbing; transform: scale(0.98); }
+        .task-card:hover { border-color: rgba(255,255,255,0.3); }
+        #brainstorm-container { cursor: grab; overflow: hidden; background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
+        #brainstorm-container:active { cursor: grabbing; }
+        .post-it { cursor: grab; transition: box-shadow 0.2s; }
+        .post-it:active { cursor: grabbing; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .toast-slide { animation: slideInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .writing-vertical { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); }
+    </style>
+</head>
+<body class="mosaic-bg h-screen w-screen flex flex-col relative text-sm bg-base">
+    <div id="app-root" class="h-full w-full flex flex-col relative z-0"></div>
+    
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
+    <div id="global-modals" class="empty:hidden relative z-[9999]"></div>
+    
+    <div id="context-menu" class="hidden fixed bg-panel border border-border rounded-lg shadow-2xl z-[9999] py-1 min-w-[150px]"></div>
+
+    <script>
+        let USERS = [];
+        let MOCK_USER = null;
+
+        let appState = {
+            view: 'projects',
+            currentProjectId: null,
+            currentVersionId: null,
+            activeTab: 'kanban',
+            openedItemId: null,
+            chatOpen: window.innerWidth > 768,
+            projects: [],
+            versions: [],
+            columns: [],
+            tasks: [],
+            notes: [],
+            polls: [],
+            chat: [],
+            projectRoles: {},
+            brainstorm: { scale: 1, panX: 0, panY: 0, isDragging: false, startX: 0, startY: 0 },
+            tempPollOptions: []
+        };
+
+        async function saveState() {
+            try {
+                await fetch('/api/workspace', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        projects: appState.projects,
+                        versions: appState.versions,
+                        columns: appState.columns,
+                        tasks: appState.tasks,
+                        notes: appState.notes,
+                        polls: appState.polls,
+                        chat: appState.chat,
+                        projectRoles: appState.projectRoles
+                    })
+                });
+            } catch(e) { console.error("Erreur de sauvegarde", e); }
+        }
+
+        async function loadState() {
+            try {
+                const res = await fetch('/api/workspace');
+                if (res.ok) {
+                    const data = await res.json();
+                    appState.projects = data.projects || [];
+                    appState.versions = data.versions || [];
+                    appState.columns = data.columns || [];
+                    appState.tasks = data.tasks || [];
+                    appState.notes = data.notes || [];
+                    appState.polls = data.polls || [];
+                    appState.chat = data.chat || [];
+                    appState.projectRoles = data.projectRoles || {};
+                }
+            } catch(e) { console.error("Erreur chargement de l'état serveur", e); }
+        }
+
+        // MAJ Url du navigateur pour faire un vrai lien
+        window.updateURL = function(replace = false) {
+            let path = '/';
+            if (appState.view === 'versions' && appState.currentProjectId) {
+                const p = appState.projects.find(p => p.id === appState.currentProjectId);
+                if (p) path = `/${encodeURIComponent(p.name)}`;
+            } else if (appState.view === 'workspace' && appState.currentProjectId && appState.currentVersionId) {
+                const p = appState.projects.find(p => p.id === appState.currentProjectId);
+                const v = appState.versions.find(v => v.id === appState.currentVersionId);
+                if (p && v) {
+                    path = `/${encodeURIComponent(p.name)}/${encodeURIComponent(v.name)}/${appState.activeTab}`;
+                    if (appState.openedItemId) path += `/${appState.openedItemId}`;
+                }
+            }
+            
+            const fullPath = '/equipe/espace-travail' + (path === '/' ? '' : path);
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'synkrone:workspace-route', path: fullPath, replaceHistory: replace }, window.location.origin);
+                } else {
+                    if (replace) window.history.replaceState(null, '', fullPath);
+                    else window.history.pushState(null, '', fullPath);
+                }
+            } catch(e) {}
+        }
+
+        function restoreStateFromURL() {
+            let pathname = '';
+            try { pathname = (window.parent && window.parent !== window) ? window.parent.location.pathname : window.location.pathname; } 
+            catch(e) { pathname = window.location.pathname; }
+            
+            const prefix = '/equipe/espace-travail';
+            if (!pathname.startsWith(prefix)) return;
+            
+            const sub = pathname.slice(prefix.length);
+            if (!sub || sub === '/') {
+                appState.view = 'projects';
+                appState.currentProjectId = null;
+                appState.currentVersionId = null;
+                return;
+            }
+
+            const parts = sub.split('/').filter(Boolean).map(decodeURIComponent);
+            if (parts.length >= 1) {
+                const pName = parts[0];
+                const proj = appState.projects.find(p => p.name === pName);
+                if (proj) {
+                    appState.currentProjectId = proj.id;
+                    appState.view = 'versions';
+                    
+                    if (parts.length >= 2) {
+                        const vName = parts[1];
+                        const vers = appState.versions.find(v => v.name === vName && v.projectId === proj.id);
+                        if (vers) {
+                            appState.currentVersionId = vers.id;
+                            appState.view = 'workspace';
+                            if (parts.length >= 3) {
+                                appState.activeTab = parts[2];
+                                if (parts.length >= 4) appState.openedItemId = parts[3];
+                            }
+                        } else {
+                            appState.currentVersionId = null;
+                            appState.view = 'versions';
+                        }
+                    }
+                } else {
+                    appState.currentProjectId = null;
+                    appState.view = 'projects';
+                }
+            }
+        }
+
+        async function init() {
+            try {
+                const res = await fetch('/api/staff/users');
+                if(res.ok) {
+                    const data = await res.json();
+                    if(data.ok && data.users) {
+                        USERS = data.users.map(u => ({
+                            id: u.id, name: u.username, avatar: u.avatar || 'https://placehold.co/100x100/4e5058/ffffff?text=U',
+                            role: u.role, isTeamOwner: u.isTeamOwner
+                        }));
+                    }
+                }
+                const meRes = await fetch('/api/me');
+                if(meRes.ok) {
+                    const meData = await meRes.json();
+                    if(meData.authenticated) {
+                        MOCK_USER = USERS.find(u => u.id === meData.user.id) || {
+                            id: meData.user.id, name: meData.user.username, avatar: meData.user.avatar,
+                            role: meData.user.role, isTeamOwner: meData.user.isTeamOwner
+                        };
+                        if(!USERS.find(u => u.id === MOCK_USER.id)) USERS.push(MOCK_USER);
+                    }
+                }
+            } catch(e) {}
+
+            if (!MOCK_USER) MOCK_USER = { id: 'guest', name: 'Visiteur', avatar: '/assets/images/logo.jpg', role: 'Visiteur' };
+            if (USERS.length === 0) USERS = [MOCK_USER];
+
+            await loadState();
+            restoreStateFromURL();
+            render();
+
+            if (appState.openedItemId) {
+                const isTask = appState.tasks.find(t => t.id === appState.openedItemId);
+                const isNote = appState.notes.find(n => n.id === appState.openedItemId);
+                if (isTask) window.openItemModal('task', appState.openedItemId, true);
+                else if (isNote) window.openItemModal('note', appState.openedItemId, true);
+            }
+
+            // Sync from Shell URL clicks
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'synkrone:workspace-parse-url') {
+                    restoreStateFromURL();
+                    render();
+                }
+            });
+        }
+
+        window.isUserAdmin = function() { return MOCK_USER && (MOCK_USER.isTeamOwner || MOCK_USER.role === 'Admin'); }
+
+        function setIframeFullscreen(isFullscreen) {
+            try {
+                if (window.parent && window.parent.document) {
+                    const frame = window.parent.document.getElementById('content-frame');
+                    if (frame) {
+                        if (isFullscreen) {
+                            frame.style.position = 'fixed'; frame.style.top = '0'; frame.style.left = '0';
+                            frame.style.width = '100vw'; frame.style.height = '100vh'; frame.style.zIndex = '9999';
+                        } else {
+                            frame.style.position = ''; frame.style.top = ''; frame.style.left = '';
+                            frame.style.width = '100%'; frame.style.height = '100%'; frame.style.zIndex = '';
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+
+        function openModalHTML(html) { setIframeFullscreen(true); document.getElementById('global-modals').innerHTML = html; }
+        function closeGlobalModal() { setIframeFullscreen(false); document.getElementById('global-modals').innerHTML = ''; }
+        function getUser(id) { return USERS.find(u => u.id === id) || { name: 'Inconnu', avatar: 'https://placehold.co/100x100/333/fff?text=?' }; }
+
+        function hexToRgba(hex, alpha) {
+            let r = 0, g = 0, b = 0;
+            hex = String(hex || '#666666').replace('#', '');
+            if (hex.length === 3) { r = parseInt(hex[0]+hex[0], 16); g = parseInt(hex[1]+hex[1], 16); b = parseInt(hex[2]+hex[2], 16); }
+            else if (hex.length === 6) { r = parseInt(hex.substring(0,2), 16); g = parseInt(hex.substring(2,4), 16); b = parseInt(hex.substring(4,6), 16); }
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function showToast(title, message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const id = 'toast_' + Date.now();
+            let icon = 'fa-info-circle text-gray-300';
+            let border = 'border-gray-500/30';
+            if(type === 'success') { icon = 'fa-check-circle text-green-400'; border = 'border-green-500/30'; }
+            if(type === 'error') { icon = 'fa-exclamation-circle text-red-400'; border = 'border-red-500/30'; }
+
+            const toastHTML = `
+                <div id="${id}" class="toast-slide bg-panel border-l-4 ${border} p-3 rounded-lg shadow-lg flex items-start gap-3 w-72 pointer-events-auto">
+                    <i class="fa-solid ${icon} mt-0.5"></i>
+                    <div>
+                        <h4 class="font-bold text-white text-sm">${title}</h4>
+                        <p class="text-gray-300 text-xs mt-1">${message}</p>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', toastHTML);
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.style.opacity = '0'; el.style.transform = 'translateX(100%)'; el.style.transition = 'all 0.3s ease';
+                    setTimeout(() => el.remove(), 300);
+                }
+            }, 3000);
+        }
+
+        function render() {
+            const root = document.getElementById('app-root');
+            if (appState.view === 'projects') {
+                root.innerHTML = renderProjectsView();
+            } else if (appState.view === 'versions') {
+                const proj = appState.projects.find(p => p.id === appState.currentProjectId);
+                if (!proj) { appState.view = 'projects'; return render(); }
+                root.innerHTML = renderVersionsView();
+            } else if (appState.view === 'workspace') {
+                const proj = appState.projects.find(p => p.id === appState.currentProjectId);
+                const vers = appState.versions.find(v => v.id === appState.currentVersionId);
+                if (!proj || !vers) { appState.view = 'projects'; return render(); }
+                root.innerHTML = renderWorkspaceView();
+                const chatBox = document.getElementById('global-chat-messages');
+                if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+                if(appState.activeTab === 'brainstorm') setupBrainstormEvents();
+            }
+        }
+
+        window.selectProject = function(id) {
+            appState.currentProjectId = id;
+            appState.view = 'versions';
+            window.updateURL();
+            saveState();
+            render();
+        }
+
+        window.selectVersion = function(id) {
+            appState.currentVersionId = id;
+            appState.activeTab = 'kanban';
+            appState.view = 'workspace';
+            window.updateURL();
+            saveState();
+            render();
+            showToast('Espace ouvert', 'Bienvenue dans la version.', 'success');
+        }
+
+        function renderProjectsView() {
+            const sortedProjects = [...appState.projects].sort((a, b) => b.createdAt - a.createdAt);
+            return `
+                <div class="flex-1 overflow-y-auto p-6 lg:p-12 fade-in">
+                    <div class="max-w-6xl mx-auto">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                            <div>
+                                <h1 class="text-3xl font-bold text-white">Espace de Travail</h1>
+                                <p class="text-gray-400 mt-1">Sélectionnez un projet pour commencer</p>
+                            </div>
+                            <button onclick="window.openCreateProjectModal()" class="${window.isUserAdmin() ? 'flex' : 'hidden'} bg-accent hover:bg-accentHover text-white px-4 py-2 rounded-lg font-medium transition shadow-lg items-center gap-2 border border-border">
+                                <i class="fa-solid fa-plus"></i> Nouveau Projet
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${sortedProjects.map(p => {
+                                return `
+                                <div class="glass-panel p-6 rounded-xl border border-border hover:border-gray-400 transition cursor-pointer flex flex-col h-full group" onclick="window.selectProject('${p.id}')">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h3 class="text-xl font-bold text-white group-hover:text-gray-300 transition">${p.name}</h3>
+                                        ${window.isUserAdmin() ? `
+                                        <div class="relative cursor-pointer ml-2 z-50" tabindex="0" onblur="setTimeout(() => this.querySelector('.menu-dropdown')?.classList.add('hidden'), 200)" onclick="this.querySelector('.menu-dropdown')?.classList.toggle('hidden'); event.stopPropagation();">
+                                            <i class="fa-solid fa-ellipsis-vertical text-gray-400 hover:text-white px-2 py-1"></i>
+                                            <div class="menu-dropdown absolute right-0 top-full mt-1 hidden w-36 bg-panel border border-border rounded-lg shadow-xl overflow-hidden z-50">
+                                                <button onclick="event.stopPropagation(); window.renameProject('${p.id}')" class="w-full text-left px-3 py-2 text-xs text-gray-200 hover:bg-card transition"><i class="fa-solid fa-pen mr-2"></i>Renommer</button>
+                                                <button onclick="event.stopPropagation(); window.deleteProject('${p.id}')" class="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-card transition border-t border-border"><i class="fa-solid fa-trash mr-2"></i>Supprimer</button>
+                                            </div>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                    <p class="text-gray-400 text-sm flex-1 mb-4">${p.desc}</p>
+                                    <div class="flex justify-between items-center mt-auto pt-4 border-t border-border">
+                                        <div class="flex -space-x-2">
+                                            ${p.members.map(mId => `<img src="${getUser(mId).avatar}" class="w-8 h-8 rounded-full border-2 border-base" title="${getUser(mId).name}">`).join('')}
+                                        </div>
+                                        ${window.isUserAdmin() ? `
+                                        <button onclick="event.stopPropagation(); window.openManageTeamModal('${p.id}')" class="text-gray-400 hover:text-white bg-card hover:bg-accent px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-2 border border-border">
+                                            <i class="fa-solid fa-users-gear"></i> Équipe
+                                        </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                `;
+                            }).join('')}
+                            ${sortedProjects.length === 0 ? `<p class="text-gray-500 text-center py-10 italic col-span-3">Aucun projet. Commencez par en créer un.</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVersionsView() {
+            const project = appState.projects.find(p => p.id === appState.currentProjectId);
+            if (!project) return ''; // Safeguard
+            const projectVersions = appState.versions.filter(v => v.projectId === project.id).sort((a, b) => b.createdAt - a.createdAt);
+
+            return `
+                <div class="flex-1 overflow-y-auto p-6 lg:p-12 fade-in">
+                    <div class="max-w-4xl mx-auto">
+                        <button onclick="appState.view = 'projects'; appState.currentProjectId = null; window.updateURL(); render();" class="text-gray-400 hover:text-white mb-6 flex items-center gap-2 transition">
+                            <i class="fa-solid fa-arrow-left"></i> Retour aux projets
+                        </button>
+                        
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                            <div>
+                                <h1 class="text-3xl font-bold text-white">${project.name}</h1>
+                                <p class="text-gray-400 mt-1">Sélectionnez une version de travail</p>
+                            </div>
+                            <button onclick="window.openCreateVersionModal()" class="${window.isUserAdmin() ? 'flex' : 'hidden'} bg-accent hover:bg-accentHover text-white px-4 py-2 rounded-lg font-medium transition shadow-lg items-center gap-2 border border-border">
+                                <i class="fa-solid fa-code-branch"></i> Nouvelle Version
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            ${projectVersions.map((v, index) => `
+                                <div onclick="window.selectVersion('${v.id}')" class="glass-panel p-5 rounded-xl border border-border hover:border-gray-400 transition cursor-pointer flex flex-col sm:flex-row justify-between sm:items-center group relative gap-2">
+                                    ${index === 0 ? `<div class="absolute top-0 right-0 bg-gray-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">Dernière</div>` : ''}
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-bold text-white group-hover:text-gray-300 transition flex items-center gap-2">
+                                            <i class="fa-solid fa-box-archive text-gray-500"></i> ${v.name}
+                                        </h3>
+                                        <p class="text-gray-400 text-sm mt-1">${v.desc}</p>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        ${window.isUserAdmin() ? `
+                                        <div class="relative cursor-pointer ml-2 z-50" tabindex="0" onblur="setTimeout(() => this.querySelector('.menu-dropdown')?.classList.add('hidden'), 200)" onclick="this.querySelector('.menu-dropdown')?.classList.toggle('hidden'); event.stopPropagation();">
+                                            <i class="fa-solid fa-ellipsis-vertical text-gray-400 hover:text-white px-2 py-1"></i>
+                                            <div class="menu-dropdown absolute right-0 top-full mt-1 hidden w-36 bg-panel border border-border rounded-lg shadow-xl overflow-hidden z-50">
+                                                <button onclick="event.stopPropagation(); window.renameVersion('${v.id}')" class="w-full text-left px-3 py-2 text-xs text-gray-200 hover:bg-card transition"><i class="fa-solid fa-pen mr-2"></i>Renommer</button>
+                                                <button onclick="event.stopPropagation(); window.deleteVersion('${v.id}')" class="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-card transition border-t border-border"><i class="fa-solid fa-trash mr-2"></i>Supprimer</button>
+                                            </div>
+                                        </div>
+                                        ` : ''}
+                                        <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-white transition"></i>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            ${projectVersions.length === 0 ? `<p class="text-gray-500 text-center py-10 italic">Aucune version créée pour ce projet.</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderWorkspaceView() {
+            const project = appState.projects.find(p => p.id === appState.currentProjectId);
+            const version = appState.versions.find(v => v.id === appState.currentVersionId);
+            
+            return `
+                <header class="bg-panel border-b border-border px-3 py-1 flex items-center justify-between shrink-0 z-20 h-10">
+                    <div class="flex items-center gap-3">
+                        <button onclick="appState.view = 'versions'; appState.currentVersionId = null; window.updateURL(); render();" class="w-6 h-6 rounded bg-card text-gray-400 hover:text-white hover:bg-accent flex items-center justify-center transition border border-border">
+                            <i class="fa-solid fa-arrow-left text-xs"></i>
+                        </button>
+                        <div>
+                            <h2 class="font-bold text-white text-sm leading-tight flex items-center gap-2">
+                                ${project.name} <i class="fa-solid fa-angle-right text-gray-500 text-[10px]"></i> <span class="text-gray-300">${version.name}</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <!-- Navigation Tabs -->
+                    <div class="hidden md:flex bg-base rounded-lg p-1 border border-border">
+                        ${renderTabBtn('kanban', 'Kanban', 'fa-table-columns')}
+                        ${renderTabBtn('brainstorm', 'Brainstorm', 'fa-lightbulb')}
+                        ${renderTabBtn('repartition', 'Répartition', 'fa-users')}
+                        ${renderTabBtn('polls', 'Sondages', 'fa-square-poll-vertical')}
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="window.toggleChat()" class="${appState.chatOpen ? 'bg-gray-300 text-black' : 'bg-card text-gray-400 hover:bg-accent'} w-7 h-7 rounded-lg flex items-center justify-center transition shadow border border-border">
+                            <i class="fa-solid fa-comment-dots text-xs"></i>
+                        </button>
+                    </div>
+                </header>
+                <!-- Mobile Tabs -->
+                <div class="md:hidden flex bg-panel border-b border-border p-2 overflow-x-auto gap-2 shrink-0">
+                    ${renderTabBtn('kanban', 'Kanban', 'fa-table-columns')}
+                    ${renderTabBtn('brainstorm', 'Brainstorm', 'fa-lightbulb')}
+                    ${renderTabBtn('repartition', 'Répartition', 'fa-users')}
+                    ${renderTabBtn('polls', 'Sondages', 'fa-square-poll-vertical')}
+                </div>
+                <div class="flex-1 flex overflow-hidden relative">
+                    <main class="flex-1 relative overflow-hidden">
+                        ${appState.activeTab === 'kanban' ? renderKanban() : ''}
+                        ${appState.activeTab === 'brainstorm' ? renderBrainstorm() : ''}
+                        ${appState.activeTab === 'repartition' ? renderRepartition() : ''}
+                        ${appState.activeTab === 'polls' ? renderPolls() : ''}
+                    </main>
+                    ${appState.chatOpen ? renderGlobalChat() : ''}
+                </div>
+            `;
+        }
+
+        function renderTabBtn(id, label, icon) {
+            const active = appState.activeTab === id;
+            return `
+                <button onclick="appState.activeTab = '${id}'; window.updateURL(); render();" class="flex-1 md:flex-none px-3 py-1 rounded-md text-xs font-medium transition flex items-center justify-center gap-2 ${active ? 'bg-card text-white shadow-sm border border-border' : 'text-gray-400 hover:text-gray-200 hover:bg-card border border-transparent'}">
+                    <i class="fa-solid ${icon}"></i> <span class="hidden sm:inline">${label}</span>
+                </button>
+            `;
+        }
+
+        function renderKanban() {
+            const vTasks = appState.tasks.filter(t => t.versionId === appState.currentVersionId);
+            
+            const colsHtml = appState.columns.map(col => {
+                const bgRgba = hexToRgba(col.color, 0.1);
+                const colTasks = vTasks.filter(t => t.status === col.id);
+                
+                return `
+                <div class="flex-none ${col.collapsed ? 'w-12 sm:w-14' : 'w-[85vw] sm:w-80'} flex flex-col glass-panel rounded-xl border-t-4 shadow-lg h-full max-h-full transition-all duration-200" style="border-top-color: ${col.color}" 
+                    draggable="${!col.collapsed}" ondragstart="window.dragStartCol(event, '${col.id}')" ondrop="window.dropCol(event, '${col.id}')" ondragover="window.allowDrop(event)">
+                    
+                    <div class="p-2 border-b border-border flex justify-between items-center relative group" style="background-color: ${bgRgba}">
+                        ${col.collapsed ? `
+                            <div class="flex flex-col items-center w-full h-full pb-2">
+                                <button onclick="window.toggleCollapseCol('${col.id}')" class="text-gray-400 hover:text-white mb-4 mt-2"><i class="fa-solid fa-expand"></i></button>
+                                <div class="writing-vertical text-center font-bold text-white tracking-widest flex-1 flex items-center gap-2 justify-center">
+                                    ${col.title} <span class="bg-base text-[10px] px-1.5 py-0.5 rounded-full text-gray-300 border border-border font-mono transform rotate-90 inline-block">${colTasks.length}</span>
+                                </div>
+                            </div>
+                        ` : `
+                            <h3 class="font-bold text-white flex items-center gap-2 truncate pr-2 cursor-grab" title="Maintenir pour déplacer la colonne">
+                                <i class="fa-solid fa-grip-vertical text-gray-500 text-xs"></i>
+                                <span class="w-2.5 h-2.5 rounded-full shadow-sm" style="background-color: ${col.color}"></span>
+                                ${col.title}
+                            </h3>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <span class="bg-base text-[10px] px-1.5 py-0.5 rounded-full text-gray-300 border border-border font-mono">${colTasks.length}</span>
+                                
+                                <button onclick="window.toggleCollapseCol('${col.id}')" class="text-gray-400 hover:text-white px-1 ml-1" title="Réduire"><i class="fa-solid fa-compress text-xs"></i></button>
+
+                                <div class="relative cursor-pointer ml-1" tabindex="0" onblur="setTimeout(() => this.querySelector('.menu-dropdown')?.classList.add('hidden'), 200)" onclick="this.querySelector('.menu-dropdown')?.classList.toggle('hidden')">
+                                    <i class="fa-solid fa-ellipsis-vertical text-gray-400 hover:text-white px-1.5 py-1"></i>
+                                    <div class="menu-dropdown absolute right-0 top-full mt-1 hidden w-36 bg-panel border border-border rounded-lg shadow-xl z-50 overflow-hidden">
+                                        <button onclick="window.openColumnModal('${col.id}')" class="w-full text-left px-3 py-2 text-xs text-gray-200 hover:bg-card hover:text-white transition"><i class="fa-solid fa-pen mr-2"></i>Modifier</button>
+                                        <button onclick="window.confirmDeleteColumn('${col.id}')" class="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-card transition border-t border-border"><i class="fa-solid fa-trash mr-2"></i>Supprimer</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+                    
+                    <div class="${col.collapsed ? 'hidden' : 'flex-1 p-3 overflow-y-auto space-y-3 kanban-column'}" id="col-${col.id}"
+                          ondrop="window.dropTask(event, '${col.id}')" ondragover="window.allowDrop(event)" ondragleave="window.dragLeave(event)">
+                        ${!col.collapsed ? colTasks.map(task => renderTaskCard(task, col.color)).join('') : ''}
+                    </div>
+                    
+                    <div class="${col.collapsed ? 'hidden' : 'p-2 border-t border-border bg-card/50 rounded-b-xl'}">
+                        <button onclick="window.createTask('${col.id}')" class="w-full py-1.5 text-xs text-gray-400 hover:text-white hover:bg-card rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Ajouter une tâche
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+            
+            return `
+            <div class="absolute inset-0 p-4 sm:p-6 overflow-x-auto overflow-y-hidden flex gap-4 sm:gap-6 fade-in items-start items-stretch">
+                ${colsHtml}
+                <button onclick="window.openColumnModal()" class="flex-none w-12 h-12 sm:w-14 sm:h-14 rounded-xl glass-panel border-2 border-border border-dashed text-gray-400 hover:text-white hover:border-gray-400 hover:bg-card transition flex items-center justify-center shrink-0 shadow-lg mt-1" title="Ajouter une section">
+                    <i class="fa-solid fa-plus text-lg"></i>
+                </button>
+            </div>`;
+        }
+
+        window.toggleCollapseCol = function(colId) {
+            const col = appState.columns.find(c => c.id === colId);
+            if(col) {
+                col.collapsed = !col.collapsed;
+                saveState();
+                render();
+            }
+        }
+
+        let dragColId = null;
+        window.dragStartCol = function(e, colId) {
+            if(e.target.classList.contains('task-card') || e.target.closest('.task-card')) {
+                e.preventDefault();
+                return;
+            }
+            dragColId = colId;
+            e.dataTransfer.setData('type', 'column');
+        }
+
+        window.dropCol = function(e, targetColId) {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('type');
+            if (type === 'column' && dragColId && dragColId !== targetColId) {
+                const fromIdx = appState.columns.findIndex(c => c.id === dragColId);
+                const toIdx = appState.columns.findIndex(c => c.id === targetColId);
+                const col = appState.columns.splice(fromIdx, 1)[0];
+                appState.columns.splice(toIdx, 0, col);
+                saveState();
+                render();
+            }
+            dragColId = null;
+        }
+
+        function renderTaskCard(task, colColor) {
+            const author = getUser(task.author);
+            return `
+                <div class="task-card bg-card border border-border rounded-lg p-3 shadow-md relative group"
+                      draggable="true" ondragstart="window.dragStart(event, '${task.id}')"
+                      oncontextmenu="window.showContextMenu(event, 'task', '${task.id}')"
+                     ondblclick="window.openItemModal('task', '${task.id}')">
+                    <div class="absolute top-0 left-0 w-1 h-full rounded-l-lg" style="background-color: ${colColor}"></div>
+                    <h4 class="font-semibold text-white text-sm mb-2 pl-2">${task.title}</h4>
+                    ${task.desc ? `<p class="text-xs text-gray-400 line-clamp-2 pl-2 mb-3">${task.desc}</p>` : ''}
+                    <div class="flex justify-between items-center pl-2 mt-2">
+                        <img src="${author.avatar}" class="w-6 h-6 rounded-full border border-border" title="Créé par ${author.name}">
+                        <div class="flex gap-2">
+                            ${task.comments.length > 0 ? `<span class="text-xs text-gray-400"><i class="fa-regular fa-comments"></i> ${task.comments.length}</span>` : ''}
+                            <button onclick="window.openItemModal('task', '${task.id}')" class="text-gray-400 hover:text-white transition" title="Détails & Chat">
+                                <i class="fa-solid fa-message"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.dragStart = function(e, taskId) {
+            e.dataTransfer.setData('type', 'task');
+            e.dataTransfer.setData('text/plain', taskId);
+            e.target.style.opacity = '0.5';
+            e.stopPropagation();
+        }
+        window.allowDrop = function(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+        window.dragLeave = function(e) { e.currentTarget.classList.remove('drag-over'); }
+        window.dropTask = function(e, targetColId) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const type = e.dataTransfer.getData('type');
+            if (type !== 'task') return;
+            const taskId = e.dataTransfer.getData('text/plain');
+            const task = appState.tasks.find(t => t.id === taskId);
+            if (task && task.status !== targetColId) {
+                task.status = targetColId;
+                saveState();
+                render();
+            }
+        }
+
+        // --- Espace Brainstorm ---
+        function renderBrainstorm() {
+            const vNotes = appState.notes.filter(n => n.versionId === appState.currentVersionId);
+            
+            return `
+            <div class="absolute inset-0 fade-in flex flex-col">
+                <div class="absolute top-4 left-4 z-10 flex flex-col gap-2 pointer-events-none">
+                    <button onclick="window.createNote()" class="pointer-events-auto bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded-lg text-sm shadow-lg flex items-center gap-2 w-fit transition border border-border font-medium">
+                        <i class="fa-solid fa-plus"></i> Nouveau Post-it
+                    </button>
+                    <button onclick="window.recenterBrainstorm()" class="pointer-events-auto bg-panel hover:bg-card border border-border text-white px-3 py-1.5 rounded-lg text-sm shadow-lg flex items-center gap-2 w-fit transition">
+                        <i class="fa-solid fa-crosshairs"></i> Recentrer (<span id="zoom-level">${Math.round(appState.brainstorm.scale * 100)}</span>%)
+                    </button>
+                    <div class="glass-panel text-xs text-gray-300 px-3 py-2 rounded-lg w-fit mt-2 pointer-events-auto shadow-lg border border-border bg-panel">
+                        <i class="fa-solid fa-mouse text-gray-400 mr-1"></i> Molette pour zoomer<br>
+                        <i class="fa-solid fa-hand text-gray-400 mr-1"></i> Clic & Glisser pour se déplacer<br>
+                        <i class="fa-solid fa-arrow-pointer text-gray-400 mr-1"></i> Double-clic sur post-it pour détails
+                    </div>
+                </div>
+                <div id="brainstorm-container" class="flex-1 w-full h-full relative" onwheel="window.handleBrainstormWheel(event)">
+                    <div id="brainstorm-canvas" style="transform: translate(${appState.brainstorm.panX}px, ${appState.brainstorm.panY}px) scale(${appState.brainstorm.scale}); transform-origin: 0 0; position: absolute; top:0; left:0; width:100%; height:100%;">
+                        ${vNotes.map(note => renderPostIt(note)).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderPostIt(note) {
+            const author = getUser(note.author);
+            return `
+            <div class="post-it absolute w-48 shadow-lg rounded-bl-xl rounded-tr-sm rounded-tl-sm rounded-br-sm p-3 border border-black/10 flex flex-col"
+                 style="background-color: ${note.color}; left: ${note.x}px; top: ${note.y}px;"
+                 draggable="true" ondragstart="window.startDragNote(event, '${note.id}')"
+                 oncontextmenu="window.showContextMenu(event, 'note', '${note.id}')"
+                 ondblclick="window.openItemModal('note', '${note.id}')">
+                <div class="flex justify-between items-start mb-2">
+                    <img src="${author.avatar}" class="w-5 h-5 rounded-full border border-black/20" title="${author.name}">
+                    <button class="text-black/50 hover:text-black transition" onclick="window.openItemModal('note', '${note.id}')" title="Détails & Chat"><i class="fa-solid fa-message text-xs"></i></button>
+                </div>
+                <p class="text-gray-900 font-medium text-sm leading-tight flex-1 whitespace-pre-wrap break-words">${note.text}</p>
+                ${note.comments.length > 0 ? `<div class="mt-2 text-right"><span class="text-[10px] text-black/60 bg-black/5 px-1.5 py-0.5 rounded"><i class="fa-regular fa-comments"></i> ${note.comments.length}</span></div>` : ''}
+                <div class="absolute bottom-0 left-0 w-0 h-0 border-l-[12px] border-l-transparent border-b-[12px] border-b-black/20 rounded-bl-xl"></div>
+            </div>`;
+        }
+
+        let dragNoteId = null, dragOffsetX = 0, dragOffsetY = 0;
+        
+        window.startDragNote = function(e, id) {
+            dragNoteId = id;
+            const rect = e.target.getBoundingClientRect();
+            dragOffsetX = (e.clientX - rect.left) / appState.brainstorm.scale;
+            dragOffsetY = (e.clientY - rect.top) / appState.brainstorm.scale;
+            e.stopPropagation();
+        }
+
+        function setupBrainstormEvents() {
+            const container = document.getElementById('brainstorm-container');
+            if(!container) return;
+            container.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.post-it') || e.button !== 0) return;
+                appState.brainstorm.isDragging = true;
+                appState.brainstorm.startX = e.clientX - appState.brainstorm.panX;
+                appState.brainstorm.startY = e.clientY - appState.brainstorm.panY;
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (appState.activeTab !== 'brainstorm') return;
+                if (appState.brainstorm.isDragging) {
+                    appState.brainstorm.panX = e.clientX - appState.brainstorm.startX;
+                    appState.brainstorm.panY = e.clientY - appState.brainstorm.startY;
+                    updateCanvasTransform();
+                }
+            });
+            window.addEventListener('mouseup', () => {
+                if (appState.brainstorm.isDragging) {
+                    appState.brainstorm.isDragging = false;
+                    saveState();
+                }
+            });
+            container.addEventListener('dragover', (e) => { e.preventDefault(); });
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (dragNoteId) {
+                    const rect = container.getBoundingClientRect();
+                    const note = appState.notes.find(n => n.id === dragNoteId);
+                    if (note) {
+                        const dropX = (e.clientX - rect.left - appState.brainstorm.panX) / appState.brainstorm.scale;
+                        const dropY = (e.clientY - rect.top - appState.brainstorm.panY) / appState.brainstorm.scale;
+                        note.x = dropX - dragOffsetX;
+                        note.y = dropY - dragOffsetY;
+                        dragNoteId = null;
+                        saveState();
+                        render();
+                    }
+                }
+            });
+        }
+
+        window.handleBrainstormWheel = function(e) {
+            e.preventDefault();
+            const container = document.getElementById('brainstorm-container');
+            const rect = container.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const zoomSensitivity = 0.001;
+            const delta = -e.deltaY * zoomSensitivity;
+            let newScale = appState.brainstorm.scale * (1 + delta);
+            newScale = Math.max(0.2, Math.min(newScale, 3));
+            const ratio = 1 - (newScale / appState.brainstorm.scale);
+            appState.brainstorm.panX += (mouseX - appState.brainstorm.panX) * ratio;
+            appState.brainstorm.panY += (mouseY - appState.brainstorm.panY) * ratio;
+            appState.brainstorm.scale = newScale;
+            updateCanvasTransform();
+            const zoomLabel = document.getElementById('zoom-level');
+            if(zoomLabel) zoomLabel.innerText = Math.round(newScale * 100);
+            saveState();
+        }
+
+        function updateCanvasTransform() {
+            const canvas = document.getElementById('brainstorm-canvas');
+            if(canvas) {
+                canvas.style.transform = `translate(${appState.brainstorm.panX}px, ${appState.brainstorm.panY}px) scale(${appState.brainstorm.scale})`;
+            }
+        }
+
+        window.recenterBrainstorm = function() {
+            appState.brainstorm.scale = 1;
+            appState.brainstorm.panX = 0;
+            appState.brainstorm.panY = 0;
+            saveState();
+            render();
+        }
+
+        window.createNote = function() {
+            const text = prompt('Texte du post-it :');
+            if(text && text.trim()) {
+                const colors = ['#fef08a', '#bbf7d0', '#bfdbfe', '#fbcfe8', '#fed7aa', '#e5e7eb'];
+                const randColor = colors[Math.floor(Math.random() * colors.length)];
+                const container = document.getElementById('brainstorm-container');
+                const rect = container.getBoundingClientRect();
+                const centerX = (rect.width / 2 - appState.brainstorm.panX) / appState.brainstorm.scale;
+                const centerY = (rect.height / 2 - appState.brainstorm.panY) / appState.brainstorm.scale;
+                
+                appState.notes.push({
+                    id: 'n' + Date.now(),
+                    versionId: appState.currentVersionId,
+                    text: text.trim(),
+                    desc: '',
+                    x: centerX - 96,
+                    y: centerY - 50,
+                    color: randColor,
+                    author: MOCK_USER.id,
+                    comments: []
+                });
+                saveState();
+                render();
+            }
+        }
+
+        // --- Onglet Répartition ---
+        function renderRepartition() {
+            const project = appState.projects.find(p => p.id === appState.currentProjectId);
+            return `
+            <div class="absolute inset-0 p-6 overflow-y-auto fade-in">
+                <div class="max-w-4xl mx-auto space-y-6">
+                    <div class="glass-panel p-6 rounded-xl border border-border">
+                        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-users text-gray-300"></i> Équipe du Projet</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-border text-gray-400 text-sm">
+                                        <th class="pb-3 px-2 font-medium">Membre</th>
+                                        <th class="pb-3 px-2 font-medium">Rôle (Global)</th>
+                                        <th class="pb-3 px-2 font-medium">Mission sur ce projet</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${project.members.map(mId => {
+                                        const user = getUser(mId);
+                                        const roleKey = `${project.id}_${user.id}`;
+                                        const projectRole = appState.projectRoles[roleKey] || '';
+                                        return `
+                                        <tr class="border-b border-border hover:bg-card/30 transition">
+                                            <td class="py-3 px-2 flex items-center gap-3">
+                                                <img src="${user.avatar}" class="w-8 h-8 rounded-full border border-border">
+                                                <span class="font-medium text-white">${user.name}</span>
+                                            </td>
+                                            <td class="py-3 px-2 text-gray-300 text-sm">${user.role}</td>
+                                            <td class="py-3 px-2">
+                                                <input type="text" value="${projectRole}" placeholder="Définir la mission..."
+                                                        onblur="window.updateProjectRole('${project.id}', '${user.id}', this.value)"
+                                                        ${window.isUserAdmin() ? '' : 'disabled'}
+                                                       class="bg-base border border-border rounded px-3 py-1.5 text-sm text-white focus:border-gray-500 outline-none w-full max-w-xs transition ${window.isUserAdmin() ? '' : 'opacity-70 cursor-not-allowed'}">
+                                            </td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        window.updateProjectRole = function(pId, uId, val) {
+            appState.projectRoles[`${pId}_${uId}`] = val.trim();
+            saveState();
+            showToast('Enregistré', 'Mission mise à jour.', 'success');
+        }
+
+        // --- Onglet Sondages ---
+        function renderPolls() {
+            const vPolls = appState.polls.filter(p => p.versionId === appState.currentVersionId).reverse();
+            return `
+            <div class="absolute inset-0 p-6 overflow-y-auto fade-in">
+                <div class="max-w-3xl mx-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-square-poll-vertical text-gray-300 mr-2"></i> Sondages</h2>
+                        <button onclick="window.openCreatePollModal()" class="bg-accent hover:bg-accentHover text-white px-4 py-2 rounded-lg font-medium transition shadow-lg text-sm flex items-center gap-2 border border-border">
+                            <i class="fa-solid fa-plus"></i> Créer un sondage
+                        </button>
+                    </div>
+                    <div class="space-y-6">
+                        ${vPolls.map(poll => renderPollCard(poll)).join('')}
+                        ${vPolls.length === 0 ? `<div class="text-center py-10 glass-panel border border-border border-dashed rounded-xl"><p class="text-gray-500">Aucun sondage actif pour cette version.</p></div>` : ''}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderPollCard(poll) {
+            const author = getUser(poll.author);
+            let totalVotes = 0;
+            let userVotedFor = null;
+            poll.options.forEach(opt => {
+                totalVotes += opt.voters.length;
+                if(opt.voters.includes(MOCK_USER.id)) userVotedFor = opt.id;
+            });
+            return `
+            <div class="glass-panel p-5 rounded-xl border border-border shadow-md relative bg-panel">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-white pr-4">${poll.question}</h3>
+                        <div class="text-xs text-gray-400 mt-1 italic flex items-center gap-1.5">
+                            Sondage envoyé par ${author.name}
+                            <img src="${author.avatar}" class="w-4 h-4 rounded-full border border-border">
+                        </div>
+                    </div>
+                    ${window.isUserAdmin() || poll.author === MOCK_USER.id ? `<button onclick="window.deletePoll('${poll.id}')" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>` : ''}
+                </div>
+                
+                <div class="space-y-3">
+                    ${poll.options.map(opt => {
+                        const count = opt.voters.length;
+                        const percent = totalVotes === 0 ? 0 : Math.round((count / totalVotes) * 100);
+                        const isSelected = userVotedFor === opt.id;
+                        const votersHtml = opt.voters.map(vId => {
+                            const vUser = getUser(vId);
+                            return `<img src="${vUser.avatar}" class="w-5 h-5 rounded-full border border-border -ml-2 first:ml-0" title="${vUser.name}">`;
+                        }).join('');
+                        
+                        return `
+                        <div class="relative group cursor-pointer" onclick="window.votePoll('${poll.id}', '${opt.id}')">
+                            <div class="absolute inset-0 bg-base rounded-lg overflow-hidden border ${isSelected ? 'border-gray-400' : 'border-border group-hover:border-gray-500'} transition">
+                                <div class="h-full ${isSelected ? 'bg-gray-600/30' : 'bg-card/50'} transition-all duration-500 ease-out" style="width: ${percent}%"></div>
+                            </div>
+                            <div class="relative px-4 py-2 flex justify-between items-center text-sm">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-4 h-4 rounded-full border ${isSelected ? 'border-gray-400 bg-gray-500' : 'border-gray-500'} flex items-center justify-center transition">
+                                        ${isSelected ? '<div class="w-1.5 h-1.5 bg-white rounded-full"></div>' : ''}
+                                    </div>
+                                    <span class="${isSelected ? 'text-white font-medium' : 'text-gray-300'}">${opt.text}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    ${votersHtml ? `<div class="flex items-center pl-2">${votersHtml}</div>` : ''}
+                                    <span class="text-gray-400 font-mono text-xs">${count} (${percent}%)</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+                <div class="mt-4 text-xs text-gray-500 flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> ${totalVotes} vote(s) au total
+                </div>
+            </div>`;
+        }
+
+        window.votePoll = function(pollId, optionId) {
+            const poll = appState.polls.find(p => p.id === pollId);
+            if(!poll) return;
+            poll.options.forEach(opt => {
+                opt.voters = opt.voters.filter(uid => uid !== MOCK_USER.id);
+            });
+            const opt = poll.options.find(o => o.id === optionId);
+            if(opt) {
+                opt.voters.push(MOCK_USER.id);
+                saveState();
+                render();
+            }
+        }
+        
+        window.deletePoll = function(pollId) {
+            if(confirm("Supprimer ce sondage ?")) {
+                appState.polls = appState.polls.filter(p => p.id !== pollId);
+                saveState();
+                render();
+            }
+        }
+
+        // --- Modals Globales (Utilisation de setIframeFullscreen) ---
+        window.openCreatePollModal = function() {
+            appState.tempPollOptions = ['', ''];
+            renderPollModalContent();
+        }
+
+        window.removePollOption = function(idx) {
+            appState.tempPollOptions.splice(idx, 1);
+            renderPollModalContent();
+        }
+        window.addPollOption = function() {
+            appState.tempPollOptions.push('');
+            renderPollModalContent();
+        }
+        window.updateTempPoll = function(idx, val) {
+            appState.tempPollOptions[idx] = val;
+        }
+
+        function renderPollModalContent() {
+            openModalHTML(`
+                <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
+                    <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-md shadow-2xl flex flex-col max-h-[90vh]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-white">Nouveau Sondage</h3>
+                            <button onclick="closeGlobalModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form onsubmit="window.submitPoll(event)" class="flex flex-col gap-4 overflow-y-auto p-1">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Question</label>
+                                <input type="text" id="poll-question" required placeholder="Ex: Quel logo préférez-vous ?" class="w-full bg-base border border-border rounded-lg p-2.5 text-white text-sm focus:border-gray-500 outline-none">
+                            </div>
+                            <div id="poll-options-container" class="space-y-2">
+                                <label class="block text-xs text-gray-400 mb-1">Options de réponse (2 min.)</label>
+                                ${appState.tempPollOptions.map((opt, idx) => `
+                                    <div class="flex gap-2">
+                                        <input type="text" required value="${opt}" onchange="window.updateTempPoll(${idx}, this.value)" placeholder="Option ${idx + 1}" class="flex-1 bg-base border border-border rounded-lg p-2 text-white text-sm focus:border-gray-500 outline-none">
+                                        ${idx >= 2 ? `<button type="button" onclick="window.removePollOption(${idx})" class="w-10 bg-card border border-border rounded-lg text-red-400 hover:bg-panel transition"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button type="button" onclick="window.addPollOption()" class="text-gray-400 hover:text-gray-300 text-sm font-medium self-start mt-1"><i class="fa-solid fa-plus mr-1"></i> Ajouter une option</button>
+                            
+                            <button type="submit" class="w-full bg-accent hover:bg-accentHover border border-border text-white py-2.5 rounded-lg font-medium transition mt-4">Créer le sondage</button>
+                        </form>
+                    </div>
+                </div>
+            `);
+            setTimeout(() => document.getElementById('poll-question')?.focus(), 50);
+        }
+
+        window.submitPoll = function(e) {
+            e.preventDefault();
+            const question = document.getElementById('poll-question').value.trim();
+            const validOptions = appState.tempPollOptions.map(o => o.trim()).filter(o => o.length > 0);
+            
+            if(validOptions.length < 2) {
+                showToast('Erreur', 'Veuillez remplir au moins 2 options.', 'error');
+                return;
+            }
+            appState.polls.push({
+                id: 'poll_' + Date.now(),
+                versionId: appState.currentVersionId,
+                question: question,
+                author: MOCK_USER.id,
+                options: validOptions.map((opt, i) => ({ id: 'opt_' + i, text: opt, voters: [] }))
+            });
+            
+            saveState();
+            closeGlobalModal();
+            render();
+            showToast('Succès', 'Sondage créé avec succès', 'success');
+        }
+
+        window.openCreateProjectModal = function() {
+            openModalHTML(`
+                <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
+                    <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-sm shadow-2xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-white">Nouveau Projet</h3>
+                            <button onclick="closeGlobalModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form onsubmit="window.submitProject(event)">
+                            <div class="mb-4">
+                                <label class="block text-xs text-gray-400 mb-1">Nom du projet</label>
+                                <input type="text" id="new-p-name" required class="w-full bg-base border border-border rounded-lg p-2.5 text-white text-sm focus:border-gray-500 outline-none">
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-xs text-gray-400 mb-1">Description courte</label>
+                                <textarea id="new-p-desc" rows="2" class="w-full bg-base border border-border rounded-lg p-2 text-white text-sm focus:border-gray-500 outline-none resize-none"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-accent hover:bg-accentHover border border-border text-white py-2.5 rounded-lg font-medium transition">Créer le projet</button>
+                        </form>
+                    </div>
+                </div>
+            `);
+            setTimeout(() => document.getElementById('new-p-name')?.focus(), 50);
+        }
+
+        window.submitProject = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-p-name').value.trim();
+            const desc = document.getElementById('new-p-desc').value.trim();
+            if(name) {
+                const newP = { id: 'p_' + Date.now(), name, desc, members: [MOCK_USER.id], createdAt: Date.now() };
+                appState.projects.push(newP);
+                saveState();
+                closeGlobalModal();
+                render();
+                showToast('Succès', 'Projet créé.', 'success');
+            }
+        }
+
+        window.renameProject = function(pId) {
+            window.hideContextMenu();
+            const proj = appState.projects.find(p => p.id === pId);
+            if (!proj) return;
+            const newName = prompt('Nouveau nom du projet :', proj.name);
+            if (newName && newName.trim()) {
+                proj.name = newName.trim();
+                saveState();
+                window.updateURL(true);
+                render();
+                showToast('Renommé', 'Projet renommé avec succès', 'success');
+            }
+        }
+
+        window.deleteProject = function(pId) {
+            window.hideContextMenu();
+            if (confirm("Supprimer définitivement ce projet et toutes ses versions ?")) {
+                appState.projects = appState.projects.filter(p => p.id !== pId);
+                appState.versions = appState.versions.filter(v => v.projectId !== pId);
+                if (appState.currentProjectId === pId) {
+                    appState.currentProjectId = null;
+                    appState.view = 'projects';
+                }
+                saveState();
+                window.updateURL(true);
+                render();
+                showToast('Supprimé', 'Projet supprimé', 'info');
+            }
+        }
+
+        window.openCreateVersionModal = function() {
+            openModalHTML(`
+                <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
+                    <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-sm shadow-2xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-white">Nouvelle Version</h3>
+                            <button onclick="closeGlobalModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form onsubmit="window.submitVersion(event)">
+                            <div class="mb-4">
+                                <label class="block text-xs text-gray-400 mb-1">Nom (ex: Sprint 3, V1.2...)</label>
+                                <input type="text" id="new-v-name" required class="w-full bg-base border border-border rounded-lg p-2.5 text-white text-sm focus:border-gray-500 outline-none">
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-xs text-gray-400 mb-1">Objectif de cette version</label>
+                                <input type="text" id="new-v-desc" class="w-full bg-base border border-border rounded-lg p-2.5 text-white text-sm focus:border-gray-500 outline-none">
+                            </div>
+                            <button type="submit" class="w-full bg-accent hover:bg-accentHover border border-border text-white py-2.5 rounded-lg font-medium transition">Créer la version</button>
+                        </form>
+                    </div>
+                </div>
+            `);
+            setTimeout(() => document.getElementById('new-v-name')?.focus(), 50);
+        }
+
+        window.submitVersion = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-v-name').value.trim();
+            const desc = document.getElementById('new-v-desc').value.trim();
+            if(name) {
+                appState.versions.push({ id: 'v_' + Date.now(), projectId: appState.currentProjectId, name, desc, createdAt: Date.now() });
+                saveState();
+                closeGlobalModal();
+                render();
+                showToast('Succès', 'Version ajoutée.', 'success');
+            }
+        }
+
+        window.renameVersion = function(vId) {
+            window.hideContextMenu();
+            const vers = appState.versions.find(v => v.id === vId);
+            if (!vers) return;
+            const newName = prompt('Nouveau nom de la version :', vers.name);
+            if (newName && newName.trim()) {
+                vers.name = newName.trim();
+                saveState();
+                window.updateURL(true);
+                render();
+                showToast('Renommée', 'Version renommée avec succès', 'success');
+            }
+        }
+
+        window.deleteVersion = function(vId) {
+            window.hideContextMenu();
+            if (confirm("Supprimer définitivement cette version ?")) {
+                appState.versions = appState.versions.filter(v => v.id !== vId);
+                if (appState.currentVersionId === vId) {
+                    appState.currentVersionId = null;
+                    appState.view = 'versions';
+                }
+                saveState();
+                window.updateURL(true);
+                render();
+                showToast('Supprimée', 'Version supprimée', 'info');
+            }
+        }
+
+        window.openManageTeamModal = function(projectId) {
+            const project = appState.projects.find(p => p.id === projectId);
+            openModalHTML(`
+                <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
+                    <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-sm shadow-2xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-white">Équipe du projet</h3>
+                            <button onclick="closeGlobalModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="space-y-3 mb-6 max-h-60 overflow-y-auto pr-1">
+                            ${USERS.map(u => {
+                                const isMember = project.members.includes(u.id);
+                                return `
+                                <div class="flex items-center justify-between p-2 rounded-lg border border-border ${isMember ? 'bg-card border-gray-500/50' : 'bg-base'}">
+                                    <div class="flex items-center gap-3">
+                                        <img src="${u.avatar}" class="w-8 h-8 rounded-full">
+                                        <div>
+                                            <p class="text-sm font-medium text-white">${u.name}</p>
+                                            <p class="text-xs text-gray-400">${u.role}</p>
+                                        </div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" ${isMember ? 'checked' : ''} onchange="window.toggleProjectMember('${projectId}', '${u.id}', this.checked)" ${u.id === MOCK_USER.id ? 'disabled' : ''}>
+                                        <div class="w-9 h-5 bg-card border border-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-500 ${u.id === MOCK_USER.id ? 'opacity-50 cursor-not-allowed' : ''}"></div>
+                                    </label>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <button onclick="closeGlobalModal()" class="w-full bg-card hover:bg-accent border border-border text-white py-2 rounded-lg font-medium transition">Fermer</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        window.toggleProjectMember = function(pId, uId, isAdding) {
+            const project = appState.projects.find(p => p.id === pId);
+            if(isAdding) {
+                if(!project.members.includes(uId)) project.members.push(uId);
+            } else {
+                project.members = project.members.filter(id => id !== uId);
+            }
+            saveState();
+            render(); 
+        }
+
+        window.openColumnModal = function(colId = null) {
+            window.hideContextMenu();
+            let title = '', color = '#475569';
+            if (colId) {
+                const col = appState.columns.find(c => c.id === colId);
+                if (col) { title = col.title; color = col.color; }
+            }
+            openModalHTML(`
+                <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
+                    <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-sm shadow-2xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-white">${colId ? 'Modifier la section' : 'Nouvelle section'}</h3>
+                            <button onclick="closeGlobalModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form onsubmit="window.submitColumn(event, '${colId || ''}')">
+                            <div class="mb-4">
+                                <label class="block text-xs text-gray-400 mb-1">Nom de la section</label>
+                                <input type="text" id="col-name" value="${title}" required class="w-full bg-base border border-border rounded p-2 text-white text-sm focus:border-gray-500 outline-none">
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-xs text-gray-400 mb-1">Couleur</label>
+                                <div class="flex gap-2 items-center">
+                                    <input type="color" id="col-color-picker" value="${color}" oninput="document.getElementById('col-color-hex').value = this.value" class="h-9 w-14 p-0 rounded cursor-pointer bg-base border border-border border-none">
+                                    <input type="text" id="col-color-hex" value="${color}" oninput="document.getElementById('col-color-picker').value = this.value" class="flex-1 bg-base border border-border rounded p-2 text-white text-sm focus:border-gray-500 outline-none uppercase font-mono" pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" title="Code Hex valide (ex: #FF0000)">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-accent hover:bg-accentHover border border-border text-white py-2 rounded-lg font-medium transition">${colId ? 'Enregistrer' : 'Créer la section'}</button>
+                        </form>
+                    </div>
+                </div>
+            `);
+            setTimeout(() => document.getElementById('col-name')?.focus(), 50);
+        }
+
+        window.submitColumn = function(e, colId) {
+            e.preventDefault();
+            const title = document.getElementById('col-name').value.trim();
+            const color = document.getElementById('col-color-hex').value.trim() || '#475569';
+            if (colId) {
+                const col = appState.columns.find(c => c.id === colId);
+                if (col) { col.title = title; col.color = color; }
+            } else {
+                appState.columns.push({ id: 'col_' + Date.now(), title, color, collapsed: false });
+            }
+            saveState();
+            closeGlobalModal();
+            render();
+            showToast('Succès', 'Section sauvegardée', 'success');
+        }
+
+        window.confirmDeleteColumn = function(colId) {
+            window.hideContextMenu();
+            openModalHTML(`
+                <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
+                    <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-sm shadow-2xl text-center">
+                        <i class="fa-solid fa-triangle-exclamation text-4xl text-red-500 mb-4"></i>
+                        <h3 class="font-bold text-lg text-white mb-2">Supprimer la section ?</h3>
+                        <p class="text-sm text-gray-400 mb-6">Toutes les tâches à l'intérieur seront également supprimées. Irréversible.</p>
+                        <div class="flex gap-3">
+                            <button onclick="closeGlobalModal()" class="flex-1 bg-card hover:bg-panel border border-border text-white py-2 rounded-lg transition">Annuler</button>
+                            <button onclick="window.doDeleteColumn('${colId}')" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg transition">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+
+        window.doDeleteColumn = function(colId) {
+            appState.columns = appState.columns.filter(c => c.id !== colId);
+            appState.tasks = appState.tasks.filter(t => t.status !== colId);
+            saveState();
+            closeGlobalModal();
+            render();
+            showToast('Section supprimée', '', 'info');
+        }
+
+        window.createTask = function(colId) {
+            const title = prompt('Titre de la nouvelle tâche :');
+            if(title && title.trim()) {
+                appState.tasks.push({
+                    id: 't_' + Date.now(),
+                    versionId: appState.currentVersionId,
+                    title: title.trim(),
+                    desc: '',
+                    status: colId,
+                    author: MOCK_USER.id,
+                    comments: []
+                });
+                saveState();
+                render();
+            }
+        }
+
+        // --- Détails & Chat Interne ---
+        window.openItemModal = function(type, id, skipUrlUpdate = false) {
+            window.hideContextMenu();
+            const item = type === 'task' 
+                 ? appState.tasks.find(t => t.id === id) 
+                 : appState.notes.find(n => n.id === id);
+            if(!item) return;
+            
+            appState.openedItemId = id;
+            if (!skipUrlUpdate) window.updateURL(false);
+
+            const title = type === 'task' ? item.title : 'Post-it';
+            const icon = type === 'task' ? 'fa-table-list text-gray-300' : 'fa-note-sticky text-gray-300';
+            
+            openModalHTML(`
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[90] fade-in" id="item-modal-bg" onclick="if(event.target.id==='item-modal-bg') window.closeItemModal()">
+                    <div class="glass-panel bg-base border border-border w-full max-w-4xl h-[90vh] sm:h-[80vh] rounded-xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
+                        
+                        <div class="flex-1 flex flex-col border-b md:border-b-0 md:border-r border-border bg-base p-6 overflow-y-auto">
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="font-bold text-xl text-white flex items-center gap-2"><i class="fa-solid ${icon}"></i> ${title}</h3>
+                                <button onclick="window.closeItemModal()" class="md:hidden text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+                            </div>
+                            
+                            ${type === 'note' ? `<div class="p-4 rounded-lg mb-6 shadow-inner text-gray-900 whitespace-pre-wrap font-medium" style="background-color: ${item.color}">${item.text}</div>` : ''}
+                            
+                            <div class="flex-1 flex flex-col">
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Description / Notes détaillées</label>
+                                <textarea id="item-desc-input" class="w-full flex-1 bg-card border border-border rounded-lg p-3 text-white text-sm focus:border-gray-500 outline-none resize-none transition min-h-[150px]" placeholder="Ajoutez une description détaillée ici... sauvegardé automatiquement.">${item.desc || ''}</textarea>
+                                <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-cloud-arrow-up"></i> Sauvegarde automatique</p>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full md:w-96 flex flex-col bg-panel h-64 md:h-full">
+                            <div class="p-4 border-b border-border flex justify-between items-center bg-base">
+                                <h4 class="font-bold text-white text-sm"><i class="fa-regular fa-comments mr-2"></i>Discussion</h4>
+                                <button onclick="window.closeItemModal()" class="hidden md:block text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                            </div>
+                            
+                            <div id="item-chat-box" class="flex-1 overflow-y-auto p-4 space-y-4">
+                                ${item.comments.map(c => renderMessage(c)).join('')}
+                                ${item.comments.length === 0 ? `<p class="text-gray-500 text-center text-xs mt-10">Aucun commentaire pour le moment.</p>` : ''}
+                            </div>
+                            
+                            <form onsubmit="window.submitItemComment(event, '${type}', '${id}')" class="p-3 bg-base border-t border-border flex gap-2">
+                                <input type="text" id="item-comment-input" autocomplete="off" placeholder="Écrire un commentaire..." class="flex-1 bg-card border border-border rounded-full px-4 py-2 text-white text-sm focus:border-gray-500 outline-none">
+                                <button type="submit" class="bg-accent hover:bg-accentHover border border-border text-white w-9 h-9 rounded-full flex items-center justify-center transition shadow shrink-0"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `);
+            
+            document.getElementById('item-desc-input').addEventListener('blur', (e) => {
+                item.desc = e.target.value;
+                saveState();
+                showToast('Sauvegardé', 'Description mise à jour', 'success');
+                render(); 
+            });
+            const chatBox = document.getElementById('item-chat-box');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        window.closeItemModal = function() {
+            appState.openedItemId = null;
+            window.updateURL(true);
+            closeGlobalModal();
+            render(); 
+        }
+
+        window.submitItemComment = function(e, type, id) {
+            e.preventDefault();
+            const input = document.getElementById('item-comment-input');
+            const text = input.value.trim();
+            if(!text) return;
+            const item = type === 'task' ? appState.tasks.find(t => t.id === id) : appState.notes.find(n => n.id === id);
+            
+            const newComment = { id: 'c_'+Date.now(), author: MOCK_USER.id, text, timestamp: Date.now() };
+            item.comments.push(newComment);
+            saveState();
+            
+            const chatBox = document.getElementById('item-chat-box');
+            if(item.comments.length === 1) chatBox.innerHTML = '';
+            chatBox.insertAdjacentHTML('beforeend', renderMessage(newComment));
+            chatBox.scrollTop = chatBox.scrollHeight;
+            input.value = '';
+        }
+
+        // --- Global Chat Sidebar ---
+        function renderGlobalChat() {
+            const vMessages = appState.chat.filter(m => m.versionId === appState.currentVersionId);
+            return `
+            <aside class="w-80 border-l border-border bg-panel flex flex-col shadow-2xl z-10 slide-in-right absolute right-0 top-0 bottom-0 md:relative">
+                <div class="p-3 border-b border-border bg-base flex justify-between items-center">
+                    <h3 class="font-bold text-white text-sm"><i class="fa-solid fa-comments text-gray-300 mr-2"></i>Chat d'équipe</h3>
+                    <button onclick="window.toggleChat()" class="md:hidden text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="global-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                    ${vMessages.map(m => renderMessage(m)).join('')}
+                    ${vMessages.length === 0 ? `<p class="text-gray-500 text-center text-xs mt-4">Commencez la discussion...</p>` : ''}
+                </div>
+                <form onsubmit="window.submitGlobalChat(event)" class="p-3 bg-base border-t border-border flex gap-2">
+                    <input type="text" id="global-chat-input" autocomplete="off" placeholder="Message..." class="flex-1 bg-card border border-border rounded-lg px-3 py-2 text-white text-sm focus:border-gray-500 outline-none">
+                    <button type="submit" class="bg-accent hover:bg-accentHover border border-border text-white w-9 h-9 rounded-lg flex items-center justify-center transition shrink-0"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+                </form>
+            </aside>`;
+        }
+
+        function renderMessage(msg) {
+            const author = getUser(msg.author);
+            const isMe = msg.author === MOCK_USER.id;
+            const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            return `
+            <div class="flex gap-2.5 ${isMe ? 'flex-row-reverse' : ''} group">
+                <img src="${author.avatar}" class="w-7 h-7 rounded-full border border-border mt-0.5 shrink-0">
+                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%]">
+                    <div class="flex items-baseline gap-2 mb-0.5 px-1">
+                        <span class="text-[11px] font-semibold ${isMe ? 'text-gray-300' : 'text-gray-400'}">${isMe ? 'Vous' : author.name}</span>
+                        <span class="text-[9px] text-gray-500">${time}</span>
+                    </div>
+                    <div class="px-3 py-2 rounded-xl text-sm ${isMe ? 'bg-accent border border-border text-white rounded-tr-sm' : 'bg-card border border-border text-gray-200 rounded-tl-sm'} shadow-sm">
+                        ${msg.text}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        window.toggleChat = function() {
+            appState.chatOpen = !appState.chatOpen;
+            saveState();
+            render();
+        }
+
+        window.submitGlobalChat = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('global-chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+            const newMsg = { id: 'm_'+Date.now(), versionId: appState.currentVersionId, author: MOCK_USER.id, text, timestamp: Date.now() };
+            appState.chat.push(newMsg);
+            saveState();
+            input.value = '';
+            render();
+        }
+
+        // --- Menu Contextuel ---
+        let contextTarget = null;
+        
+        window.showContextMenu = function(e, type, id) {
+            e.preventDefault();
+            e.stopPropagation();
+            contextTarget = { type, id };
+            const menu = document.getElementById('context-menu');
+            
+            menu.innerHTML = ''; 
+            
+            if (type === 'task') {
+                menu.innerHTML += `<button onclick="window.openItemModal('${type}', '${id}')" class="w-full text-left px-4 py-2 hover:bg-card text-gray-200 transition text-xs"><i class="fa-solid fa-pen mr-2"></i>Détails & Chat</button>`;
+                
+                const task = appState.tasks.find(t => t.id === id);
+                if (task) {
+                    appState.columns.forEach(col => {
+                        if (col.id !== task.status) {
+                            menu.innerHTML += `<button onclick="window.moveTask('${id}', '${col.id}')" class="w-full text-left px-4 py-2 hover:bg-card text-gray-200 transition text-xs border-t border-border"><i class="fa-solid fa-arrow-right-to-bracket mr-2"></i>Vers : ${col.title}</button>`;
+                        }
+                    });
+                }
+                menu.innerHTML += `<button onclick="window.deleteItem('${type}', '${id}')" class="w-full text-left px-4 py-2 hover:bg-card text-red-400 transition text-xs border-t border-border"><i class="fa-solid fa-trash mr-2"></i>Supprimer</button>`;
+            } else if (type === 'note') {
+                menu.innerHTML += `<button onclick="window.openItemModal('${type}', '${id}')" class="w-full text-left px-4 py-2 hover:bg-card text-gray-200 transition text-xs"><i class="fa-solid fa-pen mr-2"></i>Détails & Chat</button>`;
+                
+                // Palette de couleurs pour post-its
+                menu.innerHTML += `
+                    <div class="px-4 py-2 flex gap-2 border-t border-border justify-between items-center" onclick="event.stopPropagation()">
+                        <button onclick="window.changeNoteColor('${id}', '#fef08a')" class="w-5 h-5 rounded-full bg-[#fef08a] border border-gray-600 shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#bbf7d0')" class="w-5 h-5 rounded-full bg-[#bbf7d0] border border-gray-600 shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#bfdbfe')" class="w-5 h-5 rounded-full bg-[#bfdbfe] border border-gray-600 shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#fbcfe8')" class="w-5 h-5 rounded-full bg-[#fbcfe8] border border-gray-600 shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#e5e7eb')" class="w-5 h-5 rounded-full bg-[#e5e7eb] border border-gray-600 shadow-inner"></button>
+                    </div>
+                `;
+                
+                menu.innerHTML += `<button onclick="window.deleteItem('${type}', '${id}')" class="w-full text-left px-4 py-2 hover:bg-card text-red-400 transition text-xs border-t border-border"><i class="fa-solid fa-trash mr-2"></i>Supprimer</button>`;
+            }
+
+            menu.style.display = 'block';
+            menu.classList.remove('hidden');
+            
+            let x = e.clientX;
+            let y = e.clientY;
+            
+            const rect = menu.getBoundingClientRect();
+            if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 5;
+            if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 5;
+            
+            menu.style.left = `${x}px`;
+            menu.style.top = `${y}px`;
+        }
+
+        window.hideContextMenu = function() {
+            const menu = document.getElementById('context-menu');
+            if (menu && !menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+                contextTarget = null;
+            }
+        }
+
+        document.addEventListener('mousedown', (e) => {
+            if (!e.target.closest('#context-menu')) {
+                window.hideContextMenu();
+            }
+        });
+        
+        document.addEventListener('contextmenu', (e) => {
+            if (!e.target.closest('.task-card') && !e.target.closest('.post-it') && !e.target.closest('.grid-list') && !e.target.closest('.group')) {
+                window.hideContextMenu();
+            }
+        });
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeGlobalModal();
+                window.hideContextMenu();
+            }
+        });
+
+        window.moveTask = function(taskId, colId) {
+            const task = appState.tasks.find(t => t.id === taskId);
+            if(task) { 
+                task.status = colId; 
+                saveState(); 
+                render(); 
+                window.hideContextMenu(); 
+            }
+        };
+
+        window.changeNoteColor = function(noteId, hexColor) {
+            const note = appState.notes.find(n => n.id === noteId);
+            if (note) {
+                note.color = hexColor;
+                saveState();
+                render();
+                window.hideContextMenu();
+            }
+        };
+
+        window.deleteItem = function(type, id) {
+            if(type === 'task') appState.tasks = appState.tasks.filter(t => t.id !== id);
+            if(type === 'note') appState.notes = appState.notes.filter(n => n.id !== id);
+            saveState(); 
+            render(); 
+            window.hideContextMenu();
+            showToast('Élément supprimé', '', 'info');
+        };
+
+        // --- Initialisation ---
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

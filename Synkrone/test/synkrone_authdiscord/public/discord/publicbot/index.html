@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone Bots | Annuaire</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        base: '#181a1b',
+                        surface: 'rgba(30, 32, 34, 0.78)',
+                        surfaceHover: 'rgba(45, 48, 51, 0.9)',
+                        sysBorder: 'rgba(255, 255, 255, 0.12)',
+                        borderHover: 'rgba(255, 255, 255, 0.28)',
+                        accentRed: '#e14f4f',
+                        accentBlue: '#6d8cff',
+                        accentGold: '#ffd700',
+                        krones: '#4ade80',
+                        textDim: '#a0a0a0'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; background-color: var(--tw-colors-base); color: #ffffff; margin: 0; padding: 0;}
+        ::-webkit-scrollbar { width: 6px; height: 6px; display: none; }
+        
+        #app-layout { display: flex; width: 100%; height: 100%; flex-direction: column; }
+        #main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto; }
+        .page-container { max-width: 1040px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px; padding: 24px; }
+        
+        /* Navigation fine (si non inclus dans une iframe Synkrone complète) */
+        .sub-nav { display: none; } /* On cache la nav ici car Synkrone gère sa propre nav, mais on simule les onglets dans le panel Home */
+
+        .panel { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 12px; backdrop-filter: blur(8px); padding: 24px; position: relative; overflow: hidden; }
+        
+        /* Formulaires */
+        .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: var(--tw-colors-textDim); }
+        .form-control { background: rgba(0,0,0,0.3); border: 1px solid var(--tw-colors-sysBorder); color: #fff; padding: 10px 14px; border-radius: 8px; font-family: inherit; width: 100%; transition: 0.22s ease; outline: none; }
+        .form-control:focus { border-color: var(--tw-colors-accentBlue); background: rgba(0,0,0,0.5); }
+        
+        /* Boutons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; padding: 10px 18px; font-size: 14px; transition: 0.22s ease; }
+        .btn-slim-gray { background: rgba(255,255,255,0.05); border: 1px solid var(--tw-colors-sysBorder); color: var(--tw-colors-textDim); padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.22s ease; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-slim-gray:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-primary { background: var(--tw-colors-accentBlue); color: #fff; }
+        .btn-primary:hover { background: #5c7ae6; }
+        .btn-danger { background: rgba(225, 79, 79, 0.2); border: 1px solid var(--tw-colors-accentRed); color: var(--tw-colors-accentRed); }
+        .btn-danger:hover { background: rgba(225, 79, 79, 0.4); }
+
+        /* Filtres et Onglets (Tabs) */
+        .tabs { display: flex; gap: 10px; overflow-x: auto; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 12px; border: 1px solid var(--tw-colors-sysBorder); width: fit-content; }
+        .tab-btn { background: none; border: none; color: var(--tw-colors-textDim); padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: 0.22s ease; white-space: nowrap; }
+        .tab-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .tab-btn.active { background: var(--tw-colors-surfaceHover); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+        /* Grille & Cartes */
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .user-card { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.22s ease; display: flex; flex-direction: column; gap: 12px; position: relative; }
+        .user-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.3); background: var(--tw-colors-surfaceHover); }
+        .user-card.featured { border-color: rgba(255, 215, 0, 0.3); background: linear-gradient(145deg, rgba(30,32,34,0.9), rgba(40,35,15,0.9)); }
+        
+        .user-card-header { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--tw-colors-sysBorder); background: var(--tw-colors-base); }
+        .user-info { flex: 1; min-width: 0; }
+        .user-name { font-weight: bold; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
+        
+        .like-btn-mini { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--tw-colors-sysBorder); color: var(--tw-colors-textDim); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 12px; z-index: 10;}
+        .like-btn-mini:hover { color: var(--tw-colors-accentRed); border-color: var(--tw-colors-accentRed); }
+        .like-btn-mini.liked { color: var(--tw-colors-accentRed); background: rgba(225, 79, 79, 0.15); border-color: var(--tw-colors-accentRed); }
+
+        /* Profil complet */
+        .profile-wrapper { border-radius: 12px; overflow: hidden; transition: 0.22s ease; min-height: 500px; display: flex; flex-direction: column; position: relative; background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); }
+        .profile-banner { width: 100%; height: 180px; object-fit: cover; background: #1e2022; display: block; }
+        .profile-content { padding: 24px; flex: 1; position: relative; display: flex; flex-direction: column; }
+        .hero-profile { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-top: -70px; margin-bottom: 20px; }
+        .avatar-wrap { width: 118px; height: 118px; border-radius: 50%; padding: 4px; background: var(--tw-colors-base); position: relative; z-index: 2; border: 1px solid var(--tw-colors-sysBorder); }
+        .avatar-wrap img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .nav-btn-floating { position: absolute; top: 15px; left: 15px; z-index: 10; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .profile-controls { position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+        
+        .fade-in { animation: fadeIn 0.2s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modale */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-box { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 12px; padding: 24px; width: 90%; max-width: 420px; transform: scale(0.95); transition: transform 0.2s; text-align: center; }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 12px; color: #fff; }
+        .modal-text { color: var(--tw-colors-textDim); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+    </style>
+</head>
+<body class="mosaic-bg">
+
+    <!-- Modale globale -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-box">
+            <div class="modal-title" id="modalTitle">Titre</div>
+            <div class="modal-text" id="modalText">Texte</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="modalCancelBtn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--tw-colors-sysBorder); color: #fff;" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" id="modalConfirmBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-layout">
+        <main id="main-content">
+            <div class="page-container" id="view-container">
+                <!-- Injecté via JS -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let userState = { isAdmin: false, id: null };
+        let currentBots = [];
+        let currentSearch = "";
+        let currentExplorerTab = "all";
+
+        async function init() {
+            try {
+                const res = await fetch('/api/me');
+                const data = await res.json();
+                if (data.authenticated) {
+                    userState.id = data.user.id;
+                    userState.isAdmin = data.user.isTeamOwner || (data.user.role && (data.user.role.toLowerCase().includes('admin') || data.user.role.toLowerCase().includes('équipe')));
+                }
+            } catch(e) {}
+            navigate('explorer');
+        }
+
+        const viewContainer = document.getElementById('view-container');
+
+        function navigate(view, data = null) {
+            viewContainer.innerHTML = '';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'fade-in flex flex-col gap-6';
+            contentDiv.style.width = '100%';
+            
+            if (view === 'explorer') renderExplorer(contentDiv);
+            else if (view === 'mybots') renderMyBots(contentDiv);
+            else if (view === 'addbot') renderFormBot(contentDiv, null);
+            else if (view === 'editbot') renderFormBot(contentDiv, data);
+            else if (view === 'profile') renderProfile(contentDiv, data);
+            else if (view === 'admin') renderAdmin(contentDiv);
+
+            viewContainer.appendChild(contentDiv);
+        }
+
+        function showModal(title, text, confirmLabel, onConfirm, showCancel = true) {
+            document.getElementById('modalTitle').innerHTML = title;
+            document.getElementById('modalText').innerHTML = text;
+            const btn = document.getElementById('modalConfirmBtn');
+            const cancelBtn = document.getElementById('modalCancelBtn');
+            
+            btn.innerHTML = confirmLabel;
+            if(onConfirm) {
+                btn.style.display = 'inline-flex';
+                btn.onclick = () => { onConfirm(); closeModal(); };
+            } else {
+                btn.style.display = 'none';
+            }
+            cancelBtn.style.display = showCancel ? 'inline-flex' : 'none';
+            document.getElementById('customModal').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('customModal').classList.remove('active'); }
+
+        // --- VUE : EXPLORER ---
+        async function renderExplorer(container) {
+            container.innerHTML = `<div class="text-center text-textDim py-20"><i class="fa-solid fa-circle-notch fa-spin text-2xl mb-3"></i><br>Chargement des bots...</div>`;
+            try {
+                const res = await fetch('/api/discord/publicbot/list');
+                const data = await res.json();
+                currentBots = data.bots || [];
+
+                let adminTab = userState.isAdmin ? `<button class="tab-btn" style="color: #c084fc;" onclick="navigate('admin')">🛡️ Admin</button>` : '';
+
+                const filtersHTML = `
+                    <div class="panel" style="padding: 16px 20px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;">
+                        <div class="tabs" style="margin:0; border:none; padding:0; background:transparent;">
+                            <button class="tab-btn ${currentExplorerTab === 'all' ? 'active' : ''}" onclick="setExplorerTab('all')">🌍 Tous</button>
+                            <button class="tab-btn ${currentExplorerTab === 'featured' ? 'active' : ''}" onclick="setExplorerTab('featured')">⭐ Vedettes</button>
+                            <button class="tab-btn ${currentExplorerTab === 'visited' ? 'active' : ''}" onclick="setExplorerTab('visited')">🔥 Visités</button>
+                            <button class="tab-btn ${currentExplorerTab === 'liked' ? 'active' : ''}" onclick="setExplorerTab('liked')">❤️ Likés</button>
+                            <button class="tab-btn" onclick="navigate('mybots')">🤖 Mes Bots</button>
+                            ${adminTab}
+                        </div>
+                        <div style="flex: 1; max-width: 400px; width: 100%; position:relative;">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                            <input type="text" id="searchInput" value="${currentSearch}" placeholder="Recherche (Nom, tag, description...)" class="form-control" style="padding-left: 36px;">
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML = filtersHTML + `<div class="grid-cards" id="botsGrid"></div>`;
+
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    currentSearch = e.target.value.toLowerCase();
+                    refreshGrid();
+                });
+
+                refreshGrid();
+            } catch (e) {
+                container.innerHTML = `<div class="panel text-center text-accentRed py-20">Erreur de chargement.</div>`;
+            }
+        }
+
+        window.setExplorerTab = function(tab) { currentExplorerTab = tab; navigate('explorer'); }
+
+        function refreshGrid() {
+            const grid = document.getElementById('botsGrid');
+            if(!grid) return;
+
+            let filteredBots = [...currentBots];
+
+            if(currentExplorerTab === 'featured') filteredBots = filteredBots.filter(b => b.featured);
+            else if(currentExplorerTab === 'visited') filteredBots.sort((a,b) => (b.visits || 0) - (a.visits || 0));
+            else if(currentExplorerTab === 'liked') filteredBots.sort((a,b) => (b.likesCount || 0) - (a.likesCount || 0));
+
+            if(currentSearch) {
+                filteredBots = filteredBots.filter(bot => {
+                    const term = currentSearch.toLowerCase();
+                    const matchSearch = bot.name.toLowerCase().includes(term) || (bot.description && bot.description.toLowerCase().includes(term));
+                    const matchTags = (bot.tags || []).some(t => t.toLowerCase().includes(term));
+                    return matchSearch || matchTags;
+                });
+            }
+
+            if(filteredBots.length === 0) {
+                grid.innerHTML = `<div class="panel col-span-full text-center text-textDim py-20" style="border-style:dashed;">Aucun bot ne correspond à votre recherche.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filteredBots.map(bot => generateBotCard(bot, false)).join('');
+        }
+
+        window.toggleLike = async function(botId) {
+            if (!userState.id) return showModal("Attention", "Veuillez vous connecter pour liker un bot.", "Compris", null, false);
+            try {
+                const res = await fetch('/api/discord/publicbot/like', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ botId })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    const bot = currentBots.find(b => b.id === botId);
+                    if(bot) {
+                        bot.likesCount = data.likesCount;
+                        if(data.isLiked && !bot.likes.includes(userState.id)) bot.likes.push(userState.id);
+                        if(!data.isLiked) bot.likes = bot.likes.filter(id => id !== userState.id);
+                    }
+                    if(document.getElementById('profile-view-wrap')) navigate('profile', bot);
+                    else refreshGrid();
+                }
+            } catch(e) {}
+        }
+
+        // --- VUE : PROFIL COMPLET ---
+        function renderProfile(container, bot) {
+            const isFeatured = bot.featured && bot.status === 'approved';
+            const isLiked = bot.likes && bot.likes.includes(userState.id);
+            
+            fetch('/api/discord/publicbot/view', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({botId: bot.id}) });
+            bot.visits = (bot.visits || 0) + 1;
+            
+            const bannerUrl = (bot.banner && bot.banner.trim() !== '') ? bot.banner : 'https://placehold.co/1000x250/1e2022/1e2022?text=%20';
+
+            let deleteBtn = '';
+            if (bot.ownerId === userState.id || userState.isAdmin) {
+                deleteBtn = `<button class="btn" style="background: rgba(147, 51, 234, 0.15); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.3); padding: 8px 15px; border-radius: 20px; font-size: 13px;" onclick="deleteBot('${bot.id}')"><i class="fa-solid fa-trash"></i> Supprimer le bot</button>`;
+            }
+
+            container.innerHTML = `
+                <div class="profile-wrapper" id="profile-view-wrap">
+                    <button class="btn-slim-gray nav-btn-floating" onclick="navigate('explorer')">⬅️ Accueil</button>
+                    
+                    <div class="profile-banner" style="background-image: url('${bannerUrl}');"></div>
+                    
+                    <div class="profile-content">
+                        <div class="profile-controls">
+                            ${deleteBtn}
+                        </div>
+
+                        <div class="hero-profile">
+                            <div class="avatar-wrap">
+                                <img src="${bot.avatar}" alt="Avatar" onerror="this.src='/assets/images/logo.jpg'">
+                            </div>
+                            <h1 style="font-size: 26px; font-weight: 800; color: #fff; margin-top:5px; display:flex; align-items:center; gap:10px;">
+                                ${bot.name}
+                                ${isFeatured ? '<span style="font-size:12px; background:rgba(255,215,0,0.2); color:var(--tw-colors-accentGold); padding:4px 10px; border-radius:12px; border:1px solid rgba(255,215,0,0.4);">⭐ Vedette</span>' : ''}
+                            </h1>
+                            <div style="font-size: 12px; color: var(--tw-colors-textDim); display:flex; align-items:center; gap:6px; margin-bottom: 8px;">
+                                <img src="${bot.ownerAvatar}" style="width:16px; height:16px; border-radius:50%; object-fit:cover;"> Inscrit par <b>${bot.ownerName}</b>
+                            </div>
+                            <p style="color: #a0a0a0; font-size: 14px; max-width: 600px; line-height: 1.5;">${bot.description}</p>
+                            
+                            <div style="display:flex; gap: 10px; margin-top: 15px; font-size: 12px; flex-wrap: wrap; justify-content: center;">
+                                <span style="background: rgba(255,255,255,0.05); border: 1px solid var(--tw-colors-sysBorder); padding: 6px 12px; border-radius: 8px;">Préfixe: <strong style="color: var(--tw-colors-accentBlue);">${bot.prefix}</strong></span>
+                                ${bot.servers && bot.servers > 0 ? `<span style="background: rgba(255,255,255,0.05); border: 1px solid var(--tw-colors-sysBorder); padding: 6px 12px; border-radius: 8px;">🌐 ${bot.servers.toLocaleString()} Serveurs</span>` : ''}
+                            </div>
+                            <div style="display:flex; gap: 15px; margin-top: 10px; font-size: 13px; opacity: 0.7;">
+                                <span>👁️ ${bot.visits || 0} visites</span>
+                                <span>❤️ ${bot.likesCount || 0} likes</span>
+                                <span>🔗 ${bot.invites || 0} invitations</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:center; gap:15px; margin-bottom: 25px;">
+                            <button class="btn btn-primary" onclick="trackAndInvite('${bot.id}')" style="padding: 10px 20px;">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Ajouter le Bot
+                            </button>
+                            <button class="btn" style="background: ${isLiked ? 'var(--tw-colors-accentRed)' : 'rgba(0,0,0,0.5)'}; color: #fff; border: 1px solid ${isLiked ? 'var(--tw-colors-accentRed)' : 'var(--tw-colors-sysBorder)'}; padding: 10px 20px;" onclick="toggleLike('${bot.id}')">
+                                ❤️ ${isLiked ? 'Liké' : 'Liker'}
+                            </button>
+                        </div>
+
+                        ${bot.tags && bot.tags.length > 0 ? `
+                        <div style="display:flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 25px;">
+                            ${bot.tags.map(tag => `<span style="background: rgba(0,0,0,0.3); border: 1px solid var(--tw-colors-sysBorder); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #a0a0a0;">${tag}</span>`).join('')}
+                        </div>
+                        ` : ''}
+
+                        ${bot.longDescription ? `
+                        <div class="panel" style="background: rgba(0,0,0,0.2);">
+                            <h3 style="font-size:16px; font-weight:700; margin-bottom:15px; border-bottom:1px solid var(--tw-colors-sysBorder); padding-bottom:10px;">À propos</h3>
+                            <div style="font-size: 14px; color: #a0a0a0; line-height: 1.6; white-space: pre-wrap;">${bot.longDescription}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.trackAndInvite = async function(botId) {
+            try { await fetch('/api/discord/publicbot/invite', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({botId}) }); } catch(e) {}
+            window.open(`https://discord.com/oauth2/authorize?client_id=${botId}&scope=bot&permissions=0`, '_blank');
+        }
+
+        // --- VUE : MES BOTS ---
+        async function renderMyBots(container) {
+            container.innerHTML = `<div class="text-center text-textDim py-20"><i class="fa-solid fa-circle-notch fa-spin text-2xl mb-3"></i><br>Récupération de vos bots...</div>`;
+            try {
+                const res = await fetch('/api/discord/publicbot/mybots');
+                if (!res.ok) return container.innerHTML = `<div class="panel text-center text-textDim py-20">Veuillez vous connecter pour gérer vos bots.</div>`;
+                
+                const data = await res.json();
+                const myBotsList = data.bots || [];
+                
+                let html = `
+                    <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                        <div>
+                            <button class="btn-slim-gray" style="margin-bottom: 10px;" onclick="navigate('explorer')">← Explorer</button>
+                            <h2 style="font-size: 20px; font-weight: 800; color: #fff;">Gérer mes créations</h2>
+                            <p style="font-size: 13px; color: var(--tw-colors-textDim); margin-top:4px;">Mettez à jour les informations ou boostez la visibilité.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="navigate('addbot')"><i class="fa-solid fa-plus"></i> Nouveau Bot</button>
+                    </div>
+                `;
+
+                if(myBotsList.length === 0) {
+                    html += `<div class="panel text-center text-textDim py-20 mt-4" style="border-style: dashed;">Aucun bot enregistré. Le premier ajout est 100% gratuit !</div>`;
+                } else {
+                    html += `<div class="grid-cards" style="margin-top:16px;">${myBotsList.map(bot => generateBotCard(bot, true)).join('')}</div>`;
+                }
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div class="text-center text-accentRed py-20">Erreur réseau.</div>`;
+            }
+        }
+
+        // --- VUE : FORMULAIRE D'AJOUT / ÉDITION ---
+        function renderFormBot(container, botToEdit = null) {
+            const isEdit = botToEdit !== null;
+            const isCorrection = isEdit && botToEdit.status === 'needs_edit';
+            const title = isEdit ? "Gérer le profil du bot" : "Soumettre un nouveau Bot";
+            let tagsValue = (isEdit && botToEdit.tags) ? botToEdit.tags.join(', ') : '';
+
+            container.innerHTML = `
+                <div class="panel" style="max-width: 800px; margin: 0 auto; width: 100%;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+                        <h2 style="font-size: 22px; font-weight: 800;">${title}</h2>
+                        <button class="btn-slim-gray" onclick="navigate('mybots')">Retour</button>
+                    </div>
+
+                    ${isCorrection ? `<div style="background: rgba(225, 79, 79, 0.1); border: 1px solid var(--tw-colors-accentRed); padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #fff; font-size:14px;"><strong style="display:block; margin-bottom:4px;"><i class="fa-solid fa-triangle-exclamation"></i> Bot refusé (À corriger) :</strong>${botToEdit.feedback}</div>` : ''}
+
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label>ID Client Discord</label>
+                                <input type="text" id="formBotId" value="${isEdit ? botToEdit.id : ''}" class="form-control" ${isEdit ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : 'placeholder="ex: 1234567890123"'} required>
+                            </div>
+                            <div class="form-group" style="width:150px;">
+                                <label>Préfixe</label>
+                                <input type="text" id="formBotPrefix" value="${isEdit ? botToEdit.prefix : ''}" class="form-control" placeholder="ex: !" style="text-align:center;" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Lien personnalisé (Optionnel)</label>
+                            <div style="display:flex;">
+                                <span style="background:rgba(0,0,0,0.5); border:1px solid var(--tw-colors-sysBorder); border-right:none; padding:10px 14px; border-radius:8px 0 0 8px; color:var(--tw-colors-textDim); font-size:14px;">synkrone.app/bot/</span>
+                                <input type="text" id="formBotUrl" value="${isEdit ? (botToEdit.customUrl || botToEdit.id) : ''}" class="form-control" style="border-radius: 0 8px 8px 0;" placeholder="mon-bot">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mots-clés / Catégories (Séparés par des virgules)</label>
+                            <input type="text" id="formBotTags" value="${tagsValue}" class="form-control" placeholder="Modération, Musique, Économie, Fun...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Description courte (Card)</label>
+                            <textarea id="formBotDesc" class="form-control" placeholder="150 caractères max..." style="min-height: 80px; resize: vertical;" maxlength="150" required>${isEdit ? botToEdit.description : ''}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Présentation détaillée (Page Profil)</label>
+                            <textarea id="formBotLongDesc" class="form-control" placeholder="Toutes les fonctionnalités, commandes, etc..." style="min-height: 150px; resize: vertical;">${isEdit ? (botToEdit.longDescription || '') : ''}</textarea>
+                        </div>
+
+                        ${isEdit ? `
+                        <div class="form-group">
+                            <label>Lien Bannière URL</label>
+                            <input type="text" id="formBotBanner" value="${(botToEdit.banner && !botToEdit.banner.includes('placehold.co')) ? botToEdit.banner : ''}" class="form-control" placeholder="https://...">
+                        </div>
+                        ` : ''}
+
+                        <button class="btn btn-primary" style="margin-top:16px; width:100%; padding:14px;" onclick="${isEdit ? `updateBot('${botToEdit.id}', ${isCorrection})` : `submitNewBot()`}">
+                            ${isCorrection ? '🚀 Sauvegarder & Renvoyer pour validation' : (isEdit ? '💾 Enregistrer les modifications' : '🚀 Envoyer pour validation')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- VUE : ADMIN ---
+        async function renderAdmin(container) {
+            container.innerHTML = `<div class="text-center text-textDim py-20">Chargement des validations...</div>`;
+            try {
+                const res = await fetch('/api/discord/publicbot/admin/pending');
+                if (!res.ok) return container.innerHTML = `<div class="panel text-center text-accentRed py-20">Accès refusé.</div>`;
+                const data = await res.json();
+                const pendingBots = data.pendingBots || [];
+
+                let html = `
+                    <div class="panel" style="margin-bottom: 20px;">
+                        <button class="btn-slim-gray" style="margin-bottom: 10px;" onclick="navigate('explorer')">← Explorer</button>
+                        <h2 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-shield-halved text-purple-400"></i> Administration : En attente</h2>
+                    </div>
+                `;
+
+                if(pendingBots.length === 0) {
+                    html += `<div class="panel text-center text-textDim py-20" style="border-style:dashed;">Aucun bot en attente.</div>`;
+                } else {
+                    html += `<div class="grid-cards">${pendingBots.map(bot => generateBotCard(bot, false, true)).join('')}</div>`;
+                }
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div class="panel text-center text-accentRed py-20">Erreur réseau.</div>`;
+            }
+        }
+
+        // --- GÉNÉRATEUR DE CARD ---
+        function generateBotCard(bot, isMyBotView, isAdminView = false) {
+            const isFeatured = bot.featured && bot.status === 'approved';
+            const isLiked = bot.likes && bot.likes.includes(userState.id);
+            
+            let footerActions = '';
+            if (isAdminView) {
+                footerActions = `
+                    <div style="display:flex; gap:8px; margin-top:12px;">
+                        <button class="btn-slim-gray" style="flex:1; justify-content:center; color:var(--tw-colors-krones); border-color:rgba(74,222,128,0.3);" onclick="adminAction('${bot.id}', 'approve'); event.stopPropagation();">Valider</button>
+                        <button class="btn-slim-gray" style="flex:1; justify-content:center; color:var(--tw-colors-accentRed); border-color:rgba(225,79,79,0.3);" onclick="promptRejectBot('${bot.id}'); event.stopPropagation();">Refuser</button>
+                    </div>
+                `;
+            } else if(isMyBotView) {
+                let featureBtn = !isFeatured 
+                    ? `<button class="btn-slim-gray" style="flex:1; justify-content:center; color:var(--tw-colors-accentGold); border-color:rgba(255,215,0,0.3);" onclick="promptHighlight('${bot.id}'); event.stopPropagation();">⭐ À la une</button>`
+                    : `<div style="flex:1; text-align:center; font-size:12px; font-weight:bold; color:var(--tw-colors-accentGold); padding:6px; border:1px solid rgba(255,215,0,0.3); border-radius:6px; background:rgba(255,215,0,0.1);">👑 Vedette</div>`;
+                
+                let bumpBtn = `<button class="btn-slim-gray" style="flex:1; justify-content:center;" onclick="doBump('${bot.id}'); event.stopPropagation();">🚀 Bump</button>`;
+                let editBtn = `<button class="btn-slim-gray" style="width:40px; justify-content:center;" onclick="navigate('editbot', ${JSON.stringify(bot).replace(/"/g, '&quot;')}); event.stopPropagation();"><i class="fa-solid fa-pen"></i></button>`;
+
+                footerActions = `<div style="display:flex; gap:6px; margin-top:12px; width:100%;">${featureBtn}${bumpBtn}${editBtn}</div>`;
+            }
+
+            let statusBadge = '';
+            if (bot.status === 'pending') {
+                statusBadge = '<span style="position:absolute; top:-10px; right:-10px; background:#f97316; color:#000; font-size:10px; font-weight:bold; padding:4px 8px; border-radius:12px; border:2px solid var(--bg); z-index:5;">En attente</span>';
+            } else if (bot.status === 'needs_edit') {
+                statusBadge = '<span style="position:absolute; top:-10px; right:-10px; background:var(--tw-colors-accentRed); color:#fff; font-size:10px; font-weight:bold; padding:4px 8px; border-radius:12px; border:2px solid var(--bg); z-index:5;">À corriger</span>';
+            }
+
+            const clickAction = (!isAdminView && bot.status === 'approved') ? `onclick="navigate('profile', ${JSON.stringify(bot).replace(/"/g, '&quot;')})"` : '';
+            const ownerDisplay = `<div style="font-size: 10px; color: var(--tw-colors-textDim); margin-top: 2px; display:flex; items-center; gap:4px;"><img src="${bot.ownerAvatar}" style="width:14px;height:14px;border-radius:50%;"> ${bot.ownerName}</div>`;
+
+            return `
+                <div class="user-card ${isFeatured ? 'featured' : ''}" ${clickAction} style="${(!isAdminView && bot.status === 'approved') ? 'cursor:pointer;' : 'cursor:default;'}">
+                    ${statusBadge}
+                    ${!isMyBotView && !isAdminView && bot.status === 'approved' ? `<div class="like-btn-mini ${isLiked ? 'liked' : ''}" onclick="toggleLike('${bot.id}'); event.stopPropagation();" title="Liker">❤️</div>` : ''}
+
+                    <div class="user-card-header">
+                        <img src="${bot.avatar}" class="user-avatar" alt="Avatar" onerror="this.src='/assets/images/logo.jpg'">
+                        <div class="user-info">
+                            <div class="user-name">${bot.name}</div>
+                            ${ownerDisplay}
+                            <div class="user-stats" style="margin-top:6px;">
+                                <span style="background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px; border:1px solid var(--tw-colors-sysBorder);">Prefix: <strong style="color:var(--tw-colors-accentBlue)">${bot.prefix}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color:var(--tw-colors-textDim); font-size:12px; margin-top:8px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${bot.description}</p>
+                    
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
+                        ${(bot.tags || []).slice(0, 3).map(tag => `<span style="font-size:10px; background:rgba(0,0,0,0.3); border:1px solid var(--tw-colors-sysBorder); padding:3px 8px; border-radius:12px; color:var(--tw-colors-textDim);">${tag}</span>`).join('')}
+                    </div>
+                    
+                    ${footerActions}
+                </div>
+            `;
+        }
+
+        // --- ACTIONS API ---
+        window.submitNewBot = async function() {
+            const id = document.getElementById('formBotId').value.trim();
+            const prefix = document.getElementById('formBotPrefix').value.trim();
+            const desc = document.getElementById('formBotDesc').value.trim();
+            const longDesc = document.getElementById('formBotLongDesc').value.trim();
+            const url = document.getElementById('formBotUrl').value.trim();
+            const tags = document.getElementById('formBotTags').value.trim();
+
+            if(!id || !desc || !prefix) return showModal("Erreur", "Veuillez remplir les champs obligatoires (ID, Préfixe, Description courte).", "Fermer", null, false);
+
+            showModal("Confirmation", "L'ajout de ce bot nécessitera la validation d'un administrateur. Confirmer ?", "Envoyer", async () => {
+                try {
+                    const res = await fetch('/api/discord/publicbot/submit', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ botId: id, prefix, description: desc, longDescription: longDesc, customUrl: url, tags })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        showModal("Succès", data.message, "Génial", () => navigate('mybots'), false);
+                    } else {
+                        showModal("Erreur", data.error, "Fermer", null, false);
+                    }
+                } catch(e) {
+                    showModal("Erreur", "Erreur réseau.", "Fermer", null, false);
+                }
+            });
+        }
+
+        window.updateBot = async function(botId, isResubmit = false) {
+            const prefix = document.getElementById('formBotPrefix').value.trim();
+            const desc = document.getElementById('formBotDesc').value.trim();
+            const longDesc = document.getElementById('formBotLongDesc').value.trim();
+            const url = document.getElementById('formBotUrl').value.trim();
+            const tags = document.getElementById('formBotTags').value.trim();
+            const banner = document.getElementById('formBotBanner') ? document.getElementById('formBotBanner').value.trim() : undefined;
+
+            try {
+                const res = await fetch('/api/discord/publicbot/update', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ botId, prefix, description: desc, longDescription: longDesc, customUrl: url, tags, banner, resubmit: isResubmit })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if(isResubmit) showModal("Succès", "Votre bot a été renvoyé pour validation.", "Super", () => navigate('mybots'), false);
+                    else navigate('mybots');
+                } else {
+                    showModal("Erreur", data.error, "Fermer", null, false);
+                }
+            } catch(e) {
+                showModal("Erreur", "Erreur réseau.", "Fermer", null, false);
+            }
+        }
+
+        window.deleteBot = function(botId) {
+            showModal("Suppression", "Voulez-vous vraiment supprimer définitivement ce bot de la plateforme ?", "Supprimer", async () => {
+                try {
+                    const res = await fetch('/api/discord/publicbot/delete', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ botId })
+                    });
+                    const data = await res.json();
+                    if (data.success) navigate('explorer');
+                    else showModal("Erreur", data.error, "Fermer", null, false);
+                } catch(e) {
+                    showModal("Erreur", "Erreur réseau.", "Fermer", null, false);
+                }
+            });
+        }
+
+        window.promptHighlight = function(botId) {
+            showModal("Mise en avant", "Mettre ce bot en vedette pour <b>50 Krones</b> ? Il aura un design unique et remontera en haut de l'explorateur.", "Acheter", async () => {
+                try {
+                    const res = await fetch('/api/discord/publicbot/feature', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ botId })
+                    });
+                    const data = await res.json();
+                    if (data.success) navigate('mybots');
+                    else showModal("Erreur", data.error, "Fermer", null, false);
+                } catch(e) {
+                    showModal("Erreur", "Erreur réseau.", "Fermer", null, false);
+                }
+            });
+        }
+
+        window.doBump = async function(botId) {
+            try {
+                const res = await fetch('/api/discord/publicbot/trigger-bump', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ botId })
+                });
+                const data = await res.json();
+                if (!data.success) showModal("Attention", data.error, "Compris", null, false);
+                else showModal("Bump effectué", data.message, "Fermer", null, false);
+            } catch(e) {}
+        }
+
+        let pendingRejectBotId = null;
+        window.promptRejectBot = function(botId) {
+            pendingRejectBotId = botId;
+            showModal(
+                "Refuser le bot",
+                `<div class="form-group"><label style="text-align:left;">Motif du refus (indiquez ce qu'il faut corriger) :</label><textarea id="feedbackText" class="form-control" style="min-height: 80px; resize:vertical;"></textarea></div>`,
+                "Envoyer et Refuser",
+                () => {
+                    const feedback = document.getElementById('feedbackText').value.trim();
+                    if(!feedback) return alert("Un motif est requis.");
+                    adminAction(pendingRejectBotId, 'reject', feedback);
+                }
+            );
+        }
+
+        window.adminAction = async function(botId, action, feedback = null) {
+            try {
+                await fetch('/api/discord/publicbot/admin/action', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ botId, action, feedback })
+                });
+                navigate('admin');
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modpacks - Accueil</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+    <style>
+        :root {
+            --bg-main: #181a1b;
+            --bg-panel: rgba(24, 27, 29, 0.74);
+            --text-main: #d1cdc7;
+            --text-muted: #8b8f92;
+            --accent: #7ac943;
+            --border: #383c3f;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: none; }
+        *::-webkit-scrollbar { display: none; }
+        body { min-height: 100vh; background: var(--bg-main); color: var(--text-main); font-family: var(--font-family); padding: 18px; }
+        .shell { max-width: 1060px; margin: 0 auto; display: grid; gap: 14px; }
+        .hero, .compare-panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; }
+        .hero { padding: 16px; }
+        .hero h1 { color: #fff; font-size: 24px; margin-bottom: 8px; }
+        .hero p { color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+        .compare-panel { padding: 14px; }
+        .compare-title { color: #fff; font-size: 16px; font-weight: 800; margin-bottom: 10px; }
+        .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+        table {
+            width: 100%;
+            min-width: 820px;
+            border-collapse: collapse;
+            background: rgba(20, 22, 23, 0.55);
+        }
+        th, td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 12px;
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+        th {
+            color: #f4f5f6;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: rgba(54, 60, 65, 0.95);
+            font-weight: 800;
+        }
+        tr:last-child td { border-bottom: none; }
+        .pack-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .pack-cell img {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            border: 1px solid rgba(122, 201, 67, 0.38);
+            background: rgba(53, 84, 33, 0.68);
+            color: #f4ffe8;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 10px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            color: #f5f7f4;
+            background: rgba(43, 48, 52, 0.92);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            transition: 0.18s ease;
+        }
+        .btn:hover { background: rgba(56, 63, 68, 0.96); border-color: #657078; }
+        .btn.primary { background: rgba(64, 101, 39, 0.88); border-color: rgba(122, 201, 67, 0.55); color: #f4ffe8; }
+        .legend {
+            margin-top: 10px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        @media (max-width: 960px) { .hero h1 { font-size: 21px; } }
+    </style>
+</head>
+<body class="mosaic-bg">
+    <div class="shell">
+        <section class="hero">
+            <h1>Bibliotheque Modpacks Synkrone</h1>
+            <p>Retrouve ici les trois modpacks officiels. Chaque fiche contient l'identite du pack, son orientation de gameplay, les prerequis recommandés et les informations de lancement.</p>
+        </section>
+
+        <section class="compare-panel">
+            <h2 class="compare-title">Tableau comparatif des modpacks</h2>
+            <div class="table-wrap">
+                <table aria-label="Comparatif des modpacks Synkrone">
+                    <thead>
+                        <tr>
+                            <th>Modpack</th>
+                            <th>Version</th>
+                            <th>Orientation</th>
+                            <th>Minecraft</th>
+                            <th>Ambiance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="pack-cell">
+                                    <img src="https://media.forgecdn.net/avatars/thumbnails/1346/250/64/64/638874907456203025.png" alt="Xenus">
+                                    Xenus
+                                </div>
+                            </td>
+                            <td>1.1.0</td>
+                            <td><span class="chip">Skyblock</span> <span class="chip">Technologie</span> <span class="chip">Magie</span></td>
+                            <td>1.19.2</td>
+                            <td>Progression longue</td>
+                            <td>
+                                <div class="actions">
+                                    <a class="btn primary" href="/minecraft/modpack/xenus" target="_top">Voir la fiche</a>
+                                    <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/xenus/download/6889261" target="_blank" rel="noopener noreferrer">Telecharger</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="pack-cell">
+                                    <img src="https://media.forgecdn.net/attachments/description/1217771/description_a8235a90-2120-414c-a3cf-fe8c61285724.png" alt="The French Baguette">
+                                    The French Baguette
+                                </div>
+                            </td>
+                            <td>1.2.0</td>
+                            <td><span class="chip">Aventure</span> <span class="chip">Quetes</span> <span class="chip">Multijoueur</span></td>
+                            <td>1.16.5</td>
+                            <td>Communautaire FR</td>
+                            <td>
+                                <div class="actions">
+                                    <a class="btn primary" href="/minecraft/modpack/thefrenchbaguette" target="_top">Voir la fiche</a>
+                                    <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/the-french-baguette/download/7629554" target="_blank" rel="noopener noreferrer">Telecharger</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="pack-cell">
+                                    <img src="https://media.forgecdn.net/avatars/thumbnails/1401/657/64/64/638908553901119098.png" alt="Vanipack">
+                                    Vanipack
+                                </div>
+                            </td>
+                            <td>1.2</td>
+                            <td><span class="chip">Vanilla+</span> <span class="chip">Performance</span></td>
+                            <td>1.21.7 / 1.21.8</td>
+                            <td>Leger et stable</td>
+                            <td>
+                                <div class="actions">
+                                    <a class="btn primary" href="/minecraft/modpack/vanipack" target="_top">Voir la fiche</a>
+                                    <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/vanipack/download/6889206" target="_blank" rel="noopener noreferrer">Telecharger</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="legend">Astuce: sur mobile, fais glisser horizontalement pour voir toutes les colonnes.</p>
+        </section>
+    </div>
+</body>
+</html>

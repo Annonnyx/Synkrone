@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>𝑺𝒚𝒏𝒌𝒓𝒐𝒏𝒆 𝑺𝒖𝒑𝒑𝒐𝒓𝒕</title>
+    <link rel="icon" type="image/jpeg" href="../../assets/images/logo.jpg">
+    <link rel="stylesheet" href="../../assets/mosaique.css">
+    <script src="../../assets/mosaique.js" defer></script>
+    
+    <style>
+        /* =========================================
+           VARIABLES & RÉINITIALISATION
+           ========================================= */
+        :root {
+            --bg-main: #181a1b;
+            --bg-panel: rgba(34, 37, 39, 0.85);
+            --text-main: #d1cdc7;
+            --text-muted: #8b8f92;
+            --accent: #d32f2f;
+            --discord-blurple: #332f6b;
+            --btn-purple: #5ca1f6; /* Violet pour le bouton ajouter */
+            --btn-purple-hover: #3aed55;
+            --border: #383c3f;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: none; 
+        }
+        
+        *::-webkit-scrollbar { display: none; }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-main);
+            font-family: var(--font-family);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            color-scheme: dark;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* =========================================
+           HEADER (Serveur & Owner)
+           ========================================= */
+        .header-card, .owner-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .server-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            object-fit: cover;
+        }
+
+        .owner-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            object-fit: cover;
+        }
+
+        .header-content h1, .owner-content h2 {
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        .owner-content h2 {
+            font-size: 20px;
+            color: var(--accent);
+        }
+
+        .header-content p, .owner-content p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        /* Boutons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s ease;
+        }
+
+        .btn-discord {
+            background-color: var(--discord-blurple);
+            color: white;
+        }
+        .btn-discord:hover {
+            background-color: #4752C4;
+        }
+
+        .btn-add {
+            background-color: var(--btn-purple);
+            color: white;
+        }
+        .btn-add:hover {
+            background-color: var(--btn-purple-hover);
+        }
+
+        .btn-topgg {
+            background-color: #2c2f33;
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            height: 35px;
+        }
+        .btn-topgg:hover {
+            background-color: #23272a;
+        }
+        .btn-topgg img {
+            height: 20px;
+        }
+
+        /* =========================================
+           LISTE DES BOTS (Remplace le tableau)
+           ========================================= */
+        .bots-section {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .bot-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            gap: 20px;
+        }
+
+        .bot-item:last-child {
+            border-bottom: none;
+        }
+
+        .bot-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bot-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            background-color: #000;
+        }
+
+        .bot-name {
+            font-weight: bold;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .actions-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* =========================================
+           GRILLE DE SUPPORT
+           ========================================= */
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .support-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .support-card h3 {
+            color: var(--accent);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .support-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .support-card code {
+            background-color: rgba(255,255,255,0.1);
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #ff9999;
+        }
+
+        /* =========================================
+           RESPONSIVITÉ
+           ========================================= */
+        @media (max-width: 768px) {
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-card, .owner-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            /* Amélioration de l'affichage des bots sur mobile */
+            .bot-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+                padding: 20px 15px;
+            }
+            .bot-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .bot-img {
+                width: 60px;
+                height: 60px;
+            }
+            .actions-group {
+                justify-content: center;
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body class="mosaic-bg">
+
+    <div class="container">
+        
+        <!-- En-tête Serveur -->
+        <header class="header-card">
+            <img src="../../assets/images/logo.jpg" alt="Synkrone Support Logo" class="server-logo">
+            <div class="header-content">
+                <h1>𝑺𝒚𝒏𝒌𝒓𝒐𝒏𝒆 𝑺𝒖𝒑𝒑𝒐𝒓𝒕</h1>
+                <p>Bienvenue sur le serveur officiel d'assistance et de support. Rejoignez notre communauté pour suivre le développement, obtenir de l'aide ou signaler un problème.</p>
+                <a href="https://discord.gg/p768u2Pgp3" target="_blank" class="btn btn-discord">
+                    💬 Rejoindre le serveur
+                </a>
+            </div>
+        </header>
+
+        <!-- Profil Propriétaire -->
+        <section class="owner-card">
+            <img src="../../assets/images/vex.png" alt="Vex Profil" class="owner-avatar">
+            <div class="owner-content">
+                <h2>𝑽𝒆𝒙</h2>
+                <p>Créateur et administrateur du serveur <strong>𝑺𝒚𝒏𝒌𝒓𝒐𝒏𝒆 𝑺𝒖𝒑𝒑𝒐𝒓𝒕</strong>. Toute l'infrastructure et la gestion des bots sont opérées par la direction pour vous garantir un service stable et de qualité.</p>
+            </div>
+        </section>
+
+        <!-- Liste des Bots -->
+        <section class="bots-section">
+            
+            <!-- VAX -->
+            <div class="bot-item">
+                <div class="bot-info">
+                    <img src="../../assets/images/vax.png" alt="Vax" class="bot-img">
+                    <span class="bot-name">𝑽𝒂𝒙</span>
+                </div>
+                <div class="actions-group">
+                    <a href="https://discord.com/oauth2/authorize?client_id=1367891720871874560" target="_blank" class="btn btn-add">➕ Ajouter</a>
+                    <a href="https://top.gg/bot/1367891720871874560" target="_blank" class="btn btn-topgg"><img src="../../assets/images/topgg.png" alt="Top.gg"></a>
+                </div>
+            </div>
+
+            <!-- ARCEUS -->
+            <div class="bot-item">
+                <div class="bot-info">
+                    <img src="../../assets/images/arceus.png" alt="Arceus" class="bot-img">
+                    <span class="bot-name">𝑨𝒓𝒄𝒆𝒖𝒔</span>
+                </div>
+                <div class="actions-group">
+                    <a href="https://discord.com/oauth2/authorize?client_id=1492591949792940183" target="_blank" class="btn btn-add">➕ Ajouter</a>
+                    <a href="https://top.gg/bot/1492591949792940183" target="_blank" class="btn btn-topgg"><img src="../../assets/images/topgg.png" alt="Top.gg"></a>
+                </div>
+            </div>
+
+            <!-- ASUNA -->
+            <div class="bot-item">
+                <div class="bot-info">
+                    <img src="../../assets/images/asuna.png" alt="Asuna" class="bot-img">
+                    <span class="bot-name">𝑨𝒔𝒖𝒏𝒂</span>
+                </div>
+                <div class="actions-group">
+                    <a href="https://discord.com/oauth2/authorize?client_id=1428865683986452640" target="_blank" class="btn btn-add">➕ Ajouter</a>
+                    <a href="https://top.gg/bot/1428865683986452640" target="_blank" class="btn btn-topgg"><img src="../../assets/images/topgg.png" alt="Top.gg"></a>
+                </div>
+            </div>
+
+            <!-- KAYABA -->
+            <div class="bot-item">
+                <div class="bot-info">
+                    <img src="../../assets/images/kayaba.png" alt="Kayaba" class="bot-img">
+                    <span class="bot-name">𝑲𝒂𝒚𝒂𝒃𝒂</span>
+                </div>
+                <div class="actions-group">
+                    <a href="https://discord.com/oauth2/authorize?client_id=1385913159717621780" target="_blank" class="btn btn-add">➕ Ajouter</a>
+                    <a href="https://top.gg/bot/1385913159717621780" target="_blank" class="btn btn-topgg"><img src="../../assets/images/topgg.png" alt="Top.gg"></a>
+                </div>
+            </div>
+
+            <!-- YUI -->
+            <div class="bot-item">
+                <div class="bot-info">
+                    <img src="../../assets/images/yui.png" alt="Yui" class="bot-img">
+                    <span class="bot-name">𝒀𝒖𝒊</span>
+                </div>
+                <div class="actions-group">
+                    <a href="https://discord.com/oauth2/authorize?client_id=1460012999912853810" target="_blank" class="btn btn-add">➕ Ajouter</a>
+                    <a href="https://top.gg/bot/1460012999912853810" target="_blank" class="btn btn-topgg"><img src="../../assets/images/topgg.png" alt="Top.gg"></a>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Méthodes de Support -->
+        <div class="support-grid">
+            <!-- Ticket -->
+            <div class="support-card">
+                <h3>🎫 Ouvrir un Ticket</h3>
+                <p>Pour toute demande d'assistance complète, rendez-vous sur le serveur Discord dans la catégorie <code>🆘│𝑺𝒖𝒑𝒑𝒐𝒓𝒕</code> et ouvrez une requête dans le salon <code>🎫│𝑻𝒊𝒄𝒌𝒆𝒕</code>. L'équipe vous répondra dans les plus brefs délais.</p>
+            </div>
+            <!-- Messages Privés (MP) -->
+            <div class="support-card">
+                <h3>📩 Messages Privés (MP)</h3>
+                <p>En cas de problème urgent, chaque bot a ses <strong>Messages Privés ouverts</strong>. L'équipe de gestion reçoit instantanément votre message et pourra intervenir directement.</p>
+            </div>
+            <!-- Feedback -->
+            <div class="support-card">
+                <h3>💡 Faire un Retour</h3>
+                <p>Vos suggestions sont importantes ! Tous nos bots sont équipés de la commande <code>/feedback</code>. Utilisez-la pour nous faire part d'un bug, d'une idée ou d'une amélioration.</p>
+            </div>
+            <!-- Custom Bot -->
+            <div class="support-card">
+                <h3>🛠️ Bot Personnalisé</h3>
+                <p>Si vous souhaitez un bot sur-mesure avec des fonctionnalités spécifiques à vos besoins, c'est possible ! Nous proposons ce service de création personnalisée contre une gratification ou un échange de services.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

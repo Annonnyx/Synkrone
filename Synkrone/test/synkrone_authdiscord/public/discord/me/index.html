@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme Profils | Synkrone</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        base: '#181a1b',
+                        surface: 'rgba(30, 32, 34, 0.78)',
+                        surfaceHover: 'rgba(45, 48, 51, 0.9)',
+                        sysBorder: 'rgba(255, 255, 255, 0.12)',
+                        accentRed: '#e14f4f',
+                        accentBlue: '#6d8cff',
+                        accentGold: '#ffd700',
+                        krones: '#4ade80',
+                        textDim: '#a0a0a0'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/assets/mosaique.css">
+    <script src="/assets/mosaique.js" defer></script>
+    <style>
+        :root {
+            --bg: #181a1b;
+            --surface: rgba(30, 32, 34, 0.78);
+            --surface-hover: rgba(45, 48, 51, 0.9);
+            --border: rgba(255, 255, 255, 0.12);
+            --accent: #e14f4f;
+            --accent-2: #6d8cff;
+            --accent-gold: #ffd700;
+            --krones: #4ade80;
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --radius: 12px;
+            --transition: all 0.22s ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+        *::-webkit-scrollbar { width: 6px; height: 6px; }
+        *::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text); background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        #app-layout { display: flex; width: 100%; height: 100%; }
+        #main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto; }
+        
+        .page-container { max-width: 1040px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px; padding: 24px; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); backdrop-filter: blur(8px); padding: 24px; position: relative; overflow: hidden; }
+        
+        .tabs { display: flex; gap: 10px; overflow-x: auto; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 12px; border: 1px solid var(--border); width: fit-content; }
+        .tab-btn { background: none; border: none; color: var(--text-dim); padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: var(--transition); white-space: nowrap; }
+        .tab-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .tab-btn.active { background: var(--surface-hover); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+        .view-controls { display: flex; gap: 8px; align-items: center; }
+        .view-btn { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .view-btn.active { background: var(--accent-2); color: #fff; border-color: var(--accent-2); }
+
+        .time-toggle { display: inline-flex; background: rgba(0,0,0,0.4); border-radius: 8px; padding: 4px; border: 1px solid var(--border); }
+        .time-btn { background: none; border: none; color: var(--text-dim); padding: 6px 12px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .time-btn.active { background: var(--surface-hover); color: #fff; }
+
+        /* Boutons d'intégration (fins et gris) */
+        .btn-slim-gray { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px; }
+        .btn-slim-gray:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .user-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; gap: 12px; position: relative; }
+        .user-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.3); background: var(--surface-hover); }
+        .user-card-header { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        .user-info { flex: 1; min-width: 0; }
+        .user-name { font-weight: bold; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
+        .user-stats { font-size: 12px; color: var(--text-dim); display: flex; gap: 10px; margin-top: 4px; }
+        
+        .user-card.featured { border-color: rgba(255, 215, 0, 0.3); background: linear-gradient(145deg, rgba(30,32,34,0.9), rgba(40,35,15,0.9)); }
+        .user-card.featured:hover { border-color: rgba(255, 215, 0, 0.6); }
+        .featured-badge { background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: bold; border: 1px solid rgba(255,215,0,0.3); display: inline-block; margin-bottom: 8px; width: fit-content;}
+        
+        .list-view { display: flex; flex-direction: column; gap: 10px; }
+        .user-list-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 16px; position: relative; }
+        .user-list-item:hover { background: var(--surface-hover); border-color: rgba(255,255,255,0.3); }
+        .user-list-item .user-avatar { width: 36px; height: 36px; }
+        .user-list-item .user-name { font-size: 15px; }
+        .user-list-item p { margin: 0; flex: 1; color: var(--text-dim); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .like-btn-mini { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text-dim); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 12px;}
+        .user-list-item .like-btn-mini { top: auto; position: relative; right: auto; margin-left: 10px; }
+        .like-btn-mini:hover { color: var(--accent); border-color: var(--accent); }
+        .like-btn-mini.liked { color: var(--accent); background: rgba(225, 79, 79, 0.15); border-color: var(--accent); }
+
+        .profile-wrapper { border-radius: var(--radius); overflow: hidden; transition: var(--transition); min-height: 500px; display: flex; flex-direction: column; position: relative; }
+        .profile-banner { width: 100%; height: 180px; object-fit: cover; background: #2c2f33; display: block; }
+        .profile-content { padding: 24px; flex: 1; position: relative; display: flex; flex-direction: column; }
+        
+        .hero-profile { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-top: -70px; margin-bottom: 20px; }
+        .avatar-wrap { width: 118px; height: 118px; border-radius: 50%; padding: 4px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); position: relative; z-index: 2; transition: all 0.3s; }
+        .avatar-wrap img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #181a1b; object-fit: cover; }
+        .profile-name { font-size: 26px; font-weight: 800; color: #fff; transition: color 0.3s; }
+        .profile-subtitle { color: var(--text-dim); font-size: 14px; max-width: 600px; line-height: 1.5; transition: color 0.3s; }
+        
+        .link-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 10px; }
+        .link-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; text-decoration: none; transition: var(--transition); }
+        .link-item:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        .link-left { display: flex; align-items: center; gap: 12px; }
+        .link-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .link-texts strong { display: block; font-size: 14px; color: inherit; }
+        .link-texts span { opacity: 0.7; font-size: 12px; }
+        .link-action { padding: 6px 12px; background: rgba(255,255,255,0.1); border-radius: 20px; font-size: 12px; color: inherit; border: 1px solid var(--border); cursor: pointer; font-weight: bold; }
+        
+        /* Contrôles du profil avec empilement vertical */
+        .profile-controls { position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+        .nav-btn-floating { position: absolute; top: 15px; left: 15px; z-index: 10; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        
+        .like-main-btn { padding: 8px 15px; border-radius: 20px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; backdrop-filter: blur(5px); }
+        .like-main-btn:hover { background: rgba(225, 79, 79, 0.2); border-color: var(--accent); color: var(--accent); }
+        .like-main-btn.liked { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: var(--text-dim); }
+        .form-control { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px 14px; border-radius: 8px; font-family: inherit; width: 100%; }
+        .form-control:focus { outline: none; border-color: var(--accent-2); }
+        
+        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); }
+        .btn-primary { background: var(--accent-2); color: #fff; }
+        .btn-primary:hover { background: #5c7ae6; }
+        .btn-success { background: var(--krones); color: #000; }
+        .btn-success:hover { background: #3cb868; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+        .editor-section { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+        
+        .link-edit-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .link-edit-item { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid var(--border); flex-wrap: wrap;}
+        .color-picker-wrap { display: flex; align-items: center; gap: 10px; }
+        .color-picker { -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; overflow: hidden; padding: 0; background: none; }
+        .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 50%; }
+
+        .rank-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .rank-base { background: #444; color: #fff; }
+        .rank-soutien { background: #115e59; color: #5eead4; }
+        .rank-vip { background: #4c1d95; color: #c4b5fd; }
+        .rank-premium { background: linear-gradient(45deg, #b91c1c, #d97706); color: #fff; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; width: 90%; max-width: 400px; transform: scale(0.95); transition: transform 0.2s; text-align: center; }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #fff; }
+        .modal-text { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+        @media (max-width: 860px) {
+            #main-content { padding: 0; }
+            .hero-profile { margin-top: -50px; }
+            .filter-bar { flex-direction: column; align-items: stretch !important; }
+            #home-controls-dynamic { justify-content: space-between !important; margin-top: 10px; }
+        }
+    </style>
+</head>
+<body class="mosaic-bg">
+
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-box">
+            <div class="modal-title" id="modalTitle">Titre</div>
+            <div class="modal-text" id="modalText">Texte</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" id="modalConfirmBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-layout">
+        <main id="main-content">
+            <div class="page-container" id="view-container">
+                <!-- Vues dynamiques -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function setIframeFullscreen(isFullscreen) {
+            try {
+                if (window.parent && window.parent.document) {
+                    const frame = window.parent.document.getElementById('content-frame');
+                    if (frame) {
+                        if (isFullscreen) {
+                            frame.style.position = 'fixed'; frame.style.top = '0'; frame.style.left = '0';
+                            frame.style.width = '100vw'; frame.style.height = '100vh'; frame.style.zIndex = '9999';
+                        } else {
+                            frame.style.position = ''; frame.style.top = ''; frame.style.left = '';
+                            frame.style.width = '100%'; frame.style.height = '100%'; frame.style.zIndex = '';
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+
+        const DictionaireMotsCles = {
+            'jeu': ['jeux', 'gaming', 'gamer', 'joueur'],
+            'utilitaire': ['util', 'utilitaires', 'utility', 'tools', 'outil'],
+            'dev': ['developpement', 'code', 'programmeur', 'coder'],
+            'design': ['graphisme', 'dessin', 'ui', 'ux', 'art']
+        };
+
+        const Ranks = {
+            'base': { name: 'Membre', bonusLinks: 0, class: 'rank-base' },
+            'soutien': { name: 'Soutien', bonusLinks: 5, class: 'rank-soutien' },
+            'vip': { name: 'VIP', bonusLinks: 15, class: 'rank-vip' },
+            'premium': { name: 'Premium', bonusLinks: 50, class: 'rank-premium' }
+        };
+
+        const NetworkIcons = {
+            'discord': '<img src="https://upload.wikimedia.org/wikipedia/fr/thumb/4/4f/Discord_Logo_sans_texte.svg/1920px-Discord_Logo_sans_texte.svg.png" style="width:20px;height:20px;object-fit:contain;" alt="Discord" />', 
+            'twitter': '<img src="https://business-cool.com/wp-content/uploads/2023/07/x-logo-twitter-elon-musk.webp" style="width:20px;height:20px;object-fit:contain;" alt="Twitter" />', 
+            'instagram': '<img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Instagram_logo_2022.svg" style="width:20px;height:20px;object-fit:contain;" alt="Instagram" />', 
+            'youtube': '<img src="https://play-lh.googleusercontent.com/IMFZNHrzcZBkljUV6vtf4iP6upjyn3PeXdL_aMy_F6-k4bd9NHpjx8KFrMN_JYzReKPJnl_-BDfJVxUIgpiP_A" style="width:20px;height:20px;object-fit:contain;" alt="YouTube" />', 
+            'github': '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" style="width:20px;height:20px;object-fit:contain;filter:invert(1);" alt="GitHub" />', 
+            'twitch': '<img src="https://m.media-amazon.com/images/I/21kRx-CJsUL.png" style="width:20px;height:20px;object-fit:contain;" alt="Twitch" />', 
+            'custom': '🔗'
+        };
+
+        let Utilisateurs = [];
+        let MonProfil = null;
+
+        async function initData() {
+            try {
+                const meRes = await fetch('/api/me');
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    if (meData.authenticated) {
+                        MonProfil = meData.user;
+                        MonProfil.krones = meData.user.krone ?? 0;
+                        MonProfil.rank = 'base';
+                    }
+                }
+                
+                const profilesRes = await fetch('/api/profiles');
+                if (profilesRes.ok) {
+                    const profData = await profilesRes.json();
+                    Utilisateurs = profData.profiles || [];
+                }
+            } catch (e) {
+                console.error("Erreur init", e);
+            }
+            
+            let startView = 'home';
+            let startParams = null;
+
+            // Récupération de l'URL transmise par le shell
+            const urlParams = new URLSearchParams(window.location.search);
+            const profileParam = urlParams.get('profile');
+
+            if (profileParam) {
+                startView = 'profile';
+                startParams = profileParam;
+            } else {
+                // Fallback classique
+                try {
+                    const parentPath = (window.parent !== window) ? window.parent.location.pathname : window.location.pathname;
+                    const segments = parentPath.split('/').filter(Boolean);
+                    if (segments.length > 0 && segments[0] !== 'discord' && segments[0] !== 'accueil') {
+                        startView = 'profile';
+                        startParams = segments[0]; 
+                    }
+                } catch(e) {}
+            }
+
+            navigate(startView, startParams);
+        }
+
+        async function bumpMe() {
+            try {
+                const res = await fetch('/api/discord/me/trigger-bump', { method: 'POST' });
+                const data = await res.json();
+                showModal("Bump", data.message || "Bump activé !", "Fermer", null);
+            } catch (e) {
+                showModal("Erreur", "Erreur lors du bump.", "Fermer", null);
+            }
+        }
+
+        function syncUserToParent() {
+            if(window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'synkrone:user-updated', user: MonProfil }, window.location.origin);
+            }
+        }
+        
+        function setParentUrl(targetUrl) {
+            if (window.parent && window.parent !== window) {
+                setTimeout(() => {
+                    window.parent.history.replaceState(null, '', targetUrl);
+                }, 80);
+            } else {
+                window.history.replaceState(null, '', targetUrl);
+            }
+        }
+
+        const viewContainer = document.getElementById('view-container');
+        let currentHomeTab = 'all';
+        let currentHomeTime = 'month';
+        let homeViewMode = 'grid';
+        let modalCallback = null;
+
+        function showModal(title, text, confirmLabel, onConfirm) {
+            setIframeFullscreen(true);
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').innerHTML = text;
+            const btn = document.getElementById('modalConfirmBtn');
+            btn.textContent = confirmLabel;
+            modalCallback = onConfirm;
+            document.getElementById('customModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.remove('active');
+            setIframeFullscreen(false);
+            modalCallback = null;
+        }
+
+        document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+            if(modalCallback) modalCallback();
+            closeModal();
+        });
+
+        function navigate(view, params = null) {
+            viewContainer.innerHTML = '';
+            if (view === 'home') {
+                setParentUrl('/discord/me');
+                renderHome();
+            }
+            else if (view === 'profile') renderProfile(params);
+            else if (view === 'edit') renderEdit();
+        }
+        
+        window.navigateProfile = function() {
+            if(!MonProfil) {
+                showModal("Erreur", "Veuillez vous connecter.", "Fermer", () => {
+                    window.location.href = "/auth/discord";
+                });
+            } else {
+                navigate('profile', 'me');
+            }
+        }
+
+        function renderHome() {
+            let html = `
+                <div class="panel filter-bar" style="display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; width: 100%; padding: 12px 20px; margin-bottom: 20px;">
+                    <div class="tabs" style="margin: 0; padding: 0; border: none; background: transparent;">
+                        <button class="tab-btn ${currentHomeTab === 'all' ? 'active' : ''}" onclick="setHomeTab('all')">🌍 Tous</button>
+                        <button class="tab-btn ${currentHomeTab === 'featured' ? 'active' : ''}" onclick="setHomeTab('featured')">⭐ À la une</button>
+                        <button class="tab-btn ${currentHomeTab === 'visited' ? 'active' : ''}" onclick="setHomeTab('visited')">🔥 Visités</button>
+                        <button class="tab-btn ${currentHomeTab === 'liked' ? 'active' : ''}" onclick="setHomeTab('liked')">❤️ Likés</button>
+                    </div>
+                    <div id="home-controls-dynamic" style="display: flex; align-items: center; gap: 12px; flex: 1; justify-content: flex-end;"></div>
+                    ${MonProfil ? `
+                    <div>
+                        <button class="btn-slim-gray" onclick="navigateProfile()">👤 Mon profil</button>
+                    </div>
+                    ` : ''}
+                </div>
+                <div id="home-content"></div>
+            `;
+            viewContainer.innerHTML = html;
+            renderHomeContent();
+        }
+
+        window.setHomeTab = function(tab) { currentHomeTab = tab; renderHome(); }
+        window.setHomeTime = function(time) { currentHomeTime = time; renderHomeContent(); }
+        window.setViewMode = function(mode) { homeViewMode = mode; renderHomeContent(); }
+
+        function renderHomeContent() {
+            const content = document.getElementById('home-content');
+            const controlsDynamic = document.getElementById('home-controls-dynamic');
+            
+            let publicUsers = Utilisateurs.filter(u => u.privacy === 'public');
+            publicUsers.sort((a,b) => {
+                const aTime = a.featuredUntil || 0;
+                const bTime = b.featuredUntil || 0;
+                const now = Date.now();
+                const aFeatured = aTime > now;
+                const bFeatured = bTime > now;
+                if(aFeatured && !bFeatured) return -1;
+                if(!aFeatured && bFeatured) return 1;
+                return bTime - aTime;
+            });
+            publicUsers.forEach(u => {
+                if(u.featuredUntil && u.featuredUntil > Date.now()) u.featured = true;
+                else u.featured = false;
+            });
+            if (MonProfil && MonProfil.privacy === 'public' && !publicUsers.find(u => u.id === MonProfil.id)) {
+                publicUsers.push(MonProfil);
+            }
+
+            let controlsHtml = `
+                <div class="view-controls" style="margin: 0;">
+                    <button class="view-btn ${homeViewMode === 'grid' ? 'active' : ''}" onclick="setViewMode('grid')" title="Cartes">🔲</button>
+                    <button class="view-btn ${homeViewMode === 'list' ? 'active' : ''}" onclick="setViewMode('list')" title="Liste">📄</button>
+                </div>
+            `;
+
+            let extraControls = '';
+            let listHtml = '';
+            
+            if(currentHomeTab === 'featured') {
+                let list = publicUsers.filter(u => u.featured);
+                listHtml = list.length ? `<div class="${homeViewMode === 'grid' ? 'grid-cards' : 'list-view'}">${list.map(u => createUserCard(u, true)).join('')}</div>` : '<div class="panel" style="text-align:center;">Aucune mise en avant pour le moment.</div>';
+            } 
+            else if(currentHomeTab === 'visited' || currentHomeTab === 'liked') {
+                let statKey = currentHomeTab === 'visited' ? 'visits' : 'likes';
+                let sortKey = statKey + (currentHomeTime === 'month' ? 'Month' : 'Total');
+                let list = [...publicUsers].sort((a,b) => (b.stats[sortKey] || 0) - (a.stats[sortKey] || 0)).slice(0, 10);
+                
+                extraControls = `
+                    <div class="time-toggle" style="margin: 0;">
+                        <button class="time-btn ${currentHomeTime === 'month' ? 'active' : ''}" onclick="setHomeTime('month')">Mois</button>
+                        <button class="time-btn ${currentHomeTime === 'total' ? 'active' : ''}" onclick="setHomeTime('total')">Total</button>
+                    </div>
+                `;
+                listHtml = list.length ? `<div class="${homeViewMode === 'grid' ? 'grid-cards' : 'list-view'}">${list.map(u => createUserCard(u, false, sortKey)).join('')}</div>` : '<div class="panel" style="text-align:center;">Aucune donnée.</div>';
+            }
+            else if(currentHomeTab === 'all') {
+                extraControls = `<input type="text" id="tabSearchInput" class="form-control" style="width: 200px; padding: 6px 12px; margin: 0;" placeholder="Pseudo, Mot clé..." oninput="filterAllTab(this.value)">`;
+                listHtml = `<div class="${homeViewMode === 'grid' ? 'grid-cards' : 'list-view'}" id="allTabGrid">${publicUsers.map(u => createUserCard(u)).join('')}</div>`;
+            }
+
+            if (controlsDynamic) controlsDynamic.innerHTML = extraControls + controlsHtml;
+            if (content) content.innerHTML = listHtml;
+        }
+
+        window.filterAllTab = function(query) {
+            query = query.toLowerCase().trim();
+            const grid = document.getElementById('allTabGrid');
+            if(!grid) return;
+            
+            let motsClesRecherche = [query];
+            for (const [cle, synonymes] of Object.entries(DictionaireMotsCles)) {
+                if (cle.includes(query) || synonymes.some(s => s.includes(query))) motsClesRecherche.push(cle, ...synonymes);
+            }
+
+            let publicUsers = Utilisateurs.filter(u => u.privacy === 'public');
+            if (MonProfil && MonProfil.privacy === 'public' && !publicUsers.find(u => u.id === MonProfil.id)) {
+                publicUsers.push(MonProfil);
+            }
+
+            let filtered = publicUsers.filter(u => {
+                if(u.username && u.username.toLowerCase().includes(query)) return true;
+                if(u.name && u.name.toLowerCase().includes(query)) return true;
+                if(u.keywords && u.keywords.some(k => motsClesRecherche.some(mr => mr.includes(k) || k.includes(mr)))) return true;
+                return false;
+            });
+
+            grid.innerHTML = filtered.length ? filtered.map(u => createUserCard(u)).join('') : '<p style="grid-column: 1/-1; text-align:center;">Aucun résultat.</p>';
+        }
+
+        function createUserCard(user, isFeatured = false, sortKey = null) {
+            let statIcon = sortKey && sortKey.includes('likes') ? '❤️' : '👁️';
+            let statVal = sortKey ? (user.stats?.[sortKey] || 0) : (user.stats?.visitsTotal || 0);
+            let isLiked = MonProfil && (MonProfil.likedProfiles || []).includes(user.id);
+            let likeHtml = (MonProfil && user.id !== MonProfil.id) ? `<div class="like-btn-mini ${isLiked?'liked':''}" onclick="event.stopPropagation(); toggleLike('${user.id}')" title="Liker">❤️</div>` : '';
+
+            let displayName = user.name || user.username || 'Utilisateur';
+
+            if(homeViewMode === 'list') {
+                return `
+                    <div class="user-list-item ${isFeatured ? 'featured' : ''}" onclick="navigate('profile', '${user.id}')" style="${isFeatured ? 'border-color: rgba(255, 215, 0, 0.5);' : ''}">
+                        <img src="${user.avatar}" class="user-avatar" alt="${displayName}">
+                        <div class="user-name">
+                            ${displayName} 
+                            ${user.rank && user.rank !== 'base' ? `<span class="rank-badge ${Ranks[user.rank]?.class || 'rank-base'}" style="margin-left:8px;">${Ranks[user.rank]?.name || ''}</span>` : ''}
+                        </div>
+                        <p>${user.subtitle || 'Aucune description'}</p>
+                        ${isFeatured ? '<span class="featured-badge" style="position:relative; margin:0 10px; top:0; right:0;">👑 À la une</span>' : ''}
+                        <div class="user-stats">${statIcon} ${statVal}</div>
+                        ${likeHtml}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="user-card ${isFeatured ? 'featured' : ''}" onclick="navigate('profile', '${user.id}')">
+                    ${isFeatured ? '<span class="featured-badge">👑 À la une</span>' : ''}
+                    ${likeHtml}
+                    <div class="user-card-header">
+                        <img src="${user.avatar}" class="user-avatar" alt="${displayName}">
+                        <div class="user-info">
+                            <div class="user-name">
+                                ${displayName} 
+                                ${user.rank && user.rank !== 'base' ? `<span class="rank-badge ${Ranks[user.rank]?.class || 'rank-base'}">${Ranks[user.rank]?.name || ''}</span>` : ''}
+                            </div>
+                            <div class="user-stats">${statIcon} ${statVal || 0}</div>
+                        </div>
+                    </div>
+                    ${isFeatured && user.featuredDesc ? `<p style="font-size: 13px; color: #ddd; margin-top:8px;">"${user.featuredDesc}"</p>` : `<p style="color:var(--text-dim); font-size:12px; margin-top:8px;">${(user.subtitle || 'Aucune description').substring(0, 60)}...</p>`}
+                </div>
+            `;
+        }
+
+        window.toggleLike = async function(userId) {
+            if(!MonProfil) return;
+            let idx = MonProfil.likedProfiles.indexOf(userId);
+            let targetUser = Utilisateurs.find(u => u.id === userId);
+            if(!targetUser) return;
+
+            if(idx === -1) {
+                MonProfil.likedProfiles.push(userId);
+                targetUser.stats.likesTotal++;
+                targetUser.stats.likesMonth++;
+            } else {
+                MonProfil.likedProfiles.splice(idx, 1);
+                targetUser.stats.likesTotal = Math.max(0, targetUser.stats.likesTotal - 1);
+                targetUser.stats.likesMonth = Math.max(0, targetUser.stats.likesMonth - 1);
+            }
+            
+            try {
+                await fetch('/api/me/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ likedProfiles: MonProfil.likedProfiles })
+                });
+            } catch(e) { console.error(e); }
+
+            if(document.getElementById('home-content')) renderHomeContent();
+            else if(document.querySelector('.profile-wrapper')) navigate('profile', userId);
+        }
+
+        function renderProfile(userId) {
+            let user = null;
+            if (userId === 'me' || (MonProfil && (userId === MonProfil.id || userId === MonProfil.customUrl || userId === MonProfil.username))) {
+                user = MonProfil;
+            } else {
+                user = Utilisateurs.find(u => u.id === userId || u.customUrl === userId || u.username === userId);
+            }
+            
+            if(!user) {
+                viewContainer.innerHTML = `<div class="panel" style="display:flex; justify-content:center; align-items:center; height:100px;"><h2>Profil introuvable ou privé.</h2></div>`;
+                return;
+            }
+
+            const isMe = MonProfil && (userId === 'me' || userId === MonProfil.id);
+            setParentUrl(user.customUrl ? `/${user.customUrl}` : `/${user.id}`);
+
+            const isLiked = !isMe && MonProfil && MonProfil.likedProfiles.includes(user.id);
+            
+            const th = user.customTheme && user.customTheme.active ? user.customTheme : { bg: 'var(--bg)', text: 'var(--text)', border: 'var(--accent)', panelBg: 'rgba(0,0,0,0.2)' };
+            const displayName = user.name || user.username || 'Utilisateur';
+
+            let html = `
+                <div class="profile-wrapper" style="background: ${th.bg}; color: ${th.text};">
+                    <button class="btn-slim-gray nav-btn-floating" onclick="navigate('home')">⬅️ Accueil</button>
+                    
+                    <img src="${user.banner}" class="profile-banner" alt="Bannière">
+                    
+                    <div class="profile-content">
+                        ${isMe ? `<div class="profile-controls">
+                                      <button class="btn-slim-gray" style="background:rgba(0,0,0,0.5); backdrop-filter:blur(5px); justify-content:center;" onclick="navigate('edit')">✏️ Modifier</button>
+                                      <button class="btn-slim-gray" style="background:rgba(74, 222, 128, 0.15); color:var(--krones); border-color:rgba(74, 222, 128, 0.3); backdrop-filter:blur(5px); justify-content:center;" onclick="bumpMe()">🚀 Bump</button>
+                                  </div>` : ''}
+                        ${(!isMe && MonProfil) ? `<div class="profile-controls"><button class="like-main-btn ${isLiked?'liked':''}" onclick="toggleLike('${user.id}')">❤️ Liker (${user.stats?.likesTotal || 0})</button></div>` : ''}
+
+                        <div class="hero-profile">
+                            <div class="avatar-wrap" style="background: ${th.border};">
+                                <img src="${user.avatar}" alt="Avatar" onerror="this.src='/assets/images/logo.jpg';">
+                            </div>
+                            <h1 class="profile-name" style="color: ${th.text}">${displayName} 
+                                ${user.rank && user.rank !== 'base' ? `<span class="rank-badge ${Ranks[user.rank].class}" style="vertical-align: middle;">${Ranks[user.rank].name}</span>` : ''}
+                            </h1>
+                            <p class="profile-subtitle" style="color: ${th.text}; opacity: 0.8;">${user.subtitle || 'Aucune description'}</p>
+                            
+                            <div style="display:flex; gap: 15px; margin-top: 10px; font-size: 13px; opacity: 0.7;">
+                                <span>👁️ ${user.stats?.visitsTotal || 0} visites</span>
+                                <span>❤️ ${user.stats?.likesTotal || 0} likes</span>
+                            </div>
+                        </div>
+
+                        <div style="background: ${th.panelBg}; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 24px; margin-top: 20px;">
+                            <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Liens & Réseaux</h3>
+                            <div class="link-list">
+                                ${(!user.links || user.links.length === 0) ? '<p style="opacity: 0.5;">Aucun lien disponible.</p>' : ''}
+                                ${(user.links || []).map(link => `
+                                    <div class="link-item">
+                                        <div class="link-left">
+                                            <span class="link-icon">${link.reseau === 'custom' && link.custom_icon ? `<img src="${link.custom_icon}" style="width:20px;height:20px;object-fit:contain; border-radius:4px;">` : (NetworkIcons[link.reseau] || '🔗')}</span>
+                                            <div class="link-texts">
+                                                <strong>${link.display_name || link.titre || 'Lien'}</strong>
+                                                <span>${link.sousTitre}</span>
+                                            </div>
+                                        </div>
+                                        ${link.type === 'url' 
+                                            ? `<a class="link-action" href="${link.valeur}" target="_blank" style="background:rgba(255,255,255,0.15)">Visiter</a>`
+                                            : `<button class="link-action" onclick="copierTexte('${link.valeur}', this)" style="background:rgba(255,255,255,0.15)">Copier</button>`
+                                        }
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            viewContainer.innerHTML = html;
+        }
+
+        function renderEdit() {
+            if(!MonProfil) return;
+            let maxLinks = 4 + Ranks[MonProfil.rank].bonusLinks + MonProfil.extraLinkSlots;
+            
+            let html = `
+                <div class="panel">
+                    <button class="btn btn-outline" style="margin-bottom: 20px;" onclick="navigate('profile', 'me')">Retour au profil</button>
+                    <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>⚙️ Modifier le profil</span>
+                        <span class="rank-badge ${Ranks[MonProfil.rank].class}" style="font-size:14px;">Grade : ${Ranks[MonProfil.rank].name}</span>
+                    </h2>
+
+                    <div class="editor-section">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3>⭐ Mise en avant (Profil)</h3>
+                            ${(MonProfil.featuredUntil && MonProfil.featuredUntil > Date.now()) ? `<span style="color:var(--accent-gold); font-size:12px; font-weight:bold;">À la une jusqu'au ${new Date(MonProfil.featuredUntil).toLocaleDateString()}</span>` : ''}
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-dim); margin: 10px 0;">Apparaissez en priorité dans la liste globale "Tous" et dans l'onglet "À la une".</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                            <button class="btn btn-outline" style="border-color:var(--accent-gold); color:var(--accent-gold); padding:6px 12px; font-size:12px;" onclick="buyFeatured(10, 1)">24 Heures (10 Kr)</button>
+                            <button class="btn btn-outline" style="border-color:var(--accent-gold); color:var(--accent-gold); padding:6px 12px; font-size:12px;" onclick="buyFeatured(35, 7)">1 Semaine (35 Kr)</button>
+                            <button class="btn btn-outline" style="border-color:var(--accent-gold); color:var(--accent-gold); padding:6px 12px; font-size:12px;" onclick="buyFeatured(100, 30)">1 Mois (100 Kr)</button>
+                        </div>
+                        <label style="display:flex; align-items:center; gap: 8px; margin-top:15px; font-size:12px; cursor:pointer;">
+                            <input type="checkbox" id="autoRenewFeatured" ${MonProfil.autoRenewFeatured ? 'checked' : ''} onchange="toggleAutoRenew(this.checked)"> Activer le prélèvement automatique (Renouvellement)
+                        </label>
+                    </div>
+
+                    <div class="editor-section">
+                        <h3>Lien personnalisé (Pseudo)</h3>
+                        <p style="font-size: 12px; color: var(--text-dim); margin: 10px 0;">Obtenez une URL unique : <b>synkrone.app/votre-pseudo</b></p>
+                        <div class="form-group" style="flex-direction:row; align-items:center; gap: 10px;">
+                            <span style="color:var(--text-dim)">synkrone.app/</span>
+                            <input type="text" id="editCustomUrl" class="form-control" value="${MonProfil.customUrl || ''}" placeholder="mon-pseudo" ${MonProfil.customUrl ? 'disabled' : ''}>
+                            ${!MonProfil.customUrl ? `<button class="btn btn-outline" style="padding: 6px 12px; font-size:12px;" onclick="buyCustomUrl()">Réserver (200 Kr)</button>` : '<span style="color:var(--krones); font-size:12px; font-weight:bold;">✅ Acquis</span>'}
+                        </div>
+                    </div>
+
+                    <div class="editor-section">
+                        <h3>Visibilité (Achat Permanent)</h3>
+                        <p style="font-size: 12px; color: var(--text-dim); margin: 10px 0;">Sélectionnez qui peut voir votre profil. Achetez les niveaux supérieurs avec des Krones.</p>
+                        
+                        <div class="form-group" style="margin-top: 15px; flex-direction:row; align-items:center; justify-content:space-between;">
+                            <label><input type="radio" name="privacy" value="private" onchange="savePrivacyLocally()" ${MonProfil.privacy === 'private' ? 'checked' : ''}> 🔒 Privé (Gratuit)</label>
+                        </div>
+                        <div class="form-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+                            <label><input type="radio" name="privacy" value="unlisted" onchange="savePrivacyLocally()" ${MonProfil.privacy === 'unlisted' ? 'checked' : ''} ${!MonProfil.unlockedPrivacies.includes('unlisted') ? 'disabled' : ''}> 🔗 Non répertorié</label>
+                            ${!MonProfil.unlockedPrivacies.includes('unlisted') ? `<button class="btn btn-outline" style="padding: 4px 10px; font-size:12px;" onclick="buyPrivacy('unlisted')">🔓 Débloquer (30 Kr)</button>` : '<span style="color:var(--krones); font-size:12px;">Débloqué</span>'}
+                        </div>
+                        <div class="form-group" style="flex-direction:row; align-items:center; justify-content:space-between;">
+                            <label><input type="radio" name="privacy" value="public" onchange="savePrivacyLocally()" ${MonProfil.privacy === 'public' ? 'checked' : ''} ${!MonProfil.unlockedPrivacies.includes('public') ? 'disabled' : ''}> 🌍 Public (Explorer)</label>
+                            ${!MonProfil.unlockedPrivacies.includes('public') ? `<button class="btn btn-outline" style="padding: 4px 10px; font-size:12px;" onclick="buyPrivacy('public')">🔓 Débloquer (${MonProfil.unlockedPrivacies.includes('unlisted') ? '30' : '60'} Kr)</button>` : '<span style="color:var(--krones); font-size:12px;">Débloqué</span>'}
+                        </div>
+                    </div>
+
+                    <div class="editor-section">
+                        <h3>Informations de base</h3>
+                        <div class="form-group" style="margin-top:15px;">
+                            <label>Pseudo (Affichage)</label><input type="text" id="editName" class="form-control" value="${MonProfil.name || MonProfil.username}">
+                        </div>
+                        <div class="form-group">
+                            <label>Description courte</label><input type="text" id="editSub" class="form-control" value="${MonProfil.subtitle}">
+                        </div>
+                        <div class="form-group">
+                            <label>URL Bannière</label><input type="text" id="editBanner" class="form-control" value="${MonProfil.banner}">
+                        </div>
+                    </div>
+
+                    <div class="editor-section">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3>Liens & Réseaux (${MonProfil.links.length} / ${maxLinks})</h3>
+                            <button class="btn btn-outline" style="font-size:12px; padding: 4px 10px;" onclick="buyLinkSlot()">+1 Slot (10 Kr)</button>
+                        </div>
+                        <div id="linksEditorContainer" class="link-edit-list">
+                            <!-- JS Fills this -->
+                        </div>
+                        ${MonProfil.links.length < maxLinks ? `<button class="btn btn-outline" style="margin-top:15px; width:100%" onclick="addEmptyLink()">+ Ajouter un lien</button>` : `<p style="color:var(--accent); font-size:12px; margin-top:10px;">Limite de liens atteinte. Achetez des slots.</p>`}
+                    </div>
+
+                    <div class="editor-section">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3>Personnalisation du Thème</h3>
+                            ${!MonProfil.hasCustomization ? `<button class="btn btn-success" style="font-size:12px; padding: 4px 10px; color:#000;" onclick="buyCustomization()">🔓 Débloquer (50 Kr)</button>` : '<span style="color:var(--krones); font-size:12px;">Débloqué</span>'}
+                        </div>
+                        
+                        <div style="opacity: ${MonProfil.hasCustomization ? '1' : '0.5'}; pointer-events: ${MonProfil.hasCustomization ? 'all' : 'none'}; margin-top: 15px;">
+                            <label style="display:flex; align-items:center; gap: 10px; margin-bottom:15px; cursor:pointer;">
+                                <input type="checkbox" id="themeActive" ${MonProfil.customTheme.active ? 'checked' : ''}> Activer le thème personnalisé
+                            </label>
+                            
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="color-picker-wrap">
+                                    <input type="color" id="themeBg" class="color-picker" value="${MonProfil.customTheme.bg}"> <label>Fond du profil</label>
+                                </div>
+                                <div class="color-picker-wrap">
+                                    <input type="color" id="themeText" class="color-picker" value="${MonProfil.customTheme.text}"> <label>Couleur du texte</label>
+                                </div>
+                                <div class="color-picker-wrap">
+                                    <input type="color" id="themeBorder" class="color-picker" value="${MonProfil.customTheme.border}"> <label>Contour Avatar</label>
+                                </div>
+                                <div class="color-picker-wrap">
+                                    <input type="color" id="themePanelBg" class="color-picker" value="${MonProfil.customTheme.panelBg.startsWith('#') ? MonProfil.customTheme.panelBg : '#333333'}"> <label>Fond Rubrique</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button class="btn btn-primary" onclick="saveFullProfile()">💾 Enregistrer tout</button>
+                    </div>
+                </div>
+            `;
+            viewContainer.innerHTML = html;
+            renderLinksEditor();
+        }
+
+        window.buyFeatured = function(cost, days) {
+            showModal("Mise en avant", `Voulez-vous payer <b>${cost} Krones</b> pour mettre votre profil à la une pendant <b>${days} jour(s)</b> ?`, "Acheter", async () => {
+                if(MonProfil.krones >= cost) {
+                    try {
+                        const isAuto = document.getElementById('autoRenewFeatured') ? document.getElementById('autoRenewFeatured').checked : false;
+                        const res = await fetch('/api/discord/me/buy-featured', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ days, cost, autoRenew: isAuto })
+                        });
+                        const data = await res.json();
+                        
+                        if (res.ok) {
+                            MonProfil.krones = data.krone;
+                            MonProfil.featuredUntil = data.featuredUntil;
+                            MonProfil.featured = true;
+                            syncUserToParent();
+                            renderEdit();
+                            showModal("Succès", "Votre profil est maintenant mis en avant !", "Super", null);
+                        } else {
+                            showModal("Erreur", data.error || "Achat impossible.", "Fermer", null);
+                        }
+                    } catch(e) {
+                        showModal("Erreur", "Problème réseau.", "Fermer", null);
+                    }
+                } else {
+                    showModal("Erreur", "Fonds insuffisants.", "Fermer", null);
+                }
+            });
+        }
+        
+        window.toggleAutoRenew = async function(checked) {
+            MonProfil.autoRenewFeatured = checked;
+            fetch('/api/me/profile', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ autoRenewFeatured: checked })
+            });
+        }
+
+        window.buyCustomUrl = function() {
+            const input = document.getElementById('editCustomUrl').value.trim().toLowerCase();
+            if(!input) return showModal("Erreur", "Veuillez entrer un pseudo.", "Fermer", null);
+            if(!/^[a-z0-9-]+$/.test(input)) return showModal("Erreur", "Le pseudo ne doit contenir que des lettres, chiffres et tirets.", "Fermer", null);
+
+            showModal("Confirmation d'achat", `Voulez-vous réserver l'URL <b>synkrone.app/${input}</b> de façon définitive pour <b>200 Krones</b> ?`, "Acheter", async () => {
+                if(MonProfil.krones >= 200) {
+                    try {
+                        const res = await fetch('/api/me/profile', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ customUrl: input, krone: MonProfil.krones - 200 })
+                        });
+                        const data = await res.json();
+                        if(res.ok) {
+                            MonProfil.krones -= 200;
+                            MonProfil.customUrl = input;
+                            syncUserToParent();
+                            renderEdit();
+                            showModal("Félicitations", "Votre URL personnalisée a été enregistrée !", "Super", null);
+                        } else {
+                            showModal("Erreur", data.message || "Erreur lors de l'achat. Pseudo indisponible.", "Fermer", null);
+                        }
+                    } catch(e) {
+                        showModal("Erreur", "Problème de connexion.", "Fermer", null);
+                    }
+                } else {
+                    showModal("Erreur", "Fonds insuffisants.", "Fermer", null);
+                }
+            });
+        }
+
+        function renderLinksEditor() {
+            const container = document.getElementById('linksEditorContainer');
+            if(!container) return;
+            
+            container.innerHTML = MonProfil.links.map((link, index) => {
+                const isCustom = link.reseau === 'custom';
+                return `
+                <div class="link-edit-item" style="flex-wrap: wrap; gap: 8px;">
+                    <select class="form-control" style="width:120px;" onchange="updateLinkData(${index}, 'reseau', this.value); renderEdit();">
+                        ${Object.keys(NetworkIcons).map(k => `<option value="${k}" ${link.reseau === k ? 'selected' : ''}>${k.charAt(0).toUpperCase() + k.slice(1)}</option>`).join('')}
+                    </select>
+                    ${isCustom ? `<input type="text" class="form-control" style="flex:1; min-width:120px;" placeholder="URL de l'image (logo)" value="${link.custom_icon || ''}" oninput="updateLinkData(${index}, 'custom_icon', this.value)">` : ''}
+                    <input type="text" class="form-control" style="flex:1; min-width:120px;" placeholder="Nom d'affichage" value="${link.display_name || link.titre || ''}" oninput="updateLinkData(${index}, 'display_name', this.value); updateLinkData(${index}, 'titre', this.value);">
+                    <input type="text" class="form-control" style="flex:1; min-width:120px;" placeholder="Sous-titre (option.)" value="${link.sousTitre || ''}" oninput="updateLinkData(${index}, 'sousTitre', this.value)">
+                    <input type="text" class="form-control" style="flex:1.5; min-width:150px;" placeholder="URL cible ou texte à copier" value="${link.valeur || ''}" oninput="updateLinkData(${index}, 'valeur', this.value)">
+                    <select class="form-control" style="width:90px;" onchange="updateLinkData(${index}, 'type', this.value)">
+                        <option value="url" ${link.type === 'url' ? 'selected' : ''}>URL</option>
+                        <option value="copy" ${link.type === 'copy' ? 'selected' : ''}>Copie</option>
+                    </select>
+                    <button class="btn btn-outline" style="border-color:var(--accent); color:var(--accent); padding: 8px;" onclick="removeLink(${index})">🗑️</button>
+                </div>
+                `;
+            }).join('');
+        }
+
+        window.updateLinkData = function(index, field, value) { MonProfil.links[index][field] = value; }
+        window.removeLink = function(index) { MonProfil.links.splice(index, 1); renderEdit(); }
+        window.addEmptyLink = function() { 
+            MonProfil.links.push({ reseau: 'custom', titre: '', sousTitre: '', valeur: '', type: 'url' }); 
+            renderEdit(); 
+        }
+
+        window.savePrivacyLocally = function() {
+            let el = document.querySelector('input[name="privacy"]:checked');
+            if(el) MonProfil.privacy = el.value;
+        }
+
+        window.saveFullProfile = async function() {
+            const payload = {
+                subtitle: document.getElementById('editSub').value,
+                banner: document.getElementById('editBanner').value,
+                privacy: MonProfil.privacy,
+                links: MonProfil.links
+            };
+            MonProfil.name = document.getElementById('editName').value;
+            
+            if(MonProfil.hasCustomization) {
+                payload.customTheme = {
+                    active: document.getElementById('themeActive').checked,
+                    bg: document.getElementById('themeBg').value,
+                    text: document.getElementById('themeText').value,
+                    border: document.getElementById('themeBorder').value,
+                    panelBg: document.getElementById('themePanelBg').value
+                };
+            }
+
+            try {
+                const res = await fetch('/api/me/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    MonProfil = { ...MonProfil, ...payload };
+                    showModal("Succès", "Votre profil a été sauvegardé avec succès.", "Super !", () => navigate('profile', 'me'));
+                } else {
+                    showModal("Erreur", "La sauvegarde a échoué.", "Fermer", null);
+                }
+            } catch (e) {
+                showModal("Erreur", "Problème réseau.", "Fermer", null);
+            }
+        }
+
+        window.buyPrivacy = function(target) {
+            let cost = target === 'unlisted' ? 30 : (MonProfil.unlockedPrivacies.includes('unlisted') ? 30 : 60);
+            showModal("Confirmation d'achat", `Voulez-vous débloquer la visibilité <b>${target}</b> pour <b>${cost} Krones</b> ? L'achat est permanent.`, "Acheter", async () => {
+                if(MonProfil.krones >= cost) {
+                    const newUnlocked = [...MonProfil.unlockedPrivacies];
+                    if(target === 'public' && !newUnlocked.includes('unlisted')) newUnlocked.push('unlisted');
+                    newUnlocked.push(target);
+
+                    try {
+                        const res = await fetch('/api/me/profile', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ unlockedPrivacies: newUnlocked, privacy: target, krone: MonProfil.krones - cost })
+                        });
+                        if (res.ok) {
+                            MonProfil.krones -= cost;
+                            MonProfil.unlockedPrivacies = newUnlocked;
+                            MonProfil.privacy = target;
+                            syncUserToParent();
+                            renderEdit();
+                        }
+                    } catch (e) {}
+                } else {
+                    showModal("Erreur", "Fonds insuffisants. Il vous manque des Krones.", "Fermer", null);
+                }
+            });
+        }
+
+        window.buyLinkSlot = function() {
+            showModal("Acheter un Slot", "Voulez-vous ajouter un emplacement de lien supplémentaire de façon permanente pour <b>10 Krones</b> ?", "Acheter", async () => {
+                if(MonProfil.krones >= 10) {
+                    try {
+                        const res = await fetch('/api/me/profile', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ extraLinkSlots: MonProfil.extraLinkSlots + 1, krone: MonProfil.krones - 10 })
+                        });
+                        if (res.ok) {
+                            MonProfil.krones -= 10;
+                            MonProfil.extraLinkSlots += 1;
+                            syncUserToParent();
+                            renderEdit();
+                        }
+                    } catch (e) {}
+                } else {
+                    showModal("Erreur", "Fonds insuffisants.", "Fermer", null);
+                }
+            });
+        }
+
+        window.buyCustomization = function() {
+            showModal("Débloquer la personnalisation", "Débloquez les couleurs et thèmes de profil de façon permanente pour <b>50 Krones</b> ?", "Acheter", async () => {
+                if(MonProfil.krones >= 50) {
+                    try {
+                        const res = await fetch('/api/me/profile', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ hasCustomization: true, krone: MonProfil.krones - 50 })
+                        });
+                        if (res.ok) {
+                            MonProfil.krones -= 50;
+                            MonProfil.hasCustomization = true;
+                            syncUserToParent();
+                            renderEdit();
+                        }
+                    } catch (e) {}
+                } else {
+                    showModal("Erreur", "Fonds insuffisants.", "Fermer", null);
+                }
+            });
+        }
+
+        window.copierTexte = function(texte, btn) {
+            navigator.clipboard.writeText(texte).then(() => {
+                const ancien = btn.innerHTML;
+                btn.innerHTML = '✅ Copié';
+                setTimeout(() => { btn.innerHTML = ancien; }, 1500);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initData);
+
+    </script>
+</body>
+</html>
