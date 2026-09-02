@@ -1,0 +1,15 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "723720252134785057": {
+            "name": "gruegrie",
+            "timestamp": "06/08/2026 16:19",
+            "flagged": "https://google.com"
+        }
+    }
+}

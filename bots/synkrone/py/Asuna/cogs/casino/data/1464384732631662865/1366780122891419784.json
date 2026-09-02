@@ -1,0 +1,37 @@
+{
+    "Cols": 57244,
+    "honneur": 3,
+    "rob_received": {
+        "date": "2026-04-19",
+        "count": 2
+    },
+    "rob_data": {
+        "rob_date": "2026-05-08",
+        "targets_today": [
+            "1035192272301596792"
+        ],
+        "hourly_robs": [
+            "2026-05-08T11:18:09.316121"
+        ]
+    },
+    "stats": {
+        "rob_backfire": 1,
+        "rob_success": 1
+    },
+    "achievements": {
+        "rob_backfire": {
+            "tier": 1,
+            "dates": {
+                "1": "19/04/2026 14:54"
+            }
+        },
+        "rob_success": {
+            "tier": 1,
+            "dates": {
+                "1": "08/05/2026 11:18"
+            }
+        }
+    },
+    "Honneurs": 0,
+    "last_weekly": "2026-05-03T22:08:57.581448+02:00"
+}

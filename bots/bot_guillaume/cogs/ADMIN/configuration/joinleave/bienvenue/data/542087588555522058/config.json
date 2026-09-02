@@ -1,0 +1,13 @@
+{
+    "channel_id": 649366004899512325,
+    "embed_title": "Bienvenue à la {guild}",
+    "embed_description": "{user.mention} a rejoins la taverne !",
+    "content_message": "On paye tous un verre à {user.mention} ! :beers:",
+    "background_mode": "upload",
+    "background_url": "",
+    "bg_color_1": "#2c2f33",
+    "bg_color_2": "",
+    "banner_user": "author",
+    "banner_fallback_enabled": false,
+    "banner_fallback_mode": "upload"
+}

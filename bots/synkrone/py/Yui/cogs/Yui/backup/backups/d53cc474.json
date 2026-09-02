@@ -1,0 +1,179 @@
+{
+    "info": {
+        "name": "Test Backup",
+        "icon_url": "https://cdn.discordapp.com/icons/1481788380609118329/dd44ce5c2e14187a0bdadd2dd1defc9b.png?size=1024",
+        "date": "21/03/26 - 11:29",
+        "id": "d53cc474",
+        "creator_id": "1366780122891419784"
+    },
+    "roles": [
+        {
+            "name": "Expert Dev",
+            "color": 2123412,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Bot Manager",
+            "color": 15158332,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "H\u00e9bergeur",
+            "color": 15277667,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Dev Helper",
+            "color": 15277667,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Mainteneur",
+            "color": 11342935,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Support Team",
+            "color": 12745742,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": true
+        },
+        {
+            "name": "Community Manager",
+            "color": 15844367,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Designer",
+            "color": 15277667,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Contributeur",
+            "color": 15158332,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Giveawaiy",
+            "color": 12745742,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Partenaires",
+            "color": 767,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Boosteur",
+            "color": 15139071,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Responsable activit\u00e9s",
+            "color": 61695,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "D\u00e9veloppeur bots",
+            "color": 15105570,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "D\u00e9veloppeur serveur",
+            "color": 16711882,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "D\u00e9veloppeur web",
+            "color": 15277667,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Assistant staff",
+            "color": 3447003,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Staff",
+            "color": 5918136,
+            "permissions": 1721807559716807,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Mod\u00e9rateur",
+            "color": 15158332,
+            "permissions": 1720707884502769,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "G\u00e9rant",
+            "color": 3066993,
+            "permissions": 1716307519548657,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Fondateur",
+            "color": 15277667,
+            "permissions": 1721835208572927,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Co fondateur",
+            "color": 15277667,
+            "permissions": 8864258447638527,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udc51",
+            "color": 0,
+            "permissions": 1829587348619023,
+            "hoist": false,
+            "mentionable": false
+        }
+    ],
+    "categories": [
+        {
+            "name": "oui",
+            "overwrites": [],
+            "channels": []
+        }
+    ]
+}

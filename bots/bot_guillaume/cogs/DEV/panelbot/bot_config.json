@@ -1,0 +1,13 @@
+{
+    "presences": [
+        "⚡{name} {version} - {ping} ms",
+        "👥 {users} membres",
+        "❓ {prefix}help pour plus d'info",
+        "✨ Prefix : [{prefix}]"
+    ],
+    "delay": 15,
+    "status": "online",
+    "prefix": "*",
+    "sync_mode": "global",
+    "version": "𝑽1"
+}

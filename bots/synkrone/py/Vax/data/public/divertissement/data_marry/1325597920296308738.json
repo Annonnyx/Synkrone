@@ -1,0 +1,18 @@
+{
+    "user_name": "Lyzzie",
+    "points": 0,
+    "marriages_count": 1,
+    "refusals_received": 0,
+    "refusals_given": 0,
+    "current_marriages": [
+        {
+            "partner_id": 1455611676933226723,
+            "partner_name": "La OWNEUSE 🪽",
+            "timestamp": 1782766005,
+            "proposer_id": 1455611676933226723
+        }
+    ],
+    "history": [
+        "[29/06/26][20:46] Vous avez accepté la demande en mariage de <@1455611676933226723>."
+    ]
+}

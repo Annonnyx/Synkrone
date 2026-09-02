@@ -1,0 +1,9 @@
+{
+    "enabled": true,
+    "threshold": 99,
+    "timeframe": 10,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {}
+}

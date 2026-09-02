@@ -1,0 +1,30 @@
+{
+    "1": {
+        "commandes": "clear",
+        "description": "Permission 1 - Non configurée",
+        "associations": [
+            "Utilisateur: <@723720252134785057>",
+            "Rôle: <@&1478772600367878297>"
+        ]
+    },
+    "2": {
+        "commandes": "Aucune",
+        "description": "Permission 2 - Non configurée"
+    },
+    "3": {
+        "commandes": "Aucune",
+        "description": "Permission 3 - Non configurée"
+    },
+    "4": {
+        "commandes": "Aucune",
+        "description": "Permission 4 - Non configurée"
+    },
+    "5": {
+        "commandes": "Aucune",
+        "description": "Permission 5 - Non configurée"
+    },
+    "6": {
+        "commandes": "Aucune",
+        "description": "Permission 6 - Non configurée"
+    }
+}

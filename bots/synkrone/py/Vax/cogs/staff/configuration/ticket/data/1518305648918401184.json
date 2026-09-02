@@ -1,0 +1,17 @@
+{
+    "enabled": true,
+    "channel_id": 1518311382251077672,
+    "category_id": 1518311378966937651,
+    "archive_id": 1518311378966937651,
+    "support_role_id": 1518327264750862467,
+    "msg_id": 1518311383542923541,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": null,
+    "ticket_count": 0
+}

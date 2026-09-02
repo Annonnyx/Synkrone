@@ -1,0 +1,102 @@
+{
+    "1499122996185530485": {
+        "author_id": 1507832953449746472,
+        "timestamp": "2026-06-16T15:14:51.057671+00:00",
+        "type": "del",
+        "content": "+lockall"
+    },
+    "1499122996185530486": {
+        "author_id": 1505259511781261404,
+        "timestamp": "2026-06-16T08:40:06.794811+00:00",
+        "type": "del",
+        "content": "S?u"
+    },
+    "1499122995744997496": {
+        "author_id": 1347282129247277157,
+        "timestamp": "2026-06-15T14:17:25.054013+00:00",
+        "type": "del",
+        "content": ""
+    },
+    "1516078395413500121": {
+        "author_id": 1347282129247277157,
+        "timestamp": "2026-06-15T14:37:24.531338+00:00",
+        "type": "del",
+        "content": "C ou"
+    },
+    "1516081672926527499": {
+        "author_id": 977950967704195113,
+        "timestamp": "2026-06-16T13:01:14.280617+00:00",
+        "type": "del",
+        "content": "lock le salon"
+    },
+    "1499122994948210853": {
+        "author_id": 1153367806386126948,
+        "timestamp": "2026-06-15T15:34:26.643801+00:00",
+        "type": "edit",
+        "old": "# ⛩️ Bienvenue sur Akari!\n\n-# :g_giveaways: Un serveur accueillant où bonne humeur, rencontres et fun sont toujours au rendez-vous !\n\n<:boost:1502270082649424032> **Hey, bienvenue parmi nous !** Akari, c’est un espace de détente où tu peux parler avec tout le monde, faire de nouvelles connaissances et profiter d’une communauté super active. Entre les conversations, les animations et les giveaways, il y'a toujours quelque chose à faire !\n\n> :iconmember_20: Une ambiance vivante, des membres cools et un staff présent pour répondre à tes questions. Peu importe l’heure, tu trouveras toujours quelqu’un pour discuter, rigoler ou passer le temps avec toi !\n\n__Quelques infos importantes pour bien commencer :__\n\n- `🔔` **Configurer tes notifications :** utilise <id:customize> afin de choisir celles que tu veux recevoir.\n-  `📄` **Besoin d’aide ou envie de signaler un souci ? **Tu peux contacter un membre du staff directement en message privé.\n- `📩`  **Envie de rejoindre le staff ?** Ouvre un ticket dans <#1516081672926527499> pour envoyer ta candidature.\n\nMaintenant, mets-toi à l’aise et profite pleinement de l’ambiance !",
+        "new": "# ⛩️ Bienvenue sur Akari!\n\n Un serveur accueillant où bonne humeur, rencontres et fun sont toujours au rendez-vous !\n\n<:boost:1502270082649424032> **Hey, bienvenue parmi nous !** Akari, c’est un espace de détente où tu peux parler avec tout le monde, faire de nouvelles connaissances et profiter d’une communauté super active. Entre les conversations, les animations et les giveaways, il y'a toujours quelque chose à faire !\n\n> <:iconmember_20:1502291465924247683> Une ambiance vivante, des membres cools et un staff présent pour répondre à tes questions. Peu importe l’heure, tu trouveras toujours quelqu’un pour discuter, rigoler ou passer le temps avec toi !\n\n__Quelques infos importantes pour bien commencer :__\n\n- `🔔` **Configurer tes notifications :** utilise <id:customize> afin de choisir celles que tu veux recevoir.\n-  `📄` **Besoin d’aide ou envie de signaler un souci ? **Tu peux contacter un membre du staff directement en message privé.\n- `📩`  **Envie de rejoindre le staff ?** Ouvre un ticket dans <#1516081672926527499> pour envoyer ta candidature.\n\nMaintenant, mets-toi à l’aise et profite pleinement de l’ambiance !"
+    },
+    "1499122996185530479": {
+        "author_id": 1153367806386126948,
+        "timestamp": "2026-06-15T15:44:15.134437+00:00",
+        "type": "del",
+        "content": "⛩️"
+    },
+    "1499122995744997502": {
+        "author_id": 1153367806386126948,
+        "timestamp": "2026-06-15T15:45:36.878056+00:00",
+        "type": "edit",
+        "old": "## AKONA RECRUTE !!!\n\n\n:fleche: **Tu souhaites intégrer le staff de _AKARI ⛩️ __, mais tu ne sais pas comment t'y prendre ?**\n\n\nEh bien, c'est très simple ! Il te suffit de remplir les conditions suivantes :\n\n1. Être âgé de minimum **15 ans**.\n2. Avoir un total de minimum **100 messages** et/ou **1h** de **vocal**.\n\nUne fois toutes ces conditions remplies, tu peux ouvrir un ticket gestion staff dans <#1516081672926527499> afin d’être rank !\n\n*__Rappel__ : Les staffs sont les piliers du serveur, c’est pour cela qu’il est primordial de ne pas prendre ce rôle à la rigolade !*\n\n<@&1516090678277570622>",
+        "new": "## AKARI RECRUTE !!!\n\n\n<:fleche:1493646598348079104> **Tu souhaites intégrer le staff de _AKARI ⛩️ __, mais tu ne sais pas comment t'y prendre ?**\n\n\nEh bien, c'est très simple ! Il te suffit de remplir les conditions suivantes :\n\n1. Être âgé de minimum **15 ans**.\n2. Avoir un total de minimum **100 messages** et/ou **1h** de **vocal**.\n\nUne fois toutes ces conditions remplies, tu peux ouvrir un ticket gestion staff dans <#1516081672926527499> afin d’être rank !\n\n*__Rappel__ : Les staffs sont les piliers du serveur, c’est pour cela qu’il est primordial de ne pas prendre ce rôle à la rigolade !*\n\n<@&1516090678277570622>"
+    },
+    "1499122996735115427": {
+        "author_id": 912035625190961182,
+        "timestamp": "2026-06-16T08:37:56.791805+00:00",
+        "type": "del",
+        "content": "<@1347282129247277157><@1097537017115574343>jvais tous vous marier"
+    },
+    "1516078395413500117": {
+        "author_id": 1505259511781261404,
+        "timestamp": "2026-06-16T08:45:58.540691+00:00",
+        "type": "del",
+        "content": "<@&1516090678277570622>"
+    },
+    "1499122997556940879": {
+        "author_id": 1507832953449746472,
+        "timestamp": "2026-06-16T15:13:06.069708+00:00",
+        "type": "del",
+        "content": "<@1153367806386126948>"
+    },
+    "1516111973857890324": {
+        "author_id": 1505259511781261404,
+        "timestamp": "2026-06-16T10:26:24.303384+00:00",
+        "type": "del",
+        "content": ""
+    },
+    "1499122996185530481": {
+        "author_id": 1505259511781261404,
+        "timestamp": "2026-06-16T12:51:01.908588+00:00",
+        "type": "del",
+        "content": "@everyone"
+    },
+    "1499122994948210854": {
+        "author_id": 1505259511781261404,
+        "timestamp": "2026-06-16T12:58:58.640360+00:00",
+        "type": "edit",
+        "old": "**Pour récupérer vos rôles:**\n@everyone",
+        "new": "**Pour récupérer vos rôles:**"
+    },
+    "1499122997867577444": {
+        "author_id": 1505259511781261404,
+        "timestamp": "2026-06-16T13:37:41.085005+00:00",
+        "type": "edit",
+        "old": "#  _ _                〃***AKARI***  <a:angelBUtterflyypink:1502384208063107103> \n\n                                         ─\n  ₊ ˚ ⋅   # *social* ***!***    <:blueheart_11:1510744130173665441> \n                    *serveur* ﹒ __**communautaire**__    〃\n*!*           [ の](https://discord.gg/kge9wQMcr )‧˚ ◌                ：            *social* & ***chill***   ‧₊˚\n─ _ _ _ _        __*nitro*__ **&** __*décorations*__             **/akari**",
+        "new": "#  _ _                〃***AKARI***  <a:angelBUtterflyypink:1502384208063107103> \n\n                                         ─\n  ₊ ˚ ⋅   # *social* ***!***    <:blueheart_11:1510744130173665441> \n                    *serveur* ﹒ __**communautaire**__    〃\n*!* ](https://discord.gg/kge9wQMcr )‧˚ ◌                ：            *social* & ***chill***   ‧₊˚\n─ _ _ _ _        __*nitro*__ **&** __*décorations*__             **/akari**"
+    },
+    "1499122997867577445": {
+        "author_id": 1505259511781261404,
+        "timestamp": "2026-06-16T13:33:32.294053+00:00",
+        "type": "del",
+        "content": "@everyone"
+    }
+}

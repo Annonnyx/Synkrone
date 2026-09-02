@@ -1,0 +1,16 @@
+{
+    "message_id": 1511857780657618976,
+    "channel_id": 1462102150518931496,
+    "guild_id": 1379789716076892220,
+    "host_id": 1366780122891419784,
+    "prize": "Nitro",
+    "winners": 1,
+    "end_timestamp": 1780528954.188931,
+    "req_role": null,
+    "block_role": null,
+    "participants": [
+        1366780122891419784
+    ],
+    "ended": false,
+    "locked": false
+}

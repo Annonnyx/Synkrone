@@ -1,0 +1,17 @@
+{
+    "config": {
+        "role": {
+            "actif": true,
+            "seuil": 3,
+            "temps": 10,
+            "action": "D\u00e9rank"
+        },
+        "everyone": {
+            "actif": false,
+            "seuil": 2,
+            "temps": 60,
+            "action": "Kick"
+        }
+    },
+    "whitelist": []
+}

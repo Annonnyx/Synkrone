@@ -1,0 +1,131 @@
+{
+    "module_enabled": true,
+    "ch_stats_text": 1505326921653948486,
+    "delay": 30,
+    "fields": [
+        "total",
+        "humans",
+        "bots",
+        "online_total",
+        "vocal_total",
+        "record_vocal",
+        "msg_24h",
+        "msg_week",
+        "msg_month"
+    ],
+    "last_stats": {
+        "total": 8,
+        "humans": 5,
+        "bots": 3,
+        "boosts": 0,
+        "online_total": 5,
+        "online_humans": 2,
+        "online_bots": 3,
+        "vocal_total": 0,
+        "vocal_stream": 0,
+        "vocal_cam": 0,
+        "vocal_muted": 0,
+        "vocal_deaf": 0,
+        "msg_24h": 0,
+        "msg_week": 0,
+        "msg_month": 0,
+        "top_vocal_id": null,
+        "top_vocal_val": 0,
+        "top_msg_day_id": null,
+        "top_msg_day_val": 0,
+        "top_msg_week_id": null,
+        "top_msg_week_val": 0,
+        "top_msg_month_id": null,
+        "top_msg_month_val": 0,
+        "records": {
+            "members": {
+                "value": 12,
+                "date": "21/05/2026"
+            },
+            "online": {
+                "value": 10,
+                "date": "21/05/2026"
+            },
+            "vocal": {
+                "value": 0,
+                "date": "N/A"
+            },
+            "boosts": {
+                "value": 0,
+                "date": "N/A"
+            },
+            "msg_24h": {
+                "value": 7,
+                "date": "16/05/2026"
+            },
+            "msg_week": {
+                "value": 7,
+                "date": "16/05/2026"
+            },
+            "msg_month": {
+                "value": 14,
+                "date": "27/05/2026"
+            }
+        }
+    },
+    "records": {
+        "members": {
+            "value": 12,
+            "date": "21/05/2026"
+        },
+        "online": {
+            "value": 10,
+            "date": "21/05/2026"
+        },
+        "vocal": {
+            "value": 0,
+            "date": "N/A"
+        },
+        "boosts": {
+            "value": 0,
+            "date": "N/A"
+        },
+        "msg_24h": {
+            "value": 7,
+            "date": "16/05/2026"
+        },
+        "msg_week": {
+            "value": 7,
+            "date": "16/05/2026"
+        },
+        "msg_month": {
+            "value": 14,
+            "date": "27/05/2026"
+        }
+    },
+    "msg_history": {
+        "daily": {
+            "2026-05-16": 7,
+            "2026-05-21": 2,
+            "2026-05-26": 1,
+            "2026-05-27": 4,
+            "2026-06-24": 1
+        },
+        "weekly": {
+            "2026-W19": 7,
+            "2026-W20": 2,
+            "2026-W21": 5,
+            "2026-W25": 1
+        },
+        "monthly": {
+            "2026-05": 14,
+            "2026-06": 1
+        }
+    },
+    "user_activity": {
+        "voice_all_time": {},
+        "msg": {
+            "date_day": "2026-09-02",
+            "daily": {},
+            "date_week": "2026-W35",
+            "weekly": {},
+            "date_month": "2026-09",
+            "monthly": {}
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "user_name": "Vyx",
+    "warns": [
+        {
+            "id": "978f7bfd",
+            "staff_id": 1366780122891419784,
+            "staff_name": "𝑽𝒆𝒙",
+            "staff_rank": "Propriétaire",
+            "raison": "test",
+            "timestamp": "19/01/2026 à 22:21"
+        },
+        {
+            "id": "35a4f5be",
+            "staff_id": 1366780122891419784,
+            "staff_name": "𝑽𝒆𝒙",
+            "staff_rank": "Propriétaire",
+            "raison": "test",
+            "timestamp": "19/01/2026 à 22:21"
+        }
+    ]
+}

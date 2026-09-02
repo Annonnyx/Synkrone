@@ -1,0 +1,180 @@
+{
+    "1485312285684662365": {
+        "author_id": 1376883126902718557,
+        "timestamp": "2026-06-15T05:40:27.089000+00:00",
+        "type": "del",
+        "content": ""
+    },
+    "1491791962787811348": {
+        "author_id": 1214459543057342546,
+        "timestamp": "2026-04-11T16:57:12.949712+00:00",
+        "type": "del",
+        "content": "Qui a fait cette candidature"
+    },
+    "1492582461606199306": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-11T19:26:13.776341+00:00",
+        "type": "edit",
+        "old": "[11/04/2026 19:07:06] [FREE - 1452695672473260069] Connecté en tant que France RP - 27 cogs chargés (4 erreurs)\n[11/04/2026 19:07:06] [FREE - 1452695672473260069] Erreurs de chargement : cogs.STAFF.ticket.util.embed_private, cogs.STAFF.ticket.util.config_util, cogs.STAFF.ticket.util.embed_launcher, cogs.STAFF.ticket.util.embed_admin",
+        "new": "[11/04/2026 19:07:06] [FREE - 1452695672473260069] Connecté en tant que France RP - 27 cogs chargés (4 erreurs)\n```diff\n- [11/04/2026 19:07:06] [FREE - 1452695672473260069] Erreurs de chargement : cogs.STAFF.ticket.util.embed_private, cogs.STAFF.ticket.util.config_util, cogs.STAFF.ticket.util.embed_launcher, cogs.STAFF.ticket.util.embed_admin\n```"
+    },
+    "1491535867561640106": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-12T20:32:52.485995+00:00",
+        "type": "del",
+        "content": "<@1378696082283823136>"
+    },
+    "1492986234526502953": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-12T20:34:31.149880+00:00",
+        "type": "del",
+        "content": "!embed"
+    },
+    "1493307364470816819": {
+        "author_id": 1475792668822077501,
+        "timestamp": "2026-04-13T19:23:28.692266+00:00",
+        "type": "del",
+        "content": "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"
+    },
+    "1493527430097272873": {
+        "author_id": 1474411264343146660,
+        "timestamp": "2026-04-17T16:47:34.550151+00:00",
+        "type": "del",
+        "content": "!bot"
+    },
+    "1495021609659142175": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-19T15:32:59.453595+00:00",
+        "type": "del",
+        "content": ""
+    },
+    "1491445788449046528": {
+        "author_id": 1378696082283823136,
+        "timestamp": "2026-04-26T13:56:49.541944+00:00",
+        "type": "edit",
+        "old": "Et aussi c'est quel commande pour ranger ?",
+        "new": "J'ai vue laisse tomber"
+    },
+    "1496985809503518770": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-24T19:42:37.624224+00:00",
+        "type": "del",
+        "content": "!invit"
+    },
+    "1497318464589660292": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-24T19:35:23.666779+00:00",
+        "type": "edit",
+        "old": "/solde\nAffiche l’argent que possède un joueur.\n\n/weekly\nDonne une récompense chaque semaine./create-account\nCrée un compte pour commencer à jouer.\n\n/balance\nAffiche ton argent (similaire à /solde).\n\n/stats\nMontre tes statistiques (gains, pertes, etc.).\n\n\nAffiche ton niveau ou classement.\n\n\n\n\n# CASINO\n/flex /highroller /claim-vip /vip /bonus /work /transfer /withdraw /deposit /loterie /bet /dice /rank\n# STAFF CASINO\n/logs /mute /ban /reset /remove-money /add-money \n# AUTRES PUBLIC\n/meme /invites\n# AUTRES STAFF\n/greroll /gend  /gstart",
+        "new": "# CASINO PUBLIC\n/flex /highroller /claim-vip /vip /bonus /work /transfer /withdraw /deposit /loterie /bet /dice /rank /solde /weekly /create-account /balance /stats\n# STAFF CASINO\n/logs /mute /ban /reset /remove-money /add-money \n# AUTRES PUBLIC\n/meme /invites\n# AUTRES STAFF\n/greroll /gend  /gstart"
+    },
+    "1497354622292070571": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-26T17:26:52.124843+00:00",
+        "type": "edit",
+        "old": "`/convert` \n- Transformer un Honneur en Cols coutera 5% de taxe\n- Simplification : Désormais on achète ou on vend des honneurs, ceci évite les vols de cols, quand on vendait 1 000 000 cols pour avoir 3 honneurs\n- Le modal affiche la valeur max achetable ou vendable",
+        "new": "`/convert` \n- Transformer un Honneur en Cols coutera 5% de taxe\n- Simplification : Désormais on achète ou on vend des honneurs, ceci évite les vols de cols, quand on vendait 1 000 000 cols pour avoir 3 honneurs\n- Le modal affiche la valeur max achetable ou vendable\n- 1 honneur coûte : 100 000 (avec une taxe de 5% à la revente)"
+    },
+    "1497533232168566796": {
+        "author_id": 1475421794717663354,
+        "timestamp": "2026-04-26T16:03:44.512984+00:00",
+        "type": "edit",
+        "old": "NN",
+        "new": "Nn ?"
+    },
+    "1497575690269233274": {
+        "author_id": 1474411264343146660,
+        "timestamp": "2026-04-29T16:27:35.204991+00:00",
+        "type": "del",
+        "content": "@everyone\n━━━━━━━━━━━━━━━━━━━━━━\n🚨  MARNE RP — SERVEUR ROLEPLAY STRICT\n━━━━━━━━━━━━━━━━━━━━━━\n\n🏙️ Un serveur inspiré du RP réaliste type Emergency Hamburg  \n🎯 Immersion totale • Discipline • Professionnalisme  \n\n━━━━━━━━━━━━━━━━━━━━━━\n🔥 CE QUE NOUS PROPOSONS :\n━━━━━━━━━━━━━━━━━━━━━━\n\n🚓 POLICE RP ULTRA RÉALISTE  \n🚑 SAMU AVEC PROCÉDURES MÉDICALES  \n📋 RÈGLEMENT STRICT & STRUCTURÉ  \n👑 STAFF SÉRIEUX ET ACTIF  \n🤝 COMMUNAUTÉ MATURE  \n\n━━━━━━━━━━━━━━━━━━━━━━\n⚖️ NOTRE OBJECTIF :\n━━━━━━━━━━━━━━━━━━━━━━\n\nCréer un environnement :\n• réaliste  \n• immersif  \n• sans troll  \n• sans abus  \n\n👉 Ici, le RP est pris au sérieux.\n\n━━━━━━━━━━━━━━━━━━━━━━\n🚫 CE QUE NOUS REFUSONS :\n━━━━━━━━━━━━━━━━━━━━━━\n\n• No RP  \n• Troll / toxicité  \n• Abus de pouvoir  \n\n━━━━━━━━━━━━━━━━━━━━━━\n📥 REJOINS-NOUS :\n━━━━━━━━━━━━━━━━━━━━━━\n\n🔗 https://discord.gg/vkPzuTW27y\n\n━━━━━━━━━━━━━━━━━━━━━━\n🚨  MARNE RP — LE RP COMME IL DEVRAIT ÊTRE\n━━━━━━━━━━━━━━━━━━━━━━"
+    },
+    "1497686140248133804": {
+        "author_id": 1378696082283823136,
+        "timestamp": "2026-04-25T20:51:27.414142+00:00",
+        "type": "del",
+        "content": "https://discord.gg/qPtkyDVpa"
+    },
+    "1497708815829696695": {
+        "author_id": 1378696082283823136,
+        "timestamp": "2026-04-25T22:47:21.102146+00:00",
+        "type": "edit",
+        "old": "Mon script es fonctionnelle",
+        "new": "Mon script es fonctionnelle ?"
+    },
+    "1497327278856732713": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-26T17:11:10.362047+00:00",
+        "type": "del",
+        "content": "Convert : \n- Revoir pour que 1 honneur = 95% de 300 000"
+    },
+    "1495109198370050188": {
+        "author_id": 1474411264343146660,
+        "timestamp": "2026-04-26T18:42:45.756328+00:00",
+        "type": "del",
+        "content": "!lvlup"
+    },
+    "1498389300968947872": {
+        "author_id": 1498301304949309440,
+        "timestamp": "2026-04-27T18:27:22.125348+00:00",
+        "type": "edit",
+        "old": "oui elle veux aussi un bot",
+        "new": "oui"
+    },
+    "1485312270761463921": {
+        "author_id": 1378696082283823136,
+        "timestamp": "2026-04-29T16:06:08.505183+00:00",
+        "type": "edit",
+        "old": "<@&1491056547600662759> #nous sommes a la recherche de staff et des développeurs de toute choses. On cherche 5 personne ayant ses capacités, les cinq premiers qui auront créés un ticket chacun seront pris sans candidature ni question bonne chance# <@&1491056547600662759>",
+        "new": "<@&1491056547600662759>   # nous sommes a la recherche de staff et des développeurs de toute choses. On cherche 5 personne ayant ses capacités, les cinq premiers qui auront créés un ticket chacun seront pris sans candidature ni question bonne chance. #  <@&1491056547600662759>"
+    },
+    "1491457849102962808": {
+        "author_id": 1378696082283823136,
+        "timestamp": "2026-04-29T16:05:32.599444+00:00",
+        "type": "del",
+        "content": "# mes #"
+    },
+    "1499079800093151263": {
+        "author_id": 1475792668822077501,
+        "timestamp": "2026-04-30T14:44:02.048043+00:00",
+        "type": "edit",
+        "old": "Ok merci !:",
+        "new": "Ok merci !"
+    },
+    "1499123993855131919": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-04-30T10:27:32.901905+00:00",
+        "type": "edit",
+        "old": "bah les gros sur youtube ils font des spono",
+        "new": "bah les gros sur youtube ils font des sponso"
+    },
+    "1499085836153782342": {
+        "author_id": 1490629740481216542,
+        "timestamp": "2026-04-30T14:51:13.439994+00:00",
+        "type": "del",
+        "content": "Ouais ett ta besoin de modo n’importe ou"
+    },
+    "1485312287425167381": {
+        "author_id": 1475799274355687516,
+        "timestamp": "2026-05-01T21:22:24.301532+00:00",
+        "type": "del",
+        "content": "s.a"
+    },
+    "1485312295121719357": {
+        "author_id": 1376883126902718557,
+        "timestamp": "2026-06-15T05:40:27.300104+00:00",
+        "type": "del",
+        "content": ""
+    },
+    "1485312296724074649": {
+        "author_id": 1475799274355687516,
+        "timestamp": "2026-05-01T21:23:52.223851+00:00",
+        "type": "del",
+        "content": "s.a"
+    },
+    "1485312278222868511": {
+        "author_id": 1376883126902718557,
+        "timestamp": "2026-06-15T05:40:26.763811+00:00",
+        "type": "del",
+        "content": ""
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "user_name": "Moha🐣🇩🇿",
+    "points": 0,
+    "marriages_count": 2,
+    "refusals_received": 0,
+    "refusals_given": 0,
+    "current_marriages": [
+        {
+            "partner_id": 1366780122891419784,
+            "partner_name": "𝑽𝒆𝒙",
+            "timestamp": 1779618721,
+            "proposer_id": 1366780122891419784
+        },
+        {
+            "partner_id": 1340680852404965494,
+            "partner_name": "⋆｡°✩ 𝒬𝓊𝑒 𝓋𝑒𝓊𝓍-𝓉𝓊 ? ✩°｡⋆",
+            "timestamp": 1779618850,
+            "proposer_id": 806254692513742918
+        }
+    ],
+    "history": [
+        "[24/05/26][10:34] Vous vous êtes marié(e) avec <@1340680852404965494>.",
+        "[24/05/26][10:32] Vous avez accepté la demande en mariage de <@1366780122891419784>."
+    ]
+}

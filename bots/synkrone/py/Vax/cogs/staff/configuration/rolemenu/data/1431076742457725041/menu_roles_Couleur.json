@@ -1,0 +1,48 @@
+{
+    "name": "Couleur",
+    "display_type": "select",
+    "selection_mode": "unique",
+    "roles": {
+        "1455583351539765400": {
+            "label": "🟡 𝙮𝙚𝙡𝙡𝙤𝙬 𝙥𝙖𝙨𝙩𝙚𝙡",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1455581773504184460": {
+            "label": "🟣 𝙋𝙪𝙧𝙥𝙡𝙚 𝙥𝙖𝙨𝙩𝙚𝙡",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1455582625732235498": {
+            "label": "⚫️ 𝘽𝙡𝙖𝙘𝙠",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1455581636732391688": {
+            "label": "🎀 𝙥𝙞𝙣𝙠 𝙥𝙖𝙨𝙩𝙚𝙡",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1455583157855457475": {
+            "label": "🟠 𝙊𝙧𝙖𝙣𝙜𝙚",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1455583925975126026": {
+            "label": "🔴 𝙧𝙚𝙙",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1455583689202204693": {
+            "label": "🟢 𝙂𝙧𝙚𝙚𝙣 𝙥𝙖𝙨𝙩𝙚𝙡",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1455582054040338452": {
+            "label": "🔵 𝘽𝙡𝙪𝙚 𝙥𝙖𝙨𝙩𝙚𝙡",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        }
+    },
+    "deploy_url": "https://discord.com/channels/1431076742457725041/1501315134285676705/1501322202216267919"
+}

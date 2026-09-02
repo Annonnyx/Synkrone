@@ -1,0 +1,15 @@
+{
+    "enabled": true,
+    "categories": [
+        {
+            "name": "📁 Général",
+            "desc": ""
+        }
+    ],
+    "channel_id": 1456782675376476294,
+    "category_id": 1456782670934577274,
+    "archive_id": 1456782672369156329,
+    "support_role_id": 1456782673254154263,
+    "msg_id": 1456782678106837024,
+    "counter": 3
+}

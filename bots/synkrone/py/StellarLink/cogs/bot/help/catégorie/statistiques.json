@@ -1,0 +1,14 @@
+{
+    "emoji": "📊",
+    "category_name": "Statistiques",
+    "category_description": "📊 Commandes pour consulter et gérer les statistiques du serveur et des membres.",
+    "sections": {
+        "Général": {
+            "🎉 `{prefix}lvlup`": "Configurer le salon pour les annonces de niveau supérieur.",
+            "🧑 `{prefix}profil`": "Affiche le profil détaillé de l'utilisateur.",
+            "🏆 `{prefix}leader`": "Affiche le classement des membres du serveur.",
+            "📈 `{prefix}lvl`": "Affiche ou gère la configuration des niveaux.",
+            "📊 `{prefix}stats`": "Statistiques d'activité du serveur."
+        }
+    }
+}

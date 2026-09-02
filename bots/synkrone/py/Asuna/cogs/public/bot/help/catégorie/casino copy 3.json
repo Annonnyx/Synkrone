@@ -1,0 +1,13 @@
+{
+    "emoji": "📊",
+    "category_name": "Casino - Statistiques",
+    "category_description": "Commandes de statistiques du module casino.",
+    "sections": {
+        "👥 Statistiques": {
+            "👤 `{prefix}profil`": "Affiche votre profil interactif (Profil / Activité / Succès).",
+            "�️ `{prefix}lvl`": "Affiche votre niveau actuel et la progression XP.",
+            "�🏆 `{prefix}leader`": "Affiche le classement du Grand Casino d'Aincrad.",
+            "📊 `{prefix}solde` | `{prefix}balance`": "Affiche l'argent possédé."
+        }
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "enabled": true,
+    "channel_id": 1501589562311442543,
+    "category_id": 1501589558410739845,
+    "archive_id": 1501589559811637291,
+    "support_role_id": 1501589560818401332,
+    "msg_id": 1541586983179260034,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "Tickets test",
+            "desc": "Test"
+        },
+        {
+            "name": "Question",
+            "desc": "Si vous avez des questions pour le RP ou HRP ouvrez le ticket"
+        }
+    ],
+    "custom_description": "\u00c9crivez la raison de votre question",
+    "local_image_path": null,
+    "ticket_count": 1
+}

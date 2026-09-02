@@ -1,0 +1,22 @@
+{
+    "help_embed": {
+        "title": "📚 Guide de Configuration - Au revoir",
+        "description": "Configurez facilement les messages de départ de votre serveur.\n\n![🎨](https://discord.com/assets/44a7ec4589980427.svg) **Trouver une couleur :** [Cliquez ici](https://htmlcolorcodes.com/fr/)",
+        "color": 15158332,
+        "fields": [
+            {
+                "name": "🎮 Actions",
+                "value": "📍 **Sélecteur de salon**\nChoisit directement le salon d'envoi.\n\n🖼️ **État du fond**\nS'affiche sous le salon dans l'embed de configuration.\n\n📝 **Texte**\nModifie le titre, la description et le message.\n\n🖼️ **Fond**\nChoisissez un mode:\n• Image\n• URL d'image\n• Couleur HEX\n• Bannière utilisateur\n\n⏱️ **Délai pour envoyer une image**\n10 minutes.\n\n🎨 **Code HEX**\nLe symbole # est optionnel.\n\n🪄 **Mode Bannière**\n• Activez ou désactivez le fallback\n• Si fallback activé, choisissez Image, URL ou HEX\n\n👁️ **Aperçu**\nEnvoie un aperçu éphémère du rendu final.\n\n❓ **Aide**\nAffiche ce guide.\n\n♻️ **Reset**\nRemet la configuration par défaut si des changements existent."
+            },
+            {
+                "name": "✨ Variables",
+                "value": "• `{user}` Nom du membre\n• `{user.mention}` Mention du membre\n• `{guild}` Nom du serveur\n• `{guild.count}` Membres restants"
+            },
+            {
+                "name": "🎨 Style Servembed",
+                "value": "La couleur du pseudo et le contour de l'avatar dépendent de la configuration de *servembed*."
+            }
+        ],
+        "footer": "Système de Départ Vax 2"
+    }
+}

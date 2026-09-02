@@ -1,0 +1,841 @@
+{
+    "info": {
+        "name": "Shinigami 🏯 #NITRO",
+        "icon_url": "https://cdn.discordapp.com/icons/1379789716076892220/7d97c259955cce31499caee4924726a0.png?size=1024",
+        "date": "10/05/26 - 19:43",
+        "id": "8aa29843",
+        "creator_id": "1065588100073537586"
+    },
+    "roles": [
+        {
+            "name": "Shinigami membre",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "+213 🇩🇿",
+            "color": 1567628,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Bebou de Noct Valdenix ♥️",
+            "color": 15277667,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Blacklist Staff",
+            "color": 592138,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Sanction Staff",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Warn III",
+            "color": 16711680,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Warn II",
+            "color": 16711680,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Warn I",
+            "color": 16711680,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Sanction",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "MP fermés",
+            "color": 14555975,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "MP ouverts",
+            "color": 3066993,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "MP sur demande",
+            "color": 15105570,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ État MP",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "💪・Bumper",
+            "color": 16175158,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "💀・Dead Chat Ping",
+            "color": 16090659,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🎊・Evenement",
+            "color": 13381250,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "💌・Sondages",
+            "color": 12362711,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🧧・Partenariats",
+            "color": 862018,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🎁・Giveaways",
+            "color": 666656,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "📢・Annonces",
+            "color": 3577974,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Notifs",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🎭・Je ne préfère pas répondre",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🥻・Femme",
+            "color": 12209887,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "👘・Homme",
+            "color": 1783224,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🧃・Mineur",
+            "color": 3066993,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🔞・Majeur",
+            "color": 15277667,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Décoration",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.10",
+            "color": 9358774,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.20",
+            "color": 7852462,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.30",
+            "color": 50350,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.40",
+            "color": 1220024,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.50",
+            "color": 1212097,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.60",
+            "color": 8021693,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.70",
+            "color": 7419530,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.80",
+            "color": 4856765,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.90",
+            "color": 1836364,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Lvl.100",
+            "color": 1706533,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🪷┋Supporteur",
+            "color": 16036351,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "💠┋Shinigami Membre",
+            "color": 2340073,
+            "permissions": 689446440513,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Rôle",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "sombre pute",
+            "color": 6323595,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "💎┋VIP",
+            "color": 3447003,
+            "permissions": 104189505,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "💎┋VIP ⟩",
+            "color": 3447003,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "💎┋VIP ⟩⟩",
+            "color": 3447003,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "💎┋VIP ⟩⟩⟩",
+            "color": 3447003,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🌼┋Bumper Novice",
+            "color": 13618985,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🪷┋Bumper Pro",
+            "color": 14911697,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🪻┋Bumper Légendaire",
+            "color": 11099085,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Booster légendaire",
+            "color": 2123412,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Booster Mythique",
+            "color": 9557247,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "⭐┋Star Ecrit",
+            "color": 12314879,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "⭐┋Star Vocal",
+            "color": 12314879,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "📍┋Développeur",
+            "color": 11342935,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🤝┋Bras Droit Valdenix",
+            "color": 10682623,
+            "permissions": 4399156801,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Maintenance",
+            "color": 15105570,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🍙┋Tsukuyomi",
+            "color": 16735702,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Rôle Perso",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🍀┋Équipe Staff",
+            "color": 9040333,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "⚡┋Hauts Staff",
+            "color": 266311,
+            "permissions": 2048,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🛠️┋Modérateur test",
+            "color": 1752220,
+            "permissions": 6206715342483265,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🛠️┋Equipe Maintenance",
+            "color": 1056823,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🔨┋Gestion Partenariats",
+            "color": 15067975,
+            "permissions": 693674298945,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "✉️┋Gestion Recrutements",
+            "color": 8886702,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "💰┋Gestion Giveaways Claim",
+            "color": 12886659,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "⚠️┋Gestion Signalements",
+            "color": 5776163,
+            "permissions": 687231848001,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🛡️┋Gestion Reports",
+            "color": 7493796,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🎁┋Gérant Giveaways",
+            "color": 13927485,
+            "permissions": 6225416313892839,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🤖┋Gérant Bots",
+            "color": 5025232,
+            "permissions": 6225407187087311,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "⛩️┋Gestions Staff",
+            "color": 5701885,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🎲┋Animation Manager",
+            "color": 3577974,
+            "permissions": 15136706113,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "🌐┋Community Manager",
+            "color": 7852015,
+            "permissions": 6546771521,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Gestion",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🛡️┋Modérateur",
+            "color": 11156283,
+            "permissions": 691593924161,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "🪽┋Super Modérateur",
+            "color": 11156283,
+            "permissions": 6225407187087303,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "🍢┋Modérateur Senior",
+            "color": 9467253,
+            "permissions": 5099507280113601,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "🌹┋Administrateur",
+            "color": 7487552,
+            "permissions": 691593924161,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "☄️┋Super Administrateur",
+            "color": 5025232,
+            "permissions": 6225407187087303,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "⚖️┋Administrateur Senior",
+            "color": 4587723,
+            "permissions": 5099507280244677,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "⭐┋Gérant",
+            "color": 9490874,
+            "permissions": 687298956865,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "🏛️┋Directeur Général",
+            "color": 10382335,
+            "permissions": 6227606747213767,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Staff",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "👑",
+            "color": 131586,
+            "permissions": 4505418813931463,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Protect",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Bot 🤖",
+            "color": 5025232,
+            "permissions": 7146982383892336,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Bots",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🔱┋Co-Fondateur",
+            "color": 12759252,
+            "permissions": 6783058493566679,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "⚜️┋Owner",
+            "color": 6235087,
+            "permissions": 8580588743163903,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "⛩️┋Kami no Hajimari 神",
+            "color": 12491775,
+            "permissions": 8866461766385663,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "▬▬▬ Owner",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        }
+    ],
+    "categories": [],
+    "orphan_channels": [
+        {
+            "name": "modérateur-uniquement",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1379789716076892220,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 3072
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "rules",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1379789716076892220,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 240518432832
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "fermeture",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1379789716076892220,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 103079217152
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "🤖│𝒀𝒖𝒊",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1379789716076892220,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                },
+                {
+                    "id": 1460012999912853810,
+                    "name": "𝒀𝒖𝒊",
+                    "is_role": false,
+                    "allow": 84992,
+                    "deny": 0
+                },
+                {
+                    "id": 1065588100073537586,
+                    "name": "noct_valdenix",
+                    "is_role": false,
+                    "allow": 3072,
+                    "deny": 0
+                },
+                {
+                    "id": 1503089704533233715,
+                    "name": "𝒀𝒖𝒊",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1490635453085384788,
+                    "name": "Bacon Bypass",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1477620745780858945,
+                    "name": "Xenon",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1469676431637483700,
+                    "name": "🤖┋Gérant Bots",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1467577312605372481,
+                    "name": "Sapphire",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1477290398551511131,
+                    "name": "UnbelievaBoat",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1475462248788000963,
+                    "name": "[🏯] Shinigami",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1430336892091633667,
+                    "name": "ChannelBot",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1380625953285210345,
+                    "name": "Tickets",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1477675075074527325,
+                    "name": "Silent-Protect",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1477399299938586728,
+                    "name": "Guild Tag Roles",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1477674937677381839,
+                    "name": "RaidProtect",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1379816725926776885,
+                    "name": "Statbot",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1462091625684795604,
+                    "name": "Snoway",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1474446398245044475,
+                    "name": "Bump Bot",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1477282849077071924,
+                    "name": "DraftBot",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1467952320355766342,
+                    "name": "⚜️┋Owner",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1468273382989631543,
+                    "name": "⛩️┋Kami no Hajimari 神",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        }
+    ]
+}

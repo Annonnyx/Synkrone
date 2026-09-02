@@ -1,0 +1,48 @@
+{
+    "embed_title": "🚀 Bienvenue dans l'aventure !",
+    "welcome_text": "Merci d'avoir ajouté le bot à votre serveur ! Ce projet est en constante évolution pour vous offrir la meilleure expérience possible.\n\n⚠️ **Note importante :** Par défaut, la majorité des fonctionnalités sont **désactivées**. Un administrateur doit les configurer manuellement pour les activer.",
+    "help_notice": "💡 **Besoin d'aide ?** Utilisez la commande `/help` pour obtenir le détail complet de chaque fonctionnalité et leur mode d'emploi.",
+    "embed_color": "0x2b2d31",
+    "setup_pages": [
+        {
+            "title": "🛡️ Sécurité & Modération",
+            "content": "### 🛡️ Sécurité & Modération\n> *Placez le rôle du bot tout en haut de la liste des rôles pour garantir l’efficacité des actions.*\n\n**🛡️ `/secur`** • `Recommandé` : Panneau de sécurité avancée.\n**👥 `/roleauto`** • `Recommandé` : Gestion des rôles automatiques.\n**📋 `/log`** • `Recommandé` : Configuration des logs du serveur.\n"
+        },
+        {
+            "title": "⚙️ Accueil & Communauté",
+            "content": "### ⚙️ Accueil & Communauté\n**👋 `/bienvenue`** • `Recommandé` : Message personnalisé pour les nouveaux membres.\n**👋 `/aurevoir`** • `Facultatif` : Message de départ pour les membres qui quittent.\n**✨ `/boost`** • `Facultatif` : Suivi des boosts du serveur."
+        },
+        {
+            "title": "🎟️ Système de Tickets",
+            "content": "### 🎟️ Système de Tickets\n**🎟️ `/ticket`** • `Recommandé` : Ouvre le panneau de configuration des tickets."
+        },
+        {
+            "title": "📊 Vocaux & Statistiques",
+            "content": "### 📊 Vocaux & Statistiques\n**🔊 `/voice`** • `Facultatif` : Gestion du salon racine vocal.\n**📈 `/statsserver`** • `Facultatif` : Statistiques vocales en temps réel."
+        },
+        {
+            "title": "🎮 Jeux & Divertissement",
+            "content": "### 🎮 Jeux & Divertissement\n**🎮 `/infinite`** • `Facultatif` : Jeu du Juste Prix.\n**📜 `/confessions`** • `Facultatif` : Système de confessions anonymes."
+        }
+    ],
+    "commands_list": [
+        "### ⚙️ Commandes de Configuration",
+        "\n**Accueil & Communauté**",
+        "👋 `/bienvenue` - Personnaliser le message de bienvenue des nouveaux membres",
+        "👋 `/aurevoir` - Personnaliser le message de départ des membres",
+        "✨ `/boost` - Configuration du système de boosters et avantages",
+        "\n**Sécurité & Modération**",
+        "🛡️ `/secur` - Ouvrir le panneau de sécurité avancée",
+        "👥 `/roleauto` - Menu de configuration des rôles automatiques",
+        "📋 `/log` - Configurer les logs du serveur",
+        "\n**Système de Tickets**",
+        "🎟️ `/ticket` - Ouvrir le panneau de configuration des tickets",
+        "\n**Vocaux & Statistiques**",
+        "🔊 `/voice` - Gérer le salon racine vocal et ses paramètres",
+        "📈 `/statsvocal` - Configurer les statistiques vocales dynamiques",
+        "📊 `/statsserver` - Configurer les statistiques du serveur",
+        "\n**Jeux & Divertissement**",
+        "📜 `/confessions` - Gérer le système de confessions anonymes",
+        "🎮 `/infinite` - Configuration du jeu de compte à rebours"
+    ]
+}

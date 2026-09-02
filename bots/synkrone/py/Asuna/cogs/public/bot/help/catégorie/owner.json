@@ -1,0 +1,16 @@
+{
+    "emoji": "🔒",
+    "category_name": "Privé",
+    "category_description": "Commandes réservées au propriétaire du bot.",
+    "requires_owner": true,
+    "sections": {
+        "🔒 Owner du bot": {
+            "🛠️ `{prefix}panelbot`": "Accéder au panneau de configuration technique du bot.",
+            "✉️ `{prefix}mp`": "Envoyer un message privé à un utilisateur via le bot.",
+            "📊 `{prefix}devstats`": "Menu statistiques de développement.",
+            "🖌️ `{prefix}devembed`": "Accéder au constructeur d'embed réservé aux développeurs.",
+            "⛔ `{prefix}blacklist`": "Gérer la sécurité de Vax Développeur.",
+            "👑 `{prefix}owner`": "Afficher ou modifier les owners enregistrés du bot."
+        }
+    }
+}

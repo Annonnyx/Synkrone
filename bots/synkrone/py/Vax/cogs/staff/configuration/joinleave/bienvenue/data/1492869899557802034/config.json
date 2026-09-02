@@ -1,0 +1,7 @@
+{
+    "enabled": true,
+    "channel_id": 1494001446855901274,
+    "embed_title": "Bienvenue sur {guild}",
+    "embed_description": "{user.mention} est le/la nouveau/nouvelle prodige qui nous a rejoint !👑",
+    "content_message": "On acclame tous un nouveau pompier {user.mention} !\nNous sommes désormais {guild.count}.la brigade s'engradit 👨‍🚒🔥"
+}

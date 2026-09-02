@@ -1,0 +1,21 @@
+{
+    "enabled": true,
+    "channel_id": 1508409720816537694,
+    "category_id": 1508409716978618449,
+    "archive_id": 1508409718681632808,
+    "support_role_id": 1508409719847522364,
+    "msg_id": 1510768941692096613,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "R\u00f4les",
+            "desc": "Staff\nMod\u00e9rateur \nAnimateur \nManageur \nCo owner\nAdmin"
+        }
+    ],
+    "custom_description": "Que veut tu??",
+    "local_image_path": "./data/ticket/1478378153406894110/IMG_1418.jpg",
+    "ticket_count": 0
+}

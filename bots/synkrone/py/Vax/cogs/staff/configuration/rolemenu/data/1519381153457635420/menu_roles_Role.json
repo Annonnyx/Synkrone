@@ -1,0 +1,6 @@
+{
+    "name": "Role",
+    "display_type": "select",
+    "selection_mode": "multiple",
+    "roles": {}
+}

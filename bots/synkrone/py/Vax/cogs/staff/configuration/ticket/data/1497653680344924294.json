@@ -1,0 +1,17 @@
+{
+    "enabled": true,
+    "channel_id": 1497655907658760274,
+    "category_id": 1497655903992811620,
+    "archive_id": 1497655904861032490,
+    "support_role_id": 1497655906073051258,
+    "msg_id": 1526276520832925889,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": "./data/ticket/1497653680344924294/Capture_decran_2026-04-18_231522.png",
+    "ticket_count": 0
+}

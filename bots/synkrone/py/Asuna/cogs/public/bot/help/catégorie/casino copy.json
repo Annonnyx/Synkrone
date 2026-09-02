@@ -1,0 +1,19 @@
+{
+    "emoji": "💰",
+    "category_name": "Casino - Économie",
+    "category_description": "Commandes économiques du module casino.",
+    "sections": {
+        "💱 Économie": {
+            "📅 `{prefix}hourly`": "Récupérez votre bonus de Cols horaire.",
+            "📅 `{prefix}daily`": "Récupérez votre bonus de Cols quotidien.",
+            "📅 `{prefix}weekly`": "Récupérez votre bonus de Cols hebdomadaire.",
+            "📅 `{prefix}monthly`": "Récupérez votre bonus de Cols mensuel.",
+            "💰 `{prefix}give` `@tag/ID` `montant`": "Donne de l'argent à un joueur.",
+            "🔄 `{prefix}convert`": "Convertissez vos Cols en Honneur ou votre Honneur en Cols.",
+            "🦹 `{prefix}rob` `@tag/ID`": "Volez entre 0.1% et 10% des Cols d'un joueur.",
+            "🛒 `{prefix}shop`": "Permet d'acheter un article.",
+            "🗳️ `{prefix}vote`": "Voter pour doubler la mise!"
+
+        }
+    }
+}

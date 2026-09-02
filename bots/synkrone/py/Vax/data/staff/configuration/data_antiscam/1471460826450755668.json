@@ -1,0 +1,15 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1452885248168689766": {
+            "name": "juzt_m0urad",
+            "timestamp": "02/07/2026 18:44",
+            "flagged": "[message sans texte]"
+        }
+    }
+}

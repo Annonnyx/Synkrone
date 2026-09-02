@@ -1,0 +1,17 @@
+{
+    "nom": "Toka Kirishima",
+    "creation_date": "2026-03-15T12:57:30.489356+00:00",
+    "creator_id": 1016333003561111604,
+    "image": "image_20260315_141426.png",
+    "id": "4UI25",
+    "exemplaires": 100,
+    "exemplaires_restant": 99,
+    "description": "Toka Kirishima est une Goule et une ancienne serveuse de l'Antique, ainsi que l'\u00e9pouse de Ken Kaneki. Au combat, elle porte un masque ressemblant \u00e0 une t\u00eate de lapin blanc aux cheveux roses, d'o\u00f9 son surnom de Lapin.",
+    "vitesse": 82,
+    "precision": 95,
+    "vie": 100,
+    "puissance": 230,
+    "valeur": 8000000,
+    "rarete": "L\u00e9gendaire",
+    "couleur": 16766720
+}

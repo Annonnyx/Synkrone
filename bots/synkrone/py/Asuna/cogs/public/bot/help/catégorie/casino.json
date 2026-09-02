@@ -1,0 +1,18 @@
+{
+    "emoji": "🎰",
+    "category_name": "Casino - Jeux",
+    "category_description": "Commandes de jeu du module casino.",
+    "sections": {
+        "🎮 Jeux": {
+            "🎰 `{prefix}slots`": "Jeu de machine à sous avec des symboles et des multiplicateurs de gain.",
+            "🎲 `{prefix}dice`": "Jeu de dé avec des paris sur les numéros.",
+            "💣 `{prefix}mines`": "Jeu des mines où vous devez éviter les bombes pour gagner des multiplicateurs.",
+            "🃏 `{prefix}blackjack` | `{prefix}bj`": "Jouer au Blackjack contre le croupier.",
+            "🎡 `{prefix}roulette`": "Jouer à la roulette avec des paris sur les numéros ou les couleurs.",
+            "📦 `{prefix}mysteribox`": "Ouvrez un coffre scellé du clan avec des gains aléatoires.",
+            "🏮 `{prefix}lanternfall`": "Jeu de la lanterne tombante avec des multiplicateurs variables.",
+            "🪙 `{prefix}coinflip`": "Tentez de doubler vos gains au jeu de la pièce.",
+            "🧰 `{prefix}chest`": "Aiguisez vos réflexes et tentez de crocheter un coffre mystère."
+        }
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "user_name": "⋆｡°✩ 𝒬𝓊𝑒 𝓋𝑒𝓊𝓍-𝓉𝓊 ? ✩°｡⋆",
+    "points": 0,
+    "marriages_count": 4,
+    "refusals_received": 0,
+    "refusals_given": 1,
+    "current_marriages": [
+        {
+            "partner_id": 806254692513742918,
+            "partner_name": "Moha🐣🇩🇿",
+            "timestamp": 1779618850,
+            "proposer_id": 806254692513742918
+        },
+        {
+            "partner_id": 1367891720871874560,
+            "partner_name": "𝑉𝑎𝑥",
+            "timestamp": 1781632071,
+            "proposer_id": 1340680852404965494
+        },
+        {
+            "partner_id": 1401908138340257792,
+            "partner_name": "xou",
+            "timestamp": 1781896875,
+            "proposer_id": 1340680852404965494
+        },
+        {
+            "partner_id": 318312854816161792,
+            "partner_name": "DraftBot",
+            "timestamp": 1781896900,
+            "proposer_id": 1340680852404965494
+        }
+    ],
+    "history": [
+        "[19/06/26][19:21] Vous vous êtes marié(e) avec <@318312854816161792>.",
+        "[19/06/26][19:21] Vous vous êtes marié(e) avec <@1401908138340257792>.",
+        "[16/06/26][17:47] Vous vous êtes marié(e) avec <@1367891720871874560>.",
+        "[24/05/26][10:34] Vous avez accepté la demande en mariage de <@806254692513742918>.",
+        "[23/05/26][18:57] Vous avez refusé la demande de <@1366780122891419784>."
+    ]
+}

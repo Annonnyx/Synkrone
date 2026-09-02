@@ -1,0 +1,20 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1455521726703075403": {
+            "name": "taiizyy_",
+            "timestamp": "30/06/2026 19:24",
+            "flagged": "[message sans texte]"
+        },
+        "712359175035813959": {
+            "name": "yntflaco",
+            "timestamp": "04/07/2026 14:59",
+            "flagged": "[message sans texte]"
+        }
+    }
+}

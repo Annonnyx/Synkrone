@@ -1,0 +1,24 @@
+{
+    "Cols": 1076,
+    "honneur": 1,
+    "rob_data": {
+        "rob_date": "2026-06-08",
+        "targets_today": [
+            "1407451837703000184"
+        ],
+        "hourly_robs": [
+            "2026-06-08T19:17:27.040154"
+        ]
+    },
+    "stats": {
+        "rob_success": 1
+    },
+    "achievements": {
+        "rob_success": {
+            "tier": 1,
+            "dates": {
+                "1": "08/06/2026 19:17"
+            }
+        }
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "emoji": "📂",
+    "category_name": "Collection",
+    "category_description": "Commandes de la catégorie collection.",
+    "sections": {
+        "Général": {
+            "⚔️ `{prefix}pvp`": "Aucune description.",
+            "🛒 `{prefix}boutique`": "Aucune description.",
+            "🎲 `{prefix}choicemp`": "Aucune description.",
+            "🧑 `{prefix}profil`": "Aucune description.",
+            "🃏 `{prefix}collection`": "Consultez la collection de cartes",
+            "🏬 `{prefix}shop`": "Accédez au marché des joueurs",
+            "💎 `{prefix}premium`": "Affiche les avantages premium et votre statut",
+            "📖 `{prefix}guide`": "Affiche le guide complet du système de jeu",
+            "🏆 `{prefix}leader`": "Affiche les classements",
+            "🎁 `{prefix}daily`": "Récupère votre récompense quotidienne",
+            "💸 `{prefix}sell`": "Vendez vos cartes contre des Col",
+            "😴 `{prefix}sleep`": "Gérez votre garderie pour gagner de l'XP et des Col passifs",
+            "🎯 `{prefix}stage`": "Affiche les informations de progression.",
+            "🔄 `{prefix}echange`": "Aucune description.",
+            "📦 `{prefix}collect`": "Aucune description.",
+            "`/boutique`": "Aucune description.",
+            "`/guide`": "Affiche le guide complet du système de jeu",
+            "`/dev`": "Commande de développement réservée aux owners.",
+            "`/profil`": "Aucune description.",
+            "`/collection`": "Consultez la collection de cartes",
+            "`/shop`": "Accédez au marché des joueurs",
+            "`/premium`": "Affiche les avantages premium et votre statut",
+            "`/daily`": "Récupère votre récompense quotidienne",
+            "`/leader`": "Affiche les classements",
+            "`/sell`": "Vendez vos cartes contre des Col",
+            "`/pvp`": "Aucune description.",
+            "`/choicemp`": "Aucune description.",
+            "`/stage`": "Affiche les informations de progression.",
+            "`/collect`": "Aucune description.",
+            "`/echange`": "Aucune description.",
+            "`/sleep`": "Gérez votre garderie pour gagner de l'XP et des Col passifs"
+        }
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "411289039702982687": {
+            "name": "irazen41",
+            "timestamp": "13/06/2026 21:39",
+            "flagged": "[message sans texte]"
+        },
+        "1511300651517476945": {
+            "name": "kaitlynfoxz1350",
+            "timestamp": "04/07/2026 17:41",
+            "flagged": "[message sans texte]"
+        },
+        "1524840492444028943": {
+            "name": "signalize0813",
+            "timestamp": "12/07/2026 23:25",
+            "flagged": "[message sans texte]"
+        }
+    }
+}

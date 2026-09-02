@@ -1,0 +1,10 @@
+{
+    "prefixes": [
+        ".",
+        "!",
+        "?",
+        "\u20ac",
+        "&"
+    ],
+    "disable_global": false
+}

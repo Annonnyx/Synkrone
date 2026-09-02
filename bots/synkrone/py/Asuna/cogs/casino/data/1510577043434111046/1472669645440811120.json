@@ -1,0 +1,104 @@
+{
+    "Cols": 10761,
+    "last_daily": "2026-07-11T13:53:39.243864+02:00",
+    "stats": {
+        "daily_count": 4,
+        "daily_streak": 1,
+        "Cols_spent": 877301,
+        "rob_success": 3,
+        "monthly_count": 1,
+        "hourly_count": 2,
+        "lantern_games": 1
+    },
+    "last_daily_before_streak": "2026-07-11T13:53:39.243864+02:00",
+    "achievements": {
+        "daily_count": {
+            "tier": 1,
+            "dates": {
+                "1": "13/06/2026 19:24"
+            }
+        },
+        "daily_streak": {},
+        "rob_success": {
+            "tier": 1,
+            "dates": {
+                "1": "13/06/2026 21:56"
+            }
+        },
+        "lantern_games": {
+            "tier": 1,
+            "dates": {
+                "1": "03/07/2026 11:57"
+            }
+        }
+    },
+    "honneur": 5,
+    "blackjack_stats": {
+        "parties_heure": [
+            "2026-07-11T11:53:11.851812"
+        ],
+        "derniere_reset": "2026-07-11T11:53:11.851777"
+    },
+    "dice_stats": {
+        "parties_heure": [
+            "2026-06-13T21:55:35.680060"
+        ],
+        "derniere_reset": "2026-06-13T21:55:35.679883"
+    },
+    "coinflip_stats": {
+        "parties_heure": [
+            "2026-06-13T21:55:58.586849",
+            "2026-06-13T21:56:11.305963",
+            "2026-06-13T21:56:18.956065",
+            "2026-06-13T21:56:26.047873"
+        ],
+        "derniere_reset": "2026-06-13T21:55:58.586824"
+    },
+    "rob_data": {
+        "rob_date": "2026-07-01",
+        "targets_today": [
+            "1366780122891419784"
+        ],
+        "hourly_robs": [
+            "2026-07-01T13:07:37.601505"
+        ]
+    },
+    "slots_stats": {
+        "parties_heure": [
+            "2026-06-13T21:57:21.217650"
+        ],
+        "derniere_reset": "2026-06-13T21:57:21.217545"
+    },
+    "roulette_stats": {
+        "parties_heure": [
+            "2026-07-01T13:09:00.813572"
+        ]
+    },
+    "mines_stats": {
+        "parties_heure": [
+            "2026-06-27T16:31:13.482658",
+            "2026-07-11T11:55:27.563172"
+        ],
+        "derniere_reset": "2026-06-27T16:31:13.482622"
+    },
+    "random_history": [
+        "2026-07-11T13:53:57.852581+02:00",
+        "2026-07-11T13:54:03.149758+02:00",
+        "2026-07-11T13:54:08.010579+02:00"
+    ],
+    "random_uses_this_hour": 3,
+    "random_total_count": 9,
+    "random_last_use": "2026-07-11T13:54:08.010579+02:00",
+    "rob_received": {
+        "date": "2026-06-30",
+        "count": 1
+    },
+    "last_monthly": "2026-06-30T12:02:12.054240+02:00",
+    "last_hourly": "2026-07-01T15:06:59.096655+02:00",
+    "mysteribox_limits": {
+        "daily_count": 0,
+        "last_openings": [],
+        "last_reset": "2026-07-01"
+    },
+    "last_lantern_ts": 1783079858.495357
+}

@@ -1,0 +1,27 @@
+{
+    "Cols": 50000,
+    "honneur": 153,
+    "stats": {
+        "daily_count": 30,
+        "blackjack_games": 100,
+        "blackjack_wins": 30,
+        "roulette_games": 50,
+        "roulette_wins": 15,
+        "slots_games": 200,
+        "mines_games": 75,
+        "coinflip_games": 120,
+        "coinflip_wins": 60,
+        "rob_success": 10
+    },
+    "achievements": {
+        "daily_count": {
+            "tier": 4,
+            "dates": {
+                "1": "01/01/2024 10:00",
+                "2": "05/01/2024 10:00",
+                "3": "10/01/2024 10:00",
+                "4": "03/05/2026 22:37"
+            }
+        }
+    }
+}

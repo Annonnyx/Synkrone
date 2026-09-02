@@ -1,0 +1,29 @@
+{
+    "enabled": true,
+    "channel_id": 1531677755727544382,
+    "category_id": 1531677750706835567,
+    "archive_id": 1531677752766234684,
+    "support_role_id": 1531677754939146401,
+    "msg_id": 1538666663489179648,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "GESTION Staff/Admin",
+            "desc": "Tu souhaite nous rejoindre en tant que Staff/Admin ?"
+        },
+        {
+            "name": "GESTION Twitch/TikTok",
+            "desc": "Si tu souhaite etre moderateur TikTok/Twitch fait ton ticket !"
+        },
+        {
+            "name": "GESTION  Abus/Probleme",
+            "desc": "Si vous avez un probleme sur le serveur/membres fait ton ticket et dit nous le probleme !"
+        }
+    ],
+    "custom_description": "Veuillez ouvrir votre ticket ci dessous !",
+    "local_image_path": "./data/ticket/1478801195261890724/image_ticket.webp",
+    "ticket_count": 0
+}

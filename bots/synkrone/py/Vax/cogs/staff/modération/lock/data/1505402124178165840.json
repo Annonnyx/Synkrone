@@ -1,0 +1,23 @@
+{
+    "1505402441049571369": {
+        "send_messages": null,
+        "add_reactions": null,
+        "connect": null,
+        "speak": null,
+        "view_channel": null
+    },
+    "1505402359986126918": {
+        "send_messages": false,
+        "add_reactions": null,
+        "connect": null,
+        "speak": null,
+        "view_channel": true
+    },
+    "1505402385789616209": {
+        "send_messages": false,
+        "add_reactions": null,
+        "connect": null,
+        "speak": null,
+        "view_channel": true
+    }
+}

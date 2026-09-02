@@ -1,0 +1,28 @@
+{
+    "name": "Notif_revive_chat",
+    "display_type": "buttons",
+    "selection_mode": "unique",
+    "roles": {
+        "1494021930074898622": {
+            "label": "revive voc",
+            "emoji": "🎙️",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1455574615136141353": {
+            "label": "• ♡  revive chat •",
+            "emoji": "☕",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1469293471830642698": {
+            "label": "⌁ Annonces Partenariat ⌁",
+            "emoji": "🤝",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1501326380133126407": {
+            "label": "Annonces Giveaway",
+            "emoji": "🎉",
+            "description": "Cliquez pour obtenir ce rôle"
+        }
+    },
+    "deploy_url": "https://discord.com/channels/1431076742457725041/1501315134285676705/1501327875113091184"
+}

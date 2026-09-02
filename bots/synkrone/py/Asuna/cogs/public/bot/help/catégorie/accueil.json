@@ -1,0 +1,12 @@
+{
+    "emoji": "📊",
+    "category_name": "Accueil",
+    "category_description": "Commandes générales.",
+    "sections": {
+        "👥 Bots": {
+            "💬 `{prefix}feedback`": "Envoyer un retour ou une suggestion au bot.",
+            "🤖 `{prefix}bot`": "Informations sur le bot et son statut.",
+            "❔ `{prefix}help`": "Affiche le menu d'aide interactif."
+        }
+    }
+}

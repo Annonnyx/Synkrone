@@ -1,0 +1,105 @@
+{
+    "1505587214921502790": {
+        "author_id": 1412829772295180462,
+        "timestamp": "2026-05-17T15:07:08.455290+00:00",
+        "type": "edit",
+        "old": "# 📘 Guide des Commandes Modération\n\n## 🔇 Sanctions Temporaires\n\n### Tempmute\n\n**Format :**\n`!tempmute <@membre/ID> <durée> <raison>`\n\n**Exemples :**\n• `!tempmute @Vexa 2h Spam`\n• `!tempmute @Vexa @Test 30m Raison` *(répétez la commande si nécessaire)*\n\n**Unités disponibles :**\n`s` = secondes\n`m` = minutes\n`h` = heures\n`d` = jours\n\n---\n\n### Tempban\n\n**Format :**\n`!tempban @utilisateur <durée> <raison>`\n\n**Exemple :**\n`!tempban @Vexa 1d Insultes`\n\n---\n\n## ⛔ Sanctions Permanentes\n\n### Ban permanent\n\n`!ban @utilisateur <raison>`\n\n**Exemple :**\n`!ban @user Harcèlement`\n\n---\n\n### Kick\n\n`!kick @utilisateur \"<raison>\"`\n\n---\n\n### Warn\n\n`!warn @utilisateur \"<raison>\"`\n\n---\n\n## 🔒 Gestion des Salons\n\n### Lock\n\n`?lock`\n\n### Unlock\n\n`?unlock`\n\n---\n\n## ⛓️ Jail\n\n### Jail\n\n`?jail @utilisateur \"<raison>\"`\n\n### Unjail\n\n`?unjail @utilisateur`\n\n---\n\n## 🧹 Sanctions Spéciales\n\n### Softban\n\n*(Ban puis débannissement instantané pour supprimer les messages du membre)*\n\n`?softban @utilisateur \"<raison>\"`\n\n---\n\n### Shadowban\n\n`+shadowban`\n\n### Retirer un Shadowban\n\n`+unshadowban`\n\n---\n\n## 📋 Informations & Outils\n\n### Snipe\n\n`-snipe`\n\n### User Info\n\n`-user-info @utilisateur`\n\n### Liste des bannis\n\n`-banlist`\n\n---\n\n## ⚖️ Gestion des Sanctions\n\n### Retirer une sanction\n\n`/sanctions delete`\n\n### Modifier une sanction\n\n`/sanctions edit`\n\n---\n\n# 👑 Blacklist & Gestion des Ranks\n\n*(avec <@318312854816161792>)*\n\n## ➕ Permissions & Grades\n\n### Permissions\n\n+perm6\n+perm5\n+perm4\n+perm3\n+perm2\n+perm1\n\n### Grades Staff\n\n+référent\n+modo\n+assistant\n+major\n+superviseur\n+responsable\n+impérial\n+partenaire\n\n---\n\n## ➖ Gestion des Grades\n\n### Retirer tous les ranks\n\n+alldrank\n\n### Derank\n\n+derank\n\n---\n\n## 🚫 Blacklist\n\n### Ajouter à la blacklist\n\n+blacklist\n\n### Retirer de la blacklist\n\n+unblacklist",
+        "new": "# 📘 Guide des Commandes Modération\n\n## 🔇 Sanctions Temporaires\n\n### Tempmute\n\n**Format :**\n`!tempmute <@membre/ID> <durée> <raison>`\n\n**Exemples :**\n• `!tempmute @Vexa 2h Spam`\n• `!tempmute @Vexa @Test 30m Raison` *(répétez la commande si nécessaire)*\n\n**Unités disponibles :**\n`s` = secondes\n`m` = minutes\n`h` = heures\n`d` = jours\n\n---\n\n### Tempban\n\n**Format :**\n`!tempban @utilisateur <durée> <raison>`\n\n**Exemple :**\n`!tempban @Vexa 1d Insultes`\n\n---\n\n## ⛔ Sanctions Permanentes\n\n### Ban permanent\n\n`!ban @utilisateur <raison>`\n\n**Exemple :**\n`!ban @user Harcèlement`\n\n---\n\n### Kick\n\n`!kick @utilisateur \"<raison>\"`\n\n---\n\n### Warn\n\n`!warn @utilisateur \"<raison>\"`\n\n---\n\n## 🔒 Gestion des Salons\n\n### Lock\n\n`!lock`\n\n### Unlock\n\n`!unlock`\n\n---\n\n## ⛓️ Jail\n\n### Jail\n\n`?jail @utilisateur \"<raison>\"`\n\n### Unjail\n\n`?unjail @utilisateur`\n\n---\n\n## 🧹 Sanctions Spéciales\n\n### Softban\n\n*(Ban puis débannissement instantané pour supprimer les messages du membre)*\n\n`?softban @utilisateur \"<raison>\"`\n\n---\n\n### Shadowban\n\n`+shadowban`\n\n### Retirer un Shadowban\n\n`+unshadowban`\n\n---\n\n## 📋 Informations & Outils\n\n### Snipe\n\n`-snipe`\n\n### User Info\n\n`-user-info @utilisateur`\n\n### Liste des bannis\n\n`-banlist`\n\n---\n\n## ⚖️ Gestion des Sanctions\n\n### Retirer une sanction\n\n`/sanctions delete`\n\n### Modifier une sanction\n\n`/sanctions edit`\n\n---\n\n# 👑 Blacklist & Gestion des Ranks\n\n*(avec <@318312854816161792>)*\n\n## ➕ Permissions & Grades\n\n### Permissions\n\n+perm6\n+perm5\n+perm4\n+perm3\n+perm2\n+perm1\n\n### Grades Staff\n\n+référent\n+modo\n+assistant\n+major\n+superviseur\n+responsable\n+impérial\n+partenaire\n\n---\n\n## ➖ Gestion des Grades\n\n### Retirer tous les ranks\n\n+alldrank\n\n### Derank\n\n+derank\n\n---\n\n## 🚫 Blacklist\n\n### Ajouter à la blacklist\n\n+blacklist\n\n### Retirer de la blacklist\n\n+unblacklist"
+    },
+    "1505581716335759361": {
+        "author_id": 336657489108140042,
+        "timestamp": "2026-06-11T15:53:24.035291+00:00",
+        "type": "del",
+        "content": "-say <Hellotest>"
+    },
+    "1391155254833189007": {
+        "author_id": 1412829772295180462,
+        "timestamp": "2026-05-17T18:46:49.564990+00:00",
+        "type": "del",
+        "content": ""
+    },
+    "1505242516285423738": {
+        "author_id": 1421407060259635260,
+        "timestamp": "2026-05-17T22:08:48.405580+00:00",
+        "type": "del",
+        "content": "5"
+    },
+    "1449201680250831059": {
+        "author_id": 1304456666003279924,
+        "timestamp": "2026-06-21T12:02:14.090086+00:00",
+        "type": "del",
+        "content": "+tempmute 1514851489359724564 4h pub"
+    },
+    "1401931941284155395": {
+        "author_id": 1412829772295180462,
+        "timestamp": "2026-05-19T19:40:56.718536+00:00",
+        "type": "del",
+        "content": "# _ _               [**/~~KAMIYO~~**](https://discord.gg/hwNxVFjwtn) ***!!***\n\n```\n :01oursdance: **Chill**﹐ *__sfw__*﹐ *non-tox*﹒୨୧  \n```\n\n﹐ ღ   ｡*gaming*﹒*anime*﹒*salons actifs*﹒*events* ﹐ `🫧`\n:01bearflowers: ﹒**staff recrute**﹒*partenariats*﹒*fusion ouverte* ****!****﹐\n[****join us****](https://discord.gg/hwNxVFjwtn) ***!*!***\n\n🎮 Gaming & fun﹒🎌 Anime/manga﹒💬 discussions﹒🎉 animations\n🤝 communauté active & respectueuse﹒nouveaux membres every day ✦\n\n👮 **STAFF RECRUTE**\n\n> cherche membres sérieux & actifs pour rejoindre l’équipe 💠\n\n🤝 **PARTENARIATS & FUSIONS OUVERTES**\n\n> grandir ensemble & créer une grosse commu <:pinkheart:1501301641754710178>"
+    },
+    "1424867227580108862": {
+        "author_id": 1514851489359724564,
+        "timestamp": "2026-06-20T20:40:30.931025+00:00",
+        "type": "del",
+        "content": "discord.gg/prettygirls"
+    },
+    "1363295791011205451": {
+        "author_id": 1401348217379098767,
+        "timestamp": "2026-06-09T19:10:57.903773+00:00",
+        "type": "del",
+        "content": ""
+    },
+    "1390740883074318466": {
+        "author_id": 1412829772295180462,
+        "timestamp": "2026-05-24T13:35:56.590539+00:00",
+        "type": "del",
+        "content": "+dmall"
+    },
+    "1463559536026845306": {
+        "author_id": 1412829772295180462,
+        "timestamp": "2026-05-24T13:58:10.710830+00:00",
+        "type": "del",
+        "content": "+addrole"
+    },
+    "1370903189662072943": {
+        "author_id": 1514851489359724564,
+        "timestamp": "2026-06-20T20:40:32.113869+00:00",
+        "type": "del",
+        "content": "discord.gg/prettygirls"
+    },
+    "1510301028631969955": {
+        "author_id": 1412829772295180462,
+        "timestamp": "2026-05-30T15:19:50.111981+00:00",
+        "type": "del",
+        "content": "REDACTED_TOKEN"
+    },
+    "1390661752349396992": {
+        "author_id": 1412829772295180462,
+        "timestamp": "2026-05-31T02:21:18.222536+00:00",
+        "type": "del",
+        "content": "+mute 1028956609382199346 10m tes"
+    },
+    "1389981758300098581": {
+        "author_id": 881217041749672002,
+        "timestamp": "2026-08-25T11:28:22.750074+00:00",
+        "type": "del",
+        "content": "+clear 2"
+    },
+    "1500973232327626772": {
+        "author_id": 1514851489359724564,
+        "timestamp": "2026-06-20T20:40:27.400844+00:00",
+        "type": "del",
+        "content": "discord.gg/prettygirls"
+    },
+    "1364538565878612038": {
+        "author_id": 1304456666003279924,
+        "timestamp": "2026-08-06T12:25:17.630029+00:00",
+        "type": "del",
+        "content": "Rouge"
+    },
+    "1348018348335697943": {
+        "author_id": 881217041749672002,
+        "timestamp": "2026-08-11T01:29:08.283320+00:00",
+        "type": "del",
+        "content": "<@1304470689541001318>"
+    }
+}

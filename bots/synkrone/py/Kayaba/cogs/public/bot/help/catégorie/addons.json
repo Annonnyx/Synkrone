@@ -1,0 +1,18 @@
+{
+    "emoji": "🧩",
+    "category_name": "Addons",
+    "category_description": "Commandes de la catégorie addons.",
+    "sections": {
+        "🛠️ Outils d'addons": {
+            "👑 `{prefix}owner`": "Afficher ou modifier les owners enregistrés du bot.",
+            "🔤 `{prefix}prefix`": "Configure les préfixes de commandes du serveur",
+            "🔒 `{prefix}botacces`": "Gère les permissions globales du bot (Salons, Rôles, Utilisateurs).",
+            "🛠️ `{prefix}devembed`": "Configurer les embeds pour les développeurs.",
+            "`/prefix`": "Configure les préfixes de commandes du serveur",
+            "`/owner`": "Aucune description.",
+            "`/servembed`": "Personnaliser l'apparence des embeds du serveur.",
+            "`/devembed`": "Aucune description.",
+            "`/botacces`": "Gère les permissions globales du bot (Salons, Rôles, Utilisateurs)."
+        }
+    }
+}

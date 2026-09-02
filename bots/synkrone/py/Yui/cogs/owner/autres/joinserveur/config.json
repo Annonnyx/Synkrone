@@ -1,0 +1,32 @@
+{
+  "embed_title": "📋 Guide des commandes serveur",
+  "welcome_text": "Merci d'avoir ajouté le bot ! Utilisez le menu pour découvrir toutes les commandes disponibles.",
+  "help_notice": "💡 Utilisez `/guide` pour accéder au guide interactif.",
+  "embed_color": "0x2b2d31",
+  "setup_pages": [
+    {
+      "title": "🏠 Accueil",
+      "content": "Bienvenue dans le **menu help complet** du bot.\n\nCommandes principales :\n• `?guide` - Ouvre le guide interactif complet\n• `?info` - Affiche les stats du serveur\n• `?edit` - Configure le style des embeds\n• `?create <nom>` - Crée salon, forum, catégorie ou rôle\n• `?sup <ID/#salon/@role>` - Supprime un salon/role\n• `?addrole <@user/ID> <@role/ID>` - Attribue un rôle\n• `?delrole <@user/ID> <@role/ID>` - Retire un rôle\n• `?accesadd <@user|@role|ID>` - Donne accès au salon\n• `?accesdel <@user|@role|ID>` - Retire accès au salon\n• `?clear` - Nettoie des messages\n• `?purge` - Menu de purge avancée\n• `?backup` - Sauvegarde et restauration\n• `?view` - Gère la visibilité du salon"
+    },
+    {
+      "title": "🧭 Infos & Utilitaires",
+      "content": "`?guide`\n• Menu interactif complet\n\n`?info`\n• Infos détaillées du serveur\n\n`?edit`\n• Assistant de style des embeds\n\n`?prefix`\n• Configure les préfixes\n\n`?view`\n• Verrouille le salon en lecture seule"
+    },
+    {
+      "title": "🛠️ Création",
+      "content": "`?create <nom>`\n• Menu pour créer salon, forum, catégorie, rôle\n\n`?sup <ID/#salon/@role>`\n• Demande confirmation avant suppression\n\n`?addrole <@user/ID> <@role/ID>`\n• Attribue un rôle à un membre"
+    },
+    {
+      "title": "🧹 Modération",
+      "content": "`?clear [nombre] [@membre ...]`\n• Supprime des messages ciblés\n\n`?derank <@membre>`\n• Retire les rôles d'un membre\n\n`?rolemembre`\n• Attribue des rôles à plusieurs membres\n\n`?addrole` / `?delrole`\n• Attribue ou retire un rôle\n\n`?accesadd` / `?accesdel`\n• Ajoute ou retire l'accès au salon"
+    },
+    {
+      "title": "🔥 Nettoyage",
+      "content": "`?purge`\n• Menu de suppression complète : rôles, salons, catégories, emojis\n⚠️ Commandes puissantes et irréversibles."
+    },
+    {
+      "title": "💾 Backup",
+      "content": "`?backup`\n• Gestionnaire complet : création, sélection, suppression, édition, restauration.\n\nModes :\n• Restaurer (nettoie avant reconstruction)\n• Ajouter (conserve l'existant, ajoute le contenu backup)"
+    }
+  ]
+}

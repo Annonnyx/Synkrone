@@ -1,0 +1,13 @@
+{
+    "emoji": "<:Synkrone:1528768996403318855>",
+    "category_name": "Découvrez aussi",
+    "category_description": "Découvrez l'univers Synkrone !",
+    "sections": {
+        "Nos autres bots": {
+            "<:Vax:1528763526817120416> [**Vax**](https://discord.com/oauth2/authorize?client_id=1367891720871874560)": "Bot polyvalent, idéal pour tous les types de serveurs !",
+            "<:Yui:1528763520634589204> [**Yui**](https://discord.com/oauth2/authorize?client_id=1460012999912853810)": "Bot de gestion de serveur : backups, création de serveurs IA, gestion des rôles & salons.",
+            "<:Kayaba:1528763523147104288> [**Kayaba**](https://discord.com/oauth2/authorize?client_id=1385913159717621780)": "Bot de collection de cartes : collectionnez, combattez, gérez votre économie.",
+            "<:Arceus:1528763517552038050> [**Arceus**](https://discord.com/oauth2/authorize?client_id=1492591949792940183)": "Bot de collection de Pokémon : attrapez, combattez, collectionnez."
+        }
+    }
+}

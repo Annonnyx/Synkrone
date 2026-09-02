@@ -1,0 +1,21 @@
+{
+    "personnages": [
+        {
+            "nom": "Monkey D. Luffy",
+            "creation_date": "2026-03-14T20:55:22.923844+00:00",
+            "creator_id": 1366780122891419784,
+            "image": "image_20260314_215549.png",
+            "id": "XBL0Q",
+            "exemplaires": 1,
+            "exemplaires_restant": 0,
+            "description": "Chef des chapeaux de paille.",
+            "valeur": 30000000,
+            "rarete": "L\u00e9gendaire",
+            "couleur": 16766720,
+            "vitesse": 400,
+            "precision": 75,
+            "vie": 6000,
+            "puissance": 500
+        }
+    ]
+}

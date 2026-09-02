@@ -1,0 +1,18 @@
+{
+    "name": "Age",
+    "display_type": "buttons",
+    "selection_mode": "unique",
+    "roles": {
+        "1471599974876713001": {
+            "label": "𝑴𝒂𝒋𝒆𝒖𝒓",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1471600041360756900": {
+            "label": "𝑴𝒊𝒏𝒆𝒖𝒓",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        }
+    },
+    "deploy_url": "https://discord.com/channels/1340639124931219466/1471599711055118457/1471600479137038376"
+}

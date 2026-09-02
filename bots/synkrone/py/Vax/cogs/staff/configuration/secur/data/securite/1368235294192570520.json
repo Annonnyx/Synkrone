@@ -1,0 +1,65 @@
+{
+    "config": {
+        "channel": {
+            "actif": true,
+            "seuil": 3,
+            "temps": 10,
+            "action": "D\u00e9rank"
+        },
+        "deco": {
+            "actif": true,
+            "seuil": 5,
+            "temps": 60,
+            "action": "Alerte"
+        },
+        "ban": {
+            "actif": true,
+            "seuil": 5,
+            "temps": 60,
+            "action": "D\u00e9rank"
+        },
+        "bot": {
+            "actif": true,
+            "action_bot": "Kick",
+            "action_user": "D\u00e9rank"
+        },
+        "everyone": {
+            "actif": true,
+            "seuil": 2,
+            "temps": 60,
+            "action": "D\u00e9rank"
+        },
+        "anti_mention": {
+            "actif": true,
+            "seuil": 4,
+            "temps": 5,
+            "action": "Mute"
+        },
+        "update": {
+            "actif": true,
+            "action": "D\u00e9rank"
+        },
+        "massmention": {
+            "actif": true,
+            "seuil": 5,
+            "action": "Supprimer"
+        },
+        "link": {
+            "actif": true,
+            "seuil": 1,
+            "temps": 1,
+            "action": "Mute"
+        },
+        "role": {
+            "actif": true,
+            "seuil": 3,
+            "temps": 10,
+            "action": "Ban"
+        },
+        "webhook": {
+            "actif": true,
+            "action": "D\u00e9rank"
+        }
+    },
+    "whitelist": []
+}

@@ -1,0 +1,112 @@
+{
+    "1530699664108818523": {
+        "notifications": {
+            "youtube_squeezie": {
+                "pseudo": "Squeezie",
+                "platform": "youtube",
+                "user_id": "199182913340833792",
+                "channel_id": "1530792929344360498",
+                "role_id": "1530763550597972268",
+                "message": "{role} {tag} **{pseudo}** est en live ! {lien}",
+                "author_name": "",
+                "description": "test"
+            },
+            "twitch_synndaris": {
+                "pseudo": "Synndaris",
+                "platform": "twitch",
+                "user_id": "199182913340833792",
+                "channel_id": "1530792929344360498",
+                "role_id": "1530763550597972268",
+                "message": "{role} {tag} **{pseudo}** est en live ! {lien}"
+            },
+            "youtube_live_squeeze": {
+                "pseudo": "Squeeze",
+                "platform": "youtube live",
+                "user_id": "",
+                "channel_id": "1530792929344360498",
+                "role_id": ""
+            },
+            "twitch_asphalte0": {
+                "pseudo": "Asphalte0",
+                "platform": "twitch",
+                "user_id": "@asphalte0",
+                "channel_id": "1530903412558925844",
+                "role_id": "1530763550597972268"
+            },
+            "twitch_mahyars": {
+                "pseudo": "MahyarS",
+                "platform": "twitch",
+                "user_id": "@mahyars",
+                "channel_id": "1530903412558925844",
+                "role_id": "everyone"
+            }
+        }
+    },
+    "542087588555522058": {
+        "notifications": {
+            "twitch_synndaris": {
+                "pseudo": "Synndaris",
+                "platform": "twitch",
+                "user_id": "199182913340833792",
+                "channel_id": "1441059133418770462",
+                "role_id": "1526595032285577326"
+            },
+            "twitch_synndaristest": {
+                "pseudo": "synndaristest",
+                "platform": "twitch",
+                "user_id": "199182913340833792",
+                "channel_id": "1530944666210668626",
+                "role_id": "649377562987855875"
+            },
+            "twitch_asphalte0": {
+                "pseudo": "Asphalte0",
+                "platform": "twitch",
+                "user_id": "asphalte0",
+                "channel_id": "1441060574455922708",
+                "role_id": "1526595032285577326"
+            },
+            "twitch_bioxyde37": {
+                "pseudo": "Bioxyde37",
+                "platform": "twitch",
+                "user_id": "bioxyde37",
+                "channel_id": "1441060574455922708",
+                "role_id": "1526595032285577326"
+            },
+            "twitch_booclef": {
+                "pseudo": "BooClef",
+                "platform": "twitch",
+                "user_id": "booclef",
+                "channel_id": "1441060574455922708",
+                "role_id": "1526595032285577326"
+            },
+            "twitch_nirotrix": {
+                "pseudo": "Nirotrix",
+                "platform": "twitch",
+                "user_id": "nirotrix",
+                "channel_id": "1441060574455922708",
+                "role_id": "1526595032285577326"
+            },
+            "twitch_snatsh51": {
+                "pseudo": "Snatsh51",
+                "platform": "twitch",
+                "user_id": "snatsh51",
+                "channel_id": "1441060574455922708",
+                "role_id": "1526595032285577326"
+            },
+            "twitch_oishii_co": {
+                "pseudo": "Oishii_co",
+                "platform": "twitch",
+                "user_id": "oishii_co",
+                "channel_id": "1441060574455922708",
+                "role_id": "1526595032285577326"
+            },
+            "twitch_uneplanteenpot": {
+                "pseudo": "UnePlanteEnPot",
+                "platform": "twitch",
+                "user_id": "uneplanteenpot",
+                "channel_id": "1441060574455922708",
+                "role_id": "1526595032285577326"
+            }
+        }
+    }
+}

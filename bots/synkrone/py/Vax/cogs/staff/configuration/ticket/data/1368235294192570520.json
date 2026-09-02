@@ -1,0 +1,29 @@
+{
+    "enabled": true,
+    "channel_id": 1510793719174139935,
+    "category_id": 1465825775231176717,
+    "archive_id": 1465825775231176717,
+    "support_role_id": 1510793717445951500,
+    "msg_id": 1523769398005862662,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "\ud83d\udcdd Recrutement",
+            "desc": "Postulez pour rejoindre nos rangs."
+        },
+        {
+            "name": "\ud83c\udf89 Giveaway",
+            "desc": "R\u00e9clamer ma r\u00e9compense."
+        },
+        {
+            "name": "\ud83d\udc8e Boutique",
+            "desc": "Probl\u00e8me avec un achat ou un grade."
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": "./data/ticket/1368235294192570520/complet.png",
+    "ticket_count": 0
+}

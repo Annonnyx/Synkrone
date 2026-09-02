@@ -1,0 +1,7 @@
+{
+    "enabled": true,
+    "channel_id": 1449835707781746698,
+    "embed_title": "𝑩𝒊𝒆𝒏𝒗𝒆𝒏𝒖𝒆 𝒔𝒖𝒓 {guild}",
+    "embed_description": "{user.mention}  𝑵𝒐𝒖𝒔 𝒂 𝒓𝒆𝒋𝒐𝒊𝒏𝒕",
+    "content_message": "𝑶𝒏 𝒂𝒄𝒄𝒍𝒂𝒎𝒆 𝒕𝒐𝒖𝒔  {user.mention} !\n 𝑵𝒐𝒖𝒔 𝒔𝒐𝒎𝒎𝒆𝒔 𝒅𝒆́𝒔𝒐𝒓𝒎𝒂𝒊𝒔 {guild.count}."
+}

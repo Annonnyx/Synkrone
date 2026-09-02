@@ -1,0 +1,15 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1533062160190541955": {
+            "name": "prrrrp_79420",
+            "timestamp": "01/08/2026 11:03",
+            "flagged": "**SIG⁠⁠NA⁠LEZ LE C⁠OMP⁠TE DE CE⁠TTE PU⁠T⁠E**\nELLE "
+        }
+    }
+}

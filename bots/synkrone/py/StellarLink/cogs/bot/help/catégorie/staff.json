@@ -1,0 +1,67 @@
+{
+    "emoji": "🛡️",
+    "category_name": "Staff",
+    "category_description": "Commandes de la catégorie staff.",
+    "sections": {
+        "Modération": {
+            "--- Warn ---": "",
+            "⚠️ `{prefix}warn`": "Avertir un membre et enregistrer la sanction.",
+            "⚠️ `{prefix}warnlist`": "Afficher la liste des avertissements d'un membre ou du serveur.",
+            "⚠️ `{prefix}warninfo`": "Afficher le détail d'un avertissement donné à un membre.",
+            "--- Mute ---": "",
+            "🔇 `{prefix}mute`": "Mute global permanent d'un membre sur tout le serveur.",
+            "🔇 `{prefix}rmute`": "Mute local permanent d'un membre sur un salon.",
+            "🔇 `{prefix}tempmute`": "Mute global temporaire d'un membre sur tout le serveur.",
+            "⏳ `{prefix}temprmute`": "Mute local temporaire d'un membre sur un salon.",
+            "🔇 `{prefix}mutelist`": "Afficher la liste des membres actuellement mute.",
+            "--- Ban ---": "",
+            "🚫 `{prefix}ban`": "Bannir un membre avec animation Tintin.",
+            "🔨 `{prefix}tempban`": "Bannir temporairement un membre avec menu interactif.",
+            "📋 `{prefix}banlist`": "Afficher la liste des membres bannis du serveur.",
+            "♻️ `{prefix}unban`": "Débannir un utilisateur du serveur.",
+            "--- Autres ---": "",
+            "🗑️ `{prefix}clear`": "Purge les messages d'un ou plusieurs utilisateurs.",
+            "⬇️ `{prefix}derank`": "Retirer tous les rôles d'un membre (action définitive).",
+            "🔒 `{prefix}lock`": "Verrouiller l'écriture dans un salon tout en gardant la visibilité.",
+            "🔓 `{prefix}unlock`": "Déverrouiller le salon actuel si verrouillé par le bot.",
+            "🔒 `{prefix}lockall`": "Verrouiller tous les salons textuels du serveur pour empêcher l'écriture.",
+            "🔓 `{prefix}unlockall`": "Déverrouiller tous les salons textuels du serveur pour rétablir l'écriture."
+        },
+        "Configuration": {
+            "🎫 `{prefix}ticket`": "Ouvre le panneau de configuration des tickets.",
+            "📈 `{prefix}statsserver`": "Configure les statistiques.",
+            "✉️ `{prefix}invitation`": "Configuration du système d'invitations (Admin).",
+            "🔄 `{prefix}update`": "Configurer le salon des mises à jour.",
+            "🔄 `{prefix}roleauto`": "Menu de configuration des rôles automatiques.",
+            "📋 `{prefix}rolemenu`": "Configurer un menu de rôles personnalisés pour les membres.",
+            "👋 `{prefix}bienvenue`": "Affiche le menu de configuration du système de bienvenue.",
+            "👋 `{prefix}aurevoir`": "Configure le système de départ des membres.",
+            "📜 `{prefix}log`": "Afficher ou configurer les logs du serveur (journal d'événements).",
+            "🛡️ `{prefix}secur`": "Ouvrir le panel de sécurité.",
+            "🔊 `{prefix}voice`": "Gérer le salon racine vocal.",
+            "🕵️‍♂️ `{prefix}confess`": "Gérer le système de confessions anonymes.",
+            "📢 `{prefix}autoping`": "Gérer les salons d'autoping pour les annonces.",
+            "✨ `{prefix}autostats`": "Annonce auto de stats dans un salon, délai et stats personnalisables.",
+            "🤝 `{prefix}partenariat`": "Créer une annonce de partenariat avec config rapide (salon, notif, message).",
+            "📣 `{prefix}annonce`": "Créer une annonce avec salons et rôles préconfigurés.",
+            "🎁 `{prefix}reward`": "Récompenses automatiques à date précise (ex : Noël, anniversaire serveur)."
+            
+
+        },
+        "Divers": {
+            "🖼️ `{prefix}emoji`": "Ouvre le menu de gestion des emojis.",
+            "🖼️ `{prefix}emoji <emoji>`": "Affiche l'emoji ciblé au format image.",
+            "📝 `{prefix}embed`": "Lance l'éditeur d'embed complet.",
+            "💬 `{prefix}say`": "Fait parler le bot (Modal en slash, direct en préfixe).",
+            "⚙️ `{prefix}setup`": "Affiche le menu interactif pour configurer le bot.",
+            "📝 `{prefix}note`": "Créer, afficher ou supprimer une note liée à un membre ou un salon.",
+            "📋 `{prefix}copy`": "Copie un message pour récupérer la ponctuation Discord *(réponse ou ID, même sur un autre serveur)*."
+
+        },
+        "Permissions": {
+            "👥 `{prefix}addmembre`": "Rend le salon visible pour des membres/rôles ou tout le monde (@everyone).",
+            "👤 `{prefix}delmembre`": "Masque le salon pour des membres/rôles ou tout le monde (@everyone).",
+            "👥 `{prefix}rolemembre`": "Gérer les rôles massivement."
+        }
+    }
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "niveau": "2",
+    "role_id": "1504150618879692893",
+    "titre": "Débutant"
+  },
+  {
+    "niveau": "10",
+    "role_id": "1504150617965330462",
+    "titre": "Expérimenté"
+  },
+  {
+    "niveau": "20",
+    "role_id": "1504150617088725042",
+    "titre": "Expert"
+  },
+  {
+    "niveau": "45",
+    "role_id": "1504150615809458357",
+    "titre": "Matrixé"
+  },
+  {
+    "niveau": "70",
+    "role_id": "1504150614307897455",
+    "titre": "Fou Du Discord"
+  }
+]

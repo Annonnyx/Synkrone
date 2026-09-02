@@ -1,0 +1,856 @@
+{
+    "info": {
+        "name": "\ud835\udc7a\ud835\udc9a\ud835\udc8f\ud835\udc8c\ud835\udc93\ud835\udc90\ud835\udc8f\ud835\udc86 \ud835\udc7a\ud835\udc96\ud835\udc91\ud835\udc91\ud835\udc90\ud835\udc93\ud835\udc95",
+        "icon_url": "https://cdn.discordapp.com/icons/1368235294192570520/37d018f38a3c3d3bd951968056bc7696.png?size=1024",
+        "date": "21/03/26 - 11:31",
+        "id": "f8f3fdc0",
+        "creator_id": "1366780122891419784"
+    },
+    "roles": [
+        {
+            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udc64\u2502\ud835\udc74\ud835\udc86\ud835\udc8e\ud835\udc83\ud835\udc93\ud835\udc86\ud835\udc94",
+            "color": 9807270,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "- ~~ -",
+            "color": 657930,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83e\udd16\u2502\ud835\udc69\ud835\udc90\ud835\udc95\ud835\udc94",
+            "color": 7506394,
+            "permissions": 8,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "- BOT -",
+            "color": 657930,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udee1\ufe0f\u2502\ud835\udc7a\ud835\udc86\ud835\udc93\ud835\udc97\ud835\udc86\ud835\udc93",
+            "color": 65535,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udce9\u2502\ud835\udc74\ud835\udc91",
+            "color": 65535,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "- LOG -",
+            "color": 657930,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udd12\u2502\ud835\udc46\ud835\udc61\ud835\udc4e\ud835\udc61\ud835\udc56\ud835\udc60\ud835\udc61\ud835\udc56\ud835\udc5e\ud835\udc62\ud835\udc52\ud835\udc60",
+            "color": 15277667,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udd12 \u2502 \ud835\udc6c\ud835\udc94\ud835\udc91\ud835\udc82\ud835\udc84\ud835\udc86 \ud835\udc69\ud835\udc90\ud835\udc95",
+            "color": 15277667,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udd12 \u2502\ud835\udc68\ud835\udc94\ud835\udc96\ud835\udc8f\ud835\udc82",
+            "color": 15277667,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "- ACCES -",
+            "color": 657930,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83c\udf81\u2502\ud835\udc6e\ud835\udc8a\ud835\udc97\ud835\udc86\ud835\udc82\ud835\udc98\ud835\udc82\ud835\udc9a",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "- NOTIF -",
+            "color": 657930,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83c\udf1f\u2502\ud835\udc7c\ud835\udc94\ud835\udc86\ud835\udc93 \ud835\udc77\ud835\udc82\ud835\udc93\ud835\udc95\ud835\udc8f\ud835\udc86\ud835\udc93",
+            "color": 3447003,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83c\udf1f\u2502\ud835\udc76\ud835\udc98\ud835\udc8f\ud835\udc86\ud835\udc93 \ud835\udc77\ud835\udc82\ud835\udc93\ud835\udc95\ud835\udc8f\ud835\udc86\ud835\udc93",
+            "color": 3447003,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "- +++ -",
+            "color": 657930,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udc8e\u2502\ud835\udc77\ud835\udc93\ud835\udc86\ud835\udc8e\ud835\udc8a\ud835\udc96\ud835\udc8e",
+            "color": 6333946,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83c\udfa8\u2502\ud835\udc6a\ud835\udc96\ud835\udc94\ud835\udc95\ud835\udc90\ud835\udc8e",
+            "color": 16436245,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "- SOUTIEN -",
+            "color": 657930,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83c\udd98\u2502\ud835\udc7a\ud835\udc96\ud835\udc91\ud835\udc91\ud835\udc90\ud835\udc93\ud835\udc95",
+            "color": 15158332,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udcdd\u2502\ud835\udc79\ud835\udc86\u0301\ud835\udc85\ud835\udc82\ud835\udc84\ud835\udc95\ud835\udc86\ud835\udc96\ud835\udc93",
+            "color": 11032055,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udcbb\u2502\ud835\udc68\ud835\udc91\ud835\udc91\ud835\udc93\ud835\udc86\ud835\udc8f\ud835\udc95\ud835\udc8a \ud835\udc6b\ud835\udc86\ud835\udc97",
+            "color": 11027200,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udee1\ufe0f\u2502\ud835\udc68\ud835\udc85\ud835\udc8e\ud835\udc8a\ud835\udc8f",
+            "color": 14427686,
+            "permissions": 8,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+            "color": 2123412,
+            "permissions": 2091243332820417,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udc51\u2502\ud835\udc76\ud835\udc98\ud835\udc8f\ud835\udc86\ud835\udc93",
+            "color": 657930,
+            "permissions": 8,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "- STAFF -",
+            "color": 657930,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83e\udd16\u2502\ud835\udc69\ud835\udc90\ud835\udc95\ud835\udc94 \ud835\udc7b\ud835\udc86\ud835\udc94\ud835\udc95",
+            "color": 0,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83e\udd16\u2502\ud835\udc75\ud835\udc90\ud835\udc94 \ud835\udc69\ud835\udc90\ud835\udc95\ud835\udc94",
+            "color": 0,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83d\udc51",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        }
+    ],
+    "categories": [
+        {
+            "name": "\ud83d\udc4b\u2502\ud835\udc68\ud835\udc84\ud835\udc84\ud835\udc96\ud835\udc86\ud835\udc8a\ud835\udc8d",
+            "overwrites": [
+                {
+                    "id": 1478797598738354177,
+                    "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 2099264
+                }
+            ],
+            "channels": [
+                {
+                    "name": "\ud83d\udcdc\u2502\ud835\udc79\u00e8\ud835\udc54\ud835\udc59\ud835\udc52\ud835\udc60",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2112
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udce2\u2502\ud835\udc68\ud835\udc8f\ud835\udc8f\ud835\udc90\ud835\udc8f\ud835\udc84\ud835\udc86\ud835\udc94",
+                    "type": "news",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2112
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83c\udfab\u2502\ud835\udc7b\ud835\udc8a\ud835\udc84\ud835\udc8c\ud835\udc86\ud835\udc95",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83c\udf81\u2502\ud835\udc6e\ud835\udc8a\ud835\udc97\ud835\udc86\ud835\udc82\ud835\udc98\ud835\udc82\ud835\udc9a",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 309237647360
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\uded2\u2502\ud835\udc69\ud835\udc90\ud835\udc96\ud835\udc95\ud835\udc8a\ud835\udc92\ud835\udc96\ud835\udc86",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 377957124096
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83d\udcac\u2502\ud835\udc6a\ud835\udc90\ud835\udc8e\ud835\udc8e\ud835\udc96\ud835\udc8f\ud835\udc82\ud835\udc96\ud835\udc95\ud835\udc86\u0301",
+            "overwrites": [
+                {
+                    "id": 1478797598738354177,
+                    "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 2099264
+                },
+                {
+                    "id": 749005324983205938,
+                    "name": "lokene",
+                    "is_role": false,
+                    "allow": 0,
+                    "deny": 1024
+                }
+            ],
+            "channels": [
+                {
+                    "name": "\ud83d\udcac\u2502\ud835\udc6e\ud835\udc86\u0301\ud835\udc8f\ud835\udc86\u0301\ud835\udc93\ud835\udc82\ud835\udc8d",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 64
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83e\udde0\u2502\ud835\udc68\ud835\udc8a\ud835\udc85\ud835\udc86",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 0
+                        },
+                        {
+                            "id": 749005324983205938,
+                            "name": "lokene",
+                            "is_role": false,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcf7\u2502\ud835\udc74\ud835\udc86\u0301\ud835\udc85\ud835\udc8a\ud835\udc82\ud835\udc94",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 0
+                        },
+                        {
+                            "id": 749005324983205938,
+                            "name": "lokene",
+                            "is_role": false,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83e\udd16 \u2502 \ud835\udc6c\ud835\udc94\ud835\udc91\ud835\udc82\ud835\udc84\ud835\udc86 \ud835\udc69\ud835\udc90\ud835\udc95",
+            "overwrites": [
+                {
+                    "id": 1368235294192570520,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                },
+                {
+                    "id": 1461918369283440671,
+                    "name": "\ud83d\udd12 \u2502 \ud835\udc6c\ud835\udc94\ud835\udc91\ud835\udc82\ud835\udc84\ud835\udc86 \ud835\udc69\ud835\udc90\ud835\udc95",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 0
+                },
+                {
+                    "id": 1478797598738354177,
+                    "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 2099264
+                }
+            ],
+            "channels": [
+                {
+                    "name": "\u267e\ufe0f\u2502\ud835\udc70\ud835\udc8f\ud835\udc87\ud835\udc8a\ud835\udc8f\ud835\udc8a\ud835\udc95\ud835\udc86",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1461918369283440671,
+                            "name": "\ud83d\udd12 \u2502 \ud835\udc6c\ud835\udc94\ud835\udc91\ud835\udc82\ud835\udc84\ud835\udc86 \ud835\udc69\ud835\udc90\ud835\udc95",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udc8c\u2502\ud835\udc6a\ud835\udc90\ud835\udc8f\ud835\udc87\ud835\udc86\ud835\udc94\ud835\udc94\ud835\udc8a\ud835\udc90\ud835\udc8f\ud835\udc94",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 377957125120
+                        },
+                        {
+                            "id": 1461918369283440671,
+                            "name": "\ud83d\udd12 \u2502 \ud835\udc6c\ud835\udc94\ud835\udc91\ud835\udc82\ud835\udc84\ud835\udc86 \ud835\udc69\ud835\udc90\ud835\udc95",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83e\udd16\u2502\ud835\udc6a\ud835\udc8e\ud835\udc85",
+                    "type": "text",
+                    "topic": "Pour tester les commandes en cours de dev sans polluer le canal g\u00e9n\u00e9ral.",
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1461918369283440671,
+                            "name": "\ud83d\udd12 \u2502 \ud835\udc6c\ud835\udc94\ud835\udc91\ud835\udc82\ud835\udc84\ud835\udc86 \ud835\udc69\ud835\udc90\ud835\udc95",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83d\udee0\ufe0f\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+            "overwrites": [
+                {
+                    "id": 1368235294192570520,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                },
+                {
+                    "id": 1478797598738354177,
+                    "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 2099264
+                },
+                {
+                    "id": 1369430431212114002,
+                    "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 0
+                }
+            ],
+            "channels": [
+                {
+                    "name": "\ud835\udc72\ud835\udc82\ud835\udc9a\ud835\udc82\ud835\udc83\ud835\udc82",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        },
+                        {
+                            "id": 1369430431212114002,
+                            "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcac\u2502\ud835\udc36\u210e\ud835\udc4e\ud835\udc61-\ud835\udc37\ud835\udc86\u0301\ud835\udc63\ud835\udc52\ud835\udc59\ud835\udc5c\ud835\udc5d\ud835\udc5d\ud835\udc52\ud835\udc62\ud835\udc5f",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        },
+                        {
+                            "id": 1369430431212114002,
+                            "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83e\udde9\u2502\ud835\udc39\ud835\udc5c\ud835\udc5f\ud835\udc62\ud835\udc5a\ud835\udc60-\ud835\udc47\ud835\udc5f\ud835\udc4e\ud835\udc63\ud835\udc4e\ud835\udc56\ud835\udc59",
+                    "type": "forum",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        },
+                        {
+                            "id": 901535137798422600,
+                            "name": "minatsukie",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1369430431212114002,
+                            "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "projets-bots",
+                    "type": "forum",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        },
+                        {
+                            "id": 723720252134785057,
+                            "name": "vex_xev.",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1369430431212114002,
+                            "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "synkrone",
+                    "type": "forum",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        },
+                        {
+                            "id": 1369430431212114002,
+                            "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud835\udc74\ud835\udc82\ud835\udc8b-\ud835\udc7d\ud835\udc82\ud835\udc99",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        },
+                        {
+                            "id": 1369430431212114002,
+                            "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "doss-synkrone",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1478797598738354177,
+                            "name": "\ud83e\udd2b\u2502\ud835\udc74\ud835\udc96\ud835\udc86\ud835\udc95",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2099264
+                        },
+                        {
+                            "id": 1369430431212114002,
+                            "name": "\ud83d\udcbb\u2502\ud835\udc6b\ud835\udc86\u0301\ud835\udc97\ud835\udc86\ud835\udc8d\ud835\udc90\ud835\udc91\ud835\udc91\ud835\udc86\ud835\udc96\ud835\udc93",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\u26a0\ufe0f\u26a0\ufe0f\u26a0\ufe0f\u26a0\ufe0f",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1368235294192570520,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1434593083487420477,
+                            "name": "\ud83d\udc51",
+                            "is_role": true,
+                            "allow": 117760,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1367891720871874560,
+                            "name": "\ud835\udc49\ud835\udc4e\ud835\udc65",
+                            "is_role": false,
+                            "allow": 3072,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        }
+    ]
+}

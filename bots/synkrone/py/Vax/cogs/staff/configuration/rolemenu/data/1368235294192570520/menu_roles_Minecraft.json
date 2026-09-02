@@ -1,0 +1,23 @@
+{
+    "name": "Minecraft",
+    "display_type": "select",
+    "selection_mode": "multiple",
+    "roles": {
+        "1506788078864437390": {
+            "label": "⛏️│TFB",
+            "emoji": "<:TFB:1507137893414469652>",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1506787803688603759": {
+            "label": "⛏️│Xenus",
+            "emoji": "<:Xenus:1507137918387490827>",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1506787902003220691": {
+            "label": "⛏️│Vanipack",
+            "emoji": "<:Vanipack:1507138933077708881>",
+            "description": "Cliquez pour obtenir ce rôle"
+        }
+    },
+    "deploy_url": "https://discord.com/channels/1368235294192570520/1506798158531924068/1507141920445431839"
+}

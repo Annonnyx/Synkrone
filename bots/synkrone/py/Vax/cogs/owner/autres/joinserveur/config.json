@@ -1,0 +1,70 @@
+{
+    "embed_title": "🚀 Bienvenue dans l'aventure !",
+    "welcome_text": "Merci d'avoir ajouté le bot à votre serveur ! Ce projet est en constante évolution pour vous offrir la meilleure expérience possible.\n\n⚠️ **Note importante :** Par défaut, la majorité des fonctionnalités sont **désactivées**. Un administrateur doit les configurer manuellement pour les activer.",
+    "help_notice": "💡 **Besoin d'aide ?** Utilisez la commande `/help` pour obtenir le détail complet de chaque fonctionnalité et leur mode d'emploi.",
+    "embed_color": "0x2b2d31",
+    "setup_pages": [
+        {
+            "title": "🛡️ Sécurité & Modération",
+            "content": """
+### 🛡️ Sécurité & Modération
+> *Placez le rôle du bot tout en haut de la liste des rôles pour garantir l’efficacité des actions.*
+
+**Commandes :**
+- 🔔 `{prefix}autoping` — Ping automatique configurable pour notifier selon des critères
+- 🔒 `{prefix}autorole` — Attribution automatique de rôles à l'arrivée des membres
+- 📋 `{prefix}log` — Configuration des logs pour surveiller tous les événements
+- 👥 `{prefix}roleauto` — Gestion avancée des rôles automatiques
+- 🛡️ `{prefix}secur` — Panneau de sécurité avancée pour protéger le serveur
+"""
+        },
+        {
+            "title": "⚙️ Accueil & Communauté",
+            "content": """
+### ⚙️ Accueil & Communauté
+
+**Commandes :**
+- 👋 `{prefix}aurevoir` — Message de départ personnalisé pour les membres quittant le serveur
+- ✨ `{prefix}bienvenue` — Message de bienvenue personnalisé pour les nouveaux membres
+- 🎉 `{prefix}boost` — Gestion et suivi des boosts du serveur
+- 🔗 `{prefix}invitation` — Configuration et suivi des invitations
+- 🎁 `{prefix}rewards` — Système de récompenses personnalisées
+- 🎟️ `{prefix}ticket` — Gestion des tickets de support pour l'assistance des membres
+"""
+        },
+
+        {
+            "title": "📊 Vocaux & Statistiques",
+            "content": """
+### 📊 Vocaux & Statistiques
+
+**Commandes :**
+- 📈 `{prefix}autostats` — Statistiques automatiques sur l'activité du serveur
+- 📊 `{prefix}statsserver` — Statistiques détaillées du serveur
+- 🔊 `{prefix}voice` — Gestion avancée des salons vocaux
+"""
+        },
+        {
+            "title": "🎮 Jeux & Divertissement",
+            "content": """
+### 🎮 Jeux & Divertissement
+
+**Commandes :**
+- 🎂 `{prefix}anniversaire` — Gestion des anniversaires des membres
+- 📜 `{prefix}confessions` — Système de confessions anonymes
+- 🎮 `{prefix}infinite` — Jeu du Juste Prix pour divertir la communauté
+- 📋 `{prefix}rolemenu` — Menu interactif pour l'attribution de rôles
+"""
+        },
+        {
+            "title": "🛠️ Outils & Utilitaires",
+            "content": """
+### 🛠️ Outils & Utilitaires
+
+**Commandes :**
+- 🚀 `{prefix}joinserveur` — Configuration d’accueil serveur et panneau d'accueil
+- 🔄 `{prefix}update` — Mise à jour des panneaux et de la configuration du bot
+"""
+        }
+    ]
+}

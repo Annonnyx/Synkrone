@@ -1,0 +1,38 @@
+{
+    "user_id": 646691043231793153,
+    "first_seen": true,
+    "created_at": "2026-06-28T00:27:35.666570",
+    "slots": 0,
+    "collection": {
+        "F9X1W": 1,
+        "CMU60": 2,
+        "B2EQJ": 1,
+        "4UI25": 1,
+        "8YAKO": 1,
+        "B4LNU": 1
+    },
+    "mp_enabled": true,
+    "collect_cooldown": "2026-06-28T08:54:42.545434",
+    "collect_cooldown_end": "2026-06-28T09:54:42.545434",
+    "col": 31213291,
+    "last_daily": "2026-06-28T00:32:55.332684",
+    "sleep_slots": [
+        {
+            "id": "4UI25",
+            "nom": "Toka Kirishima",
+            "rarete": "Légendaire",
+            "valeur": 8000000,
+            "start_time": 1782607381,
+            "last_claim": 1782637369
+        },
+        {
+            "id": "B2EQJ",
+            "nom": "Yugo - Forme Adulte",
+            "rarete": "Légendaire",
+            "valeur": 5000000,
+            "start_time": 1782607399,
+            "last_claim": 1782637369
+        }
+    ],
+    "xp": 6240000
+}

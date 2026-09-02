@@ -1,0 +1,13 @@
+{
+    "channel_id": 1530903412558925844,
+    "embed_title": "Bienvenue sur {guild}",
+    "embed_description": "{user.mention} nous a rejoint !",
+    "content_message": "Viens partager un vers avec nous, {user.mention} !\nNous sommes désormais {guild.count} à la taverne.",
+    "background_mode": "banner",
+    "background_url": "https://static.bandainamcoent.eu/high/sword-art-online/brand-setup/sao_banner2.jpg",
+    "bg_color_1": "#2c2f33",
+    "bg_color_2": "",
+    "banner_user": "author",
+    "banner_fallback_enabled": true,
+    "banner_fallback_mode": "url"
+}

@@ -1,0 +1,20 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "603321250701508619": {
+            "name": "neyuu7",
+            "timestamp": "07/06/2026 04:05",
+            "flagged": "[message sans texte]"
+        },
+        "1401908138340257792": {
+            "name": "sorrowzxy",
+            "timestamp": "14/06/2026 18:49",
+            "flagged": "@everyone DÉCALE!!!! : https://discord.gg/YRbK8nHV"
+        }
+    }
+}

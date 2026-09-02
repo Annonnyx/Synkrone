@@ -1,0 +1,20 @@
+{
+    "user_name": "La OWNEUSE trop tuff🪽",
+    "points": 0,
+    "marriages_count": 2,
+    "refusals_received": 0,
+    "refusals_given": 0,
+    "current_marriages": [
+        {
+            "partner_id": 1325597920296308738,
+            "partner_name": "Lyzzie",
+            "timestamp": 1782766005,
+            "proposer_id": 1455611676933226723
+        }
+    ],
+    "history": [
+        "[29/06/26][20:46] Vous vous êtes marié(e) avec <@1325597920296308738>.",
+        "[20/06/26][08:18] Vous avez divorcé de <@1466412541512257547>.",
+        "[08/06/26][21:35] Vous vous êtes marié(e) avec <@1466412541512257547>."
+    ]
+}

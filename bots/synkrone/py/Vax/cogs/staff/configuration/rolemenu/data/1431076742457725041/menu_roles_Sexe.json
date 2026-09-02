@@ -1,0 +1,18 @@
+{
+    "name": "Sexe",
+    "display_type": "buttons",
+    "selection_mode": "unique",
+    "roles": {
+        "1484545818210865152": {
+            "label": "She ⊹ Féminin",
+            "emoji": "♀️",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1494010326075572245": {
+            "label": "He ⊹ Masculin",
+            "emoji": "♂️",
+            "description": "Cliquez pour obtenir ce rôle"
+        }
+    },
+    "deploy_url": "https://discord.com/channels/1431076742457725041/1501315134285676705/1501324810347741195"
+}

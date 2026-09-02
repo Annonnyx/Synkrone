@@ -1,0 +1,78 @@
+{
+    "config": {
+        "ban": {
+            "actif": true,
+            "seuil": 5,
+            "temps": 60,
+            "action": "D\u00e9rank"
+        },
+        "bot": {
+            "actif": true,
+            "action_bot": "Kick",
+            "action_user": "D\u00e9rank"
+        },
+        "channel": {
+            "actif": true,
+            "seuil": 3,
+            "temps": 10,
+            "action": "D\u00e9rank"
+        },
+        "deco": {
+            "actif": true,
+            "seuil": 5,
+            "temps": 60,
+            "action": "Alerte"
+        },
+        "everyone": {
+            "actif": true,
+            "seuil": 2,
+            "temps": 60,
+            "action": "D\u00e9rank"
+        },
+        "link": {
+            "actif": true,
+            "seuil": 3,
+            "temps": 10,
+            "action": "Mute"
+        },
+        "massmention": {
+            "actif": true,
+            "seuil": 5,
+            "action": "Supprimer"
+        },
+        "anti_mention": {
+            "actif": true,
+            "seuil": 4,
+            "temps": 5,
+            "action": "Mute"
+        },
+        "role": {
+            "actif": true,
+            "seuil": 3,
+            "temps": 10,
+            "action": "D\u00e9rank"
+        },
+        "update": {
+            "actif": true,
+            "action": "D\u00e9rank"
+        },
+        "webhook": {
+            "actif": true,
+            "action": "D\u00e9rank"
+        }
+    },
+    "whitelist": [
+        {
+            "id": 1016333003561111604,
+            "type": "Membre"
+        },
+        {
+            "id": 1458355244286218312,
+            "type": "R\u00f4le"
+        },
+        {
+            "id": 1367891720871874560,
+            "type": "Bot"
+        }
+    ]
+}

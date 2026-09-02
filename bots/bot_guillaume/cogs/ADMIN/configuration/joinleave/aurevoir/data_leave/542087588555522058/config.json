@@ -1,0 +1,14 @@
+{
+    "channel_id": 542087588555522060,
+    "is_private": true,
+    "embed_title": "Départ de {user}",
+    "embed_description": "Triste de te voir partir...",
+    "content_message": "{user.mention} nous a quitté.",
+    "background_mode": "upload",
+    "background_url": "",
+    "bg_color_1": "#2c2f33",
+    "bg_color_2": "",
+    "banner_user": "author",
+    "banner_fallback_enabled": false,
+    "banner_fallback_mode": "upload"
+}

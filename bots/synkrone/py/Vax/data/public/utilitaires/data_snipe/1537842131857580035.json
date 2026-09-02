@@ -1,0 +1,27 @@
+{
+    "1540677849445433405": {
+        "author_id": 1099627178066448406,
+        "timestamp": "2026-08-22T11:03:52.112998+00:00",
+        "type": "del",
+        "content": "1"
+    },
+    "1540692584802951178": {
+        "author_id": 1166770867590676480,
+        "timestamp": "2026-08-27T17:59:00.828815+00:00",
+        "type": "del",
+        "content": "<#1540692473184264252>"
+    },
+    "1540693905371177040": {
+        "author_id": 1166770867590676480,
+        "timestamp": "2026-08-22T12:08:45.093177+00:00",
+        "type": "del",
+        "content": "c!channel"
+    },
+    "1537842133334229088": {
+        "author_id": 1099627178066448406,
+        "timestamp": "2026-08-22T16:43:29.196880+00:00",
+        "type": "edit",
+        "old": "dites leurs que pour postuler ils mettents ce qu'ils veulent et j'accepte",
+        "new": "dites leurs que pour postuler ils mettent ce qu'ils veulent et j'accepte"
+    }
+}

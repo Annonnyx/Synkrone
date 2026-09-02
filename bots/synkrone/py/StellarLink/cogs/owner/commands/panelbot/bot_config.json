@@ -1,0 +1,10 @@
+{
+    "presences": [
+        "Stellar Link : {users} utilisateurs 👥"
+    ],
+    "delay": 15,
+    "status": "dnd",
+    "prefix": "!",
+    "sync_mode": "global",
+    "version": "𝑽2.4"
+}

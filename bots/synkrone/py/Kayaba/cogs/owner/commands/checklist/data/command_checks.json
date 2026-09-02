@@ -1,0 +1,61 @@
+{
+    "daily.py": {
+        "status": "Validé",
+        "last_user": 1366780122891419784,
+        "comment": "Parfait"
+    },
+    "mp.py": {
+        "status": "Améliorer visuel",
+        "last_user": 1366780122891419784,
+        "comment": "Besoin custom emoji - Revoir le message de l'embed",
+        "visuel": "Modification emoji & détail des notifications",
+        "technique": ""
+    },
+    "boutique.py": {
+        "status": "En travaux",
+        "last_user": 1366780122891419784,
+        "comment": "Revoir pour emoji custom - Footer - Ajouter \"Solde\" dans le bouton de mon solde"
+    },
+    "lvl.py": {
+        "status": "Validé",
+        "last_user": 1366780122891419784
+    },
+    "tracker.py": {
+        "status": "Améliorer visuel",
+        "last_user": 1366780122891419784,
+        "visuel": "Améliorer le message de bienvenue visuellement",
+        "technique": ""
+    },
+    "leader.py": {
+        "status": "En travaux",
+        "last_user": 1366780122891419784,
+        "comment": "Voir en fonction du profil pour les onglets manquants"
+    },
+    "collect.py": {
+        "status": "Ne fonctionne pas"
+    },
+    "collection.py": {
+        "status": "Améliorer visuel",
+        "visuel": "Emoji surtout",
+        "technique": ""
+    },
+    "echange.py": {
+        "status": "Non existant"
+    },
+    "stage.py": {
+        "status": "Non existant"
+    },
+    "sleep.py": {
+        "status": "Améliorer mécanique",
+        "visuel": "Améliorer le visuel",
+        "technique": "Améliorer les taux de gain"
+    },
+    "pvp.py": {
+        "status": "Ne fonctionne pas"
+    },
+    "help.py": {
+        "status": "Améliorer mécanique",
+        "visuel": "Revoir texte",
+        "technique": ""
+    }
+}

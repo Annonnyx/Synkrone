@@ -1,0 +1,57 @@
+[
+  {
+    "niveau": "2",
+    "role_id": "1491591325445918820",
+    "titre": "Jeune novice"
+  },
+  {
+    "niveau": "6",
+    "role_id": "1491591574604222675",
+    "titre": "Apprenti novice"
+  },
+  {
+    "niveau": "11",
+    "role_id": "1491591877525246055",
+    "titre": "Éveillé2cepadeia"
+  },
+  {
+    "niveau": "16",
+    "role_id": "1491592070148784148",
+    "titre": "Jeune engagée"
+  },
+  {
+    "niveau": "21",
+    "role_id": "1491592311086387270",
+    "titre": "Disciple actif"
+  },
+  {
+    "niveau": "26",
+    "role_id": "1491592499590860961",
+    "titre": "Responsabilités"
+  },
+  {
+    "niveau": "31",
+    "role_id": "1491593101318291557",
+    "titre": "Professionnalise"
+  },
+  {
+    "niveau": "41",
+    "role_id": "1491593282818543729",
+    "titre": "Supérieur actif"
+  },
+  {
+    "niveau": "61",
+    "role_id": "1491593685173932083",
+    "titre": "Notre légende"
+  },
+  {
+    "niveau": "76",
+    "role_id": "1491593919765549236",
+    "titre": "Coach 2 cepadeia"
+  },
+  {
+    "niveau": "100",
+    "role_id": "1491594221961089034",
+    "titre": "Hérité Immortel"
+  }
+]

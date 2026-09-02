@@ -1,0 +1,38 @@
+{
+    "personnages": [
+        {
+            "nom": "Ken Kaneki",
+            "creation_date": "2026-03-14T22:59:02.856415+00:00",
+            "creator_id": 1366780122891419784,
+            "image": "image_20260314_235912.png",
+            "id": "CMU60",
+            "exemplaires": 40,
+            "exemplaires_restant": 37,
+            "description": "Autrefois simple humain, il \u00e9tudiait la Litt\u00e9rature Japonaise en 1\u00e8re ann\u00e9e \u00e0 l'Universit\u00e9 Kamii, vivant ainsi une vie relativement normale.",
+            "rarete": "Commun",
+            "couleur": 65280,
+            "valeur": 2000000,
+            "vitesse": 140,
+            "precision": 100,
+            "vie": 3000,
+            "puissance": 300
+        },
+        {
+            "nom": "Toka Kirishima",
+            "creation_date": "2026-03-15T12:57:30.489356+00:00",
+            "creator_id": 1016333003561111604,
+            "image": "image_20260315_141426.png",
+            "id": "4UI25",
+            "exemplaires": 100,
+            "exemplaires_restant": 99,
+            "description": "Toka Kirishima est une Goule et une ancienne serveuse de l'Antique, ainsi que l'\u00e9pouse de Ken Kaneki. Au combat, elle porte un masque ressemblant \u00e0 une t\u00eate de lapin blanc aux cheveux roses, d'o\u00f9 son surnom de Lapin.",
+            "vitesse": 82,
+            "precision": 95,
+            "vie": 100,
+            "puissance": 230,
+            "valeur": 8000000,
+            "rarete": "L\u00e9gendaire",
+            "couleur": 16766720
+        }
+    ]
+}

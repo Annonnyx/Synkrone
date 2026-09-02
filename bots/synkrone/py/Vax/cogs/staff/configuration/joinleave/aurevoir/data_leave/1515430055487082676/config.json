@@ -1,0 +1,8 @@
+{
+    "enabled": true,
+    "channel_id": 1515435448724623540,
+    "is_private": false,
+    "embed_title": "Départ de {user}",
+    "embed_description": "Eh Hawa t'es deja partie ...",
+    "content_message": "{user.mention} nous a quitté.\nNous sommes désormais {guild.count}."
+}

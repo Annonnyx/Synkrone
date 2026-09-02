@@ -1,0 +1,25 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1515687297964576968": {
+            "name": "loveavecmoi",
+            "timestamp": "17/06/2026 14:33",
+            "flagged": "__# Bienvenue sur Shinomi__\n\n***Tu cherches un end"
+        },
+        "1516487201809240122": {
+            "name": "0effet",
+            "timestamp": "17/06/2026 14:33",
+            "flagged": "__# Bienvenue sur Shinomi__\n\n***Tu cherches un end"
+        },
+        "1514759914952851637": {
+            "name": "antoine12181719",
+            "timestamp": "17/06/2026 14:34",
+            "flagged": "__# Bienvenue sur Shinomi__\n\n***Tu cherches un end"
+        }
+    }
+}

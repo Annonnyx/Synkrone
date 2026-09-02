@@ -1,0 +1,7 @@
+{
+    "enabled": true,
+    "channel_id": 1507832088886251661,
+    "embed_title": "Bienvenue parmis 𝐋𝐞𝐬 𝟏𝟎𝟎 𝐯𝐢𝐜𝐞𝐬!!",
+    "embed_description": "{user.mention} a rejoins les 100vices 😜😜",
+    "content_message": "Bienvenue {user.mention} !\nNous sommes désormais {guild.count} 100vices"
+}

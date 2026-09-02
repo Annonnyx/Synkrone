@@ -1,0 +1,12 @@
+{
+    "Cols": 0,
+    "stats": {
+        "Cols_spent": 1000
+    },
+    "blackjack_stats": {
+        "parties_heure": [
+            "2026-05-17T15:17:39.447429"
+        ],
+        "derniere_reset": "2026-05-17T15:17:39.446661"
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "enabled": true,
+    "channel_id": 1490677914843353089,
+    "category_id": 1490677912033034331,
+    "archive_id": 1490677913056706580,
+    "support_role_id": 1490677914054955288,
+    "msg_id": 1535414556292153345,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "Up un compte",
+            "desc": "Je prends pseudo et mdp seulement en mp, si t interress\u00e9 cr\u00e9e un ticket ici"
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": null,
+    "ticket_count": 0
+}

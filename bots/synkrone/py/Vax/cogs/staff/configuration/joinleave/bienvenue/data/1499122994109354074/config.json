@@ -1,0 +1,7 @@
+{
+    "enabled": true,
+    "channel_id": 1499122996185530485,
+    "embed_title": "Bienvenue sur Akari⛩️#SOON?",
+    "embed_description": "{user.mention} nous a rejoint !\nGrâce à toi nous comme {guild.count}",
+    "content_message": "On acclame tous {user.mention} !"
+}

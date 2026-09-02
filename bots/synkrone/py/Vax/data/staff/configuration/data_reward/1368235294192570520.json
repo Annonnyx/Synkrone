@@ -1,0 +1,24 @@
+{
+    "rewards": {
+        "787195c3": {
+            "name": "test",
+            "date_timestamp": 1779494400.0,
+            "title": "test",
+            "role_id": null
+        },
+        "a9dfe576": {
+            "name": "test",
+            "date_timestamp": 1779494400.0,
+            "title": "test",
+            "role_id": 1437778159729639484
+        }
+    },
+    "users": {
+        "1366780122891419784": {
+            "obtained_rewards": {
+                "787195c3": 1779494400.0,
+                "a9dfe576": 1779494400.0
+            }
+        }
+    }
+}

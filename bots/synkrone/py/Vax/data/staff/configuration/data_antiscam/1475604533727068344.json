@@ -1,0 +1,20 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1338105130482008075": {
+            "name": "zenitsu_azerty",
+            "timestamp": "24/08/2026 07:17",
+            "flagged": "discord.gg/QyKrtC2ke"
+        },
+        "1484819545926668480": {
+            "name": "bfprtl",
+            "timestamp": "31/08/2026 18:03",
+            "flagged": "[message sans texte]"
+        }
+    }
+}

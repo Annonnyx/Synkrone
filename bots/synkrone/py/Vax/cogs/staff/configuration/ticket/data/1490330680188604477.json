@@ -1,0 +1,29 @@
+{
+    "enabled": true,
+    "channel_id": 1491156688173138032,
+    "category_id": 1491156683786031134,
+    "archive_id": 1491156685438455918,
+    "support_role_id": 1490637754286211092,
+    "msg_id": 1491156689255137461,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "Suggestions",
+            "desc": "Si tu as des propositions a faire pour le serveur ou la team, n'h\u00e9sites pas !"
+        },
+        {
+            "name": "Bug",
+            "desc": "Aie\u2026 quelque-chose ne marche pas. Dis nous tout !"
+        },
+        {
+            "name": "R\u00e9clamation",
+            "desc": ""
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": null,
+    "ticket_count": 0
+}

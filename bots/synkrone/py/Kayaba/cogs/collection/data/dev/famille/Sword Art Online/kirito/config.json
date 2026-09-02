@@ -1,0 +1,17 @@
+{
+    "nom": "Kirito",
+    "creation_date": "2026-03-08T23:14:37.517541+00:00",
+    "creator_id": 1366780122891419784,
+    "image": "image_20260309_001451.png",
+    "description": "2 \u00e9p\u00e9es pour 2 fois plus de combats",
+    "vitesse": 50,
+    "precision": 75,
+    "vie": 100,
+    "puissance": 60,
+    "valeur": 100000,
+    "exemplaires": 10000,
+    "rarete": "Rare",
+    "couleur": 49151,
+    "id": "F9X1W",
+    "exemplaires_restant": 9996
+}

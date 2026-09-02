@@ -1,0 +1,18 @@
+{
+    "user_name": "DraftBot",
+    "points": 0,
+    "marriages_count": 1,
+    "refusals_received": 0,
+    "refusals_given": 0,
+    "current_marriages": [
+        {
+            "partner_id": 1340680852404965494,
+            "partner_name": "♛ 𝕯𝖊𝖑𝖊³ ♛",
+            "timestamp": 1781896900,
+            "proposer_id": 1340680852404965494
+        }
+    ],
+    "history": [
+        "[19/06/26][19:21] Vous avez accepté la demande en mariage de <@1340680852404965494>."
+    ]
+}

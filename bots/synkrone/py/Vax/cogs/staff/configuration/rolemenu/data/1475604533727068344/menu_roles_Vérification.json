@@ -1,0 +1,13 @@
+{
+    "name": "Vérification",
+    "display_type": "buttons",
+    "selection_mode": "unique",
+    "roles": {
+        "1475613863427838054": {
+            "label": "J'accepte",
+            "emoji": "📝",
+            "description": "Cliquez pour obtenir ce rôle"
+        }
+    },
+    "deploy_url": "https://discord.com/channels/1475604533727068344/1475607748392653092/1475613796260384831"
+}

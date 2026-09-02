@@ -1,0 +1,13 @@
+{
+    "emoji": "📂",
+    "category_name": "Public",
+    "category_description": "Commandes de la catégorie public.",
+    "sections": {
+        "Général": {
+            "🎨 `{prefix}servembed`": "Personnaliser l'apparence des embeds du serveur.",
+            "⚙️ `{prefix}setup`": "Affiche le menu interactif pour configurer le bot."
+        }
+    }
+}
+
+

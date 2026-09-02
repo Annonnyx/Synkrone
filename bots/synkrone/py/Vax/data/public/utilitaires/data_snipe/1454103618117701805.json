@@ -1,0 +1,15 @@
+{
+    "1459939801741394104": {
+        "author_id": 1058432189886369902,
+        "timestamp": "2026-04-12T17:08:27.732845+00:00",
+        "type": "del",
+        "content": "Ne cliquez pas sur les lien arnaque"
+    },
+    "1454103618117701808": {
+        "author_id": 1058432189886369902,
+        "timestamp": "2026-04-12T17:09:38.474690+00:00",
+        "type": "edit",
+        "old": "@everyone ne clickez pas sur les lien arnaque",
+        "new": "@everyone ne cliquez ez pas sur les lien arnaque"
+    }
+}

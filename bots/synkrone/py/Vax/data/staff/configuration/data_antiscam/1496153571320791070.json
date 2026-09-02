@@ -1,0 +1,15 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "800369639359905813": {
+            "name": "roudoudou183",
+            "timestamp": "27/06/2026 00:50",
+            "flagged": "discordapp.com/invite/underbase"
+        }
+    }
+}

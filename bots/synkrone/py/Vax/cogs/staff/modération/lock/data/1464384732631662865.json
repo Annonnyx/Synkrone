@@ -1,0 +1,51 @@
+{
+    "1474496956003782941": {
+        "send_messages": null,
+        "add_reactions": null,
+        "connect": null,
+        "speak": null,
+        "view_channel": false
+    },
+    "1466571295889035274": {
+        "send_messages": false,
+        "add_reactions": false,
+        "connect": null,
+        "speak": null,
+        "view_channel": false
+    },
+    "1466571157036863498": {
+        "send_messages": null,
+        "add_reactions": null,
+        "connect": false,
+        "speak": null,
+        "view_channel": false
+    },
+    "1466574119201144882": {
+        "send_messages": true,
+        "add_reactions": false,
+        "connect": null,
+        "speak": null,
+        "view_channel": false
+    },
+    "1468919604360249414": {
+        "send_messages": null,
+        "add_reactions": null,
+        "connect": false,
+        "speak": null,
+        "view_channel": false
+    },
+    "1474956064717017401": {
+        "send_messages": true,
+        "add_reactions": null,
+        "connect": null,
+        "speak": null,
+        "view_channel": true
+    },
+    "1489009145448235189": {
+        "send_messages": false,
+        "add_reactions": null,
+        "connect": false,
+        "speak": null,
+        "view_channel": false
+    }
+}

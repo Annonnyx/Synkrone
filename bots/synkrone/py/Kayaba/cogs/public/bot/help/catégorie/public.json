@@ -1,0 +1,17 @@
+{
+    "emoji": "📂",
+    "category_name": "Public",
+    "category_description": "Commandes de la catégorie public.",
+    "sections": {
+        "Général": {
+            "❓ `{prefix}help`": "Affiche le centre d'aide interactif.",
+            "🏓 `{prefix}ping`": "Affiche la latence du bots.",
+            "🤖 `{prefix}bot`": "Affiche le profil du bots.",
+            "💡 `{prefix}feedback`": "Soumettre une idée, une amélioration ou signaler un bug à l'équipe de développement.",
+            "`/ping`": "Affiche la latence du bots.",
+            "`/bot`": "Affiche le profil du bots.",
+            "`/help`": "Affiche le centre d'aide interactif.",
+            "`/feedback`": "Soumettre une idée, une amélioration ou signaler un bug à l'équipe de développement."
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "emoji": "📂",
+    "category_name": "Owner",
+    "category_description": "Commandes de la catégorie owner.",
+    "sections": {
+        "Général": {
+            "📝 `/checklist`": "Aucune description.",
+            "✉️ `/mp`": "Aucune description.",
+            "📊 `/devstats`": "Menu statistiques de développement",
+            "⛔ `/blacklist`": "Aucune description.",
+            "✅ `/check`": "Aucune description.",
+            "🛠️ `/panelbot`": "Accéder au panneau de configuration technique du bots.",
+            "📁 `/data`": "[Owner] Analyse quantitative, cartographie et purge de l'arborescence des données.",
+            "`/mp`": "Aucune description.",
+            "`/setup`": "Affiche le menu interactif pour configurer le bot.",
+            "`/devstats`": "Menu statistiques de développement",
+            "`/check`": "Aucune description.",
+            "`/checklist`": "Aucune description.",
+            "`/panelbot`": "Accéder au panneau de configuration technique du bots.",
+            "`/blacklist`": "Aucune description.",
+            "`/data`": "[Owner] Analyse quantitative, cartographie et purge de l'arborescence des données."
+        },
+        "Collections": {
+            "💻 `/dev`": "Commande de développement réservée aux owners."
+        }
+    }
+}

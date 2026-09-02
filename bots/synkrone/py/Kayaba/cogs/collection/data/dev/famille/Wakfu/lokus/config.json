@@ -1,0 +1,17 @@
+{
+    "nom": "Lokus",
+    "creation_date": "2026-03-14T00:44:28.365160+00:00",
+    "creator_id": 1366780122891419784,
+    "image": "image_20260314_014440.png",
+    "id": "AZN4M",
+    "rarete": "L\u00e9gendaire",
+    "couleur": 16766720,
+    "valeur": 3000000,
+    "exemplaires": 10,
+    "vitesse": 666,
+    "precision": 100,
+    "vie": 8000,
+    "puissance": 600,
+    "description": "Lokus est un M\u00e9chasme qui garde, pour une raison inconnue, l'entr\u00e9e du Temple Eliatrope o\u00f9 r\u00e9side la D\u00e9esse Eliatrope au sein de l'Inglorium, vers la fin de l'\u00c8re du Wakfu.",
+    "exemplaires_restant": 10
+}

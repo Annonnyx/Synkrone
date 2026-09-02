@@ -1,0 +1,18 @@
+{
+    "emoji": "🛠️",
+    "category_name": "Administration",
+    "category_description": "Commandes réservées aux administrateurs du serveur.",
+    "requires_admin": true,
+    "sections": {
+        "🎰 Commandes liées au casino": {
+            "🛍️ `{prefix}adminshop`": "Permet aux admins du serveur de définir les articles en vente dans le shop.",
+            "🛠️ `{prefix}admin` `@tag/ID`": "Permet aux administrateurs de gérer le profil d'un joueur (solde, reset, etc.)."
+
+        },
+        "🌐 Commandes globales": {
+            "🎨 `{prefix}servembed`": "Personnaliser l'apparence des embeds du serveur.",
+            "🔤 `{prefix}prefix`": "Configure les préfixes de commandes du serveur.",
+            "🔄 `{prefix}update`": "Configure le salon des mises à jour du bot."
+        }
+    }
+}

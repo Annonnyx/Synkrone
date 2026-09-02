@@ -1,0 +1,33 @@
+{
+    "enabled": true,
+    "channel_id": 1516824882799837317,
+    "category_id": 1516824879360512221,
+    "archive_id": 1516824880232923238,
+    "support_role_id": 1516824881629626449,
+    "msg_id": 1516824883764527226,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "Gestion Abus/Pb \ud83d\ude24",
+            "desc": "Si un Staff/Admin fait un abus de perms , Cr\u00e9er un ticket et dite nous le probl\u00e8me"
+        },
+        {
+            "name": "Gestion Staff/Admin \ud83d\udee1\ufe0f",
+            "desc": "Si tu souhaites nous rejoindre en tant que Staff/Admin cr\u00e9\u00e9 ton ticket ."
+        },
+        {
+            "name": "Gestion Partenariat \ud83d\udc6c",
+            "desc": "Tu souhaites faire un partenariat avec la NPB Family ?"
+        },
+        {
+            "name": "Gestion probl\u00e8me \ud83e\uddd1\u200d\u2696\ufe0f",
+            "desc": "Si tu a un probl\u00e8me avec le serveur , Ou bien un membres du serveur dite le nous."
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": "./data/ticket/1504081104385347755/B61CD806-3425-47F6-AEEA-251528B02FDF.jpg",
+    "ticket_count": 0
+}

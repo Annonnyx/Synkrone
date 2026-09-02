@@ -1,0 +1,57 @@
+{
+    "1531440130441740490": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-15T15:13:58.111268+00:00",
+        "type": "del",
+        "content": "Ajouts commande : \n-# commandes d'affichage de gif \n* ²blush\n* ²cry\n* ²laugh\n* ²slap\n* ²pat\n* ²cat\n* ²dog\n* ²gif <mot clé>\n-# Autres\n²layout - Permet de créer des layout (comme ²embed)\n\nRename : \nstatsserver > compteur\nrolemembre > /massrole\n/rappel > /time"
+    },
+    "1531459797587857468": {
+        "author_id": 723720252134785057,
+        "timestamp": "2026-08-06T16:19:07.055370+00:00",
+        "type": "del",
+        "content": "https://google.com"
+    },
+    "1487865765230022826": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-02T02:28:06.984354+00:00",
+        "type": "del",
+        "content": "²clear"
+    },
+    "1531612477153083525": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-23T20:42:03.300691+00:00",
+        "type": "del",
+        "content": "1402"
+    },
+    "1532958288482799768": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-15T15:28:37.454818+00:00",
+        "type": "edit",
+        "old": "## 🔄 Modifications & Fusions\n### 🔀 Fusions de Commandes \n> Afin d'éviter d'encombrer les menus, plusieurs commandes ont été fusionnées sous des commandes chapeaux :\n* 🎮 **`!game`** — Regroupe **tous les mini-jeux** dans un menu unique et simplifié :\n  * *Intègre : * `!2048`, `!anagram`, `!enigme`, `!flags`, `!master`, `!morpion`, `!nombre`, `!pfc`, `!puissance4`.\n* ℹ️ **`!info`** — Centralise l'affichage des informations :\n  * *Intègre : * `!channel`, `!guild`, `!role`, `!whois`.\n* 🎲 **`!random`** — Réunit toutes les commandes de tirage aléatoire :\n  * *Intègre : * `!8ball`, `!rate`, `!choose`.\n* 🔤 **`!font`** — Regroupe le traitement et la stylisation de texte :\n  * *Intègre : * `!reverse`, `!ascii`, `!font`.\n* 🛠️ **`!panelbot` & `!devembed`** — Fusionnés dans une interface d'administration unique.\n### 🛠️ Refontes & Évolutions de Commandes\n* 🎨 **`!theme`** *(anciennement `!servembed`)* — Refonte complète avec l'ajout de réglages dédiés à la personnalisation du profil du bot.\n* 🔐 **`!perm`** — Intégration d'un menu interactif pour attribuer dynamiquement des permissions selon les rôles, utilisateurs et commandes.\n* 🎲 **`!dice`** — Possibilité de choisir précisément le nombre de dés à lancer ainsi que leur valeur faciale.\n* 📋 **`!copy`** — Extrait désormais simultanément les formats **embed** et **layout**.\n* 💍 **`!marry`** — Remise à niveau intégrale dotée d'une toute nouvelle interface utilisateur.\n### ✏️ Renommages \n* 📈 `statsserver` ➔ `compteur`\n* 👥 `rolemembre` ➔ `/massrole`\n* ⏰ `/rappel` ➔ `/time`\n* 🗝️ `!botacces` ➔ `!acces`\n## 🗑️ Suppressions\n* ❌ **`!owner`** — Commande supprimée.\n* 💔 **`!marryme`** — Commande supprimée et remplacée par la nouvelle version intégrée de `!marry`.\n* ❌ **`!prefix`** — Commande supprimée et remplacée par la nouvelle version intégrée de **`!theme`**.",
+        "new": "## 🔄 Modifications & Fusions\n### 🔀 Fusions de Commandes \n> Afin d'éviter d'encombrer les menus, plusieurs commandes ont été fusionnées sous des commandes chapeaux :\n* 🎮 **`!game`** — Regroupe **tous les mini-jeux** dans un menu unique et simplifié :\n  * *Intègre : * `!2048`, `!anagram`, `!enigme`, `!flags`, `!master`, `!morpion`, `!nombre`, `!pfc`, `!puissance4`.\n* ℹ️ **`!info`** — Centralise l'affichage des informations :\n  * *Intègre : * `!channel`, `!guild`, `!role`, `!whois`.\n* 🎲 **`!random`** — Réunit toutes les commandes de tirage aléatoire :\n  * *Intègre : * `!8ball`, `!rate`, `!choose`.\n* 🔤 **`!font`** — Regroupe le traitement et la stylisation de texte :\n  * *Intègre : * `!reverse`, `!ascii`, `!font`.\n* 🛠️ **`!panelbot` & `!devembed`** — Fusionnés dans une interface d'administration unique.\n### 🛠️ Refontes & Évolutions de Commandes\n* ⚙️ **`!setup`** — Commande entièrement revue pour guider pas à pas l'utilisateur et lui expliquer clairement comment prendre en main et configurer le bot.\n* 🎨 **`!theme`** *(anciennement `!servembed`)* — Refonte complète avec l'ajout de réglages dédiés à la personnalisation du profil du bot.\n* 🔐 **`!perm`** — Intégration d'un menu interactif pour attribuer dynamiquement des permissions selon les rôles, utilisateurs et commandes.\n* 🎲 **`!dice`** — Possibilité de choisir précisément le nombre de dés à lancer ainsi que leur valeur faciale.\n* 📋 **`!copy`** — Extrait désormais simultanément les formats **embed** et **layout**.\n* 💍 **`!marry`** — Remise à niveau intégrale dotée d'une toute nouvelle interface utilisateur.\n### ✏️ Renommages \n* 📈 `statsserver` ➔ `compteur`\n* 👥 `rolemembre` ➔ `/massrole`\n* ⏰ `/rappel` ➔ `/time`\n* 🗝️ `!botacces` ➔ `!acces`\n## 🗑️ Suppressions\n* ❌ **`!owner`** — Commande supprimée.\n* 💔 **`!marryme`** — Commande supprimée et remplacée par la nouvelle version intégrée de `!marry`.\n* ❌ **`!prefix`** — Commande supprimée et remplacée par la nouvelle version intégrée de **`!theme`**."
+    },
+    "1533300426886348933": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-23T20:31:48.971891+00:00",
+        "type": "del",
+        "content": "<:Synkrone:1532192122336186570>"
+    },
+    "1533475325244346502": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-02T14:17:45.479918+00:00",
+        "type": "del",
+        "content": "²emoji"
+    },
+    "1535388710353379348": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-07T20:46:38.836227+00:00",
+        "type": "del",
+        "content": "2"
+    },
+    "1541198666553884723": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-23T21:34:04.414075+00:00",
+        "type": "del",
+        "content": "dz"
+    }
+}

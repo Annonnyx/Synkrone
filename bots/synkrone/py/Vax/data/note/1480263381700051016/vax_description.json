@@ -1,0 +1,10 @@
+{
+    "content": "\ud83e\udd16 \ud83d\udccc Description officielle de Vax\n\u300e\ud835\udc7d\ud835\udcb6\ud835\udccd\u300f est un bot Discord fran\u00e7ais multi-fonction actuellement en d\u00e9veloppement (b\u00eata), qui vise \u00e0 devenir un bot complet pour g\u00e9rer et animer un serveur. \ufffd\nTop.gg\n\ud83d\udc49 Son objectif :\nCr\u00e9er un bot tout-en-un (mod\u00e9ration + fun + outils) pour remplacer plusieurs bots \u00e0 la fois.\n\ud83d\udee1\ufe0f \ud83d\udd27 Fonctionnalit\u00e9s principales\n\ud83d\udc6e Mod\u00e9ration (le plus important)\nBan / Unban\nMute / Tempmute\nWarn + liste des warns\nClear (supprimer messages)\nLock / Unlock salon\nGestion des permissions\n\ud83d\udc49 Donc oui : c\u2019est bien un bot de mod\u00e9ration complet \ufffd\nTop.gg\n\ud83d\udc51 Administration & staff\nGestion des r\u00f4les (addrole, temprole, etc.)\nTickets (support)\nEmbeds personnalis\u00e9s\nCommandes staff\n\u2699\ufe0f Configuration\nChangement de pr\u00e9fixe\nParam\u00e8tres personnalisables\nOrganisation des commandes par cat\u00e9gories\n\ud83c\udfae Fun & Jeux\nMorpion, Puissance 4, \u00c9checs\n2048, pendu, anagrammes\nCommandes fun (hug, 8ball, etc.)\n\ud83d\udee0\ufe0f Utilitaires\nPing\nInfos utilisateur / serveur\nSondages\nCalculatrice\nAvatar",
+    "title": "Description du bot vax",
+    "author_id": 1378696082283823136,
+    "created_at": "2026-04-09T08:11:28.750061",
+    "updated_at": "2026-04-09T08:15:55.005135",
+    "is_public": true,
+    "short_description": "Vax est un bot de mod\u00e9ration avancer",
+    "markdown_enabled": true
+}

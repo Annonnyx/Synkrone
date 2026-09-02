@@ -1,0 +1,33 @@
+{
+    "name": "Rôle",
+    "display_type": "select",
+    "selection_mode": "multiple",
+    "roles": {
+        "1473415398069243924": {
+            "label": "Muslim",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1467023101589196862": {
+            "label": "PERM I",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1467023240818856110": {
+            "label": "PERM II",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1467023673029296360": {
+            "label": "PERM III",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        },
+        "1467023888209940561": {
+            "label": "PERM IV",
+            "emoji": "🎭",
+            "description": "Cliquez pour obtenir ce rôle"
+        }
+    },
+    "deploy_url": "https://discord.com/channels/1464384732631662865/1469001581264371985/1494726708484509747"
+}

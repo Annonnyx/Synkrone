@@ -1,0 +1,26 @@
+{
+    "1": {
+        "commandes": "delrole | say",
+        "description": "Permission 1 - Non configurée"
+    },
+    "2": {
+        "commandes": "banlist | confess | infinite | roleauto | boost | prefix | logserver | bienvenue",
+        "description": "Permission 2 - Non configurée"
+    },
+    "3": {
+        "commandes": "rolemenu | invit | invitation | aurevoir | pub | secur | statsserver | addmembre | tempban | derank | unlock",
+        "description": "Permission 3 - Non configurée"
+    },
+    "4": {
+        "commandes": "temprmute | mutelist | warn | rmute | embed | note | addrole | emoji",
+        "description": "Permission 4 - Non configurée"
+    },
+    "5": {
+        "commandes": "lockall | unban | ban | lock | clear | unlockall | mute | tempmute | perm | warnlist | giveaway",
+        "description": "Permission 5 - Non configurée"
+    },
+    "6": {
+        "commandes": "admininfo | delmembre | ticket | update | voice",
+        "description": "Permission 6 - Non configurée"
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "nom": "Joris - Forme Adulte",
+    "creation_date": "2026-03-08T23:48:42.695441+00:00",
+    "creator_id": 1366780122891419784,
+    "image": "image_20260309_004904.png",
+    "description": "Il en a vu passer des choses..",
+    "vitesse": 50,
+    "precision": 75,
+    "vie": 100,
+    "puissance": 60,
+    "valeur": 200000,
+    "exemplaires": 1000,
+    "rarete": "Rare",
+    "couleur": 49151,
+    "id": "UKZFF",
+    "exemplaires_restant": 997
+}

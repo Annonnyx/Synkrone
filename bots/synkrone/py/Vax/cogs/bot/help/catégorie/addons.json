@@ -1,0 +1,14 @@
+{
+    "emoji": "🧩",
+    "category_name": "Addons",
+    "category_description": "Commandes de la catégorie addons.",
+    "sections": {
+        "🛠️ Outils d'addons": {
+            "🛡️ `{prefix}perm`": "Affiche les permissions disponibles avec un sélecteur.",
+            "🔒 `{prefix}botacces`": "Définissez les accès du bot ! *Système de whitelist/blacklist, configuration de salon, membres & rôles.*",
+            "🎨 `{prefix}servembed`": "Personnaliser l'apparence des embeds du serveur.",
+            "🔤 `{prefix}prefix`": "Configure les préfixes de commandes du serveur.",
+            "👑 `{prefix}owner`": "Afficher ou modifier les owners enregistrés du bot."
+        }
+    }
+}

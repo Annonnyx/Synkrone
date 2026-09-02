@@ -1,0 +1,15 @@
+{
+    "user_id": 723720252134785057,
+    "first_seen": true,
+    "created_at": "2026-03-18T16:05:58.311922",
+    "slots": 3,
+    "collection": {
+        "F9X1W": 1
+    },
+    "mp_enabled": true,
+    "col": 4283,
+    "last_daily": "2026-03-18T16:06:01.735568",
+    "collect_cooldown": "2026-03-18T16:07:28.971785",
+    "collect_cooldown_end": "2026-03-18T17:07:28.971785",
+    "sleep_slots": []
+}

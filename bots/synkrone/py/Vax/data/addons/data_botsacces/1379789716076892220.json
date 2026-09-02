@@ -1,0 +1,9 @@
+{
+    "channel_mode": "blacklist",
+    "channels": [
+        1462102150518931496
+    ],
+    "entity_mode": "blacklist",
+    "roles": [],
+    "users": []
+}

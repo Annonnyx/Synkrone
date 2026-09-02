@@ -1,0 +1,234 @@
+{
+    "info": {
+        "name": "Serveur de test",
+        "icon_url": null,
+        "date": "12/05/26 - 20:02",
+        "id": "95912987",
+        "creator_id": "1065588100073537586"
+    },
+    "roles": [
+        {
+            "name": "Non vérifié",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Membre",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Staff",
+            "color": 0,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        }
+    ],
+    "categories": [
+        {
+            "name": "Salons textuels",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "général",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1503707720283324496,
+                            "name": "Non vérifié",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "Salons vocaux",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "Général",
+                    "type": "voice",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1503707720283324496,
+                            "name": "Non vérifié",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        }
+    ],
+    "orphan_channels": [
+        {
+            "name": "rules",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1503435389439049799,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 2048
+                },
+                {
+                    "id": 1503707720283324496,
+                    "name": "Non vérifié",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 2048
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "moderator-only",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1503435389439049799,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "tokens",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1503435389439049799,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "guide",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1503707720283324496,
+                    "name": "Non vérifié",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "game",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1503707720283324496,
+                    "name": "Non vérifié",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "leaderboard",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1503707720283324496,
+                    "name": "Non vérifié",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "🤖│𝒀𝒖𝒊",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1503435389439049799,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                },
+                {
+                    "id": 1460012999912853810,
+                    "name": "𝒀𝒖𝒊",
+                    "is_role": false,
+                    "allow": 84992,
+                    "deny": 0
+                },
+                {
+                    "id": 1065588100073537586,
+                    "name": "noct_valdenix",
+                    "is_role": false,
+                    "allow": 3072,
+                    "deny": 0
+                },
+                {
+                    "id": 1503774532542926910,
+                    "name": "𝒀𝒖𝒊",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1503756414886350995,
+                    "name": "NoctBotTests",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1503462217826439402,
+                    "name": "♕NoctBot♕",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        }
+    ]
+}

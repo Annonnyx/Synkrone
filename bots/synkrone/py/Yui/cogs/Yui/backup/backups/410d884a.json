@@ -1,0 +1,1043 @@
+{
+    "info": {
+        "name": "Zeno HUB \ud83c\uddf2\ud83c\uddeb",
+        "icon_url": "https://cdn.discordapp.com/icons/1480263381700051016/042807bfbe144713b75e68b77cc348bc.png?size=1024",
+        "date": "21/03/26 - 10:54",
+        "id": "410d884a",
+        "creator_id": "1366780122891419784"
+    },
+    "roles": [
+        {
+            "name": "Membre",
+            "color": 39935,
+            "permissions": 79615809035329,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "\ud83c\udd98\u2502\ud835\udc7a\ud835\udc96\ud835\udc91\ud835\udc91\ud835\udc90\ud835\udc93\ud835\udc95",
+            "color": 15158332,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Expert Dev",
+            "color": 2123412,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Bot Manager",
+            "color": 15158332,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "H\u00e9bergeur",
+            "color": 15277667,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Dev Helper",
+            "color": 15277667,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Mainteneur",
+            "color": 11342935,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Support Team",
+            "color": 12745742,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": true
+        },
+        {
+            "name": "Community Manager",
+            "color": 15844367,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Designer",
+            "color": 15277667,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Contributeur",
+            "color": 15158332,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Giveawaiy",
+            "color": 12745742,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Partenaires",
+            "color": 767,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Boosteur",
+            "color": 15139071,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Responsable activit\u00e9s",
+            "color": 61695,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "D\u00e9veloppeur bots",
+            "color": 15105570,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "D\u00e9veloppeur serveur",
+            "color": 16711882,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "D\u00e9veloppeur web",
+            "color": 15277667,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Assistant staff",
+            "color": 3447003,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Staff",
+            "color": 5918136,
+            "permissions": 1721807559716807,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Mod\u00e9rateur",
+            "color": 15158332,
+            "permissions": 1720707884502769,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "G\u00e9rant",
+            "color": 3066993,
+            "permissions": 1716307519548657,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Fondateur",
+            "color": 15277667,
+            "permissions": 1721835208572927,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Co fondateur",
+            "color": 15277667,
+            "permissions": 8864258447638527,
+            "hoist": false,
+            "mentionable": false
+        }
+    ],
+    "categories": [
+        {
+            "name": "\ud83d\udccc Information",
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 377957124096
+                }
+            ],
+            "channels": [
+                {
+                    "name": "\ud83d\udcdc-reglement",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udce2-annonce",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83e\udd1d-partenariat",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83c\udf10-nos-sites",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "condition-partenariat",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "depart",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "bienvenue",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "la-pub-pour-notre-srv",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 1760303889512529
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83d\udcac Communaut\u00e9",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "\ud83d\udcac-g\u00e9n\u00e9ral",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\u2753-entraide",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\uddbc-media",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udca1-suggestion",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83c\udf89 Giveaways",
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 377957124096
+                }
+            ],
+            "channels": [
+                {
+                    "name": "\ud83c\udf89-giveaways",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83c\udfc6-resultat-giveaways",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83e\udd16 Developpement bots",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "\ud83d\udcbb-creation-de-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcbb-developpement-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83e\udde0-aide-codes",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcca-logs-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83d\udda5Hebergement",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "hebergement-info",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "demande-hebergement",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "status-serveurs",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83d\udee0 Staff",
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1049600
+                },
+                {
+                    "id": 1481017987879403722,
+                    "name": "Responsable activit\u00e9s",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                },
+                {
+                    "id": 1481017299849838622,
+                    "name": "D\u00e9veloppeur web",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                },
+                {
+                    "id": 1481017762506608710,
+                    "name": "D\u00e9veloppeur bots",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                },
+                {
+                    "id": 1481017512123568260,
+                    "name": "D\u00e9veloppeur serveur",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                },
+                {
+                    "id": 1481015986965712906,
+                    "name": "G\u00e9rant",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                }
+            ],
+            "channels": [
+                {
+                    "name": "\ud83d\udee0-chat-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 34359739408
+                        },
+                        {
+                            "id": 1481017512123568260,
+                            "name": "D\u00e9veloppeur serveur",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481015986965712906,
+                            "name": "G\u00e9rant",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481016224338022673,
+                            "name": "Staff",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481017762506608710,
+                            "name": "D\u00e9veloppeur bots",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481016100668833974,
+                            "name": "Mod\u00e9rateur",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481017299849838622,
+                            "name": "D\u00e9veloppeur web",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481017036518719762,
+                            "name": "Assistant staff",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udc6e-annonce-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 3072
+                        },
+                        {
+                            "id": 1480291940745609491,
+                            "name": "Co fondateur",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481015685164564500,
+                            "name": "Fondateur",
+                            "is_role": true,
+                            "allow": 1760303889513553,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83e\uddd1\u200d\ud83d\udcbc-gestion-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udee1-activit\u00e9-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udce2-absense-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "giveaway-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83c\udd98 Support",
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 377957124096
+                }
+            ],
+            "channels": [
+                {
+                    "name": "\ud83d\udce9-support",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83c\udfab\u2502\ud835\udc7b\ud835\udc8a\ud835\udc84\ud835\udc8c\ud835\udc86\ud835\udc95",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83d\udd0a Vocaux",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "\ud83d\udd0a G\u00e9n\u00e9ral",
+                    "type": "voice",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83c\udfaeDeveloppement",
+                    "type": "voice",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udee0 Support",
+                    "type": "voice",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83e\udd16 Projets Bots",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "\ud83e\udd16-projets-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udce2-presentation-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udd04-mise-a-jour-bot",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83d\udcda Apprentissage",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "\ud83d\udca1-id\u00e9es-bot",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\u2753-questions-dev",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udce6-ressources-code",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83e\uddd1\u200d\ud83d\udcbb-apprendre-le-code",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83c\udfa5-tutoriels",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83c\udf10 API & Int\u00e9grations",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "\u2699\ufe0f-tests-api",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udd17-commandes-bot",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83e\uddeb-webhooks",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "\ud83d\udcc2\u2502\ud835\udc7b\ud835\udc8a\ud835\udc84\ud835\udc8c\ud835\udc86\ud835\udc95 \ud835\udc86\ud835\udc8f \ud835\udc84\ud835\udc90\ud835\udc96\ud835\udc93\ud835\udc94",
+            "overwrites": [],
+            "channels": []
+        },
+        {
+            "name": "\ud83d\uddc4\ufe0f\u2502\ud835\udc7b\ud835\udc8a\ud835\udc84\ud835\udc8c\ud835\udc86\ud835\udc95 \ud835\udc82\ud835\udc93\ud835\udc84\ud835\udc89\ud835\udc8a\ud835\udc97\ud835\udc86\u0301",
+            "overwrites": [],
+            "channels": []
+        },
+        {
+            "name": "\ud83d\udccc Logs",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "\ud83d\udcc2logs-messages",
+                    "type": "text",
+                    "topic": "\udb40\udc6c\udb40\udc6f\udb40\udc67\udb40\udc5f\udb40\udc6d\udb40\udc65\udb40\udc73\udb40\udc73\udb40\udc61\udb40\udc67\udb40\udc65\udb40\udc5f\udb40\udc66\udb40\udc72",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "\u10e6\ud83c\udf38~\u033d\u0353\u01e4\u0141a\u0320\u0320\u0110\u00d8S~\ud83c\udf38\u10e6",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcc2logs-salons",
+                    "type": "text",
+                    "topic": "\udb40\udc6c\udb40\udc6f\udb40\udc67\udb40\udc5f\udb40\udc63\udb40\udc68\udb40\udc61\udb40\udc6e\udb40\udc6e\udb40\udc65\udb40\udc6c\udb40\udc5f\udb40\udc66\udb40\udc72",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "\u10e6\ud83c\udf38~\u033d\u0353\u01e4\u0141a\u0320\u0320\u0110\u00d8S~\ud83c\udf38\u10e6",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcc2logs-roles",
+                    "type": "text",
+                    "topic": "\udb40\udc6c\udb40\udc6f\udb40\udc67\udb40\udc5f\udb40\udc72\udb40\udc6f\udb40\udc6c\udb40\udc65\udb40\udc5f\udb40\udc66\udb40\udc72",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "\u10e6\ud83c\udf38~\u033d\u0353\u01e4\u0141a\u0320\u0320\u0110\u00d8S~\ud83c\udf38\u10e6",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcc2logs-tickets",
+                    "type": "text",
+                    "topic": "\udb40\udc6c\udb40\udc6f\udb40\udc67\udb40\udc5f\udb40\udc74\udb40\udc69\udb40\udc63\udb40\udc6b\udb40\udc65\udb40\udc74\udb40\udc73\udb40\udc5f\udb40\udc66\udb40\udc72",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "\u10e6\ud83c\udf38~\u033d\u0353\u01e4\u0141a\u0320\u0320\u0110\u00d8S~\ud83c\udf38\u10e6",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcc2logs-candidatures",
+                    "type": "text",
+                    "topic": "\udb40\udc6c\udb40\udc6f\udb40\udc67\udb40\udc5f\udb40\udc63\udb40\udc61\udb40\udc6e\udb40\udc64\udb40\udc69\udb40\udc64\udb40\udc61\udb40\udc74\udb40\udc75\udb40\udc72\udb40\udc65\udb40\udc73\udb40\udc5f\udb40\udc66\udb40\udc72",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "\u10e6\ud83c\udf38~\u033d\u0353\u01e4\u0141a\u0320\u0320\u0110\u00d8S~\ud83c\udf38\u10e6",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "\ud83d\udcc2logs-transcripts",
+                    "type": "text",
+                    "topic": "\udb40\udc6c\udb40\udc6f\udb40\udc67\udb40\udc5f\udb40\udc74\udb40\udc72\udb40\udc61\udb40\udc6e\udb40\udc73\udb40\udc63\udb40\udc72\udb40\udc69\udb40\udc70\udb40\udc74\udb40\udc73\udb40\udc5f\udb40\udc66\udb40\udc72",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "\u10e6\ud83c\udf38~\u033d\u0353\u01e4\u0141a\u0320\u0320\u0110\u00d8S~\ud83c\udf38\u10e6",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        }
+    ]
+}

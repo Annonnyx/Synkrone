@@ -1,0 +1,37 @@
+{
+    "enabled": true,
+    "channel_id": 1473094234302058538,
+    "category_id": 1473094229583597691,
+    "archive_id": 1473094231093411995,
+    "support_role_id": 1465723212125175828,
+    "msg_id": 1530485398931898428,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "\ud83e\udd1d Partenariat",
+            "desc": "Proposez une collaboration ou un \u00e9change."
+        },
+        {
+            "name": "\ud83d\udcdd Gestion perm",
+            "desc": "Postulez pour rejoindre nos rangs / Rank up derank"
+        },
+        {
+            "name": "\ud83c\udf89 Animation",
+            "desc": "Suggestions ou probl\u00e8mes li\u00e9s aux events."
+        },
+        {
+            "name": "\ud83d\udee1\ufe0f Report",
+            "desc": "Signaler un joueur ou un abus."
+        },
+        {
+            "name": "\ud83d\udcb8claim",
+            "desc": "Recevoir votre r\u00e9compense gw \u00e9vent"
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": null,
+    "ticket_count": 0
+}

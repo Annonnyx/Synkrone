@@ -1,0 +1,33 @@
+{
+    "enabled": true,
+    "channel_id": 1478773727775690883,
+    "category_id": 1478773724437282900,
+    "archive_id": 1478773725922070548,
+    "support_role_id": 1478773726987161763,
+    "msg_id": 1478773728975257642,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "\ud83e\udd1d Partenariat",
+            "desc": "Proposez une collaboration ou un \u00e9change."
+        },
+        {
+            "name": "\ud83d\udcdd Recrutement",
+            "desc": "Postulez pour rejoindre nos rangs."
+        },
+        {
+            "name": "\ud83c\udf89 Animation",
+            "desc": "Li\u00e9s aux events."
+        },
+        {
+            "name": "\ud83d\udee1\ufe0f Report",
+            "desc": "Signaler un utilisateur."
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": "./data/ticket/1443692517789798514/telecharge_2.png",
+    "ticket_count": 0
+}

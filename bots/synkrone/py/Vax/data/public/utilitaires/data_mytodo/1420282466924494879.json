@@ -1,0 +1,105 @@
+{
+    "projects": [
+        {
+            "name": "Nexus Guard",
+            "tasks": [
+                {
+                    "content": "Xeno exécuteur à rétro mais pour le moment down donc à faire après",
+                    "status": "amelioration"
+                },
+                {
+                    "content": "Madium Executeur : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Velocity : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Real : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Neuronally : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Yub-X : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Potassium : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Bunni-Lol : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "LX63 : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "JJSploit : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Valex : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Solara : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Pluto : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Drift : 🟢 rétro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Codex : 🟢",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Arceus X : retro 🟢",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Delta : 🟢 retro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Update payload avec infos de la retro",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Update le payload vers la pre production",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Faire les test de la pre prod et corriger les erreurs",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Update finale",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Ajoute dans le vps la backup vanilla des variables client luau non corrompu",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Ajouter le systeme de verification du client flag avec les différentes verification tant que ce n’est pas verifié avec l’environnement non corrompu aucun ban",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "Tout update et lancer en production",
+                    "status": "non_traite"
+                }
+            ]
+        }
+    ]
+}

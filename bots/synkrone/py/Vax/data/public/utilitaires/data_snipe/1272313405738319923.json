@@ -1,0 +1,72 @@
+{
+    "1471622403808428052": {
+        "author_id": 1016333003561111604,
+        "timestamp": "2026-09-02T17:02:08.423174+00:00",
+        "type": "edit",
+        "old": "Qu’est ce qui lui arrive à de lui là",
+        "new": "Qu’est ce qui lui arrive à celui là"
+    },
+    "1471624998924980318": {
+        "author_id": 1531830587936084050,
+        "timestamp": "2026-07-30T23:16:51.759763+00:00",
+        "type": "del",
+        "content": "257"
+    },
+    "1272313409282510921": {
+        "author_id": 1175828409608327191,
+        "timestamp": "2026-08-14T17:42:08.138317+00:00",
+        "type": "del",
+        "content": "Gabin mabire"
+    },
+    "1272313408158564403": {
+        "author_id": 1211452687380512819,
+        "timestamp": "2026-07-09T02:02:38.970636+00:00",
+        "type": "edit",
+        "old": "",
+        "new": "C moi"
+    },
+    "1272313409282510922": {
+        "author_id": 801836050544459818,
+        "timestamp": "2026-08-11T16:03:55.332323+00:00",
+        "type": "edit",
+        "old": "AH MAIS VOUS ETRS PARTIS",
+        "new": "AH MAIS VOUS ÊTES PARTIS"
+    },
+    "1471621843508134104": {
+        "author_id": 959117269491912704,
+        "timestamp": "2026-08-09T10:49:26.219058+00:00",
+        "type": "del",
+        "content": "tqt"
+    },
+    "1272313409676902421": {
+        "author_id": 1175828409608327191,
+        "timestamp": "2026-07-28T21:46:40.718549+00:00",
+        "type": "del",
+        "content": ""
+    },
+    "1272313407126900751": {
+        "author_id": 959117269491912704,
+        "timestamp": "2026-08-09T10:47:24.029969+00:00",
+        "type": "del",
+        "content": ">theme"
+    },
+    "1272313407650922596": {
+        "author_id": 959117269491912704,
+        "timestamp": "2026-07-29T11:35:29.832912+00:00",
+        "type": "del",
+        "content": ">perm"
+    },
+    "1272313408699633747": {
+        "author_id": 881217041749672002,
+        "timestamp": "2026-07-31T13:58:57.241459+00:00",
+        "type": "del",
+        "content": ">free"
+    },
+    "1528066376504180820": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-08-08T20:46:14.609966+00:00",
+        "type": "edit",
+        "old": "c comme la commande ²random",
+        "new": "c comme la commande ²random & ²font"
+    }
+}

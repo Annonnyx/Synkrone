@@ -1,0 +1,41 @@
+{
+    "name": "ᢉ𐭩’ ange",
+    "points": 100,
+    "refusals_received": 0,
+    "refusals_given": 0,
+    "marriages_count": 4,
+    "divorces_count": 0,
+    "last_divorce_ts": 0,
+    "current_marriages": [
+        {
+            "partner_id": 1262451239287787640,
+            "partner_name": "Elιpze",
+            "timestamp": 1779524498,
+            "proposer_id": 1401908138340257792
+        },
+        {
+            "partner_id": 1367891720871874560,
+            "partner_name": "𝑉𝑎𝑥",
+            "timestamp": 1779547409,
+            "proposer_id": 1401908138340257792
+        },
+        {
+            "partner_id": 1032294619540635649,
+            "partner_name": "✦𝓛ë𝓵𝔂𝓼𝓼 ✦",
+            "timestamp": 1780569898,
+            "proposer_id": 1401908138340257792
+        },
+        {
+            "partner_id": 1340680852404965494,
+            "partner_name": "♛ 𝕯𝖊𝖑𝖊³ ♛",
+            "timestamp": 1781896875,
+            "proposer_id": 1340680852404965494
+        }
+    ],
+    "history": [
+        "[19/06/26][19:21] Vous avez accepté la demande en mariage de <@1340680852404965494>.",
+        "[04/06/26][10:44] Vous vous êtes marié(e) avec <@1032294619540635649>.",
+        "[23/05/26][14:43] Vous vous êtes marié(e) avec <@1367891720871874560>.",
+        "[23/05/26][08:21] Vous vous êtes marié(e) avec <@1262451239287787640>."
+    ]
+}

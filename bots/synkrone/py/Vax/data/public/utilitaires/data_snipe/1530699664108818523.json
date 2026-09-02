@@ -1,0 +1,36 @@
+{
+    "1530792929344360498": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-07-26T06:09:25.585466+00:00",
+        "type": "del",
+        "content": "!panelboy"
+    },
+    "1530747240728100874": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-07-26T13:40:09.729585+00:00",
+        "type": "edit",
+        "old": "da",
+        "new": "dart"
+    },
+    "1530942585172922388": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-07-26T14:20:16.184354+00:00",
+        "type": "edit",
+        "old": "`*help` - 👑 Mon propriétaire est <@1530933899176448091>.\n> il affiche l'équipe alors qu'il devrait afficher le fondateur de l'équipe",
+        "new": "`*help` - 👑 Mon propriétaire est <@1530933899176448091>.\n> il affiche l'équipe alors qu'il devrait afficher le fondateur de l'équipe\n`cmd owner` Ne semble pas fonctionner pour tout les membres de l'équipe ?"
+    },
+    "1530829467197509692": {
+        "author_id": 1366780122891419784,
+        "timestamp": "2026-07-26T14:43:10.393853+00:00",
+        "type": "edit",
+        "old": "pour les custo",
+        "new": "pour les custom"
+    },
+    "1530699664712794304": {
+        "author_id": 199182913340833792,
+        "timestamp": "2026-07-28T21:15:46.255962+00:00",
+        "type": "edit",
+        "old": "si je comprend bien, quand le pseudo twitch dans la configuration, le bot va chercher lui même l'API 🤔",
+        "new": "si je comprend bien, quand le pseudo twitch dans la configuration, le bot va chercher lui même l'API twitch de la personne 🤔"
+    }
+}

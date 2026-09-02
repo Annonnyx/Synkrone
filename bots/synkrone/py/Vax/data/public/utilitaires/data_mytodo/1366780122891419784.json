@@ -1,0 +1,125 @@
+{
+    "projects": [
+        {
+            "name": "Data à revoir",
+            "tasks": [
+                {
+                    "content": "addons/prefix",
+                    "status": "valide"
+                },
+                {
+                    "content": "addons/perm",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "owner/autres/commands/data/last_commands.json",
+                    "status": "valide"
+                },
+                {
+                    "content": "public/statistiques/stats/data/configs",
+                    "status": "valide"
+                },
+                {
+                    "content": "public/utilitaires/sondage",
+                    "status": "valide"
+                },
+                {
+                    "content": "staff/configuration/autorole",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/boost",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/confessions",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/anniversaire",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/infinite",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/invitation",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/joinleaver/aurevoir",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/joinleave/bienvenue",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/logserver",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/rolemenu",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/secur",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/statsserver",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/ticket",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/update",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/voice",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/configuration/partenariat",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/divers/giveaway",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/divers/note",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/modération/ban",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/modération/lock",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/modération/mute",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/modération/rolemembre",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "staff/modération/warn",
+                    "status": "non_traite"
+                },
+                {
+                    "content": "test",
+                    "status": "non_traite"
+                }
+            ]
+        }
+    ]
+}

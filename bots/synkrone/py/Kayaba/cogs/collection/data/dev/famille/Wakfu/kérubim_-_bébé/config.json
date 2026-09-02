@@ -1,0 +1,17 @@
+{
+    "nom": "K\u00e9rubim - B\u00e9b\u00e9",
+    "creation_date": "2026-03-08T23:43:04.955820+00:00",
+    "creator_id": 1366780122891419784,
+    "image": "image_20260309_004316.png",
+    "description": "Kro meugnon le chaton",
+    "vitesse": 50,
+    "precision": 5,
+    "vie": 100,
+    "puissance": 400,
+    "rarete": "Epique",
+    "couleur": 10040012,
+    "valeur": 700000,
+    "exemplaires": 300,
+    "id": "8YAKO",
+    "exemplaires_restant": 297
+}

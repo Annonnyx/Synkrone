@@ -1,0 +1,84 @@
+{
+    "Cols": 10000000054112,
+    "last_lantern_ts": 1785088858.350771,
+    "dice_stats": {
+        "parties_heure": [
+            "2026-07-25T16:18:28.145033"
+        ],
+        "derniere_reset": "2026-07-25T16:18:28.143226"
+    },
+    "roulette_stats": {
+        "parties_heure": [
+            "2026-07-26T18:00:25.371696"
+        ]
+    },
+    "stats": {
+        "Cols_spent": 9421,
+        "daily_count": 2,
+        "daily_streak": 1,
+        "lantern_games": 1,
+        "hourly_count": 2,
+        "monthly_count": 1,
+        "rob_success": 1
+    },
+    "last_daily": "2026-07-25T03:28:37.754103+02:00",
+    "last_daily_before_streak": "2026-07-25T03:28:37.754103+02:00",
+    "achievements": {
+        "daily_count": {
+            "tier": 1,
+            "dates": {
+                "1": "26/06/2026 22:03"
+            }
+        },
+        "daily_streak": {},
+        "lantern_games": {
+            "tier": 1,
+            "dates": {
+                "1": "27/06/2026 16:00"
+            }
+        },
+        "rob_success": {
+            "tier": 1,
+            "dates": {
+                "1": "25/07/2026 03:30"
+            }
+        }
+    },
+    "honneur": 3,
+    "Honneurs": 0,
+    "last_weekly": "2026-07-20T19:41:40.297785+02:00",
+    "last_hourly": "2026-07-25T03:29:28.432974+02:00",
+    "last_monthly": "2026-06-27T18:18:56.909072+02:00",
+    "random_history": [],
+    "random_uses_this_hour": 0,
+    "random_total_count": 1,
+    "random_last_use": "2026-06-27T18:19:08.351780+02:00",
+    "mines_stats": {
+        "parties_heure": [
+            "2026-07-26T18:01:02.638487"
+        ],
+        "derniere_reset": "2026-07-26T18:01:02.638459"
+    },
+    "blackjack_stats": {
+        "parties_heure": [
+            "2026-07-26T18:00:07.798426"
+        ],
+        "derniere_reset": "2026-07-26T18:00:07.798359"
+    },
+    "xp": 220,
+    "slots_stats": {
+        "parties_heure": [
+            "2026-07-26T17:59:43.400573"
+        ],
+        "derniere_reset": "2026-07-26T17:59:43.400471"
+    },
+    "rob_data": {
+        "rob_date": "2026-07-25",
+        "targets_today": [
+            "1465117546113138941"
+        ],
+        "hourly_robs": [
+            "2026-07-25T03:30:33.778240"
+        ]
+    }
+}

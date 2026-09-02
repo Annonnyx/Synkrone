@@ -1,0 +1,37 @@
+{
+    "name": "𝑽𝒆𝒙",
+    "refusals_received": 1,
+    "refusals_given": 0,
+    "marriages_count": 4,
+    "current_marriages": [
+        {
+            "partner_id": 1367891720871874560,
+            "partner_name": "𝑉𝑎𝑥",
+            "timestamp": 1779547194,
+            "proposer_id": 1366780122891419784
+        },
+        {
+            "partner_id": 1460012999912853810,
+            "partner_name": "𝒀𝒖𝒊",
+            "timestamp": 1779562502,
+            "proposer_id": 1366780122891419784
+        },
+        {
+            "partner_id": 806254692513742918,
+            "partner_name": "Moha🐣🇩🇿",
+            "timestamp": 1779618721,
+            "proposer_id": 1366780122891419784
+        }
+    ],
+    "history": [
+        "[24/05/26][10:32] Vous vous êtes marié(e) avec <@806254692513742918>.",
+        "[23/05/26][18:57] <@1340680852404965494> a refusé votre demande en mariage.",
+        "[23/05/26][18:55] Vous vous êtes marié(e) avec <@1460012999912853810>.",
+        "[23/05/26][18:15] Vous avez divorcé de <@1385913159717621780>.",
+        "[23/05/26][14:46] Vous vous êtes marié(e) avec <@1385913159717621780>.",
+        "[23/05/26][14:39] Vous vous êtes marié(e) avec <@1367891720871874560>."
+    ],
+    "points": 100,
+    "divorces_count": 0,
+    "last_divorce_ts": 0
+}

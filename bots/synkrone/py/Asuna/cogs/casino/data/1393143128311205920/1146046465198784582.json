@@ -1,0 +1,25 @@
+{
+    "Cols": 53751,
+    "last_daily": "2026-09-02T11:56:29.647978+02:00",
+    "stats": {
+        "daily_count": 7,
+        "daily_streak": 1
+    },
+    "last_daily_before_streak": "2026-09-02T11:56:29.647978+02:00",
+    "achievements": {
+        "daily_count": {
+            "tier": 2,
+            "dates": {
+                "1": "24/08/2026 00:56",
+                "2": "30/08/2026 19:27"
+            }
+        },
+        "daily_streak": {
+            "tier": 1,
+            "dates": {
+                "1": "31/08/2026 21:57"
+            }
+        }
+    },
+    "honneur": 3
+}

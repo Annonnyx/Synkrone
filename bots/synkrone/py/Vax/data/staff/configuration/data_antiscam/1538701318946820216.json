@@ -1,0 +1,15 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1484156110423199855": {
+            "name": "malik02666",
+            "timestamp": "28/08/2026 20:05",
+            "flagged": "discord.gg/Squirt @everyone"
+        }
+    }
+}

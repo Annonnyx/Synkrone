@@ -1,0 +1,34 @@
+{
+    "name": "𝑉𝑎𝑥",
+    "points": 100,
+    "refusals_received": 0,
+    "refusals_given": 0,
+    "marriages_count": 3,
+    "divorces_count": 0,
+    "last_divorce_ts": 0,
+    "current_marriages": [
+        {
+            "partner_id": 1366780122891419784,
+            "partner_name": "𝑽𝒆𝒙",
+            "timestamp": 1779547194,
+            "proposer_id": 1366780122891419784
+        },
+        {
+            "partner_id": 1401908138340257792,
+            "partner_name": "ᢉ𐭩’ ange",
+            "timestamp": 1779547409,
+            "proposer_id": 1401908138340257792
+        },
+        {
+            "partner_id": 1340680852404965494,
+            "partner_name": "♛ 𝕯𝖊𝖑𝖊³ ♛",
+            "timestamp": 1781632071,
+            "proposer_id": 1340680852404965494
+        }
+    ],
+    "history": [
+        "[16/06/26][17:47] Vous avez accepté la demande en mariage de <@1340680852404965494>.",
+        "[23/05/26][14:43] Vous avez accepté la demande en mariage de <@1401908138340257792>.",
+        "[23/05/26][14:39] Vous avez accepté la demande en mariage de <@1366780122891419784>."
+    ]
+}

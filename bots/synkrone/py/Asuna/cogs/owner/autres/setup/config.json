@@ -1,0 +1,60 @@
+﻿{
+    "embed_title": "🚀 Bienvenue dans l'aventure !",
+    "welcome_text": "Merci d'avoir ajouté le bot à votre serveur ! Ce projet est en constante évolution pour vous offrir la meilleure expérience possible.\n\n⚠️ **Note importante :** Par défaut, la majorité des fonctionnalités sont **désactivées**. Un administrateur doit les configurer manuellement pour les activer.",
+    "help_notice": "💡 **Besoin d'aide ?** Utilisez la commande `{prefix}help` pour obtenir le détail complet de chaque fonctionnalité et leur mode d'emploi.",
+    "embed_color": "0x2b2d31",
+    "setup_pages": [
+        {
+            "title": "🛡️ Sécurité & Modération",
+            "description": "Placez le rôle du bot tout en haut de la liste des rôles pour garantir l'efficacité des actions.",
+            "sections": {
+                "🛡️ Sécurité": {
+                    "🛡️ `{prefix}secur`": "`Recommandé` Panneau de sécurité avancée.",
+                    "👥 `{prefix}roleauto`": "`Recommandé` Gestion des rôles automatiques.",
+                    "📋 `{prefix}log`": "`Recommandé` Configuration des logs du serveur."
+                }
+            }
+        },
+        {
+            "title": "⚙️ Accueil & Communauté",
+            "description": "Personnalisez l'expérience d'arrivée et de départ de vos membres.",
+            "sections": {
+                "⚙️ Communauté": {
+                    "👋 `{prefix}bienvenue`": "`Recommandé` Message personnalisé pour les nouveaux membres.",
+                    "👋 `{prefix}aurevoir`": "`Facultatif` Message de départ pour les membres qui quittent.",
+                    "✨ `{prefix}boost`": "`Facultatif` Suivi des boosts du serveur."
+                }
+            }
+        },
+        {
+            "title": "🎟️ Système de Tickets",
+            "description": "Mettez en place un support structuré pour vos membres.",
+            "sections": {
+                "🎟️ Tickets": {
+                    "🎟️ `{prefix}ticket`": "`Recommandé` Ouvre le panneau de configuration des tickets."
+                }
+            }
+        },
+        {
+            "title": "📊 Vocaux & Statistiques",
+            "description": "Gérez les salons vocaux et suivez l'activité de votre serveur.",
+            "sections": {
+                "📊 Statistiques": {
+                    "🔊 `{prefix}voice`": "`Facultatif` Gestion du salon racine vocal.",
+                    "📈 `{prefix}statsvocal`": "`Facultatif` Statistiques vocales en temps réel.",
+                    "📊 `{prefix}statsserver`": "`Facultatif` Statistiques du serveur."
+                }
+            }
+        },
+        {
+            "title": "🎮 Jeux & Divertissement",
+            "description": "Animez votre communauté avec des fonctionnalités ludiques.",
+            "sections": {
+                "🎮 Jeux": {
+                    "🎮 `{prefix}infinite`": "`Facultatif` Jeu du Juste Prix.",
+                    "📜 `{prefix}confessions`": "`Facultatif` Système de confessions anonymes."
+                }
+            }
+        }
+    ]
+}

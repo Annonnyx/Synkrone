@@ -1,0 +1,17 @@
+{
+    "config": {
+        "deco": {
+            "actif": true,
+            "seuil": 5,
+            "temps": 60,
+            "action": "Alerte"
+        },
+        "link": {
+            "actif": true,
+            "seuil": 3,
+            "temps": 10,
+            "action": "Mute"
+        }
+    },
+    "whitelist": []
+}

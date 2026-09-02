@@ -1,0 +1,15 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1376883126902718557": {
+            "name": "wilfried35000",
+            "timestamp": "15/06/2026 05:40",
+            "flagged": "[message sans texte]"
+        }
+    }
+}

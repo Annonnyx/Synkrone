@@ -1,0 +1,33 @@
+{
+    "enabled": true,
+    "channel_id": 1514835352760881214,
+    "category_id": 1514835349954760844,
+    "archive_id": 1514835350743158886,
+    "support_role_id": 1514835351770763464,
+    "msg_id": 1514835353729503232,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "Ticket Gestion Abus /Pb",
+            "desc": "Si un Staff/Admin fait un abus de perms cr\u00e9\u00e9 un ticket , Et dites-nous le probl\u00e8me."
+        },
+        {
+            "name": "Staff / Admin",
+            "desc": "Tu souhaites nous rejoindre en tant que Staff/Admin ?"
+        },
+        {
+            "name": "Ticket Partenariat",
+            "desc": "Tu souhaite faire un partenariat avec Nova World \ud83c\udf0d ? Cr\u00e9\u00e9 ton ticket \ud83c\udfab"
+        },
+        {
+            "name": "Ticket Gestion Abus 2",
+            "desc": "Un probl\u00e8me avec le serveur , Ou quelqu\u2019un du serveur cr\u00e9\u00e9 ton ticket , Et dit nous le directement"
+        }
+    ],
+    "custom_description": "Tu veux rentrer en contact avec les staffs ? Cr\u00e9er un ticket , Et rentre ta raison du ticket.",
+    "local_image_path": "./data/ticket/1511096895328616570/1F174BA9-9E00-40E5-82EE-43BFCA1A27B2.jpg",
+    "ticket_count": 0
+}

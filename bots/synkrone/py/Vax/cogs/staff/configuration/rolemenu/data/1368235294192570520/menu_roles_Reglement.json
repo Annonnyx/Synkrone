@@ -1,0 +1,13 @@
+{
+    "name": "test",
+    "display_type": "buttons",
+    "selection_mode": "multiple",
+    "roles": {
+        "1506776672458903723": {
+            "label": "Accepter le règlement",
+            "emoji": "🔒",
+            "description": "Cliquez pour obtenir ce rôle"
+        }
+    },
+    "deploy_url": "https://discord.com/channels/1368235294192570520/1427634975389515917/1506817458730831894"
+}

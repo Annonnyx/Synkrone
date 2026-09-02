@@ -1,0 +1,40 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1514376669442478223": {
+            "name": "kvflafvtn",
+            "timestamp": "19/06/2026 10:10",
+            "flagged": "@everyone"
+        },
+        "1516135335703347291": {
+            "name": "ketari0280",
+            "timestamp": "21/06/2026 00:40",
+            "flagged": "discord.gg/prettygirls @everyone"
+        },
+        "1519802134965518608": {
+            "name": "yelover0867",
+            "timestamp": "29/06/2026 13:00",
+            "flagged": "[message sans texte]"
+        },
+        "1517963094054146192": {
+            "name": "_kvbixx_x",
+            "timestamp": "02/07/2026 23:17",
+            "flagged": "[message sans texte]"
+        },
+        "1475982729945415800": {
+            "name": "aissamihoubi",
+            "timestamp": "06/07/2026 21:08",
+            "flagged": "[message sans texte]"
+        },
+        "1526130416564699206": {
+            "name": "produke15923",
+            "timestamp": "16/07/2026 08:46",
+            "flagged": "discord.gg/uXkX5TBc8"
+        }
+    }
+}

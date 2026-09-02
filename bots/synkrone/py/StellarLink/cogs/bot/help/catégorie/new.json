@@ -1,0 +1,15 @@
+{
+  "version": "2.4",
+  "ajout": [
+    "`!antiscam` - Sécurise le serveur contre les tentatives de scam."
+  ],
+  "amelioration": [],
+  "modification": [
+  ],
+  "correction": [
+    "`!leader` - N'affiche que des utilisateurs présents sur le serveur",
+    "`!profil` - Réaffiche correctement les statistiques"
+  ],
+  "nerf": [],
+  "suppression": []
+}

@@ -1,0 +1,8 @@
+{
+    "enabled": true,
+    "channel_id": 1508187883813732472,
+    "is_private": false,
+    "embed_title": "Départ de {user}",
+    "embed_description": "T’es vicieux (se)",
+    "content_message": "{user.mention} nous a quitté.\nNous sommes désormais {guild.count}."
+}

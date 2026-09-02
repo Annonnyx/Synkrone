@@ -1,0 +1,17 @@
+{
+    "Cols": 9918,
+    "blackjack_stats": {
+        "parties_heure": [
+            "2026-04-19T09:14:54.832577"
+        ],
+        "derniere_reset": "2026-04-19T09:14:54.832455"
+    },
+    "last_daily": "2026-04-19T11:15:10.087700+02:00",
+    "last_lantern_ts": 1776590154.025104,
+    "coinflip_stats": {
+        "parties_heure": [
+            "2026-04-19T09:16:24.214345"
+        ],
+        "derniere_reset": "2026-04-19T09:16:24.214208"
+    }
+}

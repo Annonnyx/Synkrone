@@ -1,0 +1,16 @@
+{
+    "presences": [
+        "⚡{name} {version} - {ping} ms",
+        "👥 {users} membres uniques",
+        "🌐 Présent sur {servers} serveurs",
+        "❓ {prefix}help pour plus d'info",
+        "✨ Prefix : [{prefix}]",
+        "⚠️ Un problème ? Mp moi",
+        "🌐 𝒉𝒕𝒕𝒑𝒔://𝒔𝒚𝒏𝒌𝒓𝒐𝒏𝒆.𝒂𝒑𝒑"
+    ],
+    "delay": 15,
+    "status": "dnd",
+    "prefix": ".",
+    "sync_mode": "global",
+    "version": "𝑽1.0.1"
+}

@@ -1,0 +1,112 @@
+[
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1368235294192570520,
+        "type": "Ajouter une feature",
+        "target": "Asuna",
+        "command": "/d",
+        "description": "d",
+        "timestamp": "2026-05-16T10:28:08.448374"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1368235294192570520,
+        "type": "Am\u00e9liorer une feature",
+        "target": "Asuna",
+        "command": "/test",
+        "description": "test\ntest2\ntest3\n-test4",
+        "timestamp": "2026-05-16T10:42:38.179027"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1368235294192570520,
+        "type": "Nerfer une feature",
+        "target": "Asuna",
+        "command": "/sdsdsd",
+        "description": "sdsdsd",
+        "timestamp": "2026-05-16T10:46:36.688599"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1368235294192570520,
+        "type": "Am\u00e9liorer une feature",
+        "target": "Asuna",
+        "command": "/fdfdf",
+        "description": "dfdfd",
+        "timestamp": "2026-05-16T10:48:34.329678"
+    },
+    {
+        "user_id": 1442084113006989363,
+        "user_name": "c_l_i_p_z_e",
+        "source_guild_id": 1511693154716225536,
+        "type": "Am\u00e9liorer une feature",
+        "target": "Asuna",
+        "command": "/adminsetup",
+        "description": "Faire un /setup seulement pour certain role dans  le serveur en question , enlever la limite de blackjack/ roulette ( enlever les limite d\u2019utilisation de casino ) ( pour pouvoir farm et flex lol ) .\nCela pourra apporter plus de fun \u00e0 jouer car tu sais que tu as a l\u2019infini , et pour les staff ajoutez/retirer des chose gr\u00e2ce au /setupadmin . \nMerci \nCordialement c_l_i_p_z_e",
+        "timestamp": "2026-06-08T19:34:43.135197"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1368235294192570520,
+        "type": "Ajouter une feature",
+        "target": "Asuna",
+        "command": "/shop & /adminshop",
+        "description": "`/shop` - Affiche le shop du serveur\n`/adminshop` - Permet de configurer les produits du shop\n- Les admins du serveur peuvent mettre en vente des r\u00f4les. \nEx : @permimage = 1 500 000 Cols\n- Le menu affichera les r\u00f4les existants & une option pour les modifier",
+        "timestamp": "2026-06-27T17:02:27.505096"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1510577043434111046,
+        "type": "Signaler un bug",
+        "target": "Asuna",
+        "command": "/blackjack",
+        "description": "- Probl\u00e8me de footer \n- Doit afficher le solde actuel\n- Corriger le probl\u00e8me sur la majoration de gain",
+        "timestamp": "2026-06-30T10:06:13.072517"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1393143128311205920,
+        "type": "Signaler un bug",
+        "target": "Asuna",
+        "command": "/dice",
+        "description": "Le gain rencontre une difficult\u00e9 \n- Si je mise petit (1000) il me fait gagner trop & trop facilement \n- Si je mise gros (100 000) il me fait gagner autant que si je misait 1 000 & pareil trop facilement (mais finalement je suis perdant)",
+        "timestamp": "2026-07-11T11:49:22.588249"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1368235294192570520,
+        "type": "Ajouter une feature",
+        "target": "Asuna",
+        "command": "/vote",
+        "description": "Via top.gg, apr\u00e8s avoir vot\u00e9, avoir un gain X2 de r\u00e9compense",
+        "timestamp": "2026-07-20T02:35:58.017825"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1368235294192570520,
+        "type": "Signaler un bug",
+        "target": "Asuna",
+        "command": "/bot",
+        "description": "Probl\u00e8me de statistiques",
+        "timestamp": "2026-07-20T02:36:51.331561"
+    },
+    {
+        "user_id": 1366780122891419784,
+        "user_name": "vexaumax",
+        "source_guild_id": 1368235294192570520,
+        "type": "Signaler un bug",
+        "target": "Asuna",
+        "command": "/bot",
+        "description": "Url top.gg incorrect \nAjouter url synkrone.app/#asuna",
+        "timestamp": "2026-07-20T02:43:54.215927"
+    }
+]

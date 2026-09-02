@@ -1,0 +1,45 @@
+{
+    "enabled": true,
+    "channel_id": 1497631082542006385,
+    "category_id": 1497631078746165549,
+    "archive_id": 1497631080122028112,
+    "support_role_id": 1497631081246101706,
+    "msg_id": 1520158659219292221,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "\ud83e\udd1d Partenariat",
+            "desc": "Proposez une collaboration ou un \u00e9change."
+        },
+        {
+            "name": "\ud83d\udcdd Recrutement",
+            "desc": "Postulez pour rejoindre nos rangs."
+        },
+        {
+            "name": "\ud83c\udf89 Animation",
+            "desc": "Suggestions ou probl\u00e8mes li\u00e9s aux events."
+        },
+        {
+            "name": "\ud83d\udee1\ufe0f Report",
+            "desc": "Signaler un joueur ou un abus."
+        },
+        {
+            "name": "\ud83d\udc8e Boutique",
+            "desc": "Probl\u00e8me avec un items achetable ou un r\u00f4le"
+        },
+        {
+            "name": "\ud83d\udee0\ufe0f Bug",
+            "desc": "Signaler un dysfonctionnement technique."
+        },
+        {
+            "name": "\u2753 Question",
+            "desc": "Besoin d'une information g\u00e9n\u00e9rale."
+        }
+    ],
+    "custom_description": "Bonjour, Veuillez patienter que l'un de nos staff vous prenne en charge ! (si vous avez quelques preuves nous dirons pas non !!)",
+    "local_image_path": "./data/ticket/1491071741114585129/file_0000000020ec7246ad6dd22d13616531.png",
+    "ticket_count": 0
+}

@@ -1,0 +1,61 @@
+{
+    "Cols": 933069,
+    "last_lantern_ts": 1778118578.181218,
+    "rob_data": {
+        "rob_date": "2026-04-22",
+        "targets_today": [
+            "1450545499940589591"
+        ],
+        "hourly_robs": [
+            "2026-04-22T18:01:09.490687"
+        ]
+    },
+    "stats": {
+        "rob_success": 6,
+        "rob_backfire": 2,
+        "lantern_games": 1
+    },
+    "achievements": {
+        "rob_success": {
+            "tier": 2,
+            "dates": {
+                "1": "19/04/2026 11:25",
+                "2": "20/04/2026 16:52"
+            }
+        },
+        "rob_backfire": {
+            "tier": 1,
+            "dates": {
+                "1": "19/04/2026 14:35"
+            }
+        },
+        "lantern_games": {
+            "tier": 1,
+            "dates": {
+                "1": "07/05/2026 01:49"
+            }
+        }
+    },
+    "honneur": 5,
+    "rob_received": {
+        "date": "2026-05-08",
+        "count": 1
+    },
+    "yakuzabox_limits": {
+        "daily_count": 1,
+        "last_openings": [
+            "2026-04-19T16:41:33.126496"
+        ],
+        "last_reset": "2026-04-19"
+    },
+    "blackjack_stats": {
+        "parties_heure": [
+            "2026-04-20T16:54:43.909774",
+            "2026-04-20T16:54:52.843375",
+            "2026-04-20T17:02:11.184877",
+            "2026-04-20T17:02:21.266002"
+        ],
+        "derniere_reset": "2026-04-20T16:54:43.909444"
+    },
+    "last_daily": "2026-04-24T13:38:52.306697+02:00"
+}

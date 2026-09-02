@@ -1,0 +1,17 @@
+{
+    "nom": "Toross Mordal",
+    "creation_date": "2026-03-08T23:47:07.770523+00:00",
+    "creator_id": 1366780122891419784,
+    "image": "image_20260309_004720.png",
+    "rarete": "Epique",
+    "couleur": 10040012,
+    "description": "Nourris par la faim, il noy\u00e9 son peuple.",
+    "valeur": 600000,
+    "exemplaires": 500,
+    "vitesse": 80,
+    "precision": 50,
+    "vie": 300,
+    "puissance": 300,
+    "id": "B4LNU",
+    "exemplaires_restant": 497
+}

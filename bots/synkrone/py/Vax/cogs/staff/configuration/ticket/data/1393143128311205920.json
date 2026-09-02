@@ -1,0 +1,49 @@
+{
+    "enabled": true,
+    "channel_id": 1473642255922237511,
+    "category_id": 1467486617689391341,
+    "archive_id": 1467486618834174240,
+    "support_role_id": 1393902612734279741,
+    "msg_id": 1540034970741907487,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "\ud83e\udd1d Partenariat",
+            "desc": "Proposez une collaboration ou un \u00e9change."
+        },
+        {
+            "name": "\ud83d\udcdd Recrutement",
+            "desc": "Postulez pour rejoindre nos rangs."
+        },
+        {
+            "name": "\ud83c\udf89 Animation",
+            "desc": "Suggestions ou probl\u00e8mes li\u00e9s aux events."
+        },
+        {
+            "name": "\ud83d\udee1\ufe0f Report",
+            "desc": "Signaler un joueur ou un abus."
+        },
+        {
+            "name": "\ud83d\udc8e Boutique",
+            "desc": "Probl\u00e8me avec un achat ou un grade."
+        },
+        {
+            "name": "\ud83d\udca1 Suggestion",
+            "desc": "Partagez vos id\u00e9es pour le serveur."
+        },
+        {
+            "name": "\ud83d\udee0\ufe0f Bug",
+            "desc": "Signaler un dysfonctionnement technique."
+        },
+        {
+            "name": "\u2753 Question",
+            "desc": "Besoin d'une information g\u00e9n\u00e9rale."
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": null,
+    "ticket_count": 0
+}

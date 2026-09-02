@@ -1,0 +1,1150 @@
+{
+    "info": {
+        "name": "Zeno HUB 🇲🇫",
+        "icon_url": "https://cdn.discordapp.com/icons/1480263381700051016/042807bfbe144713b75e68b77cc348bc.png?size=1024",
+        "date": "22/03/26 - 17:00",
+        "id": "6f11a770",
+        "creator_id": "1366780122891419784"
+    },
+    "roles": [
+        {
+            "name": "Membre",
+            "color": 39935,
+            "permissions": 79615809035329,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "🆘│𝑺𝒖𝒑𝒑𝒐𝒓𝒕",
+            "color": 15158332,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Expert Dev",
+            "color": 2123412,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Bot Manager",
+            "color": 15158332,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Hébergeur",
+            "color": 15277667,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Dev Helper",
+            "color": 15277667,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Mainteneur",
+            "color": 11342935,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Support Team",
+            "color": 12745742,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": true
+        },
+        {
+            "name": "Community Manager",
+            "color": 15844367,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Designer",
+            "color": 15277667,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Contributeur",
+            "color": 15158332,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Giveawaiy",
+            "color": 12745742,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Partenaires",
+            "color": 767,
+            "permissions": 0,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Boosteur",
+            "color": 15139071,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Responsable activités",
+            "color": 61695,
+            "permissions": 1720707884502593,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Développeur bots",
+            "color": 15105570,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Développeur serveur",
+            "color": 16711882,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Développeur web",
+            "color": 15277667,
+            "permissions": 1721807559716807,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Assistant staff",
+            "color": 3447003,
+            "permissions": 0,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Staff",
+            "color": 5918136,
+            "permissions": 1721807559716807,
+            "hoist": false,
+            "mentionable": false
+        },
+        {
+            "name": "Modérateur",
+            "color": 15158332,
+            "permissions": 1720707884502769,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Gérant",
+            "color": 3066993,
+            "permissions": 1716307519548657,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Fondateur",
+            "color": 15277667,
+            "permissions": 1721835208572927,
+            "hoist": true,
+            "mentionable": false
+        },
+        {
+            "name": "Co fondateur",
+            "color": 15277667,
+            "permissions": 8864258447638527,
+            "hoist": false,
+            "mentionable": false
+        }
+    ],
+    "categories": [
+        {
+            "name": "📌 Information",
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 377957124096
+                }
+            ],
+            "channels": [
+                {
+                    "name": "📜-reglement",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📢-annonce",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🤝-partenariat",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🌐-nos-sites",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "condition-partenariat",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "depart",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "bienvenue",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "la-pub-pour-notre-srv",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 8515703330568273
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "💬 Communauté",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "💬-général",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "❓-entraide",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🖼-media",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "💡-suggestion",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🎉 Giveaways",
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 377957124096
+                }
+            ],
+            "channels": [
+                {
+                    "name": "🎉-giveaways",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🏆-resultat-giveaways",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🤖 Developpement bots",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "💻-creation-de-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "💻-developpement-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🧠-aide-codes",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📊-logs-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🖥Hebergement",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "hebergement-info",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "demande-hebergement",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "status-serveurs",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 2048
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🛠 Staff",
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1049600
+                },
+                {
+                    "id": 1481017987879403722,
+                    "name": "Responsable activités",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                },
+                {
+                    "id": 1481017299849838622,
+                    "name": "Développeur web",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                },
+                {
+                    "id": 1481017762506608710,
+                    "name": "Développeur bots",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                },
+                {
+                    "id": 1481017512123568260,
+                    "name": "Développeur serveur",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                },
+                {
+                    "id": 1481015986965712906,
+                    "name": "Gérant",
+                    "is_role": true,
+                    "allow": 1049600,
+                    "deny": 0
+                }
+            ],
+            "channels": [
+                {
+                    "name": "🛠-chat-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 34359739408
+                        },
+                        {
+                            "id": 1481017512123568260,
+                            "name": "Développeur serveur",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481015986965712906,
+                            "name": "Gérant",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481016224338022673,
+                            "name": "Staff",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481017762506608710,
+                            "name": "Développeur bots",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481016100668833974,
+                            "name": "Modérateur",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481017299849838622,
+                            "name": "Développeur web",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481017036518719762,
+                            "name": "Assistant staff",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "👮-annonce-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 3072
+                        },
+                        {
+                            "id": 1480291940745609491,
+                            "name": "Co fondateur",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 0
+                        },
+                        {
+                            "id": 1481015685164564500,
+                            "name": "Fondateur",
+                            "is_role": true,
+                            "allow": 8515703330569297,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🧑‍💼-gestion-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🛡-activité-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📢-absense-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "giveaway-staff",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🆘 Support",
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 1024,
+                    "deny": 377957124096
+                }
+            ],
+            "channels": [
+                {
+                    "name": "📩-support",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🎫│𝑻𝒊𝒄𝒌𝒆𝒕",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🔊 Vocaux",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "🔊 Général",
+                    "type": "voice",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🎮Developpement",
+                    "type": "voice",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🛠 Support",
+                    "type": "voice",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🤖 Projets Bots",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "🤖-projets-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📢-presentation-bots",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🔄-mise-a-jour-bot",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "📚 Apprentissage",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "💡-idées-bot",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "❓-questions-dev",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📦-ressources-code",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🧑‍💻-apprendre-le-code",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🎥-tutoriels",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 1024,
+                            "deny": 377957124096
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🌐 API & Intégrations",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "⚙️-tests-api",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🔗-commandes-bot",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🧫-webhooks",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "🧪 Tests",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "🧪-sandbox",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🤖-test-bot",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "🔧-test-commandes",
+                    "type": "text",
+                    "topic": null,
+                    "overwrites": [],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        },
+        {
+            "name": "📂│𝑻𝒊𝒄𝒌𝒆𝒕 𝒆𝒏 𝒄𝒐𝒖𝒓𝒔",
+            "overwrites": [],
+            "channels": []
+        },
+        {
+            "name": "🗄️│𝑻𝒊𝒄𝒌𝒆𝒕 𝒂𝒓𝒄𝒉𝒊𝒗𝒆́",
+            "overwrites": [],
+            "channels": []
+        },
+        {
+            "name": "📌 Logs",
+            "overwrites": [],
+            "channels": [
+                {
+                    "name": "📂logs-messages",
+                    "type": "text",
+                    "topic": "󠁬󠁯󠁧󠁟󠁭󠁥󠁳󠁳󠁡󠁧󠁥󠁟󠁦󠁲",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "ღ🌸~͓̽ǤŁa̠̠ĐØS~🌸ღ",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📂logs-salons",
+                    "type": "text",
+                    "topic": "󠁬󠁯󠁧󠁟󠁣󠁨󠁡󠁮󠁮󠁥󠁬󠁟󠁦󠁲",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "ღ🌸~͓̽ǤŁa̠̠ĐØS~🌸ღ",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📂logs-roles",
+                    "type": "text",
+                    "topic": "󠁬󠁯󠁧󠁟󠁲󠁯󠁬󠁥󠁟󠁦󠁲",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "ღ🌸~͓̽ǤŁa̠̠ĐØS~🌸ღ",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📂logs-tickets",
+                    "type": "text",
+                    "topic": "󠁬󠁯󠁧󠁟󠁴󠁩󠁣󠁫󠁥󠁴󠁳󠁟󠁦󠁲",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "ღ🌸~͓̽ǤŁa̠̠ĐØS~🌸ღ",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📂logs-candidatures",
+                    "type": "text",
+                    "topic": "󠁬󠁯󠁧󠁟󠁣󠁡󠁮󠁤󠁩󠁤󠁡󠁴󠁵󠁲󠁥󠁳󠁟󠁦󠁲",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "ღ🌸~͓̽ǤŁa̠̠ĐØS~🌸ღ",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                },
+                {
+                    "name": "📂logs-transcripts",
+                    "type": "text",
+                    "topic": "󠁬󠁯󠁧󠁟󠁴󠁲󠁡󠁮󠁳󠁣󠁲󠁩󠁰󠁴󠁳󠁟󠁦󠁲",
+                    "overwrites": [
+                        {
+                            "id": 1480263381700051016,
+                            "name": "@everyone",
+                            "is_role": true,
+                            "allow": 0,
+                            "deny": 1024
+                        },
+                        {
+                            "id": 1098179232779223080,
+                            "name": "ღ🌸~͓̽ǤŁa̠̠ĐØS~🌸ღ",
+                            "is_role": false,
+                            "allow": 1024,
+                            "deny": 0
+                        }
+                    ],
+                    "nsfw": false,
+                    "user_limit": 0
+                }
+            ]
+        }
+    ],
+    "orphan_channels": [
+        {
+            "name": "moderator-only",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "🤖│𝑉𝑎𝑥",
+            "type": "text",
+            "topic": null,
+            "overwrites": [
+                {
+                    "id": 1480263381700051016,
+                    "name": "@everyone",
+                    "is_role": true,
+                    "allow": 0,
+                    "deny": 1024
+                },
+                {
+                    "id": 1367891720871874560,
+                    "name": "𝑉𝑎𝑥",
+                    "is_role": false,
+                    "allow": 84992,
+                    "deny": 0
+                },
+                {
+                    "id": 1481760976960229379,
+                    "name": "𝑽𝒂𝒙",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1378696082283823136,
+                    "name": "pixelmagique0_84063",
+                    "is_role": false,
+                    "allow": 3072,
+                    "deny": 0
+                },
+                {
+                    "id": 1480291940745609491,
+                    "name": "Co fondateur",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                },
+                {
+                    "id": 1481015685164564500,
+                    "name": "Fondateur",
+                    "is_role": true,
+                    "allow": 68608,
+                    "deny": 0
+                }
+            ],
+            "nsfw": false,
+            "user_limit": 0
+        },
+        {
+            "name": "cmd",
+            "type": "text",
+            "topic": null,
+            "overwrites": [],
+            "nsfw": false,
+            "user_limit": 0
+        }
+    ]
+}

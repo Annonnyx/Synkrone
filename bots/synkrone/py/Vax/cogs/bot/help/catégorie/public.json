@@ -1,0 +1,59 @@
+{
+    "emoji": "🌐",
+    "category_name": "Public",
+    "category_description": "Commandes de la catégorie public.",
+    "sections": {
+        "🎲 Jeux": {
+            "🧩 `{prefix}2048`": "Jouer au jeu 2048.",
+            "🟦 `{prefix}puissance4`": "Ouvre un salon de Puissance 4.",
+            "❌ `{prefix}morpion`": "Ouvre un salon de Morpion.",
+            "🔤 `{prefix}anagram`": "Lance une anagramme.",
+            "🧠 `{prefix}enigme`": "Lance une énigme.",
+            "🏳️‍🌈 `{prefix}flags`": "Lancer un quiz sur les drapeaux du monde !",
+            "🎲 `{prefix}dice`": "Lance un dé instantanément et permet d'en ajouter.",
+            "🪙 `{prefix}coinflip`": "Lance une pièce : pile ou face.",
+            "🔢 `{prefix}nombre`": "Devine un nombre entre 1 et 100."
+        },
+        "🛠️ Utilitaires": {
+            "🎙️ `{prefix}play`": "Ouvre le contrôle de lecture de musique.",
+            "🧮 `{prefix}calc`": "Ouvre la calculatrice interactive.",
+            "🎯 `{prefix}choose`": "Lancer un tirage au sort entre plusieurs propositions.",
+            "🔤 `{prefix}font`": "Change la police d'un texte.",
+            "🔁 `{prefix}reverse`": "Renverse un texte avec style !",
+            "🎨 `{prefix}ascii`": "Transforme un texte en art ASCII.",
+            "⏰ `{prefix}rappel`": "Gérez vos rappels et minuteries.",
+            "🔎 `{prefix}snipe`": "Affiche la dernière activité (suppression/edit) du salon.",
+            "📋 `{prefix}sondage`": "Permet de créer un sondage public.",
+            "📝 `{prefix}mytodo`": "Gérer vos todo-lists personnelles."
+
+        },
+        "👥 Social": {
+            "🤗 `{prefix}hug`": "Envoie un câlin à un membre.",
+            "💋 `{prefix}kiss`": "Envoie un bisou à un membre.",
+            "👊 `{prefix}punch`": "Frappe un membre.",
+            "❤️ `{prefix}amour`": "Calcule le pourcentage d'amour entre deux membres.",
+            "⭐ `{prefix}rate`": "Ouvre un menu pour noter quelque chose.",
+            "🖼️ `{prefix}meme`": "Affiche un même avec un mot clé.",
+            "🎂 `{prefix}anniversaire`": "Configurer les anniversaires : date de naissance, notifications, annonces.",
+            "💖 `{prefix}marryme`": "Demander quelqu'un en mariage.",
+            "📜 `{prefix}marry`": "Voir vos unions.",
+            "📜 `{prefix}marry <ID/@TAG>`": "Voir les unions d'un autre."
+
+        },
+        "ℹ️ Infos": {
+            "🕵️‍♂️ `{prefix}whois`": "Affiche les informations d'un membre.",
+            "🏰 `{prefix}guild`": "Affiche les informations du serveur.",
+            "📺 `{prefix}channel`": "Affiche les informations d'un salon.",
+            "🎭 `{prefix}role`": "Affiche les informations d'un rôle.",
+            "🔗 `{prefix}invitation`": "Classement et profil des invitations.",
+            "📢 `{prefix}everyone`": "Affiche les stats des pings everyone/here.",
+            "🤖 `{prefix}botprofil`": "Affiche le profil du bot.",
+            "🏓 `{prefix}ping`": "Affiche la latence du bot."
+        },
+        "❓ Divers": {
+            "🆘 `{prefix}help`": "Affiche le centre d'aide interactif.",
+            "💬 `{prefix}feedback`": "Donnez votre avis sur le bot."
+
+        }
+    }
+}

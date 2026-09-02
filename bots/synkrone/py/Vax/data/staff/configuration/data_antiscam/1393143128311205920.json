@@ -1,0 +1,15 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1266832665332420754": {
+            "name": "nolhan_thr.",
+            "timestamp": "01/09/2026 20:06",
+            "flagged": "[message sans texte]"
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "nom": "Ken Kaneki",
+    "creation_date": "2026-03-14T22:59:02.856415+00:00",
+    "creator_id": 1366780122891419784,
+    "image": "image_20260314_235912.png",
+    "id": "CMU60",
+    "exemplaires": 40,
+    "exemplaires_restant": 37,
+    "description": "Autrefois simple humain, il \u00e9tudiait la Litt\u00e9rature Japonaise en 1\u00e8re ann\u00e9e \u00e0 l'Universit\u00e9 Kamii, vivant ainsi une vie relativement normale.",
+    "rarete": "Commun",
+    "couleur": 65280,
+    "valeur": 2000000,
+    "vitesse": 140,
+    "precision": 100,
+    "vie": 3000,
+    "puissance": 300
+}

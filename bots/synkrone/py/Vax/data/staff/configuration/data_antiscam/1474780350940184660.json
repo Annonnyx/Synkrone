@@ -1,0 +1,25 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1506642786349224026": {
+            "name": "julienbernard3482_86314",
+            "timestamp": "30/06/2026 22:29",
+            "flagged": "@everyone"
+        },
+        "1524988506764607518": {
+            "name": "luankk0707",
+            "timestamp": "12/07/2026 23:41",
+            "flagged": "@everyone"
+        },
+        "1321503565369577545": {
+            "name": "l.1.k4s",
+            "timestamp": "07/08/2026 23:49",
+            "flagged": "@everyone"
+        }
+    }
+}

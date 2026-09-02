@@ -1,0 +1,18 @@
+{
+    "user_name": "𝒀𝒖𝒊",
+    "points": 0,
+    "marriages_count": 1,
+    "refusals_received": 0,
+    "refusals_given": 0,
+    "current_marriages": [
+        {
+            "partner_id": 1366780122891419784,
+            "partner_name": "𝑽𝒆𝒙",
+            "timestamp": 1779562502,
+            "proposer_id": 1366780122891419784
+        }
+    ],
+    "history": [
+        "[23/05/26][18:55] Vous avez accepté la demande en mariage de <@1366780122891419784>."
+    ]
+}

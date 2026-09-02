@@ -1,0 +1,24 @@
+[
+    {
+        "listing_id": "d5f391db-4e1c-4244-89f5-b110bac93f63",
+        "seller_id": 646691043231793153,
+        "card": {
+            "nom": "Joris - Forme Adulte",
+            "creation_date": "2026-03-08T23:48:42.695441+00:00",
+            "creator_id": 1366780122891419784,
+            "image": "image_20260309_004904.png",
+            "description": "Il en a vu passer des choses..",
+            "vitesse": 50,
+            "precision": 75,
+            "vie": 100,
+            "puissance": 60,
+            "valeur": 200000,
+            "exemplaires": 1000,
+            "exemplaires_restant": 997,
+            "rarete": "Rare",
+            "couleur": 49151,
+            "id": "UKZFF"
+        },
+        "price": 1000000
+    }
+]

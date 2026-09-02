@@ -1,0 +1,40 @@
+{
+    "enabled": true,
+    "threshold": 3,
+    "timeframe": 60,
+    "debug": true,
+    "whitelist_users": [],
+    "whitelist_roles": [],
+    "prisonniers": {
+        "1509662201592680501": {
+            "name": "4l9g8bcb",
+            "timestamp": "04/06/2026 17:44",
+            "flagged": "[message sans texte]"
+        },
+        "1334955483077017640": {
+            "name": "ayush_1464_08384",
+            "timestamp": "27/06/2026 18:39",
+            "flagged": "[message sans texte]"
+        },
+        "1514910658984935485": {
+            "name": "myiyekadehid16",
+            "timestamp": "30/06/2026 22:20",
+            "flagged": "[message sans texte]"
+        },
+        "1519889206640508989": {
+            "name": "stephaniewilsonw1974",
+            "timestamp": "04/07/2026 18:52",
+            "flagged": "[message sans texte]"
+        },
+        "1525686084267413615": {
+            "name": "goldenslash6407",
+            "timestamp": "19/07/2026 01:45",
+            "flagged": "[message sans texte]"
+        },
+        "1525152985615700071": {
+            "name": "kevinainslpro84",
+            "timestamp": "16/08/2026 23:06",
+            "flagged": "[message sans texte]"
+        }
+    }
+}

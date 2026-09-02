@@ -1,0 +1,17 @@
+{
+    "nom": "Yugo - Forme Adulte",
+    "creation_date": "2026-03-08T23:41:16.207866+00:00",
+    "creator_id": 1366780122891419784,
+    "image": "image_20260309_004140.png",
+    "description": "Le temps de l\u2019insouciance et des qu\u00eates enfantines est r\u00e9volu. Le Roi-Enfant a laiss\u00e9 place au Souverain \u00c9ternel. Sous cette stature adulte, Yugo incarne l'apog\u00e9e de la puissance Eliatrope.",
+    "vitesse": 120,
+    "precision": 99,
+    "vie": 4500,
+    "puissance": 900,
+    "valeur": 5000000,
+    "exemplaires": 2,
+    "rarete": "L\u00e9gendaire",
+    "couleur": 16766720,
+    "id": "B2EQJ",
+    "exemplaires_restant": 1
+}

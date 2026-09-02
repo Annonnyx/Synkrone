@@ -1,0 +1,33 @@
+{
+    "enabled": true,
+    "channel_id": 1478116440606511124,
+    "category_id": 1469708321719193642,
+    "archive_id": 1469708323430338653,
+    "support_role_id": 1462545908049645750,
+    "msg_id": 1522604742021349587,
+    "categories": [
+        {
+            "name": "\u2699\ufe0f G\u00e9n\u00e9ral",
+            "desc": "Support classique."
+        },
+        {
+            "name": "Probleme Discord",
+            "desc": ""
+        },
+        {
+            "name": "Suggestion",
+            "desc": ""
+        },
+        {
+            "name": "Plainte",
+            "desc": ""
+        },
+        {
+            "name": "Rejoindre l'OVRU",
+            "desc": ""
+        }
+    ],
+    "custom_description": null,
+    "local_image_path": null,
+    "ticket_count": 0
+}
