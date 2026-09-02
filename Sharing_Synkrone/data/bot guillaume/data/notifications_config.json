@@ -1,0 +1,31 @@
+{
+    "1530699664108818523": {
+        "notifications": {
+            "youtube_squeezie": {
+                "pseudo": "Squeezie",
+                "platform": "youtube",
+                "user_id": "199182913340833792",
+                "channel_id": "1530792929344360498",
+                "role_id": "1530763550597972268",
+                "message": "{role} {tag} **{pseudo}** est en live ! {lien}",
+                "author_name": "",
+                "description": "test"
+            },
+            "twitch_synndaris": {
+                "pseudo": "Synndaris",
+                "platform": "twitch",
+                "user_id": "199182913340833792",
+                "channel_id": "1530792929344360498",
+                "role_id": "1530763550597972268",
+                "message": "{role} {tag} **{pseudo}** est en live ! {lien}"
+            },
+            "youtube_live_squeeze": {
+                "pseudo": "Squeeze",
+                "platform": "youtube live",
+                "user_id": "",
+                "channel_id": "1530792929344360498",
+                "role_id": ""
+            }
+        }
+    }
+}

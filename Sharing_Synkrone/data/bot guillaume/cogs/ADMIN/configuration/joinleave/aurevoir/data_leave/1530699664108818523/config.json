@@ -1,0 +1,14 @@
+{
+    "channel_id": 1530771695298674728,
+    "is_private": true,
+    "embed_title": "Départ de {user}",
+    "embed_description": "Triste de te voir partir...",
+    "content_message": "{user.mention} nous a quitté.\nNous sommes désormais {guild.count}.",
+    "background_mode": "banner",
+    "background_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyaNIlpZgkxDPYKwqnikvIH2shPOnO4axeHI75f1bjjhLV3fFjJmcHyREo&s=10",
+    "bg_color_1": "#2c2f33",
+    "bg_color_2": "",
+    "banner_user": "author",
+    "banner_fallback_enabled": true,
+    "banner_fallback_mode": "url"
+}
