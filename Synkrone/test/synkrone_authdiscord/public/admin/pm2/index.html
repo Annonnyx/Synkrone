@@ -1,333 +1,114 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PM2 - Synkrone.app</title>
+    <title>PM2 — Synkrone</title>
     <link rel="icon" type="image/jpeg" href="../../assets/images/logo.jpg">
-    <link rel="stylesheet" href="../../assets/mosaique.css">
-    <script src="../../assets/mosaique.js" defer></script>
-        <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        slate: {
-                            50: '#f4f5f7', 100: '#e8eaed', 200: '#c5cad1', 300: '#9aa3ae',
-                            400: '#9aa3ae', 500: '#6b7380', 600: '#3d4450', 700: '#2a3139',
-                            800: '#22272e', 900: '#171a1e', 950: '#0f1114'
-                        }
-                    },
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/a2e0e6ad65.js" crossorigin="anonymous"></script>
-    <style>
-        .scrollbar-none { -ms-overflow-style: none; }
-        .scrollbar-none::-webkit-scrollbar { display: none; }
-        html, body { -ms-overflow-style: none; }
-        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
-        
-        button:disabled { cursor: not-allowed; opacity: 0.35; filter: grayscale(100%); }
-        button { transition: all 0.2s ease; }
-        button:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
-
-        .log-line { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-
-        .process-search {
-            display: block;
-            width: 100%;
-            min-width: 0;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(24, 26, 27, 0.78);
-            color: #e1e3e6;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-        }
-
-        .process-search::placeholder { color: #8a8f9d; }
-        .process-search:focus {
-            border-color: rgba(163, 230, 53, 0.55);
-            box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.12);
-        }
-
-        html, body {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-
-        #servers,
-        #vpsStats,
-        #logsModal section {
-            min-width: 0;
-        }
-
-        @media (max-width: 640px) {
-            body {
-                width: 100%;
-                padding: 0.5rem;
-                overflow-x: hidden;
-            }
-
-            body > header {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.75rem;
-                overflow: hidden;
-            }
-
-            #vpsStats {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 0.6rem;
-                width: 100%;
-            }
-
-            #vpsStats > div {
-                min-width: 0;
-                padding: 0.35rem 0.45rem;
-                border: 1px solid rgba(71, 85, 105, 0.55);
-                border-radius: 0.5rem;
-                background: rgba(15, 23, 42, 0.55);
-            }
-
-            #vpsStats > .w-px {
-                display: none;
-            }
-
-            body > header > div:last-child {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 0.4rem;
-                width: 100%;
-            }
-
-            body > header > div:last-child button {
-                min-width: 0;
-                padding: 0.55rem 0.25rem;
-                font-size: 0.68rem;
-                line-height: 1.15;
-                white-space: normal;
-            }
-
-            section.border {
-                min-width: 0;
-                padding: 0.65rem;
-            }
-
-            #servers {
-                grid-template-columns: minmax(0, 1fr) !important;
-                width: 100%;
-            }
-
-            #servers article {
-                min-width: 0;
-                padding: 0.75rem;
-            }
-
-            #servers article > div:first-child > div:first-child {
-                gap: 0.45rem;
-            }
-
-            #servers article h2 {
-                min-width: 0;
-                max-width: 12rem;
-                font-size: 0.95rem;
-            }
-
-            #servers article > div:first-child > div:first-child > div:last-child {
-                gap: 0.35rem;
-            }
-
-            #servers article .grid-cols-3 {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 0.35rem;
-            }
-
-            #servers article .grid-cols-3 > div {
-                min-width: 0;
-                padding: 0.4rem 0.2rem;
-                overflow: hidden;
-            }
-
-            #servers article .grid-cols-3 b {
-                display: block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                font-size: 0.72rem;
-            }
-
-            #servers article .flex.gap-2 {
-                flex-wrap: wrap;
-            }
-
-            #servers article .flex.gap-2 button {
-                min-width: 0;
-                flex: 1 1 calc(33.333% - 0.3rem);
-                padding-left: 0.2rem;
-                padding-right: 0.2rem;
-                font-size: 0.65rem;
-                white-space: normal;
-            }
-
-            #logsModal {
-                padding: 0.5rem;
-            }
-
-            #logsModal section {
-                max-height: 92vh;
-                border-radius: 0.75rem;
-            }
-
-            #logsTitle {
-                min-width: 0;
-                max-width: calc(100vw - 8rem);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            #logsContent {
-                min-height: 0;
-                max-height: 68vh;
-                padding: 0.75rem;
-                font-size: 0.68rem;
-                overflow-x: auto;
-                overflow-y: auto;
-            }
-
-            #clearLogsBtn {
-                width: 100%;
-            }
-
-            #toast {
-                left: 0.75rem;
-                right: 0.75rem;
-                bottom: 0.75rem;
-                justify-content: center;
-                text-align: center;
-            }
-        }
-    </style>
     <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="../admin.css">
 </head>
-<body class="mosaic-bg bg-slate-950 text-slate-100 min-h-screen p-2 md:p-3 scrollbar-none space-y-2.5">
-    
-    <!-- En-tête : Stats à gauche, Boutons à droite (Tout sur une ligne) -->
-    <header class="border border-red-900/45 bg-slate-900/92 rounded-lg p-3 flex items-center justify-between gap-6 overflow-x-auto scrollbar-none">
-        
-        <!-- Statistiques VPS Compactes -->
-        <div id="vpsStats" class="flex items-center gap-6 shrink-0">
-            <!-- Rempli dynamiquement -->
-        </div>
+<body class="admin-body">
+    <main class="admin-page">
+        <header class="admin-head">
+            <div>
+                <h1>PM2</h1>
+                <p class="admin-lead">Processus du VPS. Le site Synkrone reste protégé.</p>
+            </div>
+            <div class="btn-row">
+                <button id="startAllBtn" type="button" class="sk-btn-primary">Tout démarrer</button>
+                <button id="restartAllBtn" type="button" class="sk-btn">Tout redémarrer</button>
+                <button id="stopAllBtn" type="button" class="sk-btn danger">Tout arrêter</button>
+            </div>
+        </header>
 
-        <!-- Boutons globaux -->
-        <div class="flex items-center gap-2 shrink-0">
-            <button id="startAllBtn" class="rounded-lg bg-emerald-600/90 border border-emerald-500/50 px-4 py-2 text-sm font-bold text-white shadow-md">Tout Démarrer</button>
-            <button id="restartAllBtn" class="rounded-lg bg-amber-600/90 border border-amber-500/50 px-4 py-2 text-sm font-bold text-white shadow-md">Tout Redémarrer</button>
-            <button id="stopAllBtn" class="rounded-lg bg-rose-600/90 border border-rose-500/50 px-4 py-2 text-sm font-bold text-white shadow-md">Tout Arrêter</button>
-        </div>
-    </header>
+        <section class="admin-stats" id="vpsStats"></section>
 
-    <!-- Conteneur principal: Recherche + Liste des serveurs -->
-    <section class="border border-red-900/45 bg-slate-900/92 p-2.5 md:p-3 space-y-3 rounded-lg">
-        
-        <!-- Barre de recherche (Style index.html) -->
-        <div class="w-full">
-            <div class="flex min-w-0 flex-col gap-2 sm:flex-row">
-                <input id="searchInput" type="text" placeholder="Rechercher un processus (nom, ID)..." class="process-search rounded-lg px-3 py-2 text-sm outline-none">
-                <select id="targetFilter" class="process-search rounded-lg px-3 py-2 text-sm outline-none sm:w-44 sm:shrink-0" aria-label="Filtrer par cible">
+        <section class="admin-card">
+            <div class="admin-toolbar">
+                <input id="searchInput" type="search" placeholder="Rechercher un processus (nom, ID)">
+                <select id="targetFilter" aria-label="Filtrer par cible">
                     <option value="all">Toutes les cibles</option>
                 </select>
             </div>
-        </div>
-
-        <!-- Liste des serveurs -->
-        <div id="servers" class="grid gap-2.5 md:grid-cols-2 xl:grid-cols-3">
-            <!-- Rempli dynamiquement -->
-        </div>
-    </section>
-
-    <!-- Modal des Logs -->
-    <div id="logsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-        <section class="flex max-h-[86vh] w-full max-w-5xl flex-col overflow-hidden border border-red-900/45 bg-slate-900/95 shadow-2xl rounded-xl">
-            <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-                <h2 id="logsTitle" class="font-bold text-white">Logs PM2</h2>
-                <button id="closeLogsBtn" class="rounded-lg border border-slate-600 px-3 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-800">Fermer</button>
-            </div>
-            <pre id="logsContent" class="log-line min-h-[300px] overflow-auto bg-black p-4 text-xs leading-relaxed text-slate-300 scrollbar-none whitespace-pre-wrap break-words">Chargement...</pre>
-            <div class="flex justify-end gap-2 border-t border-slate-800 p-3 bg-slate-950/50">
-                <button id="clearLogsBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"><i class="fa-solid fa-trash mr-2"></i>Effacer les logs</button>
-            </div>
+            <div id="servers" class="admin-process-grid"></div>
         </section>
+    </main>
+
+    <div id="logsModal" class="admin-modal hidden">
+        <div class="admin-modal-card">
+            <div class="modal-top">
+                <h2 id="logsTitle">Logs PM2</h2>
+                <button id="closeLogsBtn" type="button" class="sk-btn ghost">Fermer</button>
+            </div>
+            <pre id="logsContent" class="admin-log">Chargement…</pre>
+            <div class="admin-modal-foot">
+                <span></span>
+                <button id="clearLogsBtn" type="button" class="sk-btn danger">Effacer les logs</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Toast de notification -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 text-white border border-slate-700 px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 pointer-events-none">
-        <i id="toastIcon" class="fa-solid fa-circle-info text-blue-400 text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Notification</span>
-    </div>
+    <div id="toast" class="admin-toast" role="status"><span id="toastMessage">Notification</span></div>
 
     <script>
         const apiPrefix = '/api/admin/pm2';
-            const favoritesKey = 'synkrone_pm2_favorites';
+        const favoritesKey = 'synkrone_pm2_favorites';
         let servers = [];
         let searchTerm = '';
         let targetFilter = 'all';
         let selectedServerId = null;
 
         const $ = (selector) => document.querySelector(selector);
-        
-        // Convertisseur ANSI enrichi
-            const ansiColors = {
-                30: '#111827', 31: '#ef4444', 32: '#22c55e', 33: '#eab308',
-                34: '#3b82f6', 35: '#d946ef', 36: '#06b6d4', 37: '#f8fafc',
-                90: '#64748b', 91: '#fb7185', 92: '#4ade80', 93: '#fde047',
-                94: '#60a5fa', 95: '#f0abfc', 96: '#67e8f9', 97: '#ffffff'
-            };
 
-            function parseAnsiToHtml(text) {
-                let html = '';
-                let openSpans = 0;
-                const tokens = String(text || '').split(/(\x1b\[[0-9;]*m)/g);
-                tokens.forEach((token) => {
-                    const match = token.match(/^\x1b\[([0-9;]*)m$/);
-                    if (!match) {
-                        html += escapeHtml(token);
-                        return;
-                    }
+        const ansiColors = {
+            30: '#1b211e', 31: '#a8462f', 32: '#3f6b52', 33: '#b8823d',
+            34: '#5c6a66', 35: '#2e5039', 36: '#5c6a66', 37: '#eef0ea',
+            90: '#5c6a66', 91: '#a8462f', 92: '#3f6b52', 93: '#b8823d',
+            94: '#5c6a66', 95: '#2e5039', 96: '#5c6a66', 97: '#ffffff'
+        };
 
-                    const codes = match[1] ? match[1].split(';').map(Number) : [0];
-                    codes.forEach((code) => {
-                        if (code === 0 || code === 39 || code === 22 || code === 23 || code === 24) {
-                            if (openSpans > 0) {
-                                html += '</span>'.repeat(openSpans);
-                                openSpans = 0;
-                            }
-                        } else if (ansiColors[code]) {
-                            html += `<span style="color:${ansiColors[code]}">`;
-                            openSpans += 1;
-                        } else if (code === 1) {
-                            html += '<span style="font-weight:700">';
-                            openSpans += 1;
-                        } else if (code === 3) {
-                            html += '<span style="font-style:italic">';
-                            openSpans += 1;
-                        } else if (code === 4) {
-                            html += '<span style="text-decoration:underline">';
-                            openSpans += 1;
+        function parseAnsiToHtml(text) {
+            let html = '';
+            let openSpans = 0;
+            const tokens = String(text || '').split(/(\x1b\[[0-9;]*m)/g);
+            tokens.forEach((token) => {
+                const match = token.match(/^\x1b\[([0-9;]*)m$/);
+                if (!match) {
+                    html += escapeHtml(token);
+                    return;
+                }
+                const codes = match[1] ? match[1].split(';').map(Number) : [0];
+                codes.forEach((code) => {
+                    if (code === 0 || code === 39 || code === 22 || code === 23 || code === 24) {
+                        if (openSpans > 0) {
+                            html += '</span>'.repeat(openSpans);
+                            openSpans = 0;
                         }
-                    });
+                    } else if (ansiColors[code]) {
+                        html += `<span style="color:${ansiColors[code]}">`;
+                        openSpans += 1;
+                    } else if (code === 1) {
+                        html += '<span style="font-weight:700">';
+                        openSpans += 1;
+                    } else if (code === 3) {
+                        html += '<span style="font-style:italic">';
+                        openSpans += 1;
+                    } else if (code === 4) {
+                        html += '<span style="text-decoration:underline">';
+                        openSpans += 1;
+                    }
                 });
-                return html + '</span>'.repeat(openSpans);
-            }
+            });
+            return html + '</span>'.repeat(openSpans);
+        }
 
-        const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        const escapeHtml = (value) => String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
 
         function formatBytes(value) {
             const bytes = Number(value);
@@ -352,47 +133,32 @@
             const toast = $('#toast');
             $('#toastMessage').textContent = message;
             const normalizedTone = tone === true ? 'error' : tone;
-            const toneStyles = {
-                success: ['fa-solid fa-circle-check text-emerald-400 text-lg', 'border-emerald-500/60'],
-                start: ['fa-solid fa-play text-emerald-400 text-lg', 'border-emerald-500/60'],
-                restart: ['fa-solid fa-rotate text-amber-400 text-lg', 'border-amber-500/60'],
-                stop: ['fa-solid fa-stop text-rose-400 text-lg', 'border-rose-500/60'],
-                error: ['fa-solid fa-triangle-exclamation text-rose-400 text-lg', 'border-rose-500/60'],
-                info: ['fa-solid fa-circle-info text-blue-400 text-lg', 'border-slate-700']
-            };
-            const [iconClass, borderClass] = toneStyles[normalizedTone] || toneStyles.info;
-            $('#toastIcon').className = iconClass;
-            toast.classList.remove('border-emerald-500/60', 'border-amber-500/60', 'border-rose-500/60', 'border-slate-700');
-            toast.classList.add(borderClass);
-            
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
+            toast.classList.toggle('is-error', normalizedTone === 'error' || normalizedTone === 'stop');
+            toast.classList.toggle('is-ok', normalizedTone !== 'error' && normalizedTone !== 'stop');
+            toast.classList.add('is-visible');
             clearTimeout(showToast.timer);
-            showToast.timer = setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            showToast.timer = setTimeout(() => toast.classList.remove('is-visible'), 3000);
         }
 
-            function getFavorites() {
-                try {
-                    const value = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
-                    return Array.isArray(value) ? value.map(String) : [];
-                } catch {
-                    return [];
-                }
+        function getFavorites() {
+            try {
+                const value = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
+                return Array.isArray(value) ? value.map(String) : [];
+            } catch {
+                return [];
             }
+        }
 
-            function toggleFavorite(id) {
-                const favorites = getFavorites();
-                const normalizedId = String(id);
-                const next = favorites.includes(normalizedId)
-                    ? favorites.filter((favorite) => favorite !== normalizedId)
-                    : [...favorites, normalizedId];
-                localStorage.setItem(favoritesKey, JSON.stringify(next));
-                servers = servers.map((server) => ({ ...server, isFavorite: next.includes(String(server.id)) }));
-                renderServers();
-            }
+        function toggleFavorite(id) {
+            const favorites = getFavorites();
+            const normalizedId = String(id);
+            const next = favorites.includes(normalizedId)
+                ? favorites.filter((favorite) => favorite !== normalizedId)
+                : [...favorites, normalizedId];
+            localStorage.setItem(favoritesKey, JSON.stringify(next));
+            servers = servers.map((server) => ({ ...server, isFavorite: next.includes(String(server.id)) }));
+            renderServers();
+        }
 
         async function request(path, options = {}) {
             const response = await fetch(`${apiPrefix}${path}`, options);
@@ -402,9 +168,7 @@
                 try {
                     const payload = JSON.parse(body);
                     message = payload.error || payload.message || body;
-                } catch {
-                    // Le serveur peut renvoyer une erreur texte.
-                }
+                } catch { /* texte */ }
                 throw new Error(message || `Erreur HTTP ${response.status}`);
             }
             return response;
@@ -415,30 +179,39 @@
             const total = Number(vps.totalMem || 0);
             const cpu = Number(vps.totalCpu);
             const cpuLabel = Number.isFinite(cpu) ? `${cpu.toFixed(2)} %` : 'N/A';
-            
             $('#vpsStats').innerHTML = [
-                ['RAM UTILISÉE', `${formatBytes(used)} / ${formatBytes(total)}`, 'text-sky-400'],
-                ['CPU PM2', cpuLabel, 'text-amber-400'],
-                ['CŒURS CPU', `${Number(vps.cpuCount || 0)}`, 'text-slate-200'],
-                ['PROCESSUS', `${servers.length}`, 'text-emerald-400']
-            ].map(([label, value, color]) => `
-                <div class="flex flex-col shrink-0">
-                    <span class="text-[10px] uppercase tracking-[0.16em] text-slate-500 mb-0.5">${label}</span>
-                    <span class="text-lg font-semibold leading-tight ${color}">${value}</span>
-                </div>
-            `).join('<div class="w-px h-8 bg-slate-700 shrink-0"></div>');
+                ['RAM utilisée', `${formatBytes(used)} / ${formatBytes(total)}`, ''],
+                ['CPU PM2', cpuLabel, 'is-krones'],
+                ['Cœurs CPU', `${Number(vps.cpuCount || 0)}`, ''],
+                ['Processus', `${servers.length}`, 'is-online']
+            ].map(([label, value, extra]) => `
+                <article class="admin-stat">
+                    <p class="admin-stat-label">${label}</p>
+                    <p class="admin-stat-value ${extra}">${value}</p>
+                </article>
+            `).join('');
+        }
+
+        function statusMeta(rawStatus) {
+            const status = String(rawStatus || 'unknown').toLowerCase();
+            if (status === 'online') return { label: 'En ligne', dot: 'is-online', badge: 'is-online' };
+            if (status === 'stopped' || status === 'errored' || status === 'error' || status === 'offline') {
+                return { label: 'Arrêté', dot: 'is-danger', badge: 'is-admin' };
+            }
+            if (status === 'launching') return { label: 'Démarrage', dot: 'is-warn', badge: 'is-amber' };
+            if (status === 'waiting restart' || status === 'restarting') {
+                return { label: 'Redémarrage', dot: 'is-warn', badge: 'is-amber' };
+            }
+            return { label: 'Inconnu', dot: 'is-offline', badge: 'is-offline' };
         }
 
         function renderServers() {
             const container = $('#servers');
-            
-            // Tri: Favoris en premier
-            let filteredServers = servers.filter(s => 
-                (s.name || '').toLowerCase().includes(searchTerm) || 
-                String(s.id).includes(searchTerm)
+            const disconnected = ['stopped', 'errored', 'error', 'offline'];
+            const filteredServers = servers.filter((s) =>
+                (s.name || '').toLowerCase().includes(searchTerm) || String(s.id).includes(searchTerm)
             ).filter((server) => targetFilter === 'all' || String(server.target || 'AUTRE') === targetFilter
             ).sort((a, b) => {
-                const disconnected = ['stopped', 'errored', 'error', 'offline'];
                 const aDisconnected = disconnected.includes(String(a.status || '').toLowerCase());
                 const bDisconnected = disconnected.includes(String(b.status || '').toLowerCase());
                 if (aDisconnected !== bDisconnected) return aDisconnected ? 1 : -1;
@@ -446,7 +219,7 @@
             });
 
             if (!filteredServers.length) {
-                container.innerHTML = `<div class="border border-slate-700 bg-slate-950/60 col-span-full p-8 text-center text-slate-400 rounded-lg">Aucun processus correspondant.</div>`;
+                container.innerHTML = '<p class="admin-empty">Aucun processus correspondant.</p>';
                 return;
             }
 
@@ -456,88 +229,41 @@
                 const isLaunching = rawStatus === 'launching';
                 const isOnline = rawStatus === 'online';
                 const isStopped = rawStatus === 'stopped' || rawStatus === 'errored';
-
-                let statusFr = 'Inconnu';
-                let statusColor = 'text-slate-400';
-                let statusDot = 'bg-slate-500';
-
-                if (isOnline) {
-                    statusFr = 'En ligne';
-                    statusColor = 'text-emerald-400';
-                    statusDot = 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]';
-                } else if (isStopped) {
-                    statusFr = 'Arrêté';
-                    statusColor = 'text-rose-400';
-                    statusDot = 'bg-rose-500';
-                } else if (isLaunching) {
-                    statusFr = 'En démarrage...';
-                    statusColor = 'text-blue-400';
-                    statusDot = 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)] animate-pulse';
-                } else if (isRestarting) {
-                    statusFr = 'Redémarrage';
-                    statusColor = 'text-amber-400';
-                    statusDot = 'bg-amber-500 animate-pulse';
-                }
-
-                // Logique de blocage des boutons
+                const meta = statusMeta(rawStatus);
                 const canStart = isStopped && !server.protected;
                 const canRestart = isOnline && !server.protected;
                 const canStop = (isOnline || isRestarting || isLaunching) && !server.protected;
-                const protectedLabel = server.protected ? 'Protégé' : '';
-
                 return `
-                <article class="border border-slate-700 bg-slate-950/60 p-3.5 rounded-xl flex flex-col justify-between shadow-sm">
+                <article class="admin-process">
                     <div>
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="min-w-0 flex items-center gap-2">
-                                <button class="shrink-0 text-lg transition-colors ${server.isFavorite ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400/50'}" data-action="favorite" data-id="${escapeHtml(server.id)}" title="Favoris" aria-label="Favori">
-                                    <i class="fa-solid fa-star"></i>
-                                </button>
-                                <h2 class="truncate text-base font-bold ${statusColor}" title="${escapeHtml(server.name)}">
-                                    ${escapeHtml(server.displayName || server.name)}
-                                </h2>
-                                <p class="mt-0.5 text-[11px] uppercase tracking-wide text-slate-500">PM2 #${escapeHtml(server.id)} · PID ${escapeHtml(server.pid || 'N/A')}</p>
+                        <div class="admin-process-top">
+                            <div>
+                                <h2 title="${escapeHtml(server.name)}">${escapeHtml(server.displayName || server.name)}</h2>
+                                <p class="admin-meta">PM2 #${escapeHtml(server.id)} · PID ${escapeHtml(server.pid || 'N/A')}</p>
                             </div>
-                            <div class="flex items-center gap-3 shrink-0">
-                                <span class="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-200 border border-slate-700 bg-slate-900/80 px-2 py-1 rounded-md">
-                                    <i class="h-2 w-2 rounded-full ${statusDot}"></i>${statusFr}
-                                </span>
-                                ${protectedLabel ? '<span class="text-[10px] text-amber-300">🔒 Protégé</span>' : ''}
-                            </div>
+                            <span class="sk-badge ${meta.badge}"><span class="admin-dot ${meta.dot}" style="position:static;display:inline-block;border:0;width:8px;height:8px;margin-right:4px;"></span>${meta.label}</span>
                         </div>
-                        <div class="mt-2 flex min-w-0 items-center gap-2 text-[10px] uppercase tracking-wide text-slate-500">
-                            <span class="rounded-md border border-fuchsia-500/20 bg-fuchsia-500/10 px-2 py-1 text-fuchsia-300">${escapeHtml(server.target || 'AUTRE')}</span>
-                            ${Number.isInteger(Number(server.port)) && Number(server.port) > 0 ? `<span class="rounded-md border border-cyan-500/20 bg-cyan-500/10 px-2 py-1 text-cyan-300">Port ${escapeHtml(server.port)}</span>` : ''}
+                        <div class="meta" style="margin-top:8px;">
+                            <span class="sk-badge is-grade">${escapeHtml(server.target || 'Autre')}</span>
+                            ${Number.isInteger(Number(server.port)) && Number(server.port) > 0 ? `<span class="sk-badge is-amber">Port ${escapeHtml(server.port)}</span>` : ''}
+                            ${server.protected ? '<span class="sk-badge is-amber">Protégé</span>' : ''}
                         </div>
-                        <div class="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
-                            <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-1.5">
-                                <span class="block text-[10px] uppercase text-slate-500 mb-0.5">CPU</span>
-                                <b class="text-emerald-400">${Number.isFinite(Number(server.cpu)) ? `${Number(server.cpu).toFixed(2)}%` : 'N/A'}</b>
-                            </div>
-                            <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-1.5">
-                                <span class="block text-[10px] uppercase text-slate-500 mb-0.5">RAM</span>
-                                <b class="text-sky-400">${server.memory === null ? 'N/A' : formatBytes(server.memory)}</b>
-                            </div>
-                            <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-1.5">
-                                <span class="block text-[10px] uppercase text-slate-500 mb-0.5">Uptime</span>
-                                <b class="text-slate-200">${formatUptime(server.uptime)}</b>
-                            </div>
+                        <div class="admin-process-metrics">
+                            <div><span>CPU</span><b>${Number.isFinite(Number(server.cpu)) ? `${Number(server.cpu).toFixed(2)}%` : 'N/A'}</b></div>
+                            <div><span>RAM</span><b>${server.memory === null ? 'N/A' : formatBytes(server.memory)}</b></div>
+                            <div><span>Uptime</span><b>${formatUptime(server.uptime)}</b></div>
                         </div>
                     </div>
-
-                    <div class="mt-4 flex flex-col gap-2">
-                        <!-- Ligne d'actions secondaires -->
-                        <div class="flex gap-2">
-                            <button class="flex-1 rounded-lg border border-slate-700 bg-slate-800/80 px-2 py-1.5 text-[11px] font-semibold text-slate-200 hover:bg-blue-600" data-action="logs" data-id="${escapeHtml(server.id)}" data-name="${escapeHtml(server.name)}"><i class="fa-solid fa-terminal mr-1"></i>Logs</button>
-                            <button class="flex-1 rounded-lg border border-slate-700 bg-slate-800/80 px-2 py-1.5 text-[11px] font-semibold text-slate-200 hover:bg-slate-700" data-action="rename" data-id="${escapeHtml(server.id)}" data-name="${escapeHtml(server.name)}" ${server.protected ? 'disabled title="Processus web protégé"' : ''}><i class="fa-solid fa-pen mr-1"></i>Renommer</button>
-                            <button class="flex-1 rounded-lg border border-slate-700 bg-slate-800/80 px-2 py-1.5 text-[11px] font-semibold text-slate-200 hover:bg-rose-600 transition-colors duration-300" data-action="delete" data-id="${escapeHtml(server.id)}" ${server.protected ? 'disabled title="Processus web protégé"' : ''}><i class="fa-solid fa-trash mr-1"></i>Supprimer</button>
-                        </div>
-                        <!-- Ligne d'actions principales -->
-                        <div class="grid grid-cols-3 gap-2">
-                            <button class="rounded-lg bg-emerald-600 px-2 py-2 text-xs font-bold text-white shadow-md" data-action="start" data-id="${escapeHtml(server.id)}" ${!canStart ? 'disabled' : ''}>Démarrer</button>
-                            <button class="rounded-lg bg-amber-600 px-2 py-2 text-xs font-bold text-white shadow-md" data-action="restart" data-id="${escapeHtml(server.id)}" ${!canRestart ? 'disabled' : ''}>Redémarrer</button>
-                            <button class="rounded-lg bg-rose-600 px-2 py-2 text-xs font-bold text-white shadow-md" data-action="stop" data-id="${escapeHtml(server.id)}" ${!canStop ? 'disabled' : ''}>Arrêter</button>
-                        </div>
+                    <div class="admin-actions">
+                        <button type="button" class="sk-btn admin-fav ${server.isFavorite ? 'is-on' : ''}" data-action="favorite" data-id="${escapeHtml(server.id)}">${server.isFavorite ? 'Favori' : 'Suivre'}</button>
+                        <button type="button" class="sk-btn ghost" data-action="logs" data-id="${escapeHtml(server.id)}" data-name="${escapeHtml(server.name)}">Logs</button>
+                        <button type="button" class="sk-btn ghost" data-action="rename" data-id="${escapeHtml(server.id)}" data-name="${escapeHtml(server.name)}" ${server.protected ? 'disabled title="Processus web protégé"' : ''}>Renommer</button>
+                        <button type="button" class="sk-btn danger" data-action="delete" data-id="${escapeHtml(server.id)}" ${server.protected ? 'disabled title="Processus web protégé"' : ''}>Supprimer</button>
+                    </div>
+                    <div class="admin-actions">
+                        <button type="button" class="sk-btn-primary" data-action="start" data-id="${escapeHtml(server.id)}" ${!canStart ? 'disabled' : ''}>Démarrer</button>
+                        <button type="button" class="sk-btn" data-action="restart" data-id="${escapeHtml(server.id)}" ${!canRestart ? 'disabled' : ''}>Redémarrer</button>
+                        <button type="button" class="sk-btn danger" data-action="stop" data-id="${escapeHtml(server.id)}" ${!canStop ? 'disabled' : ''}>Arrêter</button>
                     </div>
                 </article>`;
             }).join('');
@@ -562,8 +288,8 @@
                 }
                 renderVps(data.vps);
                 renderServers();
-            } catch (error) { 
-                showToast(error.message, true); 
+            } catch (error) {
+                showToast(error.message, true);
             }
         }
 
@@ -584,22 +310,24 @@
                 const tones = { start: 'start', restart: 'restart', stop: 'stop', rename: 'success', delete: 'stop' };
                 showToast(messages[action] || 'Action effectuée.', tones[action] || 'success');
                 setTimeout(loadServers, 500);
-            } catch (error) { showToast(error.message, 'error'); }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
         }
 
         async function openLogs(id, name) {
             selectedServerId = id;
-            $('#logsTitle').textContent = `Logs - ${name}`;
-            $('#logsContent').innerHTML = 'Chargement...';
+            $('#logsTitle').textContent = `Logs — ${name}`;
+            $('#logsContent').innerHTML = 'Chargement…';
             $('#logsModal').classList.remove('hidden');
-            $('#logsModal').classList.add('flex');
-            try { 
-                const rawLogs = await (await request(`/servers/${encodeURIComponent(id)}/logs`)).text(); 
-                $('#logsContent').innerHTML = parseAnsiToHtml(rawLogs) || "Aucun log trouvé.";
-            } catch (error) { $('#logsContent').textContent = error.message; }
+            try {
+                const rawLogs = await (await request(`/servers/${encodeURIComponent(id)}/logs`)).text();
+                $('#logsContent').innerHTML = parseAnsiToHtml(rawLogs) || 'Aucun log trouvé.';
+            } catch (error) {
+                $('#logsContent').textContent = error.message;
+            }
         }
 
-        // Ecouteur Recherche
         $('#searchInput').addEventListener('input', (e) => {
             searchTerm = e.target.value.toLowerCase().trim();
             renderServers();
@@ -610,51 +338,38 @@
             renderServers();
         });
 
-        // Ecouteur Boutons Serveur
         $('#servers').addEventListener('click', async (event) => {
             const button = event.target.closest('button[data-action]');
             if (!button || button.disabled) return;
-            
             const { action, id, name } = button.dataset;
-
             if (action === 'logs') {
                 openLogs(id, name);
-            } 
-            else if (action === 'rename') {
-                const newName = prompt("Saisissez le nouveau nom (les espaces sont autorisés) :", name);
+            } else if (action === 'rename') {
+                const newName = prompt('Saisissez le nouveau nom :', name);
                 if (newName && newName.trim() !== name) {
                     serverAction(id, 'rename', { name: newName.trim() });
                 }
-            }
-            else if (action === 'delete') {
-                if (button.dataset.confirm === "true") {
+            } else if (action === 'delete') {
+                if (button.dataset.confirm === 'true') {
                     serverAction(id, 'delete');
                 } else {
-                    button.dataset.confirm = "true";
-                    const originalHtml = button.innerHTML;
-                    button.innerHTML = "<i class='fa-solid fa-triangle-exclamation mr-1'></i>Confirmer ?";
-                    button.classList.add("bg-rose-700", "text-white", "border-rose-500");
-                    button.classList.remove("bg-slate-800/80", "border-slate-700");
-                    
+                    button.dataset.confirm = 'true';
+                    const originalHtml = button.textContent;
+                    button.textContent = 'Confirmer ?';
                     setTimeout(() => {
-                        if(button && button.dataset) {
-                            button.dataset.confirm = "false";
-                            button.innerHTML = originalHtml;
-                            button.classList.remove("bg-rose-700", "text-white", "border-rose-500");
-                            button.classList.add("bg-slate-800/80", "border-slate-700");
+                        if (button && button.dataset) {
+                            button.dataset.confirm = 'false';
+                            button.textContent = originalHtml;
                         }
                     }, 3500);
                 }
-            }
-            else if (action === 'favorite') {
+            } else if (action === 'favorite') {
                 toggleFavorite(id);
-            }
-            else {
+            } else {
                 serverAction(id, action);
             }
         });
 
-        // Actions globales
         $('#startAllBtn').addEventListener('click', () => serverAction('all', 'start'));
         $('#restartAllBtn').addEventListener('click', () => {
             if (confirm('Redémarrer tous les processus sauf le site Synkrone ?')) serverAction('all', 'restart');
@@ -662,17 +377,20 @@
         $('#stopAllBtn').addEventListener('click', () => {
             if (confirm('Arrêter tous les processus sauf le site Synkrone ?')) serverAction('all', 'stop');
         });
-        
-        // Logs modal actions
+
         $('#closeLogsBtn').addEventListener('click', () => $('#logsModal').classList.add('hidden'));
-        $('#logsModal').addEventListener('click', (event) => { if (event.target.id === 'logsModal') $('#logsModal').classList.add('hidden'); });
+        $('#logsModal').addEventListener('click', (event) => {
+            if (event.target.id === 'logsModal') $('#logsModal').classList.add('hidden');
+        });
         $('#clearLogsBtn').addEventListener('click', async () => {
             if (!selectedServerId) return;
             try {
                 await request(`/servers/${encodeURIComponent(selectedServerId)}/logs/clear`, { method: 'POST' });
                 $('#logsContent').innerHTML = '';
                 showToast('Logs effacés.');
-            } catch (error) { showToast(error.message, 'error'); }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
         });
 
         loadServers();

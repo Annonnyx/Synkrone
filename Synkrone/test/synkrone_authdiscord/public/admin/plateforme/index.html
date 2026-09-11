@@ -3,60 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plateforme</title>
+    <title>Plateforme — Synkrone</title>
+    <link rel="stylesheet" href="/design/synkrone.css">
     <link rel="stylesheet" href="../admin.css">
 </head>
-<body>
-<main>
-    <h1>Plateforme</h1>
-    <p class="lead">Couper Minecraft, plafonner CPU / RAM / stockage, et poser des réductions limitées dans le temps.</p>
-    <form id="form">
-        <label><input type="checkbox" id="minecraftEnabled"> Autoriser la création de serveurs Minecraft</label>
-        <div class="grid-2">
-            <label>CPU max global (millicores)<input type="number" id="maxCpuMillicores" min="100" max="16000"></label>
-            <label>RAM max globale (Mo)<input type="number" id="maxMemoryMb" min="64" max="65536"></label>
-            <label>Stockage max global (Mo)<input type="number" id="maxStorageMb" min="512" max="204800"></label>
+<body class="admin-body">
+<main class="admin-page">
+    <header class="admin-head">
+        <div>
+            <h1>Plateforme</h1>
+            <p class="admin-lead">Minecraft, plafonds CPU / RAM / stockage, et réductions limitées dans le temps.</p>
         </div>
-        <h2>Plafonds par type</h2>
-        <div class="grid-2" id="types"></div>
-        <div class="row"><button type="submit">Enregistrer les plafonds</button></div>
-        <p class="status" id="status"></p>
-    </form>
+    </header>
 
-    <h2>Réductions temporaires</h2>
-    <p class="lead">Un pourcentage, une durée, et ce que ça touche : bots, sites, Minecraft, RAM, CPU, stockage, ou tout.</p>
-    <form id="promo-form">
-        <div class="grid-2">
-            <label>Libellé<input id="promo-label" maxlength="80" placeholder="Promo de rentrée"></label>
-            <label>Réduction (%)<input id="promo-percent" type="number" min="1" max="100" value="20"></label>
-            <label>Durée<input id="promo-duration" type="number" min="1" value="7"></label>
-            <label>Unité
-                <select id="promo-unit">
-                    <option value="hours">Heures</option>
-                    <option value="days" selected>Jours</option>
-                    <option value="weeks">Semaines</option>
-                </select>
-            </label>
+    <section class="admin-card">
+        <form id="form">
+            <label class="admin-check"><input type="checkbox" id="minecraftEnabled"> Autoriser la création de serveurs Minecraft</label>
+            <div class="grid-2">
+                <label>CPU max global (millicores)<input type="number" id="maxCpuMillicores" min="100" max="16000"></label>
+                <label>RAM max globale (Mo)<input type="number" id="maxMemoryMb" min="64" max="65536"></label>
+                <label>Stockage max global (Mo)<input type="number" id="maxStorageMb" min="512" max="204800"></label>
+            </div>
+            <h2>Plafonds par type</h2>
+            <div class="grid-2" id="types"></div>
+            <div class="row"><button type="submit" class="sk-btn-primary">Enregistrer les plafonds</button></div>
+            <p class="status" id="status"></p>
+        </form>
+    </section>
+
+    <section class="admin-card">
+        <h2>Réductions temporaires</h2>
+        <p class="admin-lead">Un pourcentage, une durée, et ce que ça touche : bots, sites, Minecraft, RAM, CPU, stockage, ou tout.</p>
+        <form id="promo-form">
+            <div class="grid-2">
+                <label>Libellé<input id="promo-label" maxlength="80" placeholder="Promo de rentrée"></label>
+                <label>Réduction (%)<input id="promo-percent" type="number" min="1" max="100" value="20"></label>
+                <label>Durée<input id="promo-duration" type="number" min="1" value="7"></label>
+                <label>Unité
+                    <select id="promo-unit">
+                        <option value="hours">Heures</option>
+                        <option value="days" selected>Jours</option>
+                        <option value="weeks">Semaines</option>
+                    </select>
+                </label>
+            </div>
+            <div class="row" id="promo-targets"></div>
+            <div class="row"><button type="submit" class="sk-btn-primary">Ajouter la réduction</button></div>
+            <p class="status" id="promo-status"></p>
+        </form>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Libellé</th>
+                        <th>%</th>
+                        <th>Cible</th>
+                        <th>Fin</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="promo-rows"></tbody>
+            </table>
         </div>
-        <div class="row" id="promo-targets"></div>
-        <div class="row"><button type="submit">Ajouter la réduction</button></div>
-        <p class="status" id="promo-status"></p>
-    </form>
-    <table>
-        <thead>
-            <tr>
-                <th>Libellé</th>
-                <th>%</th>
-                <th>Cible</th>
-                <th>Fin</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody id="promo-rows"></tbody>
-    </table>
+    </section>
 </main>
 <script>
-const types = ['discord', 'minecraft', 'web'];
+const types = [
+    { id: 'discord', label: 'Bots' },
+    { id: 'minecraft', label: 'Minecraft' },
+    { id: 'web', label: 'Sites' }
+];
 const TARGETS = [
     { id: 'discord', label: 'Bots' },
     { id: 'minecraft', label: 'Minecraft' },
@@ -74,14 +90,14 @@ function field(id, label) {
 }
 document.getElementById('types').innerHTML = types.map((t) => `
     <div>
-        <strong>${t}</strong>
-        ${field(`${t}-cpu`, 'CPU millicores')}
-        ${field(`${t}-ram`, 'RAM Mo')}
-        ${field(`${t}-disk`, 'Stockage Mo')}
+        <strong>${t.label}</strong>
+        ${field(`${t.id}-cpu`, 'CPU millicores')}
+        ${field(`${t.id}-ram`, 'RAM Mo')}
+        ${field(`${t.id}-disk`, 'Stockage Mo')}
     </div>
 `).join('');
 document.getElementById('promo-targets').innerHTML = TARGETS.map((item) => `
-    <label style="display:flex;align-items:center;gap:.4rem;grid-template-columns:none;">
+    <label class="admin-check">
         <input type="checkbox" name="promo-target" value="${item.id}"> ${item.label}
     </label>
 `).join('');
@@ -93,10 +109,10 @@ function fill(data) {
     document.getElementById('maxMemoryMb').value = data.maxMemoryMb;
     document.getElementById('maxStorageMb').value = data.maxStorageMb;
     for (const t of types) {
-        const row = data.limits?.[t] || {};
-        document.getElementById(`${t}-cpu`).value = row.cpuMillicores || '';
-        document.getElementById(`${t}-ram`).value = row.memoryMb || '';
-        document.getElementById(`${t}-disk`).value = row.storageMb || '';
+        const row = data.limits?.[t.id] || {};
+        document.getElementById(`${t.id}-cpu`).value = row.cpuMillicores || '';
+        document.getElementById(`${t.id}-ram`).value = row.memoryMb || '';
+        document.getElementById(`${t.id}-disk`).value = row.storageMb || '';
     }
     renderPromos();
 }
@@ -113,9 +129,9 @@ function renderPromos() {
             <td>${row.percent} %</td>
             <td>${targets}</td>
             <td>${when}</td>
-            <td>
-                <button type="button" class="ghost" data-toggle="${row.id}">${row.enabled === false ? 'Activer' : 'Pause'}</button>
-                <button type="button" class="danger" data-del="${row.id}">Retirer</button>
+            <td class="admin-actions">
+                <button type="button" class="sk-btn ghost" data-toggle="${row.id}">${row.enabled === false ? 'Activer' : 'Pause'}</button>
+                <button type="button" class="sk-btn danger" data-del="${row.id}">Retirer</button>
             </td>
         </tr>`;
     }).join('') : '<tr><td colspan="5">Aucune réduction.</td></tr>';
@@ -142,10 +158,10 @@ document.getElementById('form').addEventListener('submit', async (e) => {
     const status = document.getElementById('status');
     const limits = {};
     for (const t of types) {
-        limits[t] = {
-            cpuMillicores: Number(document.getElementById(`${t}-cpu`).value),
-            memoryMb: Number(document.getElementById(`${t}-ram`).value),
-            storageMb: Number(document.getElementById(`${t}-disk`).value)
+        limits[t.id] = {
+            cpuMillicores: Number(document.getElementById(`${t.id}-cpu`).value),
+            memoryMb: Number(document.getElementById(`${t.id}-ram`).value),
+            storageMb: Number(document.getElementById(`${t.id}-disk`).value)
         };
     }
     try {

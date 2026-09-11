@@ -1,604 +1,183 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synkrone - Gestion des Utilisateurs</title>
+    <title>Comptes — Synkrone</title>
     <link rel="icon" type="image/jpeg" href="../../assets/images/logo.jpg">
-    <link rel="stylesheet" href="../../assets/mosaique.css">
-    <script src="../../assets/mosaique.js" defer></script>
-        <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        slate: {
-                            50: '#f4f5f7', 100: '#e8eaed', 200: '#c5cad1', 300: '#9aa3ae',
-                            400: '#9aa3ae', 500: '#6b7380', 600: '#3d4450', 700: '#2a3139',
-                            800: '#22272e', 900: '#171a1e', 950: '#0f1114'
-                        }
-                    },
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/a2e0e6ad65.js" crossorigin="anonymous"></script>
-    <style>
-        .scrollbar-none {
-            -ms-overflow-style: none;
-        }
-
-        .scrollbar-none::-webkit-scrollbar {
-            display: none;
-        }
-
-        html,
-        body {
-            -ms-overflow-style: none;
-        }
-
-        html::-webkit-scrollbar,
-        body::-webkit-scrollbar {
-            display: none;
-        }
-
-        .select-clean {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            width: 100%;
-            min-width: 0;
-            padding-right: 42px;
-        }
-
-        .select-wrap {
-            position: relative;
-            display: block;
-            width: 100%;
-        }
-
-        .select-wrap::after {
-            content: '';
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            width: 8px;
-            height: 8px;
-            border-right: 2px solid #cbd5e1;
-            border-bottom: 2px solid #cbd5e1;
-            transform: translateY(-60%) rotate(45deg);
-            pointer-events: none;
-            opacity: 0.9;
-        }
-
-        .filter-controls {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr);
-            gap: 12px;
-        }
-
-        .filter-controls > * {
-            min-width: 0;
-            width: 100%;
-        }
-
-        @media (min-width: 768px) {
-            .filter-controls {
-                grid-template-columns: minmax(0, 1fr) minmax(220px, 240px) minmax(220px, 240px);
-                align-items: center;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .select-clean {
-                font-size: 0.86rem;
-                padding-top: 0.58rem;
-                padding-bottom: 0.58rem;
-            }
-
-            .select-wrap::after {
-                right: 12px;
-                width: 7px;
-                height: 7px;
-            }
-
-            .filter-controls {
-                gap: 9px;
-            }
-
-            .filter-controls > * {
-                width: 100%;
-                min-width: 0;
-            }
-
-            .p-2\.5 {
-                padding: 0.5rem;
-            }
-
-            .md\:p-3 {
-                padding: 0.5rem;
-            }
-
-            .md\:px-4,
-            .md\:py-3,
-            .md\:px-5,
-            .md\:py-3\.5 {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
-                padding-top: 0.5rem;
-                padding-bottom: 0.5rem;
-            }
-        }
-
-        .compact-table th,
-        .compact-table td {
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
-
-        @media (max-width: 767px) {
-            .compact-table {
-                width: 100%;
-                min-width: 0;
-                table-layout: fixed;
-            }
-
-            .compact-table thead {
-                display: none;
-            }
-
-            .compact-table tbody {
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-                padding: 6px;
-            }
-
-            .compact-table tbody tr {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 6px;
-                padding: 8px;
-                border: 1px solid rgba(51, 65, 85, 0.75);
-                border-radius: 12px;
-                background: rgba(15, 23, 42, 0.62);
-            }
-
-            .compact-table tbody td {
-                display: block;
-                padding: 0;
-                min-width: 0;
-            }
-
-            .compact-table tbody td::before {
-                display: block;
-                margin-bottom: 2px;
-                font-size: 0.62rem;
-                font-weight: 700;
-                letter-spacing: 0.1em;
-                text-transform: uppercase;
-                color: #64748b;
-            }
-
-            .compact-table tbody td:nth-child(1) {
-                grid-column: 1 / -1;
-            }
-
-            .compact-table tbody td:nth-child(1)::before { content: 'Membre'; }
-            .compact-table tbody td:nth-child(2)::before { content: 'Discord ID'; }
-            .compact-table tbody td:nth-child(3)::before { content: 'Grade'; }
-            .compact-table tbody td:nth-child(4)::before { content: 'Krônes'; }
-            .compact-table tbody td:nth-child(5)::before { content: 'Statut'; }
-            .compact-table tbody td:nth-child(6) {
-                grid-column: 1 / -1;
-                display: flex;
-                justify-content: flex-start;
-                align-items: center;
-            }
-
-            .compact-table tbody td:nth-child(6)::before {
-                content: 'Action';
-                display: none;
-            }
-
-            .compact-table tbody td:nth-child(2),
-            .compact-table tbody td:nth-child(3),
-            .compact-table tbody td:nth-child(4),
-            .compact-table tbody td:nth-child(5) {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                justify-content: flex-start;
-                gap: 1px;
-                font-size: 0.72rem;
-                line-height: 1.2;
-                padding: 2px 0;
-                border: 0;
-                border-radius: 0;
-                background: transparent;
-            }
-
-            .compact-table tbody td:nth-child(2)::before,
-            .compact-table tbody td:nth-child(3)::before,
-            .compact-table tbody td:nth-child(4)::before,
-            .compact-table tbody td:nth-child(5)::before {
-                margin-bottom: 0;
-                flex-shrink: 0;
-            }
-
-            .compact-table tbody td:nth-child(2) > *,
-            .compact-table tbody td:nth-child(3) > *,
-            .compact-table tbody td:nth-child(4) > *,
-            .compact-table tbody td:nth-child(5) > * {
-                min-width: 0;
-            }
-
-            .compact-table tbody td:nth-child(4) > div,
-            .compact-table tbody td:nth-child(5) > span {
-                margin-left: 0;
-                width: 100%;
-                justify-content: flex-start;
-                text-align: left;
-            }
-
-            .compact-table .font-semibold {
-                font-size: 0.85rem;
-            }
-
-            .compact-table .inline-flex,
-            .compact-table .flex {
-                max-width: 100%;
-            }
-
-            .compact-table .inline-flex.items-center.gap-1\.5.px-3.py-1.rounded-full {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
-            }
-
-            .compact-table .py-4.px-4 {
-                padding: 0;
-            }
-
-            .compact-table .text-right {
-                text-align: left;
-            }
-
-            .compact-table button {
-                width: 100%;
-                justify-content: center;
-                padding-top: 0.45rem;
-                padding-bottom: 0.45rem;
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
-            }
-
-            .compact-user-avatar {
-                width: 28px;
-                height: 28px;
-            }
-
-            .compact-status-dot {
-                width: 8px;
-                height: 8px;
-            }
-
-            .compact-table tbody td:nth-child(1) > div {
-                gap: 5px;
-            }
-
-            .compact-table tbody td:nth-child(1) .text-xs {
-                font-size: 0.62rem;
-            }
-
-            .compact-table tbody td:nth-child(1) .font-semibold {
-                font-size: 0.82rem;
-            }
-
-            .compact-table tbody td:nth-child(1) .text-slate-500 {
-                font-size: 0.62rem;
-            }
-
-            .compact-table tbody td:nth-child(2)::before,
-            .compact-table tbody td:nth-child(3)::before,
-            .compact-table tbody td:nth-child(4)::before,
-            .compact-table tbody td:nth-child(5)::before {
-                width: 100%;
-                text-align: left;
-            }
-
-            .stat-value {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .compact-table tbody td:nth-child(2) > *,
-            .compact-table tbody td:nth-child(3) > *,
-            .compact-table tbody td:nth-child(4) > *,
-            .compact-table tbody td:nth-child(5) > * {
-                width: 100%;
-                text-align: left;
-            }
-
-            .compact-table tbody td:nth-child(1) .relative {
-                flex-shrink: 0;
-            }
-
-            .compact-table tbody td:nth-child(1) > div > div:last-child {
-                min-width: 0;
-            }
-
-            .compact-table tbody td:nth-child(4) .flex.items-center.space-x-1\.5 {
-                width: 100%;
-                justify-content: flex-start;
-            }
-        }
-
-        .compact-user-avatar {
-            width: 34px;
-            height: 34px;
-        }
-
-        .compact-status-dot {
-            width: 10px;
-            height: 10px;
-            border-width: 1px;
-        }
-
-        .adjust-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(2, 6, 23, 0.78);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            z-index: 60;
-        }
-
-        .adjust-modal-card {
-            width: 100%;
-            max-width: 360px;
-            border: 1px solid rgba(148, 163, 184, 0.4);
-            background: rgba(15, 23, 42, 0.98);
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            padding: 14px;
-        }
-
-        .avatar-status-dot {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            width: 13px;
-            height: 13px;
-            border-radius: 999px;
-            border: 2px solid rgb(15 23 42);
-        }
-
-        .badge-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            font-size: 11px;
-            line-height: 1;
-            font-weight: 600;
-        }
-
-        .badge-krobi {
-            background: rgba(15, 23, 42, 0.75);
-            color: #cbd5e1;
-            border-color: rgba(100, 116, 139, 0.45);
-        }
-
-        .badge-equipe {
-            background: rgba(8, 47, 73, 0.55);
-            color: #67e8f9;
-            border-color: rgba(34, 211, 238, 0.4);
-        }
-
-        .badge-admin {
-            background: rgba(76, 5, 25, 0.55);
-            color: #fda4af;
-            border-color: rgba(244, 63, 94, 0.45);
-        }
-
-        .badge-online {
-            background: rgba(6, 78, 59, 0.6);
-            color: #6ee7b7;
-            border-color: rgba(16, 185, 129, 0.45);
-        }
-
-        .badge-offline {
-            background: rgba(30, 41, 59, 0.65);
-            color: #94a3b8;
-            border-color: rgba(100, 116, 139, 0.5);
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="../admin.css">
 </head>
-<body class="mosaic-bg bg-slate-950 text-slate-100 min-h-screen p-0 scrollbar-none">
-    <div class="w-full min-h-screen space-y-0">
-        <section class="grid grid-cols-4 gap-1">
-            <article class="min-w-0 border border-red-900/45 bg-slate-900/92 px-2 py-2 md:px-3 md:py-2.5">
-                <p class="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-slate-400">Membres</p>
-                <p id="stat-total-users" class="stat-value text-sm md:text-xl font-semibold leading-tight">0</p>
+<body class="admin-body">
+    <main class="admin-page">
+        <header class="admin-head">
+            <div>
+                <h1>Comptes</h1>
+                <p class="admin-lead">Membres, rôles, grades et Krônes.</p>
+            </div>
+        </header>
+
+        <section class="admin-stats">
+            <article class="admin-stat">
+                <p class="admin-stat-label">Membres</p>
+                <p id="stat-total-users" class="admin-stat-value">0</p>
             </article>
-            <article class="min-w-0 border border-red-900/45 bg-slate-900/92 px-2 py-2 md:px-3 md:py-2.5">
-                <p class="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-slate-400">En ligne</p>
-                <p id="stat-online-users" class="stat-value text-sm md:text-xl font-semibold leading-tight text-emerald-400">0</p>
+            <article class="admin-stat">
+                <p class="admin-stat-label">En ligne</p>
+                <p id="stat-online-users" class="admin-stat-value is-online">0</p>
             </article>
-            <article class="min-w-0 border border-red-900/45 bg-slate-900/92 px-2 py-2 md:px-3 md:py-2.5">
-                <p class="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-slate-400">Équipes</p>
-                <p id="stat-staff-users" class="stat-value text-sm md:text-xl font-semibold leading-tight text-cyan-400">0</p>
+            <article class="admin-stat">
+                <p class="admin-stat-label">Équipe</p>
+                <p id="stat-staff-users" class="admin-stat-value is-staff">0</p>
             </article>
-            <article class="min-w-0 border border-red-900/45 bg-slate-900/92 px-2 py-2 md:px-3 md:py-2.5">
-                <p class="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-slate-400">Krônes</p>
-                <p id="stat-total-krone" title="0 Ϧ" class="stat-value text-base md:text-xl font-semibold leading-tight text-amber-400">0 Ϧ</p>
+            <article class="admin-stat">
+                <p class="admin-stat-label">Krônes</p>
+                <p id="stat-total-krone" class="admin-stat-value is-krones" title="0 ₭">0 ₭</p>
             </article>
         </section>
 
-        <section class="border border-red-900/45 bg-slate-900/92 p-2.5 md:p-3 space-y-2.5">
-            <div class="flex flex-col gap-3 md:justify-between">
-                <div class="filter-controls">
-                    <input id="searchInput" type="text" oninput="filterUsers()" placeholder="Rechercher pseudo ou ID..." class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-blue-500">
-                    <label class="select-wrap">
-                        <select id="gradeFilter" onchange="filterUsers()" title="Filtrer par grade" aria-label="Filtrer par grade" class="select-clean rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-                            <option value="ALL">Grades: tous</option>
-                            <option value="Admin">Admin</option>
-                            <option value="Équipe">Équipe</option>
-                            <option value="Aucun">Aucun</option>
-                            <option value="Kronium">Kronium</option>
-                            <option value="Synkral">Synkral</option>
-                            <option value="Kronalloy">Kronalloy</option>
-                            <option value="Synkronite">Synkronite</option>
-                            <option value="Kronix">Kronix</option>
-                        </select>
-                    </label>
-                    <label class="select-wrap">
-                        <select id="statusFilter" onchange="filterUsers()" title="Filtrer par statut" aria-label="Filtrer par statut" class="select-clean rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-                            <option value="ALL">Statuts: tous</option>
-                            <option value="online">En ligne</option>
-                            <option value="offline">Hors ligne</option>
-                        </select>
-                    </label>
-                </div>
+        <section class="admin-card">
+            <div class="admin-filters">
+                <input id="searchInput" type="search" oninput="filterUsers()" placeholder="Rechercher un pseudo ou un ID">
+                <label>
+                    Grade
+                    <select id="gradeFilter" onchange="filterUsers()" aria-label="Filtrer par grade">
+                        <option value="ALL">Tous</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Équipe">Équipe</option>
+                        <option value="Aucun">Aucun</option>
+                        <option value="Kronium">Kronium</option>
+                        <option value="Synkral">Synkral</option>
+                        <option value="Kronalloy">Kronalloy</option>
+                        <option value="Synkronite">Synkronite</option>
+                        <option value="Kronix">Kronix</option>
+                    </select>
+                </label>
+                <label>
+                    Statut
+                    <select id="statusFilter" onchange="filterUsers()" aria-label="Filtrer par statut">
+                        <option value="ALL">Tous</option>
+                        <option value="online">En ligne</option>
+                        <option value="offline">Hors ligne</option>
+                    </select>
+                </label>
             </div>
 
-            <div class="overflow-x-hidden md:overflow-x-auto scrollbar-none rounded-lg border border-slate-800">
-                <table class="compact-table w-full text-sm md:min-w-[860px]">
-                    <thead class="bg-slate-950 text-slate-400">
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <th class="text-left font-medium py-3 px-4">Membre</th>
-                            <th class="text-left font-medium py-3 px-4">Discord ID</th>
-                            <th class="text-left font-medium py-3 px-4">Grade</th>
-                            <th class="text-left font-medium py-3 px-4">Krônes</th>
-                            <th class="text-left font-medium py-3 px-4">Statut</th>
-                            <th class="text-right font-medium py-3 px-4">Action</th>
+                            <th>Membre</th>
+                            <th>Discord</th>
+                            <th>Grade</th>
+                            <th>Krônes</th>
+                            <th>Statut</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody"></tbody>
                 </table>
             </div>
-            <p id="noUsersState" class="hidden text-sm text-slate-400">Aucun utilisateur ne correspond aux filtres.</p>
+            <p id="noUsersState" class="hidden admin-empty">Aucun compte ne correspond aux filtres.</p>
         </section>
-    </div>
+    </main>
 
-    <div id="manageModal" class="hidden fixed inset-0 z-50 bg-black/70 p-2 md:p-3 overflow-y-auto md:overflow-hidden scrollbar-none">
-        <div class="w-full max-w-5xl mx-auto border border-red-900/45 bg-slate-900/95 shadow-2xl overflow-hidden md:max-h-[96vh]">
-
-            <div class="px-3 py-2.5 md:px-4 md:py-3 space-y-2.5 md:space-y-2">
-                <input id="modalUserRawId" type="hidden">
-
-                <div class="grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-2.5 items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="relative">
-                            <img id="modalAvatar" src="/assets/images/logo.jpg" alt="Avatar" class="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover border border-slate-700" onerror="this.src='/assets/images/logo.jpg';">
-                            <span id="modalStatusDot" class="avatar-status-dot bg-slate-500"></span>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Identité</div>
-                            <div class="text-sm font-semibold text-slate-100" id="modalPseudoMirror">Utilisateur</div>
-                            <div class="text-[11px] text-slate-500 font-mono" id="modalUserIdMirror">ID: -</div>
-                        </div>
-                    </div>
-
-                    <div class="rounded-lg border border-slate-800 bg-slate-950/70 p-2 text-[11px]">
-                        <p class="text-slate-500 uppercase tracking-wide mb-1.5">Historique de présence</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-1.5">
-                            <div class="rounded-md border border-slate-800 bg-slate-900/60 p-1.5">
-                                <p class="text-slate-500 uppercase tracking-wide">Dernière activité détectée</p>
-                                <p id="modalLastSeenText" class="text-slate-200 text-[11px] leading-tight">Jamais</p>
-                            </div>
-                            <div class="rounded-md border border-slate-800 bg-slate-900/60 p-1.5">
-                                <p class="text-slate-500 uppercase tracking-wide">Dernière connexion au site</p>
-                                <p id="modalLastLoginText" class="text-slate-200 text-[11px] leading-tight">Jamais</p>
-                            </div>
-                            <div class="rounded-md border border-slate-800 bg-slate-900/60 p-1.5">
-                                <p class="text-slate-500 uppercase tracking-wide">Compte créé le</p>
-                                <p id="modalCreatedAtText" class="text-slate-200 text-[11px] leading-tight">Jamais</p>
-                            </div>
-                        </div>
-                    </div>
+    <div id="manageModal" class="admin-modal hidden">
+        <div class="admin-modal-card">
+            <input id="modalUserRawId" type="hidden">
+            <div class="admin-identity">
+                <div class="admin-avatar">
+                    <img id="modalAvatar" src="/assets/images/logo.jpg" alt="" onerror="this.src='/assets/images/logo.jpg';">
+                    <span id="modalStatusDot" class="admin-dot"></span>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                    <label class="space-y-1 text-sm">
-                        <span class="text-slate-300 text-xs uppercase tracking-wide">Rôle du profil</span>
-                        <select id="modalRoleSelect" onchange="updateModalGradePreview()" class="select-clean w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm">
-                            <option value="Krobi">Krobi</option>
-                            <option value="Équipe">Équipe</option>
-                        </select>
-                    </label>
-
-                    <label class="space-y-1 text-sm">
-                        <span class="text-slate-300 text-xs uppercase tracking-wide">Grade soutien</span>
-                        <select id="modalGradeSelect" onchange="updateModalGradePreview()" class="select-clean w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm">
-                            <option value="Aucun">Aucun</option>
-                            <option value="Kronium">Kronium</option>
-                            <option value="Synkral">Synkral</option>
-                            <option value="Kronalloy">Kronalloy</option>
-                            <option value="Synkronite">Synkronite</option>
-                            <option value="Kronix">Kronix</option>
-                        </select>
-                    </label>
-
-                    <label class="space-y-1 text-sm">
-                        <span class="text-slate-300 text-xs uppercase tracking-wide">Krônes</span>
-                        <div class="flex gap-2">
-                            <button type="button" onclick="openKroneAdjustModal(-1)" class="rounded-lg border border-slate-700 px-3 py-2 text-xs hover:bg-slate-800">-</button>
-                            <input id="modalKroneInput" type="number" min="0" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm" />
-                            <button type="button" onclick="openKroneAdjustModal(1)" class="rounded-lg border border-slate-700 px-3 py-2 text-xs hover:bg-slate-800">+</button>
-                        </div>
-                    </label>
+                <div>
+                    <strong id="modalPseudoMirror">Utilisateur</strong>
+                    <p class="admin-id" id="modalUserIdMirror">ID: —</p>
                 </div>
             </div>
 
-            <div class="px-4 py-3 md:px-5 md:py-3.5 border-t border-slate-800 flex items-center justify-between">
-                <button onclick="closeManageModal()" class="rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-800">Annuler</button>
-                <button onclick="saveUserChanges()" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-500">Enregistrer</button>
+            <div class="admin-presence">
+                <article>
+                    <p>Dernière activité</p>
+                    <strong id="modalLastSeenText">Jamais</strong>
+                </article>
+                <article>
+                    <p>Dernière connexion</p>
+                    <strong id="modalLastLoginText">Jamais</strong>
+                </article>
+                <article>
+                    <p>Compte créé</p>
+                    <strong id="modalCreatedAtText">Jamais</strong>
+                </article>
+            </div>
+
+            <div class="admin-modal-fields">
+                <label>
+                    Rôle
+                    <select id="modalRoleSelect" onchange="updateModalGradePreview()">
+                        <option value="Krobi">Krobi</option>
+                        <option value="Équipe">Équipe</option>
+                    </select>
+                </label>
+                <label>
+                    Grade soutien
+                    <select id="modalGradeSelect" onchange="updateModalGradePreview()">
+                        <option value="Aucun">Aucun</option>
+                        <option value="Kronium">Kronium</option>
+                        <option value="Synkral">Synkral</option>
+                        <option value="Kronalloy">Kronalloy</option>
+                        <option value="Synkronite">Synkronite</option>
+                        <option value="Kronix">Kronix</option>
+                    </select>
+                </label>
+                <label>
+                    Krônes
+                    <div class="admin-krone-row">
+                        <button type="button" class="sk-btn" onclick="openKroneAdjustModal(-1)">−</button>
+                        <input id="modalKroneInput" type="number" min="0">
+                        <button type="button" class="sk-btn" onclick="openKroneAdjustModal(1)">+</button>
+                    </div>
+                </label>
+            </div>
+
+            <div class="admin-modal-foot">
+                <button type="button" class="sk-btn ghost" onclick="closeManageModal()">Annuler</button>
+                <button type="button" class="sk-btn-primary" onclick="saveUserChanges()">Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <div id="kroneAdjustModal" class="hidden adjust-modal-overlay">
-        <div class="adjust-modal-card">
-            <p id="kroneAdjustTitle" class="text-sm font-semibold text-slate-100">Ajustement Krônes</p>
-            <p class="mt-1 text-xs text-slate-400">Entrez une valeur positive.</p>
-            <input id="kroneAdjustInput" type="number" min="1" step="1" title="Valeur d'ajustement des Krônes" aria-label="Valeur d'ajustement des Krônes" class="mt-3 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm" />
-            <div class="mt-3 flex items-center justify-end gap-2">
-                <button type="button" onclick="closeKroneAdjustModal()" class="rounded-lg border border-slate-700 px-3 py-2 text-xs hover:bg-slate-800">Annuler</button>
-                <button type="button" onclick="confirmKroneAdjustModal()" class="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium hover:bg-blue-500">Valider</button>
+    <div id="kroneAdjustModal" class="admin-modal hidden">
+        <div class="admin-modal-card is-small">
+            <h2 id="kroneAdjustTitle">Ajuster les Krônes</h2>
+            <p class="admin-lead">Entrez une valeur positive.</p>
+            <label>
+                Montant
+                <input id="kroneAdjustInput" type="number" min="1" step="1">
+            </label>
+            <div class="admin-modal-foot">
+                <button type="button" class="sk-btn ghost" onclick="closeKroneAdjustModal()">Annuler</button>
+                <button type="button" class="sk-btn-primary" onclick="confirmKroneAdjustModal()">Valider</button>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 text-white border border-slate-700 px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 pointer-events-none">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Action effectuée</span>
-    </div>
+    <div id="toast" class="admin-toast" role="status"><span id="toastMessage">Action effectuée</span></div>
 
     <script>
         const GRADES_DATA = {
-            'Aucun': { price: 0, discount: '0%', perk: 'Aucun avantage', badgeClass: 'bg-slate-800 text-slate-400 border-slate-700' },
-            'Kronium': { price: 1, discount: '1%', perk: '1% de réduction sur toute la boutique', badgeClass: 'bg-amber-950/60 text-amber-300 border-amber-600/50' },
-            'Synkral': { price: 5, discount: '3%', perk: '3% de réduction + Accès Soutien (Discord, Remerciements, Dev)', badgeClass: 'bg-slate-800 text-slate-200 border-slate-500' },
-            'Kronalloy': { price: 10, discount: '7%', perk: '7% de réduction + Accès Soutien (Discord, Remerciements, Dev)', badgeClass: 'bg-blue-950/60 text-blue-300 border-blue-500/50' },
-            'Synkronite': { price: 20, discount: '15%', perk: '15% de réduction + Accès VIP complet', badgeClass: 'bg-emerald-950/60 text-emerald-300 border-emerald-500/50' },
-            'Kronix': { price: 50, discount: '20%', perk: '20% de réduction + Accès VIP complet', badgeClass: 'bg-purple-950/60 text-purple-300 border-purple-500/60 font-bold' }
+            Aucun: { price: 0, discount: '0%', perk: 'Aucun avantage' },
+            Kronium: { price: 1, discount: '1%', perk: '1% de réduction sur toute la boutique' },
+            Synkral: { price: 5, discount: '3%', perk: '3% de réduction + Accès Soutien' },
+            Kronalloy: { price: 10, discount: '7%', perk: '7% de réduction + Accès Soutien' },
+            Synkronite: { price: 20, discount: '15%', perk: '15% de réduction + Accès VIP' },
+            Kronix: { price: 50, discount: '20%', perk: '20% de réduction + Accès VIP' }
         };
 
         const SUPPORT_GRADE_SET = new Set(Object.keys(GRADES_DATA));
-        const DISPLAY_GRADE_STYLES = {
-            Admin: 'bg-rose-950/60 text-rose-300 border-rose-500/50',
-            'Équipe': 'bg-cyan-950/60 text-cyan-300 border-cyan-500/50'
-        };
-
         const ADMIN_USERS_API = '/api/admin/users';
 
         let users = [];
@@ -620,12 +199,9 @@
             } catch {
                 data = null;
             }
-
             if (!response.ok) {
-                const message = data?.message || `Erreur HTTP ${response.status}`;
-                throw new Error(message);
+                throw new Error(data?.message || `Erreur HTTP ${response.status}`);
             }
-
             return data;
         }
 
@@ -636,9 +212,7 @@
                 users = Array.isArray(payload?.users) ? payload.users : [];
                 renderUsersTable();
                 updateGlobalStats();
-                if (!silent) {
-                    showToast('Liste des membres actualisée.');
-                }
+                if (!silent) showToast('Liste des membres actualisée.');
             } catch (error) {
                 users = [];
                 renderUsersTable();
@@ -647,72 +221,29 @@
             }
         }
 
-        function resolveUserDisplayGrade(user) {
-            const rawRole = String(user?.role || 'Krobi').trim() || 'Krobi';
-            const rawGrade = String(user?.grade || 'Aucun').trim() || 'Aucun';
-
-            if (Boolean(user?.isTeamOwner)) {
-                return 'Admin';
-            }
-
-            if (rawRole === 'Dev' || rawRole.toLowerCase() === 'dev') {
-                return 'Dev';
-            }
-            const isManualStaff = isManualStaffRole(rawRole);
-            if (isManualStaff) {
-                return 'Équipe';
-            }
-
-            return SUPPORT_GRADE_SET.has(rawGrade) ? rawGrade : 'Aucun';
-        }
-
         function isManualStaffRole(roleValue) {
             const normalized = String(roleValue || '')
                 .trim()
                 .toLowerCase()
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '');
-            return normalized === 'staff' || normalized === 'equipe' || normalized === 'equipes' || normalized === 'admin' || normalized === 'dev';
+            return ['staff', 'equipe', 'equipes', 'admin', 'dev'].includes(normalized);
         }
 
-        function getRoleBadgeClass(roleLabel) {
-            if (roleLabel === 'Admin') return 'badge-chip badge-admin';
-            if (roleLabel === 'Équipe' || roleLabel === 'Dev') return 'badge-chip badge-equipe';
-            return 'badge-chip badge-krobi';
-        }
-
-        function getStatusBadgeClass(statusLabel) {
-            return statusLabel === 'En ligne' ? 'badge-chip badge-online' : 'badge-chip badge-offline';
-        }
-
-        function resolveUserDisplayRole(user) {
+        function resolveUserDisplayGrade(user) {
             const rawRole = String(user?.role || 'Krobi').trim() || 'Krobi';
             const rawGrade = String(user?.grade || 'Aucun').trim() || 'Aucun';
-
-            if (Boolean(user?.isTeamOwner)) {
-                return 'Admin';
-            }
-
-            if (rawRole === 'Dev' || rawRole.toLowerCase() === 'dev') {
-                return 'Dev';
-            }
-            const isManualStaff = isManualStaffRole(rawRole);
-            if (isManualStaff) {
-                return 'Équipe';
-            }
-
-            if (SUPPORT_GRADE_SET.has(rawGrade) && rawGrade !== 'Aucun') {
-                return rawGrade;
-            }
-
-            return 'Krobi';
+            if (user?.isTeamOwner) return 'Admin';
+            if (rawRole === 'Dev' || rawRole.toLowerCase() === 'dev') return 'Dev';
+            if (isManualStaffRole(rawRole)) return 'Équipe';
+            return SUPPORT_GRADE_SET.has(rawGrade) ? rawGrade : 'Aucun';
         }
 
-        function syncModalIdentityBadges({ statusLabel }) {
-            const statusDot = document.getElementById('modalStatusDot');
-            if (!statusDot) return;
-            statusDot.classList.toggle('bg-emerald-500', statusLabel === 'En ligne');
-            statusDot.classList.toggle('bg-slate-500', statusLabel !== 'En ligne');
+        function gradeBadgeClass(label) {
+            if (label === 'Admin') return 'sk-badge is-admin';
+            if (label === 'Équipe' || label === 'Dev') return 'sk-badge is-staff';
+            if (label === 'Kronium' || label === 'Kronalloy' || label === 'Kronix') return 'sk-badge is-amber';
+            return 'sk-badge is-grade';
         }
 
         function renderUsersTable() {
@@ -721,7 +252,6 @@
             const searchTerm = String(document.getElementById('searchInput').value || '').toLowerCase();
             const gradeFilter = document.getElementById('gradeFilter').value;
             const statusFilter = document.getElementById('statusFilter').value;
-
             tbody.innerHTML = '';
 
             const filteredUsers = users.filter((user) => {
@@ -738,56 +268,32 @@
 
             filteredUsers.forEach((user) => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/40 transition-colors';
-
-                const safeGrade = GRADES_DATA[user.grade] ? user.grade : 'Aucun';
                 const displayGrade = resolveUserDisplayGrade(user);
-                const gradeBadgeClass = GRADES_DATA[displayGrade]?.badgeClass
-                    || DISPLAY_GRADE_STYLES[displayGrade]
-                    || GRADES_DATA[safeGrade].badgeClass;
                 const safeAvatar = user.avatar || '/assets/images/logo.jpg';
                 const kroneValue = Number(user.krone || 0);
                 const kroneCompact = formatKroneCompact(kroneValue);
-
+                const online = user.status === 'online';
                 tr.innerHTML = `
-                    <td class="py-4 px-4">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="relative">
-                                <img src="${safeAvatar}" alt="${escapeHtml(user.username || 'Utilisateur')}" class="compact-user-avatar rounded-full object-cover border border-slate-700" onerror="this.src='/assets/images/logo.jpg';">
-                                <span class="compact-status-dot absolute bottom-0 right-0 rounded-full border-2 border-slate-900 ${user.status === 'online' ? 'bg-emerald-500' : 'bg-slate-500'}"></span>
+                    <td>
+                        <div class="admin-member">
+                            <div class="admin-avatar">
+                                <img src="${safeAvatar}" alt="" onerror="this.src='/assets/images/logo.jpg';">
+                                <span class="admin-dot ${online ? 'is-online' : 'is-offline'}"></span>
                             </div>
                             <div>
-                                <div class="font-semibold text-white leading-tight">${escapeHtml(user.username || 'Utilisateur')}</div>
-                                <div class="text-xs text-slate-500">Vu: ${formatDateTime(user.lastSeenAt)}</div>
+                                <strong>${escapeHtml(user.username || 'Utilisateur')}</strong>
+                                <p class="admin-meta">Vu : ${formatDateTime(user.lastSeenAt)}</p>
                             </div>
                         </div>
                     </td>
-                    <td class="py-4 px-4 font-mono text-xs text-slate-400 break-all">${escapeHtml(String(user.id || ''))}</td>
-                    <td class="py-4 px-4">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${gradeBadgeClass}">
-                            <i class="fa-solid fa-shield-halved text-[10px]"></i>
-                            ${displayGrade}
-                        </span>
-                    </td>
-                    <td class="py-4 px-4">
-                        <div class="flex items-center space-x-1.5 font-semibold text-amber-400" title="${escapeHtml(kroneCompact.exact)}">
-                            <i class="fa-solid fa-coins text-xs"></i>
-                            <span>${kroneCompact.short}</span>
-                        </div>
-                    </td>
-                    <td class="py-4 px-4">
-                        ${user.status === 'online'
-                            ? '<span class="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-medium"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> En ligne</span>'
-                            : '<span class="inline-flex items-center gap-1.5 text-xs text-slate-400"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Hors ligne</span>'}
-                    </td>
-                    <td class="py-4 px-4 text-right">
-                        <button onclick="openManageModal('${escapeJsString(String(user.id || ''))}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-300 text-xs font-medium transition-all border border-slate-700">
-                            <i class="fa-solid fa-sliders"></i>
-                            <span>Gérer</span>
-                        </button>
+                    <td class="admin-id">${escapeHtml(String(user.id || ''))}</td>
+                    <td><span class="${gradeBadgeClass(displayGrade)}">${escapeHtml(displayGrade)}</span></td>
+                    <td class="admin-krones" title="${escapeHtml(kroneCompact.exact)}">${kroneCompact.short}</td>
+                    <td><span class="sk-badge ${online ? 'is-online' : 'is-offline'}">${online ? 'En ligne' : 'Hors ligne'}</span></td>
+                    <td>
+                        <button type="button" class="sk-btn" onclick="openManageModal('${escapeJsString(String(user.id || ''))}')">Gérer</button>
                     </td>
                 `;
-
                 tbody.appendChild(tr);
             });
         }
@@ -846,7 +352,6 @@
                 document.getElementById('modalLastSeenText').textContent = formatDateTime(user.lastSeenAt);
                 document.getElementById('modalLastLoginText').textContent = formatDateTime(user.lastLoginAt);
                 document.getElementById('modalCreatedAtText').textContent = formatDateTime(user.createdAt);
-
                 updateModalGradePreview();
                 document.getElementById('manageModal').classList.remove('hidden');
             } catch (error) {
@@ -870,10 +375,7 @@
             const modal = document.getElementById('kroneAdjustModal');
             const title = document.getElementById('kroneAdjustTitle');
             const input = document.getElementById('kroneAdjustInput');
-
-            title.textContent = pendingKroneAdjustDirection > 0
-                ? 'Ajouter des Krônes'
-                : 'Retirer des Krônes';
+            title.textContent = pendingKroneAdjustDirection > 0 ? 'Ajouter des Krônes' : 'Retirer des Krônes';
             input.value = '100';
             modal.classList.remove('hidden');
             input.focus();
@@ -885,41 +387,43 @@
         }
 
         function confirmKroneAdjustModal() {
-            const rawValue = document.getElementById('kroneAdjustInput').value;
-            const delta = parseInt(String(rawValue).trim(), 10);
+            const delta = parseInt(String(document.getElementById('kroneAdjustInput').value).trim(), 10);
             if (!Number.isFinite(delta) || delta <= 0) {
                 showToast('Valeur invalide.', true);
                 return;
             }
-
             adjustKrone(pendingKroneAdjustDirection > 0 ? delta : -delta);
             closeKroneAdjustModal();
         }
 
+        function syncModalIdentityBadges({ statusLabel }) {
+            const statusDot = document.getElementById('modalStatusDot');
+            if (!statusDot) return;
+            statusDot.classList.toggle('is-online', statusLabel === 'En ligne');
+            statusDot.classList.toggle('is-offline', statusLabel !== 'En ligne');
+        }
+
         function updateModalGradePreview() {
             if (!activeUserForModal) return;
-
             const newRole = document.getElementById('modalRoleSelect').value;
-            const isAdminLocked = Boolean(activeUserForModal.isTeamOwner);
             const statusLabel = activeUserForModal.status === 'online' ? 'En ligne' : 'Hors ligne';
-
-            if (isAdminLocked) {
+            if (activeUserForModal.isTeamOwner) {
                 document.getElementById('modalRoleSelect').value = 'ADMIN_LOCKED';
-            } else if (newRole !== 'Équipe' && newRole !== 'Krobi') {
+            } else if (!['Équipe', 'Krobi', 'Dev'].includes(newRole)) {
                 document.getElementById('modalRoleSelect').value = 'Krobi';
             }
-
             syncModalIdentityBadges({ statusLabel });
         }
 
         async function saveUserChanges() {
             if (!activeUserForModal) return;
-
             const userId = String(document.getElementById('modalUserRawId').value || '').trim();
             const newGrade = document.getElementById('modalGradeSelect').value;
             const selectedRole = document.getElementById('modalRoleSelect').value;
             const newKrone = Math.max(0, parseInt(document.getElementById('modalKroneInput').value, 10) || 0);
-            const nextRole = activeUserForModal.isTeamOwner ? undefined : (selectedRole === 'Équipe' ? 'Équipe' : 'Krobi');
+            const nextRole = activeUserForModal.isTeamOwner
+                ? undefined
+                : (selectedRole === 'Dev' ? 'Dev' : (selectedRole === 'Équipe' ? 'Équipe' : 'Krobi'));
 
             try {
                 const payload = await apiJson(`${ADMIN_USERS_API}/${encodeURIComponent(userId)}`, {
@@ -931,34 +435,20 @@
                         ...(nextRole ? { role: nextRole } : {})
                     })
                 });
-
                 const updated = payload?.user;
                 if (updated) {
                     const idx = users.findIndex((item) => item.id === updated.id);
-                    if (idx >= 0) {
-                        users[idx] = updated;
-                    }
+                    if (idx >= 0) users[idx] = updated;
                 }
-
                 renderUsersTable();
                 updateGlobalStats();
-
                 try {
                     if (window.parent && window.parent !== window) {
-                        window.parent.postMessage(
-                            {
-                                type: 'synkrone:user-updated',
-                                user: updated || null
-                            },
-                            window.location.origin
-                        );
+                        window.parent.postMessage({ type: 'synkrone:user-updated', user: updated || null }, window.location.origin);
                     }
-                } catch {
-                    // no-op
-                }
-
+                } catch { /* no-op */ }
                 closeManageModal();
-                showToast('Membre mis à jour avec succès.');
+                showToast('Membre mis à jour.');
             } catch (error) {
                 showToast(`Sauvegarde impossible: ${error.message}`, true);
             }
@@ -966,22 +456,12 @@
 
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMessage.textContent = message;
-            toastIcon.className = isError
-                ? 'fa-solid fa-triangle-exclamation text-rose-400 text-lg'
-                : 'fa-solid fa-circle-check text-emerald-400 text-lg';
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.toggle('is-error', Boolean(isError));
+            toast.classList.toggle('is-ok', !isError);
+            toast.classList.add('is-visible');
             window.clearTimeout(showToast._timer);
-            showToast._timer = window.setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3200);
+            showToast._timer = window.setTimeout(() => toast.classList.remove('is-visible'), 3200);
         }
 
         function escapeHtml(value) {
@@ -989,7 +469,7 @@
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
-                .replace(/\"/g, '&quot;')
+                .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
         }
 
@@ -1007,31 +487,22 @@
 
         function formatKroneCompact(value) {
             const safeValue = Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : 0;
-            const exact = `${Math.round(safeValue).toLocaleString('fr-FR')} Ϧ`;
-
+            const exact = `${Math.round(safeValue).toLocaleString('fr-FR')} ₭`;
             let divisor = 1;
             let suffix = '';
-            if (safeValue >= 1_000_000_000) {
-                divisor = 1_000_000_000;
-                suffix = 'MM';
-            } else if (safeValue >= 1_000_000) {
-                divisor = 1_000_000;
-                suffix = 'M';
-            } else if (safeValue >= 1_000) {
-                divisor = 1_000;
-                suffix = 'K';
-            }
-
+            if (safeValue >= 1_000_000_000) { divisor = 1_000_000_000; suffix = 'MM'; }
+            else if (safeValue >= 1_000_000) { divisor = 1_000_000; suffix = 'M'; }
+            else if (safeValue >= 1_000) { divisor = 1_000; suffix = 'K'; }
             const baseValue = safeValue / divisor;
             const rounded = baseValue >= 100 ? Math.round(baseValue) : Math.round(baseValue * 10) / 10;
-            const shortBase = rounded.toLocaleString('fr-FR');
-            const short = `${shortBase}${suffix ? ` ${suffix}` : ''} Ϧ`;
+            const short = `${rounded.toLocaleString('fr-FR')}${suffix ? ` ${suffix}` : ''} ₭`;
             return { short, exact };
         }
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 closeKroneAdjustModal();
+                closeManageModal();
             }
         });
     </script>

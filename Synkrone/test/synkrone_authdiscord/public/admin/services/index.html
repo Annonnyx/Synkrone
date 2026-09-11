@@ -3,35 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services</title>
+    <title>Services — Synkrone</title>
+    <link rel="stylesheet" href="/design/synkrone.css">
     <link rel="stylesheet" href="../admin.css">
 </head>
-<body>
-<main>
-    <h1>Services hébergés</h1>
-    <p class="lead">Tous les services users : stop / start, puis fichiers.</p>
-    <div class="row">
-        <input id="q" placeholder="Filtrer nom, type, owner…">
-        <button type="button" class="ghost" id="reload">Actualiser</button>
-    </div>
-    <p class="status" id="status"></p>
-    <table>
-        <thead><tr><th>Service</th><th>Type</th><th>État</th><th>Owner</th><th>Ressources</th><th></th></tr></thead>
-        <tbody id="rows"></tbody>
-    </table>
-    <section id="files" hidden>
-        <h2 id="files-title">Fichiers</h2>
-        <div class="row">
-            <input id="dir" value="/" style="min-width:16rem">
-            <button type="button" id="list-dir">Lister</button>
+<body class="admin-body">
+<main class="admin-page">
+    <header class="admin-head">
+        <div>
+            <h1>Services hébergés</h1>
+            <p class="admin-lead">Tous les services : démarrer, arrêter, puis fichiers.</p>
         </div>
-        <table><tbody id="file-rows"></tbody></table>
+    </header>
+
+    <section class="admin-card">
+        <div class="admin-toolbar">
+            <input id="q" type="search" placeholder="Filtrer nom, type, propriétaire…">
+            <button type="button" class="sk-btn ghost" id="reload">Actualiser</button>
+        </div>
+        <p class="status" id="status"></p>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Service</th><th>Type</th><th>État</th><th>Propriétaire</th><th>Ressources</th><th></th></tr></thead>
+                <tbody id="rows"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="admin-card" id="files" hidden>
+        <h2 id="files-title">Fichiers</h2>
+        <div class="admin-toolbar">
+            <input id="dir" value="/">
+            <button type="button" class="sk-btn" id="list-dir">Lister</button>
+        </div>
+        <div class="admin-table-wrap">
+            <table class="admin-table"><tbody id="file-rows"></tbody></table>
+        </div>
         <label>Fichier ouvert
-            <input id="file-path" style="width:100%">
+            <input id="file-path">
         </label>
-        <textarea id="file-content" rows="16" style="width:100%"></textarea>
+        <textarea id="file-content" rows="16"></textarea>
         <div class="row">
-            <button type="button" id="save-file">Enregistrer le fichier</button>
+            <button type="button" class="sk-btn-primary" id="save-file">Enregistrer le fichier</button>
         </div>
     </section>
 </main>
@@ -53,16 +66,16 @@ function render() {
     const rows = services.filter((s) => JSON.stringify(s).toLowerCase().includes(q));
     document.getElementById('rows').innerHTML = rows.map((s) => `
         <tr>
-            <td>${s.name}<br><small>${s.slug || s.id}</small></td>
+            <td>${s.name}<br><span class="admin-id">${s.slug || s.id}</span></td>
             <td>${s.type}</td>
             <td>${s.state}</td>
-            <td>${s.ownerName || ''}<br><small>${s.ownerEmail || s.ownerId || ''}</small></td>
+            <td>${s.ownerName || ''}<br><span class="admin-id">${s.ownerEmail || s.ownerId || ''}</span></td>
             <td>${(s.cpuLimit / 1000).toFixed(1)} CPU · ${s.memoryLimitMb} Mo</td>
-            <td>
-                <button type="button" class="ghost" data-a="start" data-id="${s.id}">Start</button>
-                <button type="button" class="danger" data-a="stop" data-id="${s.id}">Stop</button>
-                <button type="button" class="ghost" data-a="restart" data-id="${s.id}">Restart</button>
-                <button type="button" class="ghost" data-files="${s.id}" data-name="${s.name}">Fichiers</button>
+            <td class="admin-actions">
+                <button type="button" class="sk-btn ghost" data-a="start" data-id="${s.id}">Démarrer</button>
+                <button type="button" class="sk-btn danger" data-a="stop" data-id="${s.id}">Arrêter</button>
+                <button type="button" class="sk-btn ghost" data-a="restart" data-id="${s.id}">Redémarrer</button>
+                <button type="button" class="sk-btn ghost" data-files="${s.id}" data-name="${s.name}">Fichiers</button>
             </td>
         </tr>
     `).join('') || '<tr><td colspan="6">Aucun service.</td></tr>';
@@ -86,7 +99,7 @@ async function listFiles() {
     if (!res.ok) { setStatus(data.error || 'liste impossible'); return; }
     document.getElementById('file-rows').innerHTML = (data.entries || []).map((e) => `
         <tr>
-            <td>${e.type === 'directory' ? 'dir' : 'file'}</td>
+            <td>${e.type === 'directory' ? 'dossier' : 'fichier'}</td>
             <td><a href="#" data-open="${e.path}" data-kind="${e.type}">${e.name}</a></td>
             <td>${e.size}</td>
         </tr>

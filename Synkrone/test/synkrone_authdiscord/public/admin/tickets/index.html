@@ -3,18 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tickets</title>
+    <title>Tickets — Synkrone</title>
+    <link rel="stylesheet" href="/design/synkrone.css">
     <link rel="stylesheet" href="../admin.css">
 </head>
-<body>
-<main>
-    <h1>Tickets</h1>
-    <p class="lead">Salons Discord de la catégorie support. Le fil se lit et se répond sur Discord.</p>
-    <p class="status" id="status"></p>
-    <table>
-        <thead><tr><th>Salon</th><th>Ouvert</th><th></th></tr></thead>
-        <tbody id="rows"></tbody>
-    </table>
+<body class="admin-body">
+<main class="admin-page">
+    <header class="admin-head">
+        <div>
+            <h1>Tickets</h1>
+            <p class="admin-lead">Salons Discord de la catégorie support. Le fil se lit et se répond sur Discord.</p>
+        </div>
+    </header>
+    <section class="admin-card">
+        <p class="status" id="status"></p>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Salon</th><th>Ouvert</th><th></th></tr></thead>
+                <tbody id="rows"></tbody>
+            </table>
+        </div>
+    </section>
 </main>
 <script>
 (async () => {
@@ -29,9 +38,9 @@
         : `${tickets.length} salon(s) texte (pas de catégorie ticket définie)`;
     document.getElementById('rows').innerHTML = tickets.map((t) => `
         <tr>
-            <td>#${t.name}<br><small>${t.topic || ''}</small></td>
+            <td>#${t.name}<br><span class="admin-meta">${t.topic || ''}</span></td>
             <td>${t.createdAt ? new Date(t.createdAt).toLocaleString('fr-FR') : '—'}</td>
-            <td><a class="btn ghost" href="${t.url}" target="_blank" rel="noreferrer">Ouvrir</a></td>
+            <td><a class="sk-btn ghost" href="${t.url}" target="_blank" rel="noreferrer">Ouvrir</a></td>
         </tr>
     `).join('') || '<tr><td colspan="3">Aucun ticket ouvert.</td></tr>';
 })();
