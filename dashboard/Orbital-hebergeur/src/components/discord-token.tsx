@@ -1,10 +1,64 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff, ExternalLink, KeyRound, ShieldCheck, Trash2 } from "lucide-react";
+import { Check, Copy, Eye, EyeOff, ExternalLink, KeyRound, ShieldCheck, Trash2 } from "lucide-react";
 import { ErrorText } from "@/components/panel";
 import { useT } from "@/lib/i18n";
-import { DISCORD_PORTAL_URL, applicationIdFromToken, isDiscordToken } from "@/lib/discord/token";
+import {
+  DISCORD_PORTAL_URL,
+  applicationIdFromToken,
+  discordBotInviteUrl,
+  isDiscordToken,
+} from "@/lib/discord/token";
+
+export function DiscordInviteLink({
+  applicationId,
+  compact = false,
+}: {
+  applicationId?: string | null;
+  compact?: boolean;
+}) {
+  const t = useT();
+  const [copied, setCopied] = useState(false);
+  const href = discordBotInviteUrl(applicationId);
+  if (!href) return null;
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(href);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  };
+
+  if (compact) {
+    return (
+      <div className="flex flex-wrap gap-2">
+        <a className="btn btn-primary" href={href} target="_blank" rel="noreferrer">
+          <ExternalLink size={14} /> {t("discord.invite")}
+        </a>
+        <button type="button" className={`btn ${copied ? "btn-copied" : ""}`} onClick={() => void copy()}>
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+          {copied ? t("common.copied") : t("discord.copyInvite")}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-[var(--line)] bg-[var(--panel-2)] px-3 py-2.5">
+      <div className="label mb-1">{t("discord.invite")}</div>
+      <p className="mb-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("discord.inviteHint")}</p>
+      <div className="flex flex-wrap gap-2">
+        <a className="btn btn-primary" href={href} target="_blank" rel="noreferrer">
+          <ExternalLink size={14} /> {t("discord.invite")}
+        </a>
+        <button type="button" className={`btn ${copied ? "btn-copied" : ""}`} onClick={() => void copy()}>
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+          {copied ? t("common.copied") : t("discord.copyInvite")}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function TokenHelp() {
   const t = useT();
@@ -94,6 +148,7 @@ export function TokenField({
           placeholder={derived ?? t("discord.readFromToken")}
         />
       </div>
+      <DiscordInviteLink applicationId={applicationId.trim() || derived} />
       <TokenHelp />
     </div>
   );
@@ -225,6 +280,7 @@ export function DiscordTokenPanel({
 
       <ErrorText error={error} />
       {notice && <div className="text-xs text-[var(--success)]">{notice}</div>}
+      <DiscordInviteLink applicationId={appId.trim() || applicationId} />
       <TokenHelp />
     </div>
   );

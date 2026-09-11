@@ -28,3 +28,20 @@ export function applicationIdFromToken(value: string): string | null {
 }
 
 export const DISCORD_PORTAL_URL = "https://discord.com/developers/applications";
+
+/** Administrator — the catalog cogs need kick, ban, manage channels/roles, etc. */
+export const DISCORD_INVITE_PERMISSIONS = 8;
+
+export function discordBotInviteUrl(
+  applicationId: string | null | undefined,
+  permissions: number = DISCORD_INVITE_PERMISSIONS,
+): string | null {
+  const id = String(applicationId || "").trim();
+  if (!/^\d{15,25}$/.test(id)) return null;
+  const url = new URL("https://discord.com/oauth2/authorize");
+  url.searchParams.set("client_id", id);
+  url.searchParams.set("permissions", String(permissions));
+  url.searchParams.set("integration_type", "0");
+  url.searchParams.set("scope", "bot applications.commands");
+  return url.toString();
+}

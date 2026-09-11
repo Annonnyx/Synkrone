@@ -388,6 +388,14 @@ export const fr = {
     officialReadOnly: "Bot officiel : le code Python est déployé tel quel. Les modules ne se pickent pas à l'unité.",
     commandSearch: "Rechercher une commande",
     noCommands: "Aucune commande pour ce bot.",
+    botCommands: "Commandes du bot",
+    prefixHint: "1 à 10 caractères, au choix — par exemple !, ?, . ou sk!",
+    slashHint:
+      "Désactivées, les commandes / sont retirées de Discord au prochain redémarrage. Les commandes préfixe restent disponibles.",
+    saveBotCommands: "Enregistrer préfixe et slash",
+    botCommandsSaved: "Préfixe et slash enregistrés — redémarrez le bot pour appliquer",
+    slashOn: "Activées",
+    slashOff: "Désactivées",
   },
   tabs: {
     overview: "Vue d'ensemble",
@@ -512,7 +520,7 @@ export const fr = {
     step3: "Collez-le ci-dessous. Il est chiffré en AES-256-GCM et ne sera plus jamais affiché.",
     step4:
       "Uniquement si vous avez coché des intents privilégiés dans le panneau : toujours dans l'onglet Bot, activez Server Members Intent et Message Content Intent. Laissez-les désactivés sinon.",
-    step5: "Utilisez OAuth2 > Générateur d'URL avec les portées bot et applications.commands pour inviter le bot sur votre serveur.",
+    step5: "Le panel affiche le lien d'invitation dès que le token (ou l'ID d'application) est enregistré.",
     warning: "Le token est un mot de passe : quiconque le détient contrôle votre bot. Réinitialisez-le dans le portail s'il fuit.",
     botToken: "Token du bot",
     optionalLater: "Optionnel maintenant — vous pourrez l'ajouter plus tard depuis la page du service",
@@ -536,6 +544,9 @@ export const fr = {
     tokenStored: "Token chiffré enregistré. Recréez le conteneur pour l'injecter.",
     appIdSaved: "ID d'application enregistré.",
     unknown: "inconnue",
+    invite: "Inviter le bot",
+    inviteHint: "Lien généré depuis l'ID d'application contenu dans le token. Discord demandera le serveur et les permissions.",
+    copyInvite: "Copier le lien",
   },
   sftp: {
     howTitle: "Comment se connecter",

@@ -29,6 +29,7 @@ import { MINECRAFT_SOFTWARE, resolveGatewayIntents } from "@/lib/runtime/templat
 import { parseProperties, serializeProperties } from "@/lib/runtime/minecraft";
 import { normalizeProperties } from "@/lib/minecraft/properties";
 import { applicationIdFromToken, isDiscordToken } from "@/lib/discord/token";
+import { normalizeBotPrefix } from "@/lib/discord/prefix";
 import { backupsDir, type ServiceType } from "@/lib/paths";
 import { createJob, dispatch } from "@/lib/jobs/queue";
 import {
@@ -575,15 +576,25 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         const modules = payload.modules ?? bot.modules;
         if (payload.applicationId !== undefined && !/^\d{0,25}$/.test(payload.applicationId.trim()))
           return fail("The application ID is the numeric snowflake of your Discord application");
+        let prefix = bot.prefix;
+        if (payload.prefix !== undefined) {
+          const parsed = normalizeBotPrefix(payload.prefix);
+          if (!parsed) return fail("Prefix must be 1–10 characters, without line breaks.");
+          prefix = parsed;
+        }
         const intents = payload.intents
           ? resolveGatewayIntents(payload.intents, modules)
           : payload.modules
             ? resolveGatewayIntents(undefined, modules)
             : bot.intents;
+        const onlyRuntime =
+          payload.modules === undefined &&
+          payload.intents === undefined &&
+          payload.commands === undefined;
         await db
           .update(discordBots)
           .set({
-            prefix: payload.prefix ?? bot.prefix,
+            prefix,
             slashCommands: payload.slashCommands ?? bot.slashCommands,
             applicationId:
               payload.applicationId !== undefined
@@ -594,8 +605,15 @@ export async function POST(req: NextRequest, ctx: Ctx) {
             commands,
           })
           .where(eq(discordBots.id, bot.id));
-        await getProvider("discord").scaffold(toRecord(svc));
-        await appendConsole(id, "Bot configuration regenerated - restart to apply");
+        const provider = getProvider("discord");
+        const record = toRecord(svc);
+        if (onlyRuntime && typeof provider.syncPlatformRuntime === "function") {
+          await provider.syncPlatformRuntime(record);
+          await appendConsole(id, "Bot prefix and slash settings updated - restart to apply");
+        } else {
+          await provider.scaffold(record);
+          await appendConsole(id, "Bot configuration regenerated - restart to apply");
+        }
         await audit({ userId: user.id, serviceId: id, action: "discord.config" });
         return { ok: true };
       }

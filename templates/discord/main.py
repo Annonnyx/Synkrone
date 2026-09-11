@@ -161,7 +161,7 @@ logging.getLogger('asyncio').setLevel(logging.CRITICAL)
 # Configuration initiale
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-DEFAULT_PREFIX = os.getenv("PREFIX", "!")
+DEFAULT_PREFIX = os.getenv("BOT_PREFIX") or os.getenv("PREFIX", "!")
 
 intents = discord.Intents.all()  # Active tous les intents pour le développement
 
@@ -226,32 +226,53 @@ async def load_cogs():
 # 4. SYSTÈME DE PRÉFIXES
 # ==============================================================================
 # Préfixe global uniquement (ce dépôt n'inclut pas cogs/addons/prefix) :
-#   a. Cog BotAdmin en mémoire (panelbot, mis à jour sans redémarrage)
-#   b. cogs/DEV/panelbot/bot_config.json
-#   c. PREFIX dans .env
+#   a. config/bot.json (panneau Synkrone)
+#   b. Cog BotAdmin en mémoire (panelbot, mis à jour sans redémarrage)
+#   c. cogs/DEV/panelbot/bot_config.json
+#   d. BOT_PREFIX / PREFIX dans l'environnement
 
+_PANEL_CFG_PATH = os.path.join('config', 'bot.json')
 _PANELBOT_CFG_PATH = os.path.join('cogs', 'DEV', 'panelbot', 'bot_config.json')
 
+def _read_json_prefix(path: str) -> Optional[str]:
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            prefix = json.load(f).get('prefix')
+            if prefix:
+                return str(prefix)
+    except Exception:
+        pass
+    return None
+
+def _slash_enabled() -> bool:
+    if os.path.exists(_PANEL_CFG_PATH):
+        try:
+            with open(_PANEL_CFG_PATH, 'r', encoding='utf-8') as f:
+                flag = json.load(f).get('slashCommands')
+                if flag is not None:
+                    return bool(flag)
+        except Exception:
+            pass
+    raw = os.getenv('ENABLE_SLASH_COMMANDS', 'true')
+    return str(raw).lower() in ('1', 'true', 'yes')
+
 def _get_global_prefix() -> str:
-    """Retourne le préfixe global actif : BotAdmin en mémoire → bot_config.json → .env"""
+    """Retourne le préfixe global actif : panneau → BotAdmin → bot_config.json → env"""
+    panel_prefix = _read_json_prefix(_PANEL_CFG_PATH)
+    if panel_prefix:
+        return panel_prefix
     try:
         cog = bot.cogs.get('BotAdmin')
-        if cog and hasattr(cog, 'default_prefix'):
+        if cog and hasattr(cog, 'default_prefix') and cog.default_prefix:
             return cog.default_prefix
     except Exception:
         pass
-    if os.path.exists(_PANELBOT_CFG_PATH):
-        try:
-            with open(_PANELBOT_CFG_PATH, 'r', encoding='utf-8') as f:
-                prefix = json.load(f).get('prefix')
-                if prefix:
-                    return prefix
-        except Exception:
-            pass
-    return DEFAULT_PREFIX
+    return _read_json_prefix(_PANELBOT_CFG_PATH) or DEFAULT_PREFIX
 
 def get_prefix(bot, message):
-    """Préfixe global (BotAdmin en mémoire > bot_config.json > .env)."""
+    """Préfixe global (panneau > BotAdmin en mémoire > bot_config.json > env)."""
     return [_get_global_prefix()]
 
 # ==============================================================================
@@ -300,6 +321,16 @@ bot.help_command = None  # Désactive l'aide par défaut
 async def on_ready():
     print(f'\033[92m🤖 Connecté en tant que {bot.user.name}\033[0m')
     print('\033[94m' + '─' * 60 + '\033[0m')
+    try:
+        if _slash_enabled():
+            synced = await bot.tree.sync()
+            print(f'\033[92m[✓] {len(synced)} commande(s) slash synchronisée(s)\033[0m')
+        else:
+            bot.tree.clear_commands(guild=None)
+            await bot.tree.sync()
+            print('\033[93m[!] Commandes slash désactivées\033[0m')
+    except Exception as e:
+        print(f'\033[93m[!] Erreur lors de la synchronisation des slash commands : {e}\033[0m')
     if COGS_ERRORS:
         print('\033[93m[!] Erreurs de chargement des cogs :\033[0m')
         for cog, msg in COGS_ERRORS:

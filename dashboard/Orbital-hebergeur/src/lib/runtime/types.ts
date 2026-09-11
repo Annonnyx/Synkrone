@@ -70,6 +70,8 @@ export type ServiceRecord = {
 export interface RuntimeProvider {
   readonly type: ServiceType;
   scaffold(service: ServiceRecord): Promise<void>;
+  /** Write prefix / slash / env files without recopying the bot tree. */
+  syncPlatformRuntime?(service: ServiceRecord): Promise<void>;
   create(service: ServiceRecord): Promise<{ containerId: string; image: string }>;
   start(serviceId: string): Promise<void>;
   stop(serviceId: string): Promise<void>;

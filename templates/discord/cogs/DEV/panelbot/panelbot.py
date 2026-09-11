@@ -104,6 +104,17 @@ class BotAdmin(commands.Cog):
         }
         with open(self.config_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
+        panel_cfg = os.path.join('config', 'bot.json')
+        if os.path.exists(panel_cfg):
+            try:
+                with open(panel_cfg, 'r', encoding='utf-8') as f:
+                    panel = json.load(f)
+                if isinstance(panel, dict):
+                    panel['prefix'] = self.default_prefix
+                    with open(panel_cfg, 'w', encoding='utf-8') as f:
+                        json.dump(panel, f, indent=2, ensure_ascii=False)
+            except Exception:
+                pass
 
     def _load_owners(self):
         return []
@@ -231,6 +242,21 @@ class MainAdminView(ui.View):
     async def sync_commands(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         try:
+            slash = True
+            panel_cfg = os.path.join('config', 'bot.json')
+            if os.path.exists(panel_cfg):
+                try:
+                    with open(panel_cfg, 'r', encoding='utf-8') as f:
+                        flag = json.load(f).get('slashCommands')
+                        if flag is not None:
+                            slash = bool(flag)
+                except Exception:
+                    pass
+            if not slash:
+                self.cog.bot.tree.clear_commands(guild=None)
+                await self.cog.bot.tree.sync()
+                await interaction.followup.send("Slash commands désactivées depuis le panneau.", ephemeral=True)
+                return
             await self.cog.bot.tree.sync()
             await interaction.followup.send("✅ Synchro Globale effectuée.", ephemeral=True)
         except Exception as e:
@@ -260,7 +286,7 @@ class MainAdminView(ui.View):
 class GlobalModal(ui.Modal, title="Paramètres Globaux"):
     name_input = ui.TextInput(label="Nom du Bot", min_length=2, max_length=32)
     version_input = ui.TextInput(label="Version", min_length=1, max_length=16)
-    prefix_input = ui.TextInput(label="Préfixe", min_length=1, max_length=5)
+    prefix_input = ui.TextInput(label="Préfixe", min_length=1, max_length=10)
     delay_input = ui.TextInput(label="Délai rotation (s/m/h/j)", min_length=1, max_length=8, placeholder="ex: 30s, 2m, 1h", required=True)
 
     def __init__(self, cog):

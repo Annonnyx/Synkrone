@@ -423,20 +423,47 @@ export default function CreateServicePage() {
             />
             {field(
               t("create.prefix"),
-              <div className="flex gap-2">
-                {["!", "?", ".", "$"].map((p) => (
-                  <button key={p} type="button" className="btn" onClick={() => setPrefix(p)}
-                    style={{ borderColor: prefix === p ? "var(--accent)" : "var(--line)" }}>
-                    {p}
-                  </button>
-                ))}
-                <input className="input" value={prefix} onChange={(e) => setPrefix(e.target.value)} />
+              <div className="space-y-1">
+                <div className="flex flex-wrap gap-2">
+                  {["!", "?", ".", "$", "-"].map((p) => (
+                    <button key={p} type="button" className="btn font-mono" onClick={() => setPrefix(p)}
+                      style={{ borderColor: prefix === p ? "var(--accent)" : "var(--line)" }}>
+                      {p}
+                    </button>
+                  ))}
+                  <input
+                    className="input max-w-[12rem] font-mono"
+                    value={prefix}
+                    maxLength={10}
+                    onChange={(e) => setPrefix(e.target.value.slice(0, 10))}
+                    spellCheck={false}
+                  />
+                </div>
+                <p className="text-[11px] text-[var(--muted)]">{t("service.prefixHint")}</p>
               </div>,
             )}
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={slash} onChange={(e) => setSlash(e.target.checked)} />
-              {t("create.slashEnable")}
-            </label>
+            <div>
+              <div className="label mb-1">{t("service.slashCommands")}</div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="btn"
+                  style={{ borderColor: slash ? "var(--accent)" : "var(--line)" }}
+                  onClick={() => setSlash(true)}
+                >
+                  {t("service.slashOn")}
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  style={{ borderColor: !slash ? "var(--accent)" : "var(--line)" }}
+                  onClick={() => setSlash(false)}
+                >
+                  {t("service.slashOff")}
+                </button>
+              </div>
+              <p className="mt-1 text-[11px] text-[var(--muted)]">{t("create.slashEnable")}</p>
+            </div>
             {privilegedHint.length > 0 && (
               <p className="text-sm leading-relaxed text-[var(--muted)]">
                 {t("create.suggestedPrivileged", { list: privilegedHint.join(", ") })}

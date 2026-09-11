@@ -390,6 +390,14 @@ export const en: Dict = {
     officialReadOnly: "Official bot: the Python tree is deployed as-is. Modules are not picked one by one.",
     commandSearch: "Search a command",
     noCommands: "No commands on this bot.",
+    botCommands: "Bot commands",
+    prefixHint: "1 to 10 characters, anything you want — for example !, ?, . or sk!",
+    slashHint:
+      "When off, slash commands are removed from Discord on the next restart. Prefix commands stay available.",
+    saveBotCommands: "Save prefix and slash",
+    botCommandsSaved: "Prefix and slash saved — restart the bot to apply",
+    slashOn: "On",
+    slashOff: "Off",
   },
   tabs: {
     overview: "Overview",
@@ -513,7 +521,7 @@ export const en: Dict = {
     step3: "Paste it below. It is encrypted with AES-256-GCM and never shown again.",
     step4:
       "Only if you checked privileged intents in the panel: still in the Bot tab, enable Server Members Intent and Message Content Intent. Leave them off if you did not check those intents.",
-    step5: "Use OAuth2 > URL Generator with the bot and applications.commands scopes to invite the bot to your server.",
+    step5: "The panel shows the invite link as soon as the token (or application ID) is saved.",
     warning: "The token is a password: anyone holding it controls your bot. Reset it in the portal if it ever leaks.",
     botToken: "Bot token",
     optionalLater: "Optional now — you can add it from the service page later",
@@ -537,6 +545,9 @@ export const en: Dict = {
     tokenStored: "Token stored encrypted. Recreate the container to inject it.",
     appIdSaved: "Application ID saved.",
     unknown: "unknown",
+    invite: "Invite the bot",
+    inviteHint: "Link built from the application ID inside the token. Discord will ask for the server and permissions.",
+    copyInvite: "Copy link",
   },
   sftp: {
     howTitle: "How to connect",

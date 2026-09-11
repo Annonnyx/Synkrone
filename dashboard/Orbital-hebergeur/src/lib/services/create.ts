@@ -22,6 +22,7 @@ import {
 import { DEFAULT_PROPERTIES } from "@/lib/runtime/minecraft";
 import { normalizeProperties } from "@/lib/minecraft/properties";
 import { applicationIdFromToken, isDiscordToken } from "@/lib/discord/token";
+import { normalizeBotPrefix } from "@/lib/discord/prefix";
 import { SFTPManager } from "@/lib/sftp/manager";
 import { defaultMaxRestarts, defaultRestartPolicy } from "@/lib/services/defaults";
 import type { ServiceType } from "@/lib/paths";
@@ -194,7 +195,7 @@ export async function createService(userId: string, input: CreateServiceInput) {
       tokenFingerprint: token ? fingerprint(token) : null,
       applicationId:
         d.applicationId?.trim() || (token ? applicationIdFromToken(token) : null) || null,
-      prefix: d.prefix || "!",
+      prefix: normalizeBotPrefix(d.prefix) ?? "!",
       slashCommands: d.slashCommands ?? true,
       flavor: "custom",
       intents: resolveGatewayIntents(d.intents, modules),

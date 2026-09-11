@@ -17,6 +17,8 @@ import {
 import { body, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
+import { decryptSecret } from "@/lib/crypto";
+import { applicationIdFromToken } from "@/lib/discord/token";
 import { authorizeService } from "@/lib/runtime";
 import { dnsRecordsFor, domainHints } from "@/lib/domains/public";
 import { createJob, dispatch } from "@/lib/jobs/queue";
@@ -40,6 +42,13 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     const detail: Record<string, unknown> = { service: svc, container: container ?? null };
     if (svc.type === "discord") {
       const [bot] = await db.select().from(discordBots).where(eq(discordBots.serviceId, id));
+      if (bot && !bot.applicationId && bot.tokenEnc) {
+        const fromToken = applicationIdFromToken(decryptSecret(bot.tokenEnc) ?? "");
+        if (fromToken) {
+          await db.update(discordBots).set({ applicationId: fromToken }).where(eq(discordBots.id, bot.id));
+          bot.applicationId = fromToken;
+        }
+      }
       detail.discord = bot
         ? { ...bot, tokenEnc: undefined, hasToken: Boolean(bot.tokenEnc) }
         : null;

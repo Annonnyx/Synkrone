@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Play, RefreshCw, RotateCcw, Square, Trash2, Zap } from "lucide-react";
 import { api, fmtBytesMb, fmtUptime } from "@/lib/client";
 import { useT } from "@/lib/i18n";
@@ -11,7 +11,7 @@ import { SftpFields, SftpHowTo, SftpPasswordHint } from "@/components/sftp-conne
 import { useToast } from "@/components/toast";
 import { Console } from "@/components/console";
 import { FileManager } from "@/components/files";
-import { DiscordTokenPanel } from "@/components/discord-token";
+import { DiscordInviteLink, DiscordTokenPanel } from "@/components/discord-token";
 import { IntentPicker, PrivilegedPortalChecklist } from "@/components/discord-intents";
 import { isPrivilegedIntent, mergeIntentsForModules } from "@/lib/discord/intents";
 import { COMMAND_CATALOG, customCategories, flavorFromModules, officialBot } from "@/lib/discord/catalog";
@@ -218,7 +218,10 @@ function ServiceDetail() {
         <TypeIcon type={svc.type} size={20} />
         <h1 className="text-2xl font-bold">{svc.name}</h1>
         <StateBadge state={svc.state} />
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex flex-wrap gap-2">
+          {svc.type === "discord" && data.discord?.applicationId && (
+            <DiscordInviteLink applicationId={data.discord.applicationId} compact />
+          )}
           <button className="btn" disabled={busy} onClick={() => act("start")}>
             {busy ? <span className="spinner" /> : <Play size={14} />} {t("service.start")}
           </button>
@@ -401,7 +404,8 @@ function ServiceDetail() {
                   {t("service.prefix")}: {data.discord.prefix}
                 </div>
                 <div>
-                  {t("service.slashCommands")}: {String(data.discord.slashCommands)}
+                  {t("service.slashCommands")}:{" "}
+                  {data.discord.slashCommands ? t("service.slashOn") : t("service.slashOff")}
                 </div>
                 <div>
                   {t("service.token")}:{" "}
@@ -409,6 +413,11 @@ function ServiceDetail() {
                     ? t("service.tokenStored", { fp: data.discord.tokenFingerprint ?? "" })
                     : t("service.tokenMissing")}
                 </div>
+                {data.discord.applicationId && (
+                  <div className="pt-2">
+                    <DiscordInviteLink applicationId={data.discord.applicationId} />
+                  </div>
+                )}
               </div>
             )}
             <button className="btn mt-4 w-full justify-center" disabled={busy} onClick={() => act("recreate")}>
@@ -457,8 +466,6 @@ function ServiceDetail() {
           modules={data.discord.modules}
           flavor={data.discord.flavor}
           intents={data.discord.intents}
-          prefix={data.discord.prefix}
-          slash={data.discord.slashCommands}
           applicationId={data.discord.applicationId}
           onSave={(payload) => act("discord", { op: "config", ...payload })}
         />
@@ -722,6 +729,23 @@ function ServiceDetail() {
       {tab === "settings" && (
         <Settings
           service={svc}
+          discord={data.discord}
+          busy={busy}
+          onSaveBotCommands={async (payload) => {
+            setBusy(true);
+            setError(null);
+            try {
+              await api(`/api/services/${id}/discord`, {
+                json: { op: "config", ...payload },
+              });
+              toast.success(t("service.botCommandsSaved"));
+              await load();
+            } catch (err) {
+              setError((err as Error).message);
+            } finally {
+              setBusy(false);
+            }
+          }}
           onSave={async (patch) => {
             setBusy(true);
             try {
@@ -749,16 +773,12 @@ function DiscordModules({
   modules,
   flavor,
   intents,
-  prefix,
-  slash,
   applicationId,
   onSave,
 }: {
   modules: string[];
   flavor?: string;
   intents: string[];
-  prefix: string;
-  slash: boolean;
   applicationId?: string | null;
   onSave: (payload: Record<string, unknown>) => void;
 }) {
@@ -776,8 +796,6 @@ function DiscordModules({
     : customCategories().map((c) => ({ id: c.id, label: c.name }));
   const [selected, setSelected] = useState(modules);
   const [chosenIntents, setChosenIntents] = useState(intents);
-  const [p, setP] = useState(prefix);
-  const [s, setS] = useState(slash);
   const [showPortalChecklist, setShowPortalChecklist] = useState(false);
 
   return (
@@ -832,15 +850,10 @@ function DiscordModules({
           </div>
         )}
         <div className="mt-3 flex items-center gap-3">
-          <input className="input w-24" value={p} onChange={(e) => setP(e.target.value)} />
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={s} onChange={(e) => setS(e.target.checked)} />{" "}
-            {t("service.slashCommands")}
-          </label>
           <button
             className="btn btn-primary ml-auto"
             onClick={() => {
-              onSave({ modules: selected, prefix: p, slashCommands: s, intents: chosenIntents });
+              onSave({ modules: selected, intents: chosenIntents });
               setShowPortalChecklist(chosenIntents.some(isPrivilegedIntent));
             }}
           >
@@ -965,12 +978,106 @@ function MinecraftRuntime({
   );
 }
 
+const PREFIX_PRESETS = ["!", "?", ".", "$", "-"];
+
+function DiscordRuntimeSettings({
+  prefix,
+  slash,
+  busy,
+  onSave,
+}: {
+  prefix: string;
+  slash: boolean;
+  busy: boolean;
+  onSave: (payload: { prefix: string; slashCommands: boolean }) => void;
+}) {
+  const t = useT();
+  const [nextPrefix, setNextPrefix] = useState(prefix);
+  const [nextSlash, setNextSlash] = useState(slash);
+
+  useEffect(() => {
+    setNextPrefix(prefix);
+    setNextSlash(slash);
+  }, [prefix, slash]);
+
+  const trimmed = nextPrefix.trim();
+  const valid = trimmed.length >= 1 && trimmed.length <= 10 && !/[\u0000-\u001F\u007F]/.test(trimmed);
+  const dirty = trimmed !== prefix || nextSlash !== slash;
+
+  return (
+    <div className="panel space-y-4 p-4">
+      <div>
+        <div className="label">{t("service.botCommands")}</div>
+      </div>
+      <div>
+        <div className="label mb-1">{t("service.prefix")}</div>
+        <div className="flex flex-wrap items-center gap-2">
+          {PREFIX_PRESETS.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className="btn font-mono"
+              style={{ borderColor: nextPrefix === item ? "var(--accent)" : "var(--line)" }}
+              onClick={() => setNextPrefix(item)}
+            >
+              {item}
+            </button>
+          ))}
+          <input
+            className="input max-w-[12rem] font-mono"
+            value={nextPrefix}
+            maxLength={10}
+            onChange={(e) => setNextPrefix(e.target.value.slice(0, 10))}
+            spellCheck={false}
+          />
+        </div>
+        <p className="mt-1 text-[11px] text-[var(--muted)]">{t("service.prefixHint")}</p>
+      </div>
+      <div>
+        <div className="label mb-1">{t("service.slashCommands")}</div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="btn"
+            style={{ borderColor: nextSlash ? "var(--accent)" : "var(--line)" }}
+            onClick={() => setNextSlash(true)}
+          >
+            {t("service.slashOn")}
+          </button>
+          <button
+            type="button"
+            className="btn"
+            style={{ borderColor: !nextSlash ? "var(--accent)" : "var(--line)" }}
+            onClick={() => setNextSlash(false)}
+          >
+            {t("service.slashOff")}
+          </button>
+        </div>
+        <p className="mt-1 text-[11px] text-[var(--muted)]">{t("service.slashHint")}</p>
+      </div>
+      <button
+        className="btn btn-primary"
+        disabled={busy || !valid || !dirty}
+        onClick={() => onSave({ prefix: trimmed, slashCommands: nextSlash })}
+      >
+        {t("service.saveBotCommands")}
+      </button>
+    </div>
+  );
+}
+
 function Settings({
   service,
+  discord,
+  busy,
+  onSaveBotCommands,
   onSave,
   onDelete,
 }: {
   service: Detail["service"];
+  discord?: Detail["discord"];
+  busy: boolean;
+  onSaveBotCommands: (payload: { prefix: string; slashCommands: boolean }) => void;
   onSave: (patch: Record<string, unknown>) => void;
   onDelete: () => void;
 }) {
@@ -982,6 +1089,14 @@ function Settings({
 
   return (
     <div className="space-y-4">
+      {discord && (
+        <DiscordRuntimeSettings
+          prefix={discord.prefix}
+          slash={discord.slashCommands}
+          busy={busy}
+          onSave={onSaveBotCommands}
+        />
+      )}
       <div className="panel space-y-3 p-4">
         <div>
           <div className="label mb-1">{t("common.name")}</div>
