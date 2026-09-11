@@ -33,6 +33,28 @@ try {
     kronesApi = null;
 }
 
+const { readPlatform, writePlatform } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'platform'));
+const { panelAdmin, pm2Logs, listTickets } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'admin-ops'));
+
+function safeReturnTo(value) {
+    const raw = String(value || '').trim();
+    if (!raw.startsWith('/') || raw.startsWith('//') || raw.includes('\\') || raw.includes('://')) return '';
+    if (raw.length > 256) return '';
+    if (/^\/(auth|logout|api)(\/|$)/i.test(raw)) return '';
+    return raw;
+}
+
+function rememberReturnTo(req) {
+    const dest = safeReturnTo(req.query.returnTo);
+    if (dest) req.session.returnTo = dest;
+}
+
+function consumeReturnTo(req) {
+    const dest = safeReturnTo(req.session?.returnTo) || '/';
+    if (req.session) delete req.session.returnTo;
+    return dest;
+}
+
 async function overlayWalletOnUser(user) {
     if (!kronesApi || !user || user.isGuest) return user;
     const id = String(user.id || '').trim();
@@ -64,7 +86,7 @@ const ROULETTE_PRIZES = [
     { label: '1', amount: 1, color: '#374151', textColor: '#ffffff', weight: 25 }
 ];
 
-const ALLOWED_MANUAL_ROLES = new Set(['Initié', 'Krobi', 'Équipe', 'Admin']);
+const ALLOWED_MANUAL_ROLES = new Set(['Initié', 'Krobi', 'Dev', 'Équipe', 'Admin']);
 const BASE_MEMBER_ROLES = new Set(['Initié', 'Krobi']);
 const GRADE_KRONE_COSTS = {
     Aucun: 0,
@@ -83,7 +105,7 @@ let botOwnerCache = {
 
 function isManualStaffRole(roleValue) {
     const normalized = String(roleValue || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return ['staff', 'equipe', 'equipes', 'admin'].includes(normalized);
+    return ['staff', 'equipe', 'equipes', 'admin', 'dev'].includes(normalized);
 }
 
 async function ensureDbFile(filePath, defaultContent) {
@@ -272,6 +294,8 @@ function normalizeStoredUser(user, userId) {
     let safeRole = 'Krobi';
     if (safeOwner || rawRole.toLowerCase() === 'admin') {
         safeRole = 'Admin';
+    } else if (rawRole.toLowerCase() === 'dev') {
+        safeRole = 'Dev';
     } else if (isManualStaffRole(rawRole)) {
         safeRole = 'Équipe';
     } else {
@@ -480,22 +504,32 @@ async function getBotOwnerIds() {
     const token = String(process.env.DISCORD_BOT_TOKEN || '').trim();
     if (!token) return new Set();
     if (Date.now() < botOwnerCache.expiresAt) return botOwnerCache.ownerIds;
-    
-    const response = await axios.get(`${DISCORD_API_BASE}/oauth2/applications/@me`, { headers: { Authorization: `Bot ${token}` } });
-    const application = response?.data || {};
-    const ownerIds = new Set();
-    const directOwnerId = String(application?.owner?.id || '').trim();
-    if (directOwnerId) ownerIds.add(directOwnerId);
-    
-    const teamMembers = Array.isArray(application?.team?.members) ? application.team.members : [];
-    for (const member of teamMembers) {
-        const memberId = String(member?.user?.id || '').trim();
-        if (!memberId) continue;
-        const membershipState = Number(member?.membership_state || 0);
-        if (!membershipState || membershipState === 2) ownerIds.add(memberId);
+    try {
+        const response = await axios.get(`${DISCORD_API_BASE}/oauth2/applications/@me`, {
+            headers: { Authorization: `Bot ${token}` },
+            timeout: 2500
+        });
+        const application = response?.data || {};
+        const ownerIds = new Set();
+        const directOwnerId = String(application?.owner?.id || '').trim();
+        if (directOwnerId) ownerIds.add(directOwnerId);
+
+        const teamMembers = Array.isArray(application?.team?.members) ? application.team.members : [];
+        for (const member of teamMembers) {
+            const memberId = String(member?.user?.id || '').trim();
+            if (!memberId) continue;
+            const membershipState = Number(member?.membership_state || 0);
+            if (!membershipState || membershipState === 2) ownerIds.add(memberId);
+        }
+        botOwnerCache = { ownerIds, expiresAt: Date.now() + BOT_OWNER_CACHE_TTL_MS };
+        return ownerIds;
+    } catch {
+        botOwnerCache = {
+            ownerIds: botOwnerCache.ownerIds || new Set(),
+            expiresAt: Date.now() + 30_000
+        };
+        return botOwnerCache.ownerIds;
     }
-    botOwnerCache = { ownerIds, expiresAt: Date.now() + BOT_OWNER_CACHE_TTL_MS };
-    return ownerIds;
 }
 
 async function isBotOwnerUserId(userId) {
@@ -522,7 +556,8 @@ async function resolveAdminAccessForSessionUser(user) {
 }
 
 app.get('/auth/discord', (req, res) => {
-    if (!isDiscordOAuthConfigured()) return res.redirect('/');
+    if (!isDiscordOAuthConfigured()) return res.redirect(safeReturnTo(req.query.returnTo) || '/login');
+    rememberReturnTo(req);
     const discordUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify`;
     res.redirect(discordUrl);
 });
@@ -549,14 +584,15 @@ app.get('/auth/discord/callback', async (req, res) => {
             grade: persistedUser?.grade || 'Aucun', krone: Number.isFinite(Number(persistedUser?.krone)) ? Number(persistedUser.krone) : 0,
             isGuest: false, isTeamOwner
         };
-        res.redirect('/');
+        res.redirect(consumeReturnTo(req));
     } catch (err) { 
-        res.redirect('/'); 
+        res.redirect(safeReturnTo(req.session?.returnTo) || '/login'); 
     }
 });
 
 app.get('/auth/github', (req, res) => {
-    if (!isGithubOAuthConfigured()) return res.redirect('/');
+    if (!isGithubOAuthConfigured()) return res.redirect(safeReturnTo(req.query.returnTo) || '/login');
+    rememberReturnTo(req);
     const url = new URL('https://github.com/login/oauth/authorize');
     url.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID);
     url.searchParams.set('redirect_uri', githubRedirectUri(req));
@@ -598,14 +634,15 @@ app.get('/auth/github/callback', async (req, res) => {
             isGuest: false,
             isTeamOwner: persistedUser.isTeamOwner
         };
-        res.redirect('/');
+        res.redirect(consumeReturnTo(req));
     } catch (err) {
-        res.redirect('/');
+        res.redirect(safeReturnTo(req.session?.returnTo) || '/login');
     }
 });
 
 app.get('/auth/google', (req, res) => {
-    if (!isGoogleOAuthConfigured()) return res.redirect('/');
+    if (!isGoogleOAuthConfigured()) return res.redirect(safeReturnTo(req.query.returnTo) || '/login');
+    rememberReturnTo(req);
     const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     url.searchParams.set('client_id', process.env.GOOGLE_CLIENT_ID);
     url.searchParams.set('redirect_uri', googleRedirectUri(req));
@@ -649,15 +686,16 @@ app.get('/auth/google/callback', async (req, res) => {
             isGuest: false,
             isTeamOwner: persistedUser.isTeamOwner
         };
-        res.redirect('/');
+        res.redirect(consumeReturnTo(req));
     } catch (err) {
-        res.redirect('/');
+        res.redirect(safeReturnTo(req.session?.returnTo) || '/login');
     }
 });
 
 app.get('/auth/guest', (req, res) => {
+    rememberReturnTo(req);
     req.session.user = { id: 'guest', username: 'Visiteur', isGuest: true };
-    res.redirect('/');
+    res.redirect(consumeReturnTo(req));
 });
 
 app.get('/api/me', async (req, res) => {
@@ -665,6 +703,9 @@ app.get('/api/me', async (req, res) => {
     await resolveAdminAccessForSessionUser(req.session.user);
     const syncedUser = await syncSessionUserWithDb(req.session.user);
     
+    if (kronesApi && syncedUser && !syncedUser.isGuest) {
+        void kronesApi.claimJoinBonus(syncedUser.id).catch(() => undefined);
+    }
     const db = await readUsersDb();
     const fullUser = db.users[syncedUser.id];
     if (fullUser) await overlayWalletOnUser(fullUser);
@@ -714,7 +755,8 @@ app.get('/api/profiles', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    req.session.destroy(() => res.redirect('/'));
+    const dest = safeReturnTo(req.query.returnTo) || '/';
+    req.session.destroy(() => res.redirect(dest));
 });
 
 // --- CLOUD ---
@@ -1070,6 +1112,110 @@ app.post(/^\/api\/admin\/pm2\/servers\/(all|\d+)\/(start|restart|stop)$/, async 
     } catch (error) { return res.status(500).json({ error: 'PM2 impossible.' }); }
 });
 
+app.get('/api/admin/pm2/servers/:id/logs', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    try {
+        const logs = await pm2Logs(req.params.id, req.query.lines);
+        const text = [logs.out, logs.err ? `--- stderr ---\n${logs.err}` : ''].filter(Boolean).join('\n');
+        return res.type('text/plain').send(text);
+    } catch (error) {
+        return res.status(error.status || 500).json({ error: error.message || 'Logs indisponibles.' });
+    }
+});
+
+app.post('/api/admin/pm2/servers/:id/logs/clear', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    try {
+        const { stdout } = await execFileAsync('pm2', ['jlist'], { maxBuffer: 2 * 1024 * 1024 });
+        const processes = JSON.parse(stdout);
+        const row = processes.find((p) => String(p.pm_id) === String(req.params.id));
+        if (!row) return res.status(404).json({ error: 'Processus introuvable.' });
+        const fsSync = require('node:fs');
+        for (const file of [row.pm2_env?.pm_out_log_path, row.pm2_env?.pm_err_log_path]) {
+            if (file) fsSync.writeFileSync(file, '');
+        }
+        return res.json({ ok: true });
+    } catch (error) {
+        return res.status(500).json({ error: 'Impossible de vider les logs.' });
+    }
+});
+
+app.get('/api/admin/platform', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    return res.json(await readPlatform());
+});
+
+app.patch('/api/admin/platform', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    return res.json(await writePlatform(req.body || {}));
+});
+
+app.get('/api/admin/hosting/services', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    try {
+        return res.json(await panelAdmin('/services'));
+    } catch (error) {
+        return res.status(error.status || 500).json({ error: error.message || 'Services indisponibles.' });
+    }
+});
+
+app.post('/api/admin/hosting/services/:id/:action', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    const action = String(req.params.action || '').trim();
+    if (!['start', 'stop', 'restart', 'kill', 'file', 'recreate'].includes(action)) {
+        return res.status(400).json({ error: 'Action inconnue.' });
+    }
+    try {
+        return res.json(await panelAdmin(`/services/${encodeURIComponent(req.params.id)}/${action}`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(req.body || {})
+        }));
+    } catch (error) {
+        return res.status(error.status || 500).json({ error: error.message || 'Action impossible.' });
+    }
+});
+
+app.get('/api/admin/hosting/services/:id/files', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    try {
+        const q = new URLSearchParams();
+        if (req.query.path) q.set('path', String(req.query.path));
+        return res.json(await panelAdmin(`/services/${encodeURIComponent(req.params.id)}/files?${q}`));
+    } catch (error) {
+        return res.status(error.status || 500).json({ error: error.message || 'Fichiers indisponibles.' });
+    }
+});
+
+app.get('/api/admin/hosting/services/:id/file', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    try {
+        const q = new URLSearchParams();
+        if (req.query.path) q.set('path', String(req.query.path));
+        return res.json(await panelAdmin(`/services/${encodeURIComponent(req.params.id)}/file?${q}`));
+    } catch (error) {
+        return res.status(error.status || 500).json({ error: error.message || 'Lecture impossible.' });
+    }
+});
+
+app.get('/api/admin/tickets', async (req, res) => {
+    const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+    if (!hasAccess) return res.status(403).json({ error: 'Acces refuse.' });
+    try {
+        return res.json(await listTickets());
+    } catch (error) {
+        return res.status(error.status || 500).json({ error: error.message || 'Tickets indisponibles.' });
+    }
+});
+
 // -- ROUTES IFRAMES --
 app.get(/^\/discord\/bots\/(discord|asuna|vax|yui|kayaba|arceus|bot)\.html$/i, (req, res) => res.sendFile(path.join(__dirname, 'public', 'discord', 'bots', `${String(req.params[0]).toLowerCase()}.html`)));
 app.get(/^\/minecraft\/modpack\/(accueil|xenus|thefrenchbaguette|vanipack)\.html$/i, (req, res) => res.sendFile(path.join(__dirname, 'public', 'minecraft', 'modpack', `${String(req.params[0]).toLowerCase()}.html`)));
@@ -1078,18 +1224,18 @@ app.get(/^\/equipe\/(espace-travail|cloud)\/index\.html$/i, (req, res) => {
     const page = String(req.params[0] || '').toLowerCase();
     res.sendFile(path.join(__dirname, 'public', 'equipe', page, 'index.html'));
 });
-app.get(/^\/admin\/(utilisateur|annonce|pm2)\/index\.html$/i, async (req, res) => {
+app.get(/^\/admin\/(utilisateur|annonce|pm2|plateforme|services|tickets)\/index\.html$/i, async (req, res) => {
     const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
     if (!hasAccess) return res.status(403).send('Acces refuse');
     res.sendFile(path.join(__dirname, 'public', 'admin', String(req.params[0]).toLowerCase(), 'index.html'));
 });
 
-app.get(['/faq', '/faq/', '/krones', '/krones/', '/cgv', '/cgv/', '/stats', '/stats/'], (_req, res) => {
+app.get(['/faq', '/faq/', '/krones', '/krones/', '/cgv', '/cgv/', '/stats', '/stats/', '/login', '/login/'], (_req, res) => {
     return res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // -- ROUTES SHELL --
-const SHELL_ROUTES = new Set(['/', '/accueil', '/discord', '/discord/bots', '/discord/publicbot', '/discord/dashbot', '/discord/commandes', '/discord/me', '/discord/bump', '/minecraft', '/minecraft/serveur', '/minecraft/modpack', '/admin', '/admin/utilisateur', '/admin/annonce', '/admin/pm2', '/equipe', '/equipe/espace-travail', '/equipe/cloud', '/cgu', '/cgv', '/contact', '/faq', '/krones', '/stats', '/parametre.html']);
+const SHELL_ROUTES = new Set(['/', '/accueil', '/login', '/discord', '/discord/bots', '/discord/publicbot', '/discord/dashbot', '/discord/commandes', '/discord/me', '/discord/bump', '/minecraft', '/minecraft/serveur', '/minecraft/modpack', '/admin', '/admin/utilisateur', '/admin/annonce', '/admin/pm2', '/admin/plateforme', '/admin/services', '/admin/tickets', '/equipe', '/equipe/espace-travail', '/equipe/cloud', '/cgu', '/cgv', '/contact', '/faq', '/krones', '/stats', '/parametre.html']);
 const SHELL_PREFIXES = ['/discord/bots/', '/minecraft/modpack/', '/equipe/espace-travail/', '/equipe/cloud/'];
 
 app.get(/^\/(.*)$/i, async (req, res, next) => {

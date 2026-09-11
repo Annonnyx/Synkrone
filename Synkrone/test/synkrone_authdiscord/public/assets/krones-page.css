@@ -405,4 +405,8 @@
     .grade-list {
         grid-template-columns: 1fr;
     }
+
+    .mc-grid {
+        grid-template-columns: 1fr;
+    }
 }

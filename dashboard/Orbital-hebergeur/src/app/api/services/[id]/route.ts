@@ -108,14 +108,22 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       maxRestarts?: number;
     }>(req);
     const { services: servicesTable } = await import("@/db/schema");
+    const { clampResources } = await import("@/lib/services/limits");
+    const { readPlatformSettings } = await import("@/lib/platform-settings");
+    const settings = await readPlatformSettings();
+    const resources = clampResources(settings, svc.type as "discord" | "minecraft" | "web", {
+      cpuMillicores: patch.cpuMillicores ?? svc.cpuLimit,
+      memoryMb: patch.memoryMb ?? svc.memoryLimitMb,
+      storageMb: patch.storageMb ?? svc.storageLimitMb,
+    });
     await db
       .update(servicesTable)
       .set({
         name: patch.name ?? svc.name,
         description: patch.description ?? svc.description,
-        cpuLimit: patch.cpuMillicores ?? svc.cpuLimit,
-        memoryLimitMb: patch.memoryMb ?? svc.memoryLimitMb,
-        storageLimitMb: patch.storageMb ?? svc.storageLimitMb,
+        cpuLimit: resources.cpuMillicores,
+        memoryLimitMb: resources.memoryMb,
+        storageLimitMb: resources.storageMb,
         restartPolicy: patch.restartPolicy ?? svc.restartPolicy,
         maxRestarts: patch.maxRestarts ?? svc.maxRestarts,
         updatedAt: new Date(),

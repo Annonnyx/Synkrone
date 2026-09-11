@@ -230,7 +230,7 @@ function billingPublicDto(account) {
     const seller = sellerRecord();
     return {
         authenticated: Boolean(account),
-        loginUrl: '/hebergement/login',
+        loginUrl: '/login?returnTo=/krones',
         currency: 'EUR',
         vatRate: vatRate(),
         vatLabel: `${Math.round(vatRate() * 100)} %`,
@@ -377,7 +377,7 @@ function mountBilling(app, deps) {
 
     app.get('/api/krones/orders', async (req, res) => {
         const account = await sessionAccount(req);
-        if (!account) return res.status(401).json({ error: 'Connectez-vous pour voir vos commandes.', loginUrl: '/hebergement/login' });
+        if (!account) return res.status(401).json({ error: 'Connectez-vous pour voir vos commandes.', loginUrl: '/login?returnTo=/krones' });
         try {
             const list = await withFileLock(async () => {
                 const store = await readStore();
@@ -402,7 +402,7 @@ function mountBilling(app, deps) {
 
     app.get('/api/krones/orders/:id', async (req, res) => {
         const account = await sessionAccount(req);
-        if (!account) return res.status(401).json({ error: 'Connectez-vous.', loginUrl: '/hebergement/login' });
+        if (!account) return res.status(401).json({ error: 'Connectez-vous.', loginUrl: '/login?returnTo=/krones' });
         try {
             const dto = await withFileLock(async () => {
                 const store = await readStore();
@@ -424,7 +424,7 @@ function mountBilling(app, deps) {
     app.post('/api/krones/checkout', async (req, res) => {
         const account = await sessionAccount(req);
         if (!account) {
-            return res.status(401).json({ error: 'Un compte est obligatoire pour acheter.', loginUrl: '/hebergement/login' });
+            return res.status(401).json({ error: 'Un compte est obligatoire pour acheter.', loginUrl: '/login?returnTo=/krones' });
         }
         if (!consentsOk(req.body)) {
             return res.status(400).json({
@@ -529,7 +529,7 @@ function mountBilling(app, deps) {
 
     app.post('/api/krones/orders/:id/pay', async (req, res) => {
         const account = await sessionAccount(req);
-        if (!account) return res.status(401).json({ error: 'Connectez-vous.', loginUrl: '/hebergement/login' });
+        if (!account) return res.status(401).json({ error: 'Connectez-vous.', loginUrl: '/login?returnTo=/krones' });
         const method = String(req.body?.method || '').trim();
         const seller = sellerRecord();
         const methods = paymentMethods(seller);
@@ -591,7 +591,7 @@ function mountBilling(app, deps) {
 
     app.post('/api/krones/orders/:id/cancel', async (req, res) => {
         const account = await sessionAccount(req);
-        if (!account) return res.status(401).json({ error: 'Connectez-vous.', loginUrl: '/hebergement/login' });
+        if (!account) return res.status(401).json({ error: 'Connectez-vous.', loginUrl: '/login?returnTo=/krones' });
         try {
             const result = await withFileLock(async () => {
                 const store = await readStore();

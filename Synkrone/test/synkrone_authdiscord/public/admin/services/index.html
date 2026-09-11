@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services</title>
+    <link rel="stylesheet" href="../admin.css">
+</head>
+<body>
+<main>
+    <h1>Services hébergés</h1>
+    <p class="lead">Tous les services users : stop / start, puis fichiers.</p>
+    <div class="row">
+        <input id="q" placeholder="Filtrer nom, type, owner…">
+        <button type="button" class="ghost" id="reload">Actualiser</button>
+    </div>
+    <p class="status" id="status"></p>
+    <table>
+        <thead><tr><th>Service</th><th>Type</th><th>État</th><th>Owner</th><th>Ressources</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+    </table>
+    <section id="files" hidden>
+        <h2 id="files-title">Fichiers</h2>
+        <div class="row">
+            <input id="dir" value="/" style="min-width:16rem">
+            <button type="button" id="list-dir">Lister</button>
+        </div>
+        <table><tbody id="file-rows"></tbody></table>
+        <label>Fichier ouvert
+            <input id="file-path" style="width:100%">
+        </label>
+        <textarea id="file-content" rows="16" style="width:100%"></textarea>
+        <div class="row">
+            <button type="button" id="save-file">Enregistrer le fichier</button>
+        </div>
+    </section>
+</main>
+<script>
+let services = [];
+let currentId = '';
+
+function setStatus(t) { document.getElementById('status').textContent = t || ''; }
+
+async function act(id, action) {
+    const res = await fetch(`/api/admin/hosting/services/${id}/${action}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+    const data = await res.json().catch(() => ({}));
+    setStatus(res.ok ? `${action} ok` : (data.error || 'échec'));
+    if (res.ok) load();
+}
+
+function render() {
+    const q = document.getElementById('q').value.toLowerCase();
+    const rows = services.filter((s) => JSON.stringify(s).toLowerCase().includes(q));
+    document.getElementById('rows').innerHTML = rows.map((s) => `
+        <tr>
+            <td>${s.name}<br><small>${s.slug || s.id}</small></td>
+            <td>${s.type}</td>
+            <td>${s.state}</td>
+            <td>${s.ownerName || ''}<br><small>${s.ownerEmail || s.ownerId || ''}</small></td>
+            <td>${(s.cpuLimit / 1000).toFixed(1)} CPU · ${s.memoryLimitMb} Mo</td>
+            <td>
+                <button type="button" class="ghost" data-a="start" data-id="${s.id}">Start</button>
+                <button type="button" class="danger" data-a="stop" data-id="${s.id}">Stop</button>
+                <button type="button" class="ghost" data-a="restart" data-id="${s.id}">Restart</button>
+                <button type="button" class="ghost" data-files="${s.id}" data-name="${s.name}">Fichiers</button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="6">Aucun service.</td></tr>';
+}
+
+async function load() {
+    setStatus('Chargement…');
+    const res = await fetch('/api/admin/hosting/services');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { setStatus(data.error || 'Panel injoignable'); return; }
+    services = data.services || [];
+    setStatus(`${services.length} service(s)`);
+    render();
+}
+
+async function listFiles() {
+    if (!currentId) return;
+    const path = document.getElementById('dir').value || '/';
+    const res = await fetch(`/api/admin/hosting/services/${currentId}/files?path=${encodeURIComponent(path)}`);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { setStatus(data.error || 'liste impossible'); return; }
+    document.getElementById('file-rows').innerHTML = (data.entries || []).map((e) => `
+        <tr>
+            <td>${e.type === 'directory' ? 'dir' : 'file'}</td>
+            <td><a href="#" data-open="${e.path}" data-kind="${e.type}">${e.name}</a></td>
+            <td>${e.size}</td>
+        </tr>
+    `).join('');
+}
+
+async function openFile(path) {
+    const res = await fetch(`/api/admin/hosting/services/${currentId}/file?path=${encodeURIComponent(path)}`);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { setStatus(data.error || 'lecture impossible'); return; }
+    document.getElementById('file-path').value = data.path;
+    document.getElementById('file-content').value = data.content || '';
+}
+
+document.getElementById('rows').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    if (btn.dataset.a) act(btn.dataset.id, btn.dataset.a);
+    if (btn.dataset.files) {
+        currentId = btn.dataset.files;
+        document.getElementById('files').hidden = false;
+        document.getElementById('files-title').textContent = `Fichiers — ${btn.dataset.name}`;
+        document.getElementById('dir').value = '/';
+        listFiles();
+    }
+});
+
+document.getElementById('file-rows').addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-open]');
+    if (!a) return;
+    e.preventDefault();
+    if (a.dataset.kind === 'directory') {
+        document.getElementById('dir').value = a.dataset.open;
+        listFiles();
+    } else {
+        openFile(a.dataset.open);
+    }
+});
+
+document.getElementById('q').addEventListener('input', render);
+document.getElementById('reload').addEventListener('click', load);
+document.getElementById('list-dir').addEventListener('click', listFiles);
+document.getElementById('save-file').addEventListener('click', async () => {
+    const res = await fetch(`/api/admin/hosting/services/${currentId}/file`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+            path: document.getElementById('file-path').value,
+            content: document.getElementById('file-content').value
+        })
+    });
+    const data = await res.json().catch(() => ({}));
+    setStatus(res.ok ? 'Fichier enregistré' : (data.error || 'écriture impossible'));
+});
+
+load();
+</script>
+</body>
+</html>

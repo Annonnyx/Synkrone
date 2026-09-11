@@ -2,6 +2,7 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { applyHostingDiscount, readPlatform } = require('./platform');
 
 const DATA_PATH = path.join(__dirname, '..', 'data', 'krones.json');
 const LOCK_PATH = `${DATA_PATH}.lock`;
@@ -23,7 +24,11 @@ const LEDGER_CAP = 200;
 const LOCK_STALE_MS = 15000;
 const LOCK_WAIT_MS = 10000;
 const GRADE_ORDER = ['Aucun', 'Kronium', 'Synkral', 'Kronalloy', 'Synkronite', 'Kronix'];
+const DEV_PLAN = 'Synkral';
+const LOW_BALANCE = 300;
 const KRONES_PER_EURO = 150;
+const JOIN_BONUS = 100;
+const JOIN_BONUS_REASON = 'discord:join';
 const VAT_RATE = 0.2;
 
 const DEFAULT_PACKS = [
@@ -230,16 +235,19 @@ function asInt(value, fallback = 0) {
     return Math.trunc(n);
 }
 
-function computeMcMonthly({ ramGb = 0, cpu = 0, storageGb = 0, db = false } = {}) {
+function computeMcMonthly({ ramGb = 0, cpu = 0, storageGb = 0, db = false, discounts } = {}) {
     const ram = Math.max(0, Number(ramGb) || 0);
     const cpuN = Math.max(0, Number(cpu) || 0);
     const storage = Math.max(0, Number(storageGb) || 0);
     const hasDb = db === true || db === 1 || db === '1' || String(db).toLowerCase() === 'true';
-    return MC_COEFF.base
-        + ram * MC_COEFF.ramGb
-        + cpuN * MC_COEFF.cpu
-        + Math.ceil(storage / 10) * MC_COEFF.storagePer10Gb
-        + (hasDb ? MC_COEFF.db : 0);
+    const parts = {
+        base: MC_COEFF.base,
+        ram: ram * MC_COEFF.ramGb,
+        cpu: cpuN * MC_COEFF.cpu,
+        storage: Math.ceil(storage / 10) * MC_COEFF.storagePer10Gb,
+        db: hasDb ? MC_COEFF.db : 0
+    };
+    return applyHostingDiscount(parts, 'minecraft', discounts);
 }
 
 function defaultStore() {
@@ -255,7 +263,8 @@ function defaultStore() {
         subscriptions: DEFAULT_SUBSCRIPTIONS,
         minecraft: { ...MC_COEFF },
         discord: { ...DISCORD_COEFF },
-        web: { ...WEB_COEFF }
+        web: { ...WEB_COEFF },
+        joinBonus: {}
     };
 }
 
@@ -291,7 +300,8 @@ function normalizeStore(parsed) {
         subscriptions,
         minecraft: { ...MC_COEFF, ...(parsed.minecraft || {}) },
         discord: { ...DISCORD_COEFF, ...(parsed.discord || {}) },
-        web: { ...WEB_COEFF, ...(parsed.web || {}) }
+        web: { ...WEB_COEFF, ...(parsed.web || {}) },
+        joinBonus: parsed.joinBonus && typeof parsed.joinBonus === 'object' ? parsed.joinBonus : {}
     };
 }
 
@@ -313,7 +323,8 @@ async function persistStore(store) {
         subscriptions: store.subscriptions,
         minecraft: { ...MC_COEFF, ...(store.minecraft || {}) },
         discord: { ...DISCORD_COEFF, ...(store.discord || {}) },
-        web: { ...WEB_COEFF, ...(store.web || {}) }
+        web: { ...WEB_COEFF, ...(store.web || {}) },
+        joinBonus: store.joinBonus && typeof store.joinBonus === 'object' ? store.joinBonus : {}
     };
     const tmp = `${DATA_PATH}.${process.pid}.tmp`;
     await fs.writeFile(tmp, JSON.stringify(payload, null, 2), 'utf8');
@@ -370,17 +381,48 @@ async function panelAccountFromCookie(req) {
 }
 
 async function sessionAccount(req) {
-    return expressAccount(req) || panelAccountFromCookie(req);
+    return expressAccount(req);
+}
+
+function normalizeRole(role) {
+    return String(role || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function privilegeFromUser(user) {
+    if (!user) return null;
+    if (user.isTeamOwner) return 'admin';
+    const role = normalizeRole(user.role);
+    if (role === 'admin') return 'admin';
+    if (['dev', 'equipe', 'equipes', 'staff'].includes(role)) return 'dev';
+    return null;
+}
+
+function applyPrivilegePlan(wallet, privilege) {
+    if (!wallet || privilege !== 'dev') return false;
+    const current = GRADE_ORDER.indexOf(String(wallet.plan || 'Aucun'));
+    const mid = GRADE_ORDER.indexOf(DEV_PLAN);
+    if (current < mid) {
+        wallet.plan = DEV_PLAN;
+        return true;
+    }
+    return false;
 }
 
 function walletDto(wallet, meta = {}) {
     const authenticated = meta.authenticated === true;
+    const privilege = meta.privilege || null;
+    const unlimited = privilege === 'admin';
+    const balance = Math.max(0, asInt(wallet?.balance, 0));
     return {
-        balance: Math.max(0, asInt(wallet?.balance, 0)),
+        balance,
         plan: GRADE_ORDER.includes(String(wallet?.plan || '')) ? String(wallet.plan) : 'Aucun',
         ledger: Array.isArray(wallet?.ledger) ? wallet.ledger : [],
         authenticated,
-        demo: !authenticated
+        demo: !authenticated,
+        unlimited,
+        privilege,
+        shopUrl: '/krones',
+        lowBalance: authenticated && !unlimited && balance < LOW_BALANCE
     };
 }
 
@@ -475,7 +517,7 @@ function parseMcQuery(query) {
     };
 }
 
-function catalogDto(store, mcQuery) {
+function catalogDto(store, mcQuery, discounts) {
     const catalog = buildCatalog(store);
     const minecraft = { ...catalog.minecraft };
     const input = parseMcQuery(mcQuery);
@@ -486,7 +528,7 @@ function catalogDto(store, mcQuery) {
             storageGb: input.storageGb,
             db: input.db === true || input.db === 1 || input.db === '1' || String(input.db).toLowerCase() === 'true'
         };
-        minecraft.monthly = catalog.computeMcMonthly(input);
+        minecraft.monthly = computeMcMonthly({ ...minecraft.input, discounts });
     }
     return {
         unit: 'Krônes',
@@ -495,6 +537,7 @@ function catalogDto(store, mcQuery) {
         abonnements: catalog.subscriptions,
         compare: catalog.compare,
         pricing: catalog.pricing,
+        discounts: Array.isArray(discounts) ? discounts : [],
         minecraft,
         discord: catalog.discord,
         web: catalog.web
@@ -567,8 +610,14 @@ async function seedFor(id) {
 async function ensureWallet(store, req) {
     const account = await sessionAccount(req);
     const id = account?.id || DEMO_ACCOUNT_ID;
-    const { wallet, created } = ensureWalletInStore(store, id, await seedFor(id));
-    return { id, wallet, created };
+    const seed = await seedFor(id);
+    const { wallet, created } = ensureWalletInStore(store, id, seed);
+    const privilege = privilegeFromUser({
+        ...(seed || {}),
+        isTeamOwner: Boolean(account?.isTeamOwner || seed?.isTeamOwner)
+    });
+    const planChanged = applyPrivilegePlan(wallet, privilege);
+    return { id, wallet, created: created || planChanged, privilege };
 }
 
 function appendLedger(wallet, type, amount, reason) {
@@ -599,11 +648,13 @@ async function peekWallet(id) {
     return withFileLock(async () => {
         const store = await readStore();
         const { wallet, created } = ensureWalletInStore(store, account, await seedFor(account));
-        if (created) {
+        const privilege = privilegeFromUser(await seedFor(account));
+        const planChanged = applyPrivilegePlan(wallet, privilege);
+        if (created || planChanged) {
             await persistStore(store);
             await syncProfile(account, wallet);
         }
-        return { id: account, ...walletDto(wallet, { authenticated: account !== DEMO_ACCOUNT_ID }) };
+        return { id: account, ...walletDto(wallet, { authenticated: account !== DEMO_ACCOUNT_ID, privilege }) };
     });
 }
 
@@ -644,16 +695,25 @@ async function debitAccount(id, amount, reason) {
     const account = String(id || '').trim() || DEMO_ACCOUNT_ID;
     return withFileLock(async () => {
         const store = await readStore();
-        const { wallet } = ensureWalletInStore(store, account, await seedFor(account));
+        const seed = await seedFor(account);
+        const { wallet } = ensureWalletInStore(store, account, seed);
+        const privilege = privilegeFromUser(seed);
+        applyPrivilegePlan(wallet, privilege);
+        if (privilege === 'admin') {
+            store.wallets[account] = wallet;
+            await persistStore(store);
+            await syncProfile(account, wallet);
+            return { ok: true, wallet: walletDto(wallet, { privilege, authenticated: true }) };
+        }
         if (wallet.balance < parsed) {
-            return { ok: false, error: 'Solde insuffisant.', wallet: walletDto(wallet) };
+            return { ok: false, error: 'Solde insuffisant.', wallet: walletDto(wallet, { privilege, authenticated: true }) };
         }
         wallet.balance -= parsed;
         appendLedger(wallet, 'debit', parsed, reason);
         store.wallets[account] = wallet;
         await persistStore(store);
         await syncProfile(account, wallet);
-        return { ok: true, wallet: walletDto(wallet) };
+        return { ok: true, wallet: walletDto(wallet, { privilege, authenticated: true }) };
     });
 }
 
@@ -673,6 +733,61 @@ async function setAccountBalance(id, balance, reason) {
         await persistStore(store);
         await syncProfile(account, wallet);
         return { ok: true, wallet: walletDto(wallet) };
+    });
+}
+
+function isDiscordSnowflake(id) {
+    return /^\d{15,22}$/.test(String(id || '').trim());
+}
+
+async function isGuildMember(discordId) {
+    const token = String(process.env.DISCORD_BOT_TOKEN || '').trim();
+    const guildId = String(process.env.DISCORD_GUILD_ID || '').trim();
+    if (!token || !guildId || !isDiscordSnowflake(discordId)) return false;
+    try {
+        const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
+            headers: { Authorization: `Bot ${token}` },
+            signal: AbortSignal.timeout(2000)
+        });
+        return res.ok;
+    } catch {
+        return false;
+    }
+}
+
+async function alreadyClaimedJoinBonus(account) {
+    try {
+        const store = await readStore();
+        return Boolean(store.joinBonus && store.joinBonus[account]);
+    } catch {
+        return false;
+    }
+}
+
+async function claimJoinBonus(id) {
+    const account = String(id || '').trim();
+    if (!isDiscordSnowflake(account) || account === DEMO_ACCOUNT_ID) {
+        return { ok: false, claimed: false, reason: 'invalid' };
+    }
+    if (await alreadyClaimedJoinBonus(account)) {
+        return { ok: true, claimed: false, reason: 'already' };
+    }
+    const member = await isGuildMember(account);
+    if (!member) return { ok: false, claimed: false, reason: 'not-member' };
+    return withFileLock(async () => {
+        const store = await readStore();
+        if (!store.joinBonus || typeof store.joinBonus !== 'object') store.joinBonus = {};
+        if (store.joinBonus[account]) {
+            return { ok: true, claimed: false, reason: 'already' };
+        }
+        store.joinBonus[account] = Date.now();
+        const { wallet } = ensureWalletInStore(store, account, await seedFor(account));
+        wallet.balance += JOIN_BONUS;
+        appendLedger(wallet, 'credit', JOIN_BONUS, JOIN_BONUS_REASON);
+        store.wallets[account] = wallet;
+        await persistStore(store);
+        await syncProfile(account, wallet);
+        return { ok: true, claimed: true, amount: JOIN_BONUS, wallet: walletDto(wallet, { authenticated: true }) };
     });
 }
 
@@ -702,12 +817,18 @@ function mountKrones(app) {
         try {
             const dto = await withFileLock(async () => {
                 const store = await readStore();
-                const { id, wallet, created } = await ensureWallet(store, req);
-                if (created) await persistStore(store);
+                const { id, wallet, created, privilege } = await ensureWallet(store, req);
+                if (created) {
+                    await persistStore(store);
+                    if (id !== DEMO_ACCOUNT_ID) await syncProfile(id, wallet);
+                }
                 mountKrones.catalog = buildCatalog(store);
-                return walletDto(wallet, { authenticated: id !== DEMO_ACCOUNT_ID });
+                return { id, privilege, dto: walletDto(wallet, { authenticated: id !== DEMO_ACCOUNT_ID, privilege }) };
             });
-            return res.json(dto);
+            if (dto.id && dto.id !== DEMO_ACCOUNT_ID) {
+                void claimJoinBonus(dto.id).catch(() => undefined);
+            }
+            return res.json(dto.dto);
         } catch (error) {
             return res.status(500).json({ error: 'Krônes indisponibles.' });
         }
@@ -717,12 +838,13 @@ function mountKrones(app) {
         try {
             const store = await readStore();
             mountKrones.catalog = buildCatalog(store);
-            const dto = catalogDto(store, req.query);
+            const platform = await readPlatform().catch(() => ({ discounts: [] }));
+            const dto = catalogDto(store, req.query, platform.discounts);
             try {
                 const { billingPublicDto } = require('./billing');
                 dto.billing = billingPublicDto(await sessionAccount(req));
             } catch {
-                dto.billing = { authenticated: Boolean(await sessionAccount(req)), loginUrl: '/hebergement/login' };
+                dto.billing = { authenticated: Boolean(await sessionAccount(req)), loginUrl: '/login?returnTo=/krones' };
             }
             return res.json(dto);
         } catch (error) {
@@ -791,6 +913,7 @@ module.exports = {
     setAccountBalance,
     setAccountPlan,
     sessionAccount,
+    claimJoinBonus,
     GRADE_ORDER,
     DATA_PATH
 };

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets</title>
+    <link rel="stylesheet" href="../admin.css">
+</head>
+<body>
+<main>
+    <h1>Tickets</h1>
+    <p class="lead">Salons Discord de la catégorie support. Le fil se lit et se répond sur Discord.</p>
+    <p class="status" id="status"></p>
+    <table>
+        <thead><tr><th>Salon</th><th>Ouvert</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+    </table>
+</main>
+<script>
+(async () => {
+    const status = document.getElementById('status');
+    const res = await fetch('/api/admin/tickets');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { status.textContent = data.error || 'Impossible de lire les tickets'; return; }
+    if (!data.configured) { status.textContent = data.hint || 'Bot Discord non configuré'; return; }
+    const tickets = data.tickets || [];
+    status.textContent = data.categoryId
+        ? `${tickets.length} ticket(s) dans la catégorie`
+        : `${tickets.length} salon(s) texte (pas de catégorie ticket définie)`;
+    document.getElementById('rows').innerHTML = tickets.map((t) => `
+        <tr>
+            <td>#${t.name}<br><small>${t.topic || ''}</small></td>
+            <td>${t.createdAt ? new Date(t.createdAt).toLocaleString('fr-FR') : '—'}</td>
+            <td><a class="btn ghost" href="${t.url}" target="_blank" rel="noreferrer">Ouvrir</a></td>
+        </tr>
+    `).join('') || '<tr><td colspan="3">Aucun ticket ouvert.</td></tr>';
+})();
+</script>
+</body>
+</html>

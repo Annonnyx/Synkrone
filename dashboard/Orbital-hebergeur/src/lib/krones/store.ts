@@ -3,6 +3,12 @@ import path from "node:path";
 import { synkroneRepoRoot } from "@/lib/repo-root";
 import { getOAuthAccount } from "@/lib/oauth/accounts";
 import { DISCORD_COEFF, MC_COEFF, WEB_COEFF, hostingCost } from "./pricing";
+import {
+  applyPrivilegePlan,
+  LOW_BALANCE,
+  resolveKronesPrivilege,
+  type KronesPrivilege,
+} from "./privilege";
 
 export { DISCORD_COEFF, MC_COEFF, WEB_COEFF, hostingCost };
 
@@ -33,7 +39,30 @@ type Store = {
   minecraft: typeof MC_COEFF;
   discord?: typeof DISCORD_COEFF;
   web?: typeof WEB_COEFF;
+  joinBonus?: Record<string, number>;
 };
+
+const JOIN_BONUS = 100;
+const JOIN_BONUS_REASON = "discord:join";
+
+function isDiscordSnowflake(id: string) {
+  return /^\d{15,22}$/.test(id);
+}
+
+async function isGuildMember(discordId: string) {
+  const token = String(process.env.DISCORD_BOT_TOKEN || "").trim();
+  const guildId = String(process.env.DISCORD_GUILD_ID || "").trim();
+  if (!token || !guildId || !isDiscordSnowflake(discordId)) return false;
+  try {
+    const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
+      headers: { Authorization: `Bot ${token}` },
+      signal: AbortSignal.timeout(2000),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 let writeChain: Promise<unknown> = Promise.resolve();
 
@@ -108,6 +137,7 @@ async function readStore(): Promise<Store> {
       minecraft: { ...MC_COEFF, ...(parsed.minecraft ?? {}) },
       discord: { ...DISCORD_COEFF, ...(parsed.discord ?? {}) },
       web: { ...WEB_COEFF, ...(parsed.web ?? {}) },
+      joinBonus: parsed.joinBonus && typeof parsed.joinBonus === "object" ? parsed.joinBonus : {},
     };
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
@@ -118,6 +148,7 @@ async function readStore(): Promise<Store> {
       minecraft: { ...MC_COEFF },
       discord: { ...DISCORD_COEFF },
       web: { ...WEB_COEFF },
+      joinBonus: {},
     };
   }
 }
@@ -154,13 +185,46 @@ function appendLedger(wallet: Wallet, type: "credit" | "debit", amount: number, 
   wallet.ledger = [entry, ...(wallet.ledger ?? [])].slice(0, LEDGER_CAP);
 }
 
+function walletView(wallet: Wallet, id: string, privilege: KronesPrivilege) {
+  const unlimited = privilege === "admin";
+  return {
+    id,
+    linkedDiscord: !id.startsWith("panel:"),
+    ...wallet,
+    unlimited,
+    privilege,
+    shopUrl: "/krones",
+    lowBalance: !unlimited && wallet.balance < LOW_BALANCE,
+  };
+}
+
 export async function getWallet(userId: string) {
+  const privilege = await resolveKronesPrivilege(userId);
+  const id = await walletAccountId(userId);
+  let alreadyClaimed = false;
+  try {
+    const peek = await readStore();
+    alreadyClaimed = Boolean(peek.joinBonus && peek.joinBonus[id]);
+  } catch {
+    alreadyClaimed = false;
+  }
+  const canClaim = !alreadyClaimed && isDiscordSnowflake(id) && (await isGuildMember(id));
   return withFileLock(async () => {
     const store = await readStore();
-    const id = await walletAccountId(userId);
     const { wallet, created } = ensureWallet(store, id);
-    if (created) await persistStore(store);
-    return { id, linkedDiscord: !id.startsWith("panel:"), ...wallet };
+    const planChanged = applyPrivilegePlan(wallet, privilege, GRADE_ORDER);
+    let bonusGranted = false;
+    if (canClaim) {
+      if (!store.joinBonus) store.joinBonus = {};
+      if (!store.joinBonus[id]) {
+        store.joinBonus[id] = Date.now();
+        wallet.balance += JOIN_BONUS;
+        appendLedger(wallet, "credit", JOIN_BONUS, JOIN_BONUS_REASON);
+        bonusGranted = true;
+      }
+    }
+    if (created || planChanged || bonusGranted) await persistStore(store);
+    return walletView(wallet, id, privilege);
   });
 }
 
@@ -196,10 +260,17 @@ export async function creditWallet(userId: string, amount: number, reason: strin
 
 export async function debitWallet(userId: string, amount: number, reason: string) {
   if (!Number.isFinite(amount) || amount <= 0) throw new Error("Montant invalide.");
+  const privilege = await resolveKronesPrivilege(userId);
   return withFileLock(async () => {
     const store = await readStore();
     const id = await walletAccountId(userId);
     const { wallet } = ensureWallet(store, id);
+    applyPrivilegePlan(wallet, privilege, GRADE_ORDER);
+    if (privilege === "admin") {
+      store.wallets[id] = wallet;
+      await persistStore(store);
+      return wallet;
+    }
     const cost = Math.trunc(amount);
     if (wallet.balance < cost) {
       const err = new Error("Solde insuffisant.");

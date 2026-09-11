@@ -28,12 +28,16 @@ function List() {
   const t = useT();
   const [services, setServices] = useState<Service[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [minecraftEnabled, setMinecraftEnabled] = useState<boolean | null>(null);
 
   const load = useCallback(async () => {
     try {
       const d = await api<{ services: Service[] }>("/api/dashboard", { silent: true });
       setServices(d.services);
       setError(null);
+      api<{ minecraftEnabled: boolean }>("/api/platform", { silent: true })
+        .then((p) => setMinecraftEnabled(p.minecraftEnabled))
+        .catch(() => setMinecraftEnabled(true));
     } catch (err) {
       setError((err as Error).message);
     }
@@ -42,6 +46,8 @@ function List() {
   usePoll(load, 10000);
 
   const filtered = (services ?? []).filter((s) => !type || s.type === type);
+  const createType = type === "minecraft" || type === "discord" || type === "web" ? type : null;
+  const createHref = `/dashboard/new/${createType || "discord"}`;
 
   return (
     <div>
@@ -49,14 +55,16 @@ function List() {
         title={type ? t(`nav.${type}`) : t("services.titleAll")}
         subtitle={t("services.subtitle")}
         actions={
-          <div className="flex gap-2">
-            <Link href="/dashboard/new/discord" className="btn">
+          <div className="flex flex-wrap gap-2">
+            <Link href="/dashboard/new/discord" className={createType === "discord" ? "btn btn-primary" : "btn"}>
               <Plus size={14} /> {t("services.newDiscord")}
             </Link>
-            <Link href="/dashboard/new/minecraft" className="btn">
-              <Plus size={14} /> {t("services.newMinecraft")}
-            </Link>
-            <Link href="/dashboard/new/web" className="btn btn-primary">
+            {minecraftEnabled !== false && (
+              <Link href="/dashboard/new/minecraft" className={createType === "minecraft" ? "btn btn-primary" : "btn"}>
+                <Plus size={14} /> {t("services.newMinecraft")}
+              </Link>
+            )}
+            <Link href="/dashboard/new/web" className={createType === "web" ? "btn btn-primary" : "btn"}>
               <Plus size={14} /> {t("services.newWeb")}
             </Link>
           </div>
@@ -79,7 +87,7 @@ function List() {
           title={type ? t("services.empty") : t("services.emptyAll")}
           hint={t("services.emptyHint")}
           action={
-            <Link href="/dashboard/new/web" className="btn btn-primary">
+            <Link href={createHref} className="btn btn-primary">
               <Plus size={14} /> {t("dashboard.createFirst")}
             </Link>
           }

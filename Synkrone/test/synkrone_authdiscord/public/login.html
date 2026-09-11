@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion — Synkrone</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/design/synkrone.css">
+    <style>
+        .login-page { max-width: 28rem; margin: 3rem auto; padding: 0 1.25rem 4rem; }
+        .login-page h1 { font-family: var(--sk-serif); font-size: 2.2rem; margin: 0 0 .5rem; }
+        .login-page p { color: var(--sk-muted); margin: 0 0 1.5rem; max-width: 42ch; }
+        .login-list { display: grid; gap: .75rem; }
+        .login-list a {
+            display: block;
+            padding: .95rem 1.1rem;
+            border: 1px solid var(--sk-border);
+            background: var(--pierre);
+            color: inherit;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-list a:hover { border-color: var(--mousse); }
+        .login-list a.discord { border-color: #5865f2; }
+        .login-note { margin-top: 1.75rem; font-size: .9rem; color: var(--sk-muted); }
+        .login-note a { color: var(--mousse); }
+    </style>
+</head>
+<body>
+    <main class="login-page">
+        <h1>Se connecter</h1>
+        <p>Tu restes sur le site. Le panel d’hébergement a sa propre page de connexion.</p>
+        <div class="login-list" id="providers"></div>
+        <p class="login-note">Pour créer un bot, un serveur ou un site : <a href="/hebergement/login" target="_top">ouvrir le panel</a>.</p>
+    </main>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const returnTo = params.get('returnTo') || '/';
+        function href(provider) {
+            return `/auth/${provider}?returnTo=${encodeURIComponent(returnTo)}`;
+        }
+        (async () => {
+            try {
+                const res = await fetch('/api/me');
+                const data = await res.json();
+                if (data.authenticated && window.top) {
+                    window.top.location.href = returnTo.startsWith('/') ? returnTo : '/';
+                    return;
+                }
+                const p = data.providers || {};
+                const box = document.getElementById('providers');
+                const items = [];
+                if (p.discord) items.push(`<a class="discord" href="${href('discord')}" target="_top">Continuer avec Discord</a>`);
+                if (p.github) items.push(`<a href="${href('github')}" target="_top">Continuer avec GitHub</a>`);
+                if (p.google) items.push(`<a href="${href('google')}" target="_top">Continuer avec Google</a>`);
+                box.innerHTML = items.join('') || '<p>Aucune connexion n’est configurée pour le moment.</p>';
+            } catch {
+                document.getElementById('providers').innerHTML = '<p>Connexion indisponible.</p>';
+            }
+        })();
+    </script>
+</body>
+</html>

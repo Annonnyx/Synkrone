@@ -196,7 +196,7 @@
         }
 
         function loginUrl() {
-            return catalog.billing?.loginUrl || '/hebergement/login';
+            return catalog.billing?.loginUrl || '/login?returnTo=/krones';
         }
 
         function computeMcMonthly({ ramGb = 0, cpu = 0, storageGb = 0, db = false } = {}) {
@@ -231,10 +231,19 @@
                 }
             } else {
                 const n = Math.max(0, Math.trunc(Number(wallet.balance || 0)));
-                if (amount) amount.textContent = formatKrones(n);
-                if (label) label.textContent = n <= 1 ? 'Krône' : 'Krônes';
-                if (plan) plan.textContent = `Plan · ${wallet.plan || 'Aucun'}`;
-                if (note) note.textContent = 'Les Krônes achetés sont un crédit d’usage interne, non remboursable en euros.';
+                if (amount) amount.textContent = wallet.unlimited ? '∞' : formatKrones(n);
+                if (label) label.textContent = wallet.unlimited ? 'Illimité' : (n <= 1 ? 'Krône' : 'Krônes');
+                if (plan) {
+                    const extra = wallet.privilege === 'admin'
+                        ? ' · Admin'
+                        : (wallet.privilege === 'dev' ? ' · Dev (Synkral)' : '');
+                    plan.textContent = `Plan · ${wallet.plan || 'Aucun'}${extra}`;
+                }
+                if (note) {
+                    note.textContent = wallet.unlimited
+                        ? 'Compte admin : les créations de services ne débitent pas le solde.'
+                        : 'Les Krônes achetés sont un crédit d’usage interne, non remboursable en euros.';
+                }
             }
             const body = document.getElementById('ledger-body');
             if (!body) return;

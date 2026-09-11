@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Accueil</title>
     <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="../assets/accueil.css">
     <link rel="stylesheet" href="../assets/stats-page.css">
 </head>
@@ -108,11 +111,11 @@
                 </div>
             </div>
             <div class="prose reveal">
-                <p>Le bouton Se connecter (en haut à droite) ouvre la page de connexion et de création de compte. Vous pouvez entrer avec Discord, Google ou GitHub, ou avec un e-mail.</p>
-                <p>Ce compte débloque le panel d’hébergement, le solde Krônes, Bump, Me, les packs de commandes et le reste de la plateforme. Pour lister un serveur sur Bump, Discord doit être lié et au moins un bot officiel doit être sur le serveur. Pour un ticket support, Discord lié et le serveur Synkrone sont requis.</p>
+                <p>Le bouton Se connecter (en haut à droite) ouvre Discord, Google ou GitHub et te ramène sur la page en cours. L’e-mail reste pour le panel d’hébergement.</p>
+                <p>Ce compte débloque Krônes, Bump, Me et les packs. Le panel Hébergement a sa propre connexion. Pour un ticket support, Discord et le serveur Synkrone sont requis.</p>
             </div>
             <div class="plates cols-2 reveal">
-                <a class="plate" id="login-link" href="/hebergement/login" target="_top">
+                <a class="plate" id="login-link" href="/login?returnTo=/accueil" target="_top">
                     <div class="plate-meta"><span>Compte</span><span>Login</span></div>
                     <h3>Se connecter</h3>
                     <p>Discord, Google, GitHub ou e-mail. Un compte ouvre panel, Krônes, Bump et Me.</p>
@@ -320,7 +323,7 @@
             </div>
             <div class="apps-grid reveal" id="apps-grid">
                 <a class="plate" id="app-hosting" href="/hebergement" target="_top"><h3>Hébergement</h3><p>Panel</p></a>
-                <a class="plate" href="/hebergement/login" target="_top"><h3>Se connecter</h3><p>Compte</p></a>
+                <a class="plate" href="/login?returnTo=/accueil" target="_top"><h3>Se connecter</h3><p>Compte</p></a>
                 <a class="plate" href="/discord/bots" onclick="goSection(event, 'discord')"><h3>Bots</h3><p>Fiches</p></a>
                 <a class="plate" href="/discord/dashbot" onclick="goSection(event, 'discord', { subTab: 'dashbot' })"><h3>Dashbot</h3><p>Invitations</p></a>
                 <a class="plate" href="/discord/commandes" onclick="goSection(event, 'discord', { subTab: 'commandes' })"><h3>Commandes</h3><p>Packs</p></a>
@@ -591,7 +594,7 @@
                 el.setAttribute('href', origin);
             });
             const login = document.getElementById('login-link');
-            if (login) login.setAttribute('href', `${String(origin).replace(/\/$/, '')}/login`);
+            if (login) login.setAttribute('href', '/login?returnTo=/accueil');
         }
 
         window.addEventListener('DOMContentLoaded', async () => {

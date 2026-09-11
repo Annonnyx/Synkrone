@@ -51,6 +51,11 @@
         *::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
         body { font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; color: var(--text); background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        @media (max-width: 800px) {
+            body { height: auto; min-height: 100%; overflow: auto; display: block; }
+            #app-layout { display: block; height: auto; }
+            .page-container { padding: 16px; }
+        }
         #app-layout { display: flex; width: 100%; height: 100%; }
         #main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto; }
         
@@ -360,7 +365,7 @@
         window.navigateProfile = function() {
             if(!MonProfil) {
                 showModal("Erreur", "Veuillez vous connecter.", "Fermer", () => {
-                    window.top.location.href = "/hebergement/login";
+                    window.top.location.href = "/login?returnTo=/discord/me";
                 });
             } else {
                 navigate('profile', 'me');

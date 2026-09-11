@@ -122,7 +122,7 @@
             }
 
             if (!data.authenticated) {
-                showLoginMessage('Connectez-vous avec le bouton Se connecter du header (Discord, Google, GitHub ou e-mail). Le ticket de support exige un compte Discord lié et la présence sur le serveur Synkrone.');
+                showLoginMessage('Connectez-vous avec Discord (bouton Se connecter). Le ticket exige un compte Discord et la présence sur le serveur Synkrone.');
                 return;
             }
 

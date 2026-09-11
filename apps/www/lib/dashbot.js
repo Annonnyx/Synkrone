@@ -290,7 +290,7 @@ function serializeState(mode, user, bucket, guildsPayload, slotCost) {
         ok: true,
         mode,
         oauthConfigured: isDiscordOAuthConfigured(),
-        loginUrl: '/auth/discord',
+        loginUrl: '/login?returnTo=/discord/dashbot',
         user: publicUser(user),
         bots: publicBots(selectedGuildId),
         guilds: guildsPayload.guilds,

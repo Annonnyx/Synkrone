@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone.app</title>
     <link rel="icon" type="image/jpeg" href="assets/images/logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"></noscript>
     <link rel="stylesheet" href="/design/synkrone.css">
     <style>
-        html, body { width: 100%; height: 100%; overflow: hidden; }
+        html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; background: #eef0ea; color: #1b211e; }
         .header-login-row {
     display: flex;
     flex-wrap: wrap;
@@ -22,7 +26,22 @@
     <div class="app-container">
         <div class="chrome" id="app-chrome">
             <header id="app-header"></header>
-            <div id="menu-container"></div>
+            <div id="menu-container">
+                <button type="button" class="sk-nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="menu-tabs">Menu</button>
+                <nav id="app-nav" aria-label="Navigation">
+                    <div class="nav-tabs" id="menu-tabs">
+                        <button type="button" class="nav-tab active" data-target="accueil">Accueil</button>
+                        <a class="nav-tab nav-tab-external" id="nav-hosting" href="/hebergement" target="_top">Hébergement</a>
+                        <button type="button" class="nav-tab" data-target="stats">Stats</button>
+                        <button type="button" class="nav-tab" data-target="discord">Bots</button>
+                        <button type="button" class="nav-tab" data-target="minecraft">Minecraft</button>
+                        <button type="button" class="nav-tab" data-target="bump">Bump</button>
+                        <button type="button" class="nav-tab" data-target="me">Me</button>
+                        <button type="button" class="nav-tab hidden" data-target="admin">Admin</button>
+                        <button type="button" class="nav-tab hidden" data-target="equipe">Équipe</button>
+                    </div>
+                </nav>
+            </div>
         </div>
         <main>
             <div id="section-menu-container"></div>
@@ -54,7 +73,10 @@
         const store = {
             user: null,
             oauth: { discord: false, github: false, google: false },
-            panelOrigin: '/hebergement'
+            panelOrigin: '/hebergement',
+            internal: false,
+            hub: true,
+            krones: null
         };
         const SUPPORT_GRADE_ORDER = {
             Aucun: 0,
@@ -66,7 +88,7 @@
         };
         function isManualStaffRole(roleValue) {
             const normalized = String(roleValue || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            return ['staff', 'equipe', 'equipes'].includes(normalized);
+            return ['staff', 'equipe', 'equipes', 'dev'].includes(normalized);
         }
         function resolveSupportGradeLabel(user) {
             const gradeFromProfile = String(user?.grade || 'Aucun');
@@ -85,8 +107,11 @@
             if (isAdminProfile) {
                 return 'Admin';
             }
+            if (String(rawRole).toLowerCase() === 'dev') {
+                return 'Dev';
+            }
             if (isStaffProfile) {
-                return 'Équipes';
+                return 'Équipe';
             }
             return resolveSupportGradeLabel(user);
         }
@@ -97,14 +122,30 @@
             if (value >= 1e3) return (value / 1e3).toFixed(1).replace(/\.0$/, '') + ' K';
             return value.toString();
         }
+        function siteLoginUrl(returnTo) {
+            const dest = encodeURIComponent(returnTo || window.location.pathname || '/');
+            return `/login?returnTo=${dest}`;
+        }
         function kronesBadgeHtml() {
+            if (!store.user) {
+                return `<a class="btn-krones" href="${siteLoginUrl('/krones')}" title="Portefeuille Krônes">
+                    <span class="btn-krones-label">Krônes</span>
+                    <span class="btn-krones-value">
+                        <span class="btn-krones-amount">—</span>
+                        <span class="btn-krones-unit">₭</span>
+                    </span>
+                </a>`;
+            }
             const fromUser = typeof store.user?.krone === 'number' ? store.user.krone : null;
             const fromWallet = typeof store.krones?.balance === 'number' ? store.krones.balance : null;
             const safeKrone = fromUser !== null ? fromUser : fromWallet;
+            const unlimited = Boolean(store.krones?.unlimited);
             const hasAmount = typeof safeKrone === 'number';
             const kroneLabel = hasAmount && safeKrone <= 1 ? 'Krône' : 'Krônes';
-            const formatted = hasAmount ? formatKrones(safeKrone) : '—';
-            const title = hasAmount ? `${Number(safeKrone).toLocaleString('fr-FR')} ${kroneLabel}` : 'Portefeuille Krônes';
+            const formatted = unlimited ? '∞' : (hasAmount ? formatKrones(safeKrone) : '—');
+            const title = unlimited
+                ? 'Krônes illimités'
+                : (hasAmount ? `${Number(safeKrone).toLocaleString('fr-FR')} ${kroneLabel}` : 'Portefeuille Krônes');
             return `<button type="button" class="btn-krones" title="${title}" onclick="navigateToMainSection('krones', { updateUrl: true })">
                 <span class="btn-krones-label">${kroneLabel}</span>
                 <span class="btn-krones-value">
@@ -113,9 +154,14 @@
                 </span>
             </button>`;
         }
+        function fetchJson(url, ms = 4000) {
+            const ctrl = new AbortController();
+            const timer = window.setTimeout(() => ctrl.abort(), ms);
+            return fetch(url, { signal: ctrl.signal }).finally(() => window.clearTimeout(timer));
+        }
         async function loadKronesWallet() {
             try {
-                const res = await fetch('/api/krones');
+                const res = await fetchJson('/api/krones');
                 if (!res.ok) return;
                 store.krones = await res.json();
                 if (store.user && typeof store.krones?.balance === 'number') {
@@ -126,14 +172,11 @@
                 // no-op
             }
         }
-        function panelLoginUrl() {
-            const origin = String(store.panelOrigin || '/hebergement').replace(/\/$/, '');
-            return `${origin}/login`;
-        }
         function loginButtonsHtml() {
-            return `<a class="btn-login" href="${panelLoginUrl()}" target="_top">Se connecter</a>`;
+            return `<a class="btn-login" href="${siteLoginUrl(window.location.pathname)}" target="_top">Se connecter</a>`;
         }
         function publicToolsHtml() {
+            if (store.hub === false) return '';
             return `<nav class="sk-app-nav" aria-label="Hub">
                 <a href="/hub">Hub</a>
             </nav>`;
@@ -149,15 +192,18 @@
             const menuContainer = document.getElementById('menu-container');
             if (!menuContainer) return;
             try {
-                const res = await fetch('/menu.html');
-                if (!res.ok) return;
-                menuContainer.innerHTML = await res.text();
+                if (!menuContainer.querySelector('#app-nav')) {
+                    const res = await fetchJson('/menu.html', 3000);
+                    if (res.ok) menuContainer.innerHTML = await res.text();
+                }
                 bindNavToggle();
                 try {
-                    const cfg = await fetch('/api/config');
+                    const cfg = await fetchJson('/api/config', 3000);
                     if (cfg.ok) {
                         const data = await cfg.json();
                         if (data.panelOrigin) store.panelOrigin = data.panelOrigin;
+                        store.internal = Boolean(data.internal);
+                        if (data.hub !== undefined) store.hub = Boolean(data.hub);
                         const hosting = menuContainer.querySelector('#nav-hosting');
                         if (hosting && data.panelOrigin) hosting.setAttribute('href', data.panelOrigin);
                     }
@@ -168,7 +214,7 @@
         }
         async function loadSessionUser() {
             try {
-                const res = await fetch('/api/me');
+                const res = await fetchJson('/api/me');
                 if (!res.ok) {
                     store.user = null;
                     return;
@@ -196,7 +242,7 @@
         }
         async function refreshSessionUserSilently() {
             try {
-                const res = await fetch('/api/me');
+                const res = await fetchJson('/api/me');
                 if (!res.ok) return;
                 const data = await res.json();
                 if (!data?.authenticated || !data.user) return;
@@ -221,11 +267,12 @@
             if (equipeTab) equipeTab.classList.toggle('hidden', !canAccessEquipe());
         }
         async function logout() {
-            await fetch('/logout');
-            store.user = null;
-            store.krones = null;
-            await loadKronesWallet();
-            renderUI();
+            try {
+                await fetch('/hebergement/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+            } catch {
+                // panel session absente
+            }
+            window.location.href = `/logout?returnTo=${encodeURIComponent(window.location.pathname || '/')}`;
         }
         
         const DISCORD_BOT_PAGES = new Set(['vax', 'arceus', 'asuna', 'kayaba', 'yui', 'bot']);
@@ -273,17 +320,27 @@
                     modpack: '/minecraft/modpack'
                 }
             },
+            login: {
+                route: '/login',
+                page: '/login.html'
+            },
             admin: {
                 route: '/admin',
                 menu: '/admin/menu.html',
                 defaultSubTab: 'utilisateur',
                 pages: {
                     utilisateur: '/admin/utilisateur/index.html',
+                    plateforme: '/admin/plateforme/index.html',
+                    services: '/admin/services/index.html',
+                    tickets: '/admin/tickets/index.html',
                     annonce: '/admin/annonce/index.html',
                     pm2: '/admin/pm2/index.html'
                 },
                 routes: {
                     utilisateur: '/admin/utilisateur',
+                    plateforme: '/admin/plateforme',
+                    services: '/admin/services',
+                    tickets: '/admin/tickets',
                     annonce: '/admin/annonce',
                     pm2: '/admin/pm2'
                 }
@@ -592,10 +649,7 @@
         }
 
         function applyMobileHeaderBrandVisibility() {
-            const isMobile = window.matchMedia('(max-width: 768px)').matches;
-            const username = String(store.user?.username || '').trim();
-            const shouldHideBrand = Boolean(store.user) && isMobile && username.length > 6;
-            document.body.classList.toggle('hide-brand-mobile', shouldHideBrand);
+            document.body.classList.remove('hide-brand-mobile');
         }
         
         // --- RENDU DYNAMIQUE DE L'INTERFACE ---
@@ -683,12 +737,10 @@
         
         // --- DÉMARRAGE ---
         (async function init() {
-            await loadMenu();
-            await loadSessionUser();
-            await loadKronesWallet();
+            bindNavToggle();
             renderUI();
             initMainNavigation();
-            
+
             const rouletteModal = document.getElementById('roulette-modal');
             if (rouletteModal) {
                 rouletteModal.addEventListener('click', (event) => {
@@ -696,15 +748,35 @@
                 });
             }
             const route = parseRoute(window.location.pathname);
-            await navigateToMainSection(route.mainSection, {
-                subTab: route.subTab,
-                botsTab: route.botsTab || null,
-                modpackTab: route.modpackTab || null,
-                cloudPath: route.cloudPath || null,
-                profileTab: route.profileTab || null,
-                updateUrl: true,
-                replaceHistory: normalizePath(window.location.pathname) !== normalizePath(route.canonical)
-            });
+            const needsGate = route.mainSection === 'admin' || route.mainSection === 'equipe';
+            const menuP = loadMenu();
+            const sessionP = loadSessionUser();
+            const kronesP = loadKronesWallet();
+            if (!needsGate) {
+                void navigateToMainSection(route.mainSection, {
+                    subTab: route.subTab,
+                    botsTab: route.botsTab || null,
+                    modpackTab: route.modpackTab || null,
+                    cloudPath: route.cloudPath || null,
+                    profileTab: route.profileTab || null,
+                    updateUrl: true,
+                    replaceHistory: normalizePath(window.location.pathname) !== normalizePath(route.canonical)
+                });
+            }
+            await Promise.all([menuP, sessionP]);
+            renderUI();
+            if (needsGate) {
+                await navigateToMainSection(route.mainSection, {
+                    subTab: route.subTab,
+                    botsTab: route.botsTab || null,
+                    modpackTab: route.modpackTab || null,
+                    cloudPath: route.cloudPath || null,
+                    profileTab: route.profileTab || null,
+                    updateUrl: true,
+                    replaceHistory: normalizePath(window.location.pathname) !== normalizePath(route.canonical)
+                });
+            }
+            void kronesP.then(() => renderUI());
             window.addEventListener('popstate', async () => {
                 const popRoute = parseRoute(window.location.pathname);
                 await navigateToMainSection(popRoute.mainSection, {

@@ -16,6 +16,7 @@ import {
   Languages,
   LayoutDashboard,
   LogOut,
+  Menu,
   Plus,
   Server,
   Shield,
@@ -97,14 +98,21 @@ export function LanguageSelector() {
   );
 }
 
-function KronesPill() {
-  const [balance, setBalance] = useState<number | null>(null);
+type WalletSummary = {
+  balance: number;
+  unlimited?: boolean;
+  lowBalance?: boolean;
+  privilege?: string | null;
+};
+
+function useWalletSummary() {
+  const [wallet, setWallet] = useState<WalletSummary | null>(null);
   useEffect(() => {
     let stop = false;
     const load = () => {
-      void api<{ balance: number }>("/api/krones", { silent: true })
+      void api<WalletSummary>("/api/krones", { silent: true })
         .then((w) => {
-          if (!stop) setBalance(w.balance);
+          if (!stop) setWallet(w);
         })
         .catch(() => undefined);
     };
@@ -115,10 +123,52 @@ function KronesPill() {
       clearInterval(t);
     };
   }, []);
+  return wallet;
+}
+
+export function ShopKronesLink({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: React.ReactNode;
+}) {
+  const t = useT();
+  return (
+    <a href="/krones" className={className || "btn btn-primary"} target="_top">
+      {children || t("krones.shop")}
+    </a>
+  );
+}
+
+function KronesPill() {
+  const t = useT();
+  const wallet = useWalletSummary();
+  const label = wallet?.unlimited ? t("krones.unlimited") : `${(wallet?.balance ?? 0).toLocaleString("fr-FR")} ₭`;
   return (
     <Link href="/dashboard/krones" className="badge badge-gold w-full justify-center">
-      {(balance ?? 0).toLocaleString("fr-FR")} ₭
+      {label}
     </Link>
+  );
+}
+
+export function LowBalanceBanner() {
+  const t = useT();
+  const wallet = useWalletSummary();
+  if (!wallet || wallet.unlimited || !wallet.lowBalance) return null;
+  return (
+    <div
+      className="rounded-lg border px-3 py-2 text-xs"
+      style={{
+        borderColor: "rgba(184, 130, 61, 0.45)",
+        background: "rgba(184, 130, 61, 0.14)",
+        color: "#e3b675",
+      }}
+      role="status"
+    >
+      <div className="font-semibold">{t("krones.lowBalance")}</div>
+      <ShopKronesLink className="btn mt-2 w-full justify-center" />
+    </div>
   );
 }
 
@@ -138,10 +188,25 @@ function EngineStatusPill() {
   );
 }
 
-export function Sidebar({ user }: { user: { name: string; email: string } }) {
+export function Sidebar({
+  user,
+  open = false,
+  onNavigate,
+}: {
+  user: { name: string; email: string };
+  open?: boolean;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const t = useT();
+  const [minecraftEnabled, setMinecraftEnabled] = useState(true);
+
+  useEffect(() => {
+    void api<{ minecraftEnabled: boolean }>("/api/platform", { silent: true })
+      .then((p) => setMinecraftEnabled(p.minecraftEnabled !== false))
+      .catch(() => setMinecraftEnabled(true));
+  }, []);
 
   const NAV = [
     { section: null, items: [{ href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard }] },
@@ -164,9 +229,11 @@ export function Sidebar({ user }: { user: { name: string; email: string } }) {
     {
       section: t("nav.advanced"),
       items: [
-        { href: "/dashboard/services?type=discord", label: t("nav.discord"), icon: Bot },
-        { href: "/dashboard/services?type=minecraft", label: t("nav.minecraft"), icon: Boxes },
-        { href: "/dashboard/services?type=web", label: t("nav.web"), icon: Globe },
+        { href: "/dashboard/new/discord", label: t("nav.discord"), icon: Bot },
+        ...(minecraftEnabled
+          ? [{ href: "/dashboard/new/minecraft", label: t("nav.minecraft"), icon: Boxes }]
+          : []),
+        { href: "/dashboard/new/web", label: t("nav.web"), icon: Globe },
         { href: "/dashboard/infrastructure/databases", label: t("nav.databases"), icon: Database },
         { href: "/dashboard/infrastructure/sftp", label: t("nav.sftp"), icon: HardDrive },
         { href: "/dashboard/infrastructure/engine", label: t("nav.engine"), icon: Gauge },
@@ -175,7 +242,11 @@ export function Sidebar({ user }: { user: { name: string; email: string } }) {
   ];
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-[var(--line)] bg-[var(--panel)]">
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 flex w-60 shrink-0 flex-col border-r border-[var(--line)] bg-[var(--panel)] transition-transform md:static md:translate-x-0 ${
+        open ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
       <div className="flex items-center gap-2.5 border-b border-[var(--line)] px-4 py-4">
         <Logo />
         <div>
@@ -200,6 +271,7 @@ export function Sidebar({ user }: { user: { name: string; email: string } }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onNavigate}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] transition"
                   style={{
                     background: active ? "var(--panel-2)" : "transparent",
@@ -219,6 +291,7 @@ export function Sidebar({ user }: { user: { name: string; email: string } }) {
       </nav>
       <div className="space-y-2 border-t border-[var(--line)] p-3">
         <KronesPill />
+        <LowBalanceBanner />
         <EngineStatusPill />
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 truncate text-xs text-[var(--muted)]" title={user.email}>
@@ -238,6 +311,42 @@ export function Sidebar({ user }: { user: { name: string; email: string } }) {
         </button>
       </div>
     </aside>
+  );
+}
+
+export function DashboardShell({
+  user,
+  children,
+}: {
+  user: { name: string; email: string };
+  children: React.ReactNode;
+}) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex h-[100dvh] flex-col overflow-hidden md:flex-row">
+      <header className="space-y-2 border-b border-[var(--line)] bg-[var(--panel)] px-3 py-2 md:hidden">
+        <div className="flex items-center justify-between gap-2">
+          <button type="button" className="btn" onClick={() => setOpen(true)} aria-expanded={open}>
+            <Menu size={16} /> Menu
+          </button>
+          <KronesPill />
+        </div>
+        <LowBalanceBanner />
+      </header>
+      {open && (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          aria-label={t("common.close")}
+          onClick={() => setOpen(false)}
+        />
+      )}
+      <Sidebar user={user} open={open} onNavigate={() => setOpen(false)} />
+      <div className="scroll min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-7xl px-4 py-4 md:px-6 md:py-6">{children}</div>
+      </div>
+    </div>
   );
 }
 
@@ -314,9 +423,7 @@ export function ErrorText({ error }: { error: string | null }) {
       <div className="mt-0.5 opacity-90">{explained.explanation}</div>
       {explained.action && <div className="mt-1 text-[var(--text)]">{explained.action}</div>}
       {/INSUFFICIENT_KRONES|Solde insuffisant/i.test(error) && (
-        <Link href="/dashboard/krones" className="mt-2 inline-block underline">
-          Krônes
-        </Link>
+        <ShopKronesLink className="btn btn-primary mt-2" />
       )}
     </div>
   );

@@ -44,6 +44,7 @@ const PORT = Number(process.env.PORT || 3668);
 const LISTEN_HOST = String(process.env.SYNKRONE_LISTEN_HOST || '127.0.0.1').trim() || '127.0.0.1';
 const IS_PROD = process.env.NODE_ENV === 'production';
 const INTERNAL_TOOLS = process.env.SYNKRONE_INTERNAL === '1' || !IS_PROD;
+const HUB_ENABLED = process.env.SYNKRONE_HUB === '0' ? false : true;
 const SESSION_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
 
 function lanUrls(port) {
@@ -94,12 +95,14 @@ app.use(session({
     }
 }));
 
-if (INTERNAL_TOOLS) {
-    mountUi(app);
-    mountSharing(app);
+if (HUB_ENABLED) {
     app.get('/hub', (req, res) => {
         res.sendFile(path.join(WWW_DIR, 'index.html'));
     });
+}
+if (INTERNAL_TOOLS) {
+    mountUi(app);
+    mountSharing(app);
     app.get(['/ui', '/ui/'], (req, res) => {
         res.sendFile(path.join(UI_DIR, 'index.html'));
     });
@@ -109,7 +112,7 @@ if (INTERNAL_TOOLS) {
     app.use('/ui', express.static(UI_DIR));
     app.use('/sharing', express.static(SHARING_DIR));
 } else {
-    console.log('[prod] /ui /sharing /hub désactivés (SYNKRONE_INTERNAL=1 pour les ouvrir)');
+    console.log('[prod] /ui /sharing fermés (SYNKRONE_INTERNAL=1 pour les ouvrir)');
 }
 
 mountVux(app);
@@ -118,7 +121,10 @@ app.use('/design', express.static(path.join(WWW_DIR, 'design')));
 
 app.get('/api/config', (_req, res) => {
     res.json({
-        panelOrigin: panelPublicOrigin(PORT)
+        panelOrigin: panelPublicOrigin(PORT),
+        internal: INTERNAL_TOOLS,
+        hub: HUB_ENABLED,
+        supportInvite: process.env.DISCORD_SUPPORT_INVITE_URL || 'https://discord.gg/p768u2Pgp3'
     });
 });
 
@@ -151,8 +157,10 @@ const server = app.listen(PORT, LISTEN_HOST, () => {
     }
     console.log(`  hébergement : http://127.0.0.1:${PORT}${PANEL_PREFIX}`);
     console.log(`  vux         : http://127.0.0.1:${PORT}/vux/`);
-    if (INTERNAL_TOOLS) {
+    if (HUB_ENABLED) {
         console.log(`  hub         : http://127.0.0.1:${PORT}/hub`);
+    }
+    if (INTERNAL_TOOLS) {
         console.log(`  ui          : http://127.0.0.1:${PORT}/ui/`);
         console.log(`  sharing     : http://127.0.0.1:${PORT}/sharing/`);
     }

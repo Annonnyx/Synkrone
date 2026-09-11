@@ -23,12 +23,12 @@ const RULES: Rule[] = [
     fr: {
       title: "Solde Krônes insuffisant",
       explanation: "La création d'un service débite le portefeuille. Le solde actuel ne couvre pas le coût.",
-      action: "Rechargez des Krônes ou liez Discord pour partager le solde du site public.",
+      action: "Ouvrez la boutique Krônes pour recharger, ou liez Discord pour partager le solde du site public.",
     },
     en: {
       title: "Not enough Krônes",
       explanation: "Creating a service debits the wallet. The current balance does not cover the cost.",
-      action: "Top up Krônes or link Discord to share the public-site balance.",
+      action: "Open the Krônes shop to top up, or link Discord to share the public-site balance.",
     },
   },
   {

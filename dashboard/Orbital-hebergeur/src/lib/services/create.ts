@@ -30,13 +30,8 @@ import { publicBaseDomain, suggestedHostname } from "@/lib/domains/public";
 import { syncTraefikConfig } from "@/lib/domains/traefik";
 import { assertGithubRepoAccess } from "@/lib/oauth/github";
 import { debitWallet, hostingCost } from "@/lib/krones/store";
-import {
-  COMMAND_CATALOG,
-  DISCORD_COMMANDS,
-  flavorFromModules,
-  isOfficialFlavor,
-  officialBot,
-} from "@/lib/discord/catalog";
+import { assertCreationAllowed, clampResources, type ServiceKind } from "@/lib/services/limits";
+import { DISCORD_COMMANDS } from "@/lib/discord/catalog";
 
 export type CreateServiceInput = {
   type: ServiceType;
@@ -124,6 +119,8 @@ function assertCreateInput(input: CreateServiceInput) {
 
 export async function createService(userId: string, input: CreateServiceInput) {
   assertCreateInput(input);
+  const settings = await assertCreationAllowed(input.type);
+  const resources = clampResources(settings, input.type as ServiceKind, input);
 
   let githubRepoUrl: string | null = null;
   if (input.type === "web" && input.web?.source === "github") {
@@ -131,18 +128,24 @@ export async function createService(userId: string, input: CreateServiceInput) {
     githubRepoUrl = parsed.httpsUrl;
   }
 
-  const cost = hostingCost(input.type, {
-    memoryMb: input.memoryMb,
-    cpuMillicores: input.cpuMillicores,
-    storageMb: input.storageMb,
-  });
-  try {
-    await debitWallet(userId, cost, `host:${input.type}:${input.name}`);
-  } catch (err) {
-    if (err instanceof Error && (err as Error & { code?: string }).code === "INSUFFICIENT_KRONES") {
-      throw new HttpError(403, `Solde insuffisant (${cost} Krônes requis).`, "INSUFFICIENT_KRONES");
+  const cost = hostingCost(
+    input.type,
+    {
+      memoryMb: resources.memoryMb,
+      cpuMillicores: resources.cpuMillicores,
+      storageMb: resources.storageMb,
+    },
+    settings.discounts,
+  );
+  if (cost > 0) {
+    try {
+      await debitWallet(userId, cost, `host:${input.type}:${input.name}`);
+    } catch (err) {
+      if (err instanceof Error && (err as Error & { code?: string }).code === "INSUFFICIENT_KRONES") {
+        throw new HttpError(403, `Solde insuffisant (${cost} Krônes requis).`, "INSUFFICIENT_KRONES");
+      }
+      throw err;
     }
-    throw err;
   }
 
   const projectId = await ensureProject(userId, input.projectId, `${input.name} project`);
@@ -158,9 +161,9 @@ export async function createService(userId: string, input: CreateServiceInput) {
       slug,
       description: input.description ?? null,
       state: "CREATING",
-      cpuLimit: Math.min(Math.max(input.cpuMillicores || 1000, 100), 16000),
-      memoryLimitMb: Math.min(Math.max(input.memoryMb || 512, 64), 65536),
-      storageLimitMb: Math.max(input.storageMb || 5120, 512),
+      cpuLimit: resources.cpuMillicores,
+      memoryLimitMb: resources.memoryMb,
+      storageLimitMb: resources.storageMb,
       restartPolicy: input.restartPolicy ?? defaultRestartPolicy(input.type),
       maxRestarts: defaultMaxRestarts(input.type),
     })
@@ -169,37 +172,21 @@ export async function createService(userId: string, input: CreateServiceInput) {
   if (input.type === "discord") {
     const d = input.discord;
     if (!d) throw new HttpError(400, "Discord configuration is required");
-    const flavor = isOfficialFlavor(d.flavor) ? d.flavor : flavorFromModules(d.modules ?? []);
-    const official = flavor !== "custom" ? officialBot(flavor) : null;
-    const modules = official ? [`official:${official.id}`] : (d.modules ?? []).filter((id) => id in DISCORD_COMMANDS);
+    const modules = (d.modules ?? []).filter((id) => id in DISCORD_COMMANDS);
     const selected = new Set(d.commands ?? []);
-    const commands = official
-      ? COMMAND_CATALOG.categories.flatMap((cat) =>
-          cat.commands
-            .filter((cmd) => cmd.source.toLowerCase().includes(official.name.toLowerCase()))
-            .map((cmd) => ({
-              name: cmd.name,
-              module: cat.id,
-              enabled: true,
-              description: cmd.description,
-              permission: "",
-              cooldown: 3,
-              logging: false,
-            })),
-        )
-      : Object.entries(DISCORD_COMMANDS)
-          .filter(([moduleId]) => modules.includes(moduleId))
-          .flatMap(([moduleId, list]) =>
-            list.map((c) => ({
-              name: c.name,
-              module: moduleId,
-              enabled: selected.size === 0 ? true : selected.has(c.name),
-              description: c.description,
-              permission: c.permission,
-              cooldown: 3,
-              logging: false,
-            })),
-          );
+    const commands = Object.entries(DISCORD_COMMANDS)
+      .filter(([moduleId]) => modules.includes(moduleId))
+      .flatMap(([moduleId, list]) =>
+        list.map((c) => ({
+          name: c.name,
+          module: moduleId,
+          enabled: selected.size === 0 ? true : selected.has(c.name),
+          description: c.description,
+          permission: c.permission,
+          cooldown: 3,
+          logging: false,
+        })),
+      );
     const token = d.token?.trim() || undefined;
     await db.insert(discordBots).values({
       serviceId: svc.id,
@@ -207,9 +194,9 @@ export async function createService(userId: string, input: CreateServiceInput) {
       tokenFingerprint: token ? fingerprint(token) : null,
       applicationId:
         d.applicationId?.trim() || (token ? applicationIdFromToken(token) : null) || null,
-      prefix: official?.prefix || d.prefix || "!",
+      prefix: d.prefix || "!",
       slashCommands: d.slashCommands ?? true,
-      flavor: official?.id ?? "custom",
+      flavor: "custom",
       intents: resolveGatewayIntents(d.intents, modules),
       modules,
       commands,

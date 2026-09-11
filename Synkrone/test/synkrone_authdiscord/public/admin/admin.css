@@ -1,0 +1,43 @@
+html, body {
+    margin: 0;
+    background: #1B211E;
+    color: #EEF0EA;
+    font: 14px/1.5 "IBM Plex Sans", system-ui, sans-serif;
+}
+main { padding: 1.25rem 1.4rem 3rem; max-width: 72rem; }
+h1 { font-family: "Zilla Slab", Georgia, serif; font-size: 1.8rem; margin: 0 0 .35rem; }
+.lead { color: #8FA096; margin: 0 0 1.25rem; }
+.row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin: .5rem 0 1rem; }
+label { display: grid; gap: .25rem; font-size: .82rem; color: #8FA096; }
+input, select, textarea {
+    background: #141916;
+    color: #EEF0EA;
+    border: 1px solid #3A4540;
+    padding: .45rem .55rem;
+    font: inherit;
+}
+button, .btn {
+    border: 1px solid #3F6B52;
+    background: #2E5039;
+    color: #E4ECE4;
+    padding: .4rem .7rem;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+button.ghost, .btn.ghost { background: transparent; border-color: #5C6A66; color: #EEF0EA; }
+button.danger { background: #A8462F; border-color: #A8462F; }
+table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+th, td { text-align: left; padding: .45rem .4rem; border-bottom: 1px solid #2A3330; vertical-align: top; }
+.status { font-size: .75rem; color: #8FA096; min-height: 1.2em; }
+pre {
+    background: #141916;
+    border: 1px solid #2A3330;
+    padding: .75rem;
+    overflow: auto;
+    max-height: 22rem;
+    white-space: pre-wrap;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .78rem;
+}
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .75rem; }

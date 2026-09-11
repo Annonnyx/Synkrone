@@ -655,6 +655,9 @@
                 return 'Admin';
             }
 
+            if (rawRole === 'Dev' || rawRole.toLowerCase() === 'dev') {
+                return 'Dev';
+            }
             const isManualStaff = isManualStaffRole(rawRole);
             if (isManualStaff) {
                 return 'Équipe';
@@ -669,12 +672,12 @@
                 .toLowerCase()
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '');
-            return normalized === 'staff' || normalized === 'equipe' || normalized === 'equipes' || normalized === 'admin';
+            return normalized === 'staff' || normalized === 'equipe' || normalized === 'equipes' || normalized === 'admin' || normalized === 'dev';
         }
 
         function getRoleBadgeClass(roleLabel) {
             if (roleLabel === 'Admin') return 'badge-chip badge-admin';
-            if (roleLabel === 'Équipe') return 'badge-chip badge-equipe';
+            if (roleLabel === 'Équipe' || roleLabel === 'Dev') return 'badge-chip badge-equipe';
             return 'badge-chip badge-krobi';
         }
 
@@ -690,6 +693,9 @@
                 return 'Admin';
             }
 
+            if (rawRole === 'Dev' || rawRole.toLowerCase() === 'dev') {
+                return 'Dev';
+            }
             const isManualStaff = isManualStaffRole(rawRole);
             if (isManualStaff) {
                 return 'Équipe';
@@ -824,9 +830,13 @@
                 } else {
                     roleSelect.innerHTML = [
                         '<option value="Krobi">Krobi</option>',
+                        '<option value="Dev">Dev</option>',
                         '<option value="Équipe">Équipe</option>'
                     ].join('');
-                    roleSelect.value = isManualStaffRole(user.role) ? 'Équipe' : 'Krobi';
+                    const currentRole = String(user.role || 'Krobi');
+                    roleSelect.value = currentRole === 'Dev' || currentRole.toLowerCase() === 'dev'
+                        ? 'Dev'
+                        : (isManualStaffRole(currentRole) ? 'Équipe' : 'Krobi');
                     roleSelect.disabled = false;
                 }
                 document.getElementById('modalKroneInput').value = Math.max(0, Number(user.krone || 0));

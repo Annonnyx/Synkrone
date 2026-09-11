@@ -48,7 +48,7 @@ function envPair(primaryId: string, primarySecret: string, fallbackId: string, f
 export function getProviderConfig(provider: OAuthProvider): ProviderConfig | null {
   const map: Record<OAuthProvider, { id?: string; secret?: string }> = {
     github: envPair("GITHUB_PANEL_CLIENT_ID", "GITHUB_PANEL_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET"),
-    google: { id: process.env.GOOGLE_CLIENT_ID, secret: process.env.GOOGLE_CLIENT_SECRET },
+    google: envPair("GOOGLE_PANEL_CLIENT_ID", "GOOGLE_PANEL_CLIENT_SECRET", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"),
     discord: { id: process.env.DISCORD_CLIENT_ID, secret: process.env.DISCORD_CLIENT_SECRET },
   };
   const row = map[provider];

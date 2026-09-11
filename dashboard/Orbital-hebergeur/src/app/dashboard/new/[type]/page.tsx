@@ -2,7 +2,6 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import type { GithubRepo } from "@/lib/oauth/types";
 import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { api } from "@/lib/client";
@@ -14,10 +13,19 @@ import { SoftwarePicker, VersionPicker } from "@/components/mc-runtime";
 import { PropertyControl } from "@/components/mc-properties";
 import { PROPERTY_BY_KEY, defaultProperties } from "@/lib/minecraft/properties";
 import { mergeIntentsForModules, suggestedPrivilegedIntents } from "@/lib/discord/intents";
-import { COMMAND_CATALOG, COMMAND_COGS, OFFICIAL_BOTS, customCategories } from "@/lib/discord/catalog";
+import { COMMAND_COGS, customCategories } from "@/lib/discord/catalog";
 import { hostingCost } from "@/lib/krones/pricing";
+import { activeDiscounts, type PromoDiscount } from "@/lib/krones/discounts";
 import { withPanelBase } from "@/lib/panel-base";
 import { PageHeader } from "@/components/ui";
+
+const CREATE_TYPES = ["discord", "minecraft", "web"] as const;
+type CreateType = (typeof CREATE_TYPES)[number];
+
+function resolveCreateType(raw: unknown): CreateType {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  return CREATE_TYPES.includes(value as CreateType) ? (value as CreateType) : "discord";
+}
 
 const CUSTOM_CATEGORIES = customCategories();
 
@@ -62,7 +70,12 @@ export default function CreateServicePage() {
   const params = useParams<{ type: string }>();
   const t = useT();
   const toast = useToast();
-  const type = (params.type as string) ?? "discord";
+  const type = resolveCreateType(params.type);
+
+  useEffect(() => {
+    const raw = Array.isArray(params.type) ? params.type[0] : params.type;
+    if (raw && raw !== type) router.replace(`/dashboard/new/${type}`);
+  }, [params.type, type, router]);
 
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +90,34 @@ export default function CreateServicePage() {
   const [memoryMb, setMemoryMb] = useState(type === "minecraft" ? 4096 : 512);
   const [cpu, setCpu] = useState(type === "minecraft" ? 2000 : 1000);
   const [storageMb, setStorageMb] = useState(type === "minecraft" ? 20480 : 5120);
+  const [platform, setPlatform] = useState<{
+    minecraftEnabled: boolean;
+    maxCpuMillicores: number;
+    maxMemoryMb: number;
+    maxStorageMb: number;
+    limits: Record<string, { cpuMillicores: number; memoryMb: number; storageMb: number }>;
+    discounts?: PromoDiscount[];
+  } | null>(null);
+
+  useEffect(() => {
+    void api<NonNullable<typeof platform>>("/api/platform", { silent: true })
+      .then((data) => {
+        setPlatform(data);
+        const cap = data.limits?.[type] || {
+          cpuMillicores: data.maxCpuMillicores,
+          memoryMb: data.maxMemoryMb,
+          storageMb: data.maxStorageMb,
+        };
+        setMemoryMb((cur) => Math.min(cur, cap.memoryMb));
+        setCpu((cur) => Math.min(cur, cap.cpuMillicores));
+        setStorageMb((cur) => Math.min(cur, cap.storageMb));
+      })
+      .catch(() => setPlatform(null));
+  }, [type]);
+
+  const typeLimits = platform?.limits?.[type];
+  const ramPresets = [512, 1024, 2048, 4096, 8192, 16384].filter((m) => m <= (typeLimits?.memoryMb ?? 16384));
+  const cpuPresets = [500, 1000, 2000, 4000].filter((c) => c <= (typeLimits?.cpuMillicores ?? 4000));
   const [envText, setEnvText] = useState("");
 
   // discord
@@ -84,23 +125,35 @@ export default function CreateServicePage() {
   const [applicationId, setApplicationId] = useState("");
   const [prefix, setPrefix] = useState("!");
   const [slash, setSlash] = useState(true);
-  const [flavor, setFlavor] = useState<"custom" | (typeof OFFICIAL_BOTS)[number]["id"]>("custom");
+  const [botSource, setBotSource] = useState<"catalog" | "ticket">("catalog");
+  const [supportInvite, setSupportInvite] = useState("https://discord.gg/p768u2Pgp3");
   const [modules, setModules] = useState<string[]>(["moderation", "public"]);
   const [commands, setCommands] = useState<string[]>(["ban", "kick", "ping"]);
   const [intents, setIntents] = useState<string[]>(() => mergeIntentsForModules([], ["moderation", "public"]));
   const [cmdQuery, setCmdQuery] = useState("");
 
+  useEffect(() => {
+    void fetch("/api/config")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (typeof data?.supportInvite === "string" && data.supportInvite.startsWith("http")) {
+          setSupportInvite(data.supportInvite);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
   const STEPS = useMemo(() => {
     if (type === "discord") {
-      return flavor === "custom"
-        ? ["flavor", "general", "commands", "discord", "resources", "review"]
-        : ["flavor", "general", "discord", "resources", "review"];
+      return botSource === "ticket"
+        ? ["botSource"]
+        : ["botSource", "general", "commands", "discord", "resources", "review"];
     }
     if (type === "minecraft") {
       return ["basic", "software", "version", "resources", "network", "properties", "review"];
     }
     return ["basic", "template", "source", "build", "resources", "environment", "review"];
-  }, [type, flavor]);
+  }, [type, botSource]);
 
   const stepLabel = (id: string) => t(`create.step${id[0].toUpperCase()}${id.slice(1)}`);
 
@@ -184,11 +237,18 @@ export default function CreateServicePage() {
         .map((l) => [l.slice(0, l.indexOf("=")).trim(), l.slice(l.indexOf("=") + 1).trim()]),
     );
 
-  const cost = hostingCost(type as "discord" | "minecraft" | "web", {
-    memoryMb,
-    cpuMillicores: cpu,
-    storageMb,
-  });
+  const cost = hostingCost(
+    type,
+    {
+      memoryMb,
+      cpuMillicores: cpu,
+      storageMb,
+    },
+    platform?.discounts,
+  );
+  const livePromos = activeDiscounts(platform?.discounts).filter((row) =>
+    row.targets.some((target) => target === "all" || target === type || target === "ram" || target === "cpu" || target === "storage"),
+  );
   const privilegedHint = type === "discord" ? suggestedPrivilegedIntents(modules) : [];
 
   const submit = async () => {
@@ -211,8 +271,8 @@ export default function CreateServicePage() {
           applicationId: applicationId.trim() || undefined,
           prefix,
           slashCommands: slash,
-          flavor,
-          modules: flavor === "custom" ? modules : [`official:${flavor}`],
+          flavor: "custom",
+          modules,
           commands,
           intents,
         };
@@ -384,57 +444,39 @@ export default function CreateServicePage() {
             )}
           </div>
         );
-      case "discord:flavor":
+      case "discord:botSource":
         return (
           <div className="space-y-4">
-            <p className="text-sm leading-relaxed text-[var(--muted)]">
-              {t("create.officialPack")}. {t("create.customCogs")}.
-            </p>
+            <p className="text-sm leading-relaxed text-[var(--muted)]">{t("create.botSourceIntro")}</p>
             <div className="grid gap-2 md:grid-cols-2">
-              {OFFICIAL_BOTS.map((bot) => (
-                <button
-                  key={bot.id}
-                  type="button"
-                  className="panel panel-hover p-4 text-left"
-                  style={{ borderColor: flavor === bot.id ? "var(--accent)" : "var(--line)" }}
-                  onClick={() => {
-                    setFlavor(bot.id);
-                    setPrefix(bot.prefix);
-                    setName(bot.name);
-                  }}
-                >
-                  <div className="font-semibold">{bot.name}</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">{bot.role}</div>
-                </button>
-              ))}
               <button
                 type="button"
                 className="panel panel-hover p-4 text-left"
-                style={{ borderColor: flavor === "custom" ? "var(--accent)" : "var(--line)" }}
-                onClick={() => setFlavor("custom")}
+                style={{ borderColor: botSource === "catalog" ? "var(--accent)" : "var(--line)" }}
+                onClick={() => setBotSource("catalog")}
               >
-                <div className="font-semibold">Custom</div>
-                <div className="mt-1 text-sm text-[var(--muted)]">{t("create.customCogs")}</div>
+                <div className="font-semibold">{t("create.botSourceCatalog")}</div>
+                <div className="mt-1 text-sm text-[var(--muted)]">{t("create.botSourceCatalogHint")}</div>
+              </button>
+              <button
+                type="button"
+                className="panel panel-hover p-4 text-left"
+                style={{ borderColor: botSource === "ticket" ? "var(--accent)" : "var(--line)" }}
+                onClick={() => setBotSource("ticket")}
+              >
+                <div className="font-semibold">{t("create.botSourceTicket")}</div>
+                <div className="mt-1 text-sm text-[var(--muted)]">{t("create.botSourceTicketHint")}</div>
               </button>
             </div>
+            {botSource === "ticket" && (
+              <a href={supportInvite} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                {t("create.openTickets")}
+              </a>
+            )}
           </div>
         );
       case "discord:modules":
       case "discord:commands": {
-        if (flavor !== "custom") {
-          const bot = OFFICIAL_BOTS.find((b) => b.id === flavor);
-          const cats = COMMAND_CATALOG.categories.filter((cat) =>
-            cat.commands.some((c) => c.source.toLowerCase().includes(bot?.name.toLowerCase() ?? "")),
-          );
-          return (
-            <p className="text-sm leading-relaxed text-[var(--muted)]">
-              {t("create.officialIncludes", {
-                name: bot?.name ?? flavor,
-                list: cats.map((c) => c.name).join(", ") || t("create.none"),
-              })}
-            </p>
-          );
-        }
         const q = cmdQuery.trim().toLowerCase();
         return (
           <div className="space-y-4">
@@ -663,7 +705,7 @@ export default function CreateServicePage() {
             <div>
               <div className="label mb-1">{t("create.ram")}</div>
               <div className="flex flex-wrap gap-2">
-                {[512, 1024, 2048, 4096, 8192, 16384].map((m) => (
+                {ramPresets.map((m) => (
                   <button
                     key={m}
                     type="button"
@@ -678,6 +720,7 @@ export default function CreateServicePage() {
                   className="input w-32"
                   type="number"
                   value={memoryMb}
+                  max={typeLimits?.memoryMb}
                   onChange={(e) => setMemoryMb(Number(e.target.value))}
                 />
               </div>
@@ -685,7 +728,7 @@ export default function CreateServicePage() {
             <div>
               <div className="label mb-1">{t("create.cpu")}</div>
               <div className="flex flex-wrap gap-2">
-                {[500, 1000, 2000, 4000].map((c) => (
+                {cpuPresets.map((c) => (
                   <button
                     key={c}
                     type="button"
@@ -700,6 +743,7 @@ export default function CreateServicePage() {
                   className="input w-32"
                   type="number"
                   value={cpu}
+                  max={typeLimits?.cpuMillicores}
                   onChange={(e) => setCpu(Number(e.target.value))}
                 />
               </div>
@@ -710,6 +754,7 @@ export default function CreateServicePage() {
                 className="input"
                 type="number"
                 value={storageMb}
+                max={typeLimits?.storageMb}
                 onChange={(e) => setStorageMb(Number(e.target.value))}
               />,
             )}
@@ -746,8 +791,8 @@ export default function CreateServicePage() {
             {type === "discord" && (
               <>
                 <div>
-                  <span className="label">{t("create.stepFlavor")}</span>
-                  <div className="mt-1">{flavor}</div>
+                  <span className="label">{t("create.stepBotSource")}</span>
+                  <div className="mt-1">{t("create.botSourceCatalog")}</div>
                 </div>
                 <div>
                   <span className="label">{t("create.prefix")}</span>
@@ -757,9 +802,7 @@ export default function CreateServicePage() {
                 </div>
                 <div>
                   <span className="label">{t("create.stepCommands")}</span>
-                  <div className="mt-1">
-                    {flavor === "custom" ? commands.join(", ") || t("create.none") : t("create.officialPack")}
-                  </div>
+                  <div className="mt-1">{commands.join(", ") || t("create.none")}</div>
                 </div>
                 <div>
                   <span className="label">{t("discord.botToken")}</span>
@@ -797,10 +840,38 @@ export default function CreateServicePage() {
     }
   };
 
+  if (type === "minecraft" && platform && !platform.minecraftEnabled) {
+    return (
+      <div className="mx-auto max-w-3xl">
+        <PageHeader title={t("create.title", { type: t("nav.minecraft") })} subtitle={t("create.costHint")} />
+        <ErrorText error="La création de serveurs Minecraft est désactivée." />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader title={t("create.title", { type: t(`nav.${type}`) })} subtitle={t("create.costHint")} />
-      <div className="mb-5 mt-3 flex flex-wrap gap-1">
+      <div className="mb-4 flex flex-wrap gap-2">
+        {CREATE_TYPES.filter((kind) => kind !== "minecraft" || platform?.minecraftEnabled !== false).map((kind) => (
+          <button
+            key={kind}
+            type="button"
+            className={kind === type ? "btn btn-primary" : "btn"}
+            onClick={() => {
+              if (kind !== type) router.push(`/dashboard/new/${kind}`);
+            }}
+          >
+            {kind === "discord" ? t("services.newDiscord") : kind === "minecraft" ? t("services.newMinecraft") : t("services.newWeb")}
+          </button>
+        ))}
+      </div>
+      {livePromos.length > 0 && (
+        <p className="mb-3 text-sm text-[var(--gold)]">
+          {livePromos.map((row) => `${row.label} −${row.percent} %`).join(" · ")}
+        </p>
+      )}
+      <div className="mb-5 mt-3 flex flex-wrap gap-1 overflow-x-auto">
         {STEPS.map((s, i) => (
           <button
             key={s}
@@ -815,17 +886,21 @@ export default function CreateServicePage() {
 
       <div className="panel p-5">{content()}</div>
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <button className="btn" disabled={step === 0} onClick={() => setStep(step - 1)}>
           <ChevronLeft size={14} /> {t("common.back")}
         </button>
         <ErrorText error={error} />
         {error && /insuffisant|INSUFFICIENT_KRONES/i.test(error) && (
-          <Link href="/dashboard/krones" className="btn">
-            {t("nav.krones")}
-          </Link>
+          <a href="/krones" className="btn btn-primary" target="_top">
+            {t("krones.shop")}
+          </a>
         )}
-        {step < STEPS.length - 1 ? (
+        {type === "discord" && botSource === "ticket" ? (
+          <a href={supportInvite} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+            {t("create.openTickets")}
+          </a>
+        ) : step < STEPS.length - 1 ? (
           <button className="btn btn-primary" onClick={() => setStep(step + 1)}>
             {t("create.next")} <ChevronRight size={14} />
           </button>

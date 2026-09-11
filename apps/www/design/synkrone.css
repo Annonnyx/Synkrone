@@ -1,6 +1,5 @@
 /* Synkrone — coquille unique (salle machines). Chargé en dernier. */
-
-@import url("https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap");
+/* Polices : lien async dans le HTML, pas d'@import (bloque le premier rendu). */
 
 :root {
     --pierre: #eef0ea;
@@ -477,6 +476,7 @@ table.sk-table {
     display: flex;
     flex-direction: column;
     height: 100%;
+    height: 100dvh;
     background: var(--sk-bg);
 }
 
@@ -996,33 +996,66 @@ button.tab-btn.active {
 
 @media (max-width: 860px) {
     .chrome {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: minmax(0, auto) auto minmax(0, 1fr);
+        align-items: center;
         height: auto;
         min-height: 52px;
         padding: 8px 10px;
-        grid-template-columns: none;
+        padding-top: max(8px, env(safe-area-inset-top));
+        column-gap: 8px;
+        overflow: visible;
     }
 
     header#app-header,
     #app-header {
-        display: flex;
-        width: 100%;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 52px;
+        display: contents;
+        width: auto;
+        min-height: 0;
     }
 
-    .header-top,
-    .header-bottom {
-        grid-column: auto;
-        justify-self: auto;
+    .header-top {
+        grid-column: 1;
+        justify-self: start;
+        min-width: 0;
     }
 
     #menu-container {
-        width: 100%;
-        grid-column: auto;
+        grid-column: 2;
+        width: auto;
+        position: relative;
+        z-index: 50;
     }
+
+    .header-bottom {
+        grid-column: 3;
+        justify-self: end;
+        min-width: 0;
+    }
+
+    .header-brand .brand-tld { display: none; }
+    .header-brand { gap: 8px; font-size: 16px; }
+    .header-brand img { width: 26px; height: 26px; }
+
+    .header-user {
+        flex-wrap: nowrap;
+        gap: 6px;
+    }
+
+    .btn-roulette,
+    .user-name,
+    .badge-role,
+    .badge-admin,
+    .sk-app-nav { display: none; }
+
+    .btn-krones {
+        min-height: 36px;
+        padding: 0 8px 0 8px;
+        gap: 6px;
+    }
+
+    .btn-krones-label { display: none; }
+    .btn-krones-value { padding-left: 0; border-left: 0; }
 
     .sk-nav-toggle { display: inline-flex; }
 
@@ -1030,16 +1063,18 @@ button.tab-btn.active {
         display: none;
         flex-direction: column;
         height: auto;
-        position: absolute;
-        left: 8px;
-        right: 8px;
-        top: calc(100% + 4px);
-        z-index: 40;
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        top: calc(env(safe-area-inset-top) + 56px);
+        z-index: 60;
         background: var(--sk-surface);
         border: 1px solid var(--sk-border);
         box-shadow: var(--sk-shadow);
         padding: 6px;
         width: auto;
+        max-height: min(70dvh, 480px);
+        overflow-y: auto;
     }
 
     #menu-container.nav-open #app-nav .nav-tabs,
@@ -1060,9 +1095,31 @@ button.tab-btn.active {
     }
 
     .roulette-text { display: none; }
-    .user-name { max-width: 88px; }
-    .sk-app-nav { display: none; }
-    body.hide-brand-mobile #app-header .header-top { display: none; }
+
+    #section-menu-container .sub-nav,
+    .sub-nav {
+        padding: 6px 10px;
+        min-height: 44px;
+    }
+
+    .app-container > footer,
+    .sk-footer,
+    footer.sk-footer {
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 36px;
+        padding: 6px 10px;
+        padding-bottom: max(6px, env(safe-area-inset-bottom));
+        gap: 8px;
+    }
+
+    .footer-links {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px 12px;
+    }
+
+    body.hide-brand-mobile #app-header .header-top { display: flex; }
 }
 
 @media (prefers-reduced-motion: reduce) {

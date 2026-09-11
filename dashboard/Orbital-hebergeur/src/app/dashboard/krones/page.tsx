@@ -13,29 +13,21 @@ type Wallet = {
   balance: number;
   plan: string;
   linkedDiscord: boolean;
+  unlimited?: boolean;
+  privilege?: string | null;
+  lowBalance?: boolean;
   ledger: Array<{ id: string; type: string; amount: number; reason: string; at: number; balanceAfter: number }>;
-};
-
-type Catalog = {
-  packs: Array<{ id: string; label: string; krones: number }>;
-  subscriptions: Array<{ id: string; name: string; krones: number; perk: string }>;
 };
 
 export default function KronesPage() {
   const t = useT();
   const { locale } = useI18n();
   const [wallet, setWallet] = useState<Wallet | null>(null);
-  const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const [w, c] = await Promise.all([
-        api<Wallet>("/api/krones", { silent: true }),
-        api<Catalog>("/api/krones/catalog", { silent: true }),
-      ]);
-      setWallet(w);
-      setCatalog(c);
+      setWallet(await api<Wallet>("/api/krones", { silent: true }));
       setError(null);
     } catch (err) {
       setError((err as Error).message);
@@ -44,24 +36,36 @@ export default function KronesPage() {
 
   usePoll(load, 15000);
 
-  const credit = async (amount: number, reason: string) => {
-    await api("/api/krones/credit", { json: { amount, reason } });
-    await load();
-  };
-
   const loc = locale === "en" ? "en-GB" : "fr-FR";
 
   return (
     <div>
       <PageHeader title={t("krones.title")} subtitle={t("krones.subtitle")} />
       <ErrorText error={error} />
+      {wallet?.lowBalance && !wallet.unlimited && (
+        <div
+          className="mb-4 rounded-lg border px-3 py-3 text-sm"
+          style={{
+            borderColor: "rgba(184, 130, 61, 0.45)",
+            background: "rgba(184, 130, 61, 0.14)",
+            color: "#e3b675",
+          }}
+        >
+          <p>{t("krones.lowBalance")}</p>
+          <a href="/krones" className="btn btn-primary mt-2" target="_top">
+            {t("krones.shop")}
+          </a>
+        </div>
+      )}
       <div className="mb-6 grid gap-3 md:grid-cols-3">
         <div className="panel p-4">
           <div className="label">{t("krones.balance")}</div>
           <div className="mt-1 font-serif text-3xl text-[var(--gold)]">
-            {(wallet?.balance ?? 0).toLocaleString(loc)} ₭
+            {wallet?.unlimited ? t("krones.unlimited") : `${(wallet?.balance ?? 0).toLocaleString(loc)} ₭`}
           </div>
           <p className="hint mt-1">{t("krones.plan", { name: wallet?.plan || t("common.none") })}</p>
+          {wallet?.privilege === "admin" && <p className="hint">{t("krones.privilegeAdmin")}</p>}
+          {wallet?.privilege === "dev" && <p className="hint">{t("krones.privilegeDev")}</p>}
         </div>
         <div className="panel p-4">
           <div className="label">{t("krones.identity")}</div>
@@ -76,24 +80,19 @@ export default function KronesPage() {
         </div>
         <div className="panel p-4">
           <div className="label">{t("krones.publicSite")}</div>
-          <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{t("krones.publicHint")}</p>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{t("krones.shopHint")}</p>
+          <a href="/krones" className="btn btn-primary mt-3" target="_top">
+            {t("krones.shop")}
+          </a>
         </div>
       </div>
 
       <div className="mb-6">
         <h2 className="mb-3 text-sm font-semibold">{t("krones.packs")}</h2>
-        <div className="flex flex-wrap gap-2">
-          {(catalog?.packs ?? []).map((pack) => (
-            <button
-              key={pack.id}
-              type="button"
-              className="btn"
-              onClick={() => void credit(pack.krones, `pack:${pack.id}`)}
-            >
-              {pack.label} · {pack.krones.toLocaleString(loc)} ₭
-            </button>
-          ))}
-        </div>
+        <p className="mb-3 text-sm text-[var(--muted)]">{t("krones.shopHint")}</p>
+        <a href="/krones" className="btn btn-primary" target="_top">
+          {t("krones.shop")}
+        </a>
       </div>
 
       <h2 className="mb-3 text-sm font-semibold">{t("krones.ledger")}</h2>

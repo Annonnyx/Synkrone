@@ -48,6 +48,15 @@
             display: flex;
             background: var(--bg);
         }
+        @media (max-width: 800px) {
+            html, body {
+                width: 100%;
+                height: auto;
+                min-height: 100%;
+                overflow: auto;
+                display: block;
+            }
+        }
 
         /* Couche dynamique pour le background personnalisé du profil */
         #dynamic-bg {
@@ -380,7 +389,7 @@
                         ${store.user ? `
                             <button class="btn btn-primary" onclick="navigate('myservers')">Mes serveurs</button>
                         ` : `
-                            <button class="btn btn-outline" onclick="window.top.location.href='/hebergement/login'">Se connecter pour ajouter un serveur</button>
+                            <button class="btn btn-outline" onclick="window.top.location.href='/login?returnTo=/discord/bump'">Se connecter pour ajouter un serveur</button>
                         `}
                     </div>
                 </div>
