@@ -11,20 +11,34 @@
 <main class="admin-page">
     <header class="admin-head">
         <div>
-            <h1>Services hébergés</h1>
-            <p class="admin-lead">Tous les services : démarrer, arrêter, puis fichiers.</p>
+            <h1>Services clients</h1>
+            <p class="admin-lead">Tous les services hébergés. Couper un type bloque seulement les nouvelles créations.</p>
         </div>
     </header>
 
     <section class="admin-card">
+        <h2>Nouvelles créations</h2>
+        <p class="admin-lead">Décochez pour empêcher les clients d’en créer. Les instances déjà en place restent inchangées.</p>
+        <form id="creation-form">
+            <label class="admin-check"><input type="checkbox" id="discordEnabled"> Autoriser les bots Discord</label>
+            <label class="admin-check"><input type="checkbox" id="minecraftEnabled"> Autoriser les serveurs Minecraft</label>
+            <label class="admin-check"><input type="checkbox" id="webEnabled"> Autoriser les sites</label>
+            <div class="row"><button type="submit" class="sk-btn-primary">Enregistrer</button></div>
+            <p class="status" id="creation-status"></p>
+        </form>
+    </section>
+
+    <section class="admin-card">
+        <div class="admin-stats" id="stats"></div>
         <div class="admin-toolbar">
             <input id="q" type="search" placeholder="Filtrer nom, type, propriétaire…">
+            <div class="admin-filters" id="filters"></div>
             <button type="button" class="sk-btn ghost" id="reload">Actualiser</button>
         </div>
         <p class="status" id="status"></p>
         <div class="admin-table-wrap">
             <table class="admin-table">
-                <thead><tr><th>Service</th><th>Type</th><th>État</th><th>Propriétaire</th><th>Ressources</th><th></th></tr></thead>
+                <thead><tr><th>Service</th><th>Type</th><th>État</th><th>Client</th><th>Ressources</th><th></th></tr></thead>
                 <tbody id="rows"></tbody>
             </table>
         </div>
@@ -49,10 +63,36 @@
     </section>
 </main>
 <script>
+const TYPE_LABEL = { discord: 'Bot', minecraft: 'Minecraft', web: 'Site' };
+const STATE_LABEL = {
+    CREATING: 'Création',
+    STARTING: 'Démarrage',
+    RUNNING: 'En cours',
+    STOPPING: 'Arrêt',
+    STOPPED: 'Arrêté',
+    RESTARTING: 'Redémarrage',
+    CRASHED: 'Planté',
+    ERROR: 'Erreur',
+    DELETING: 'Suppression'
+};
+const FILTERS = [
+    { id: '', label: 'Tous' },
+    { id: 'discord', label: 'Bots' },
+    { id: 'minecraft', label: 'Minecraft' },
+    { id: 'web', label: 'Sites' }
+];
+
 let services = [];
 let currentId = '';
+let typeFilter = '';
 
 function setStatus(t) { document.getElementById('status').textContent = t || ''; }
+
+function esc(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+}
 
 async function act(id, action) {
     const res = await fetch(`/api/admin/hosting/services/${id}/${action}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
@@ -61,24 +101,60 @@ async function act(id, action) {
     if (res.ok) load();
 }
 
+function counts() {
+    const out = { all: services.length, discord: 0, minecraft: 0, web: 0 };
+    for (const s of services) {
+        if (out[s.type] !== undefined) out[s.type] += 1;
+    }
+    return out;
+}
+
+function renderStats() {
+    const c = counts();
+    document.getElementById('stats').innerHTML = `
+        <div class="admin-stat"><p class="admin-stat-label">Tous</p><p class="admin-stat-value">${c.all}</p></div>
+        <div class="admin-stat"><p class="admin-stat-label">Bots</p><p class="admin-stat-value">${c.discord}</p></div>
+        <div class="admin-stat"><p class="admin-stat-label">Minecraft</p><p class="admin-stat-value">${c.minecraft}</p></div>
+        <div class="admin-stat"><p class="admin-stat-label">Sites</p><p class="admin-stat-value">${c.web}</p></div>
+    `;
+    document.getElementById('filters').innerHTML = FILTERS.map((item) => `
+        <button type="button" class="sk-btn ghost${typeFilter === item.id ? ' is-active' : ''}" data-filter="${item.id}">
+            ${item.label}${item.id ? ` (${c[item.id] || 0})` : ` (${c.all})`}
+        </button>
+    `).join('');
+}
+
 function render() {
     const q = document.getElementById('q').value.toLowerCase();
-    const rows = services.filter((s) => JSON.stringify(s).toLowerCase().includes(q));
+    const rows = services.filter((s) => {
+        if (typeFilter && s.type !== typeFilter) return false;
+        return JSON.stringify(s).toLowerCase().includes(q);
+    });
+    renderStats();
     document.getElementById('rows').innerHTML = rows.map((s) => `
         <tr>
-            <td>${s.name}<br><span class="admin-id">${s.slug || s.id}</span></td>
-            <td>${s.type}</td>
-            <td>${s.state}</td>
-            <td>${s.ownerName || ''}<br><span class="admin-id">${s.ownerEmail || s.ownerId || ''}</span></td>
-            <td>${(s.cpuLimit / 1000).toFixed(1)} CPU · ${s.memoryLimitMb} Mo</td>
+            <td>${esc(s.name)}<br><span class="admin-id">${esc(s.slug || s.id)}</span></td>
+            <td>${esc(TYPE_LABEL[s.type] || s.type)}</td>
+            <td>${esc(STATE_LABEL[s.state] || s.state)}</td>
+            <td>${esc(s.ownerName || '')}<br><span class="admin-id">${esc(s.ownerEmail || s.ownerId || '')}</span></td>
+            <td>${(s.cpuLimit / 1000).toFixed(1)} CPU · ${esc(s.memoryLimitMb)} Mo</td>
             <td class="admin-actions">
-                <button type="button" class="sk-btn ghost" data-a="start" data-id="${s.id}">Démarrer</button>
-                <button type="button" class="sk-btn danger" data-a="stop" data-id="${s.id}">Arrêter</button>
-                <button type="button" class="sk-btn ghost" data-a="restart" data-id="${s.id}">Redémarrer</button>
-                <button type="button" class="sk-btn ghost" data-files="${s.id}" data-name="${s.name}">Fichiers</button>
+                <button type="button" class="sk-btn ghost" data-a="start" data-id="${esc(s.id)}">Démarrer</button>
+                <button type="button" class="sk-btn danger" data-a="stop" data-id="${esc(s.id)}">Arrêter</button>
+                <button type="button" class="sk-btn ghost" data-a="restart" data-id="${esc(s.id)}">Redémarrer</button>
+                <button type="button" class="sk-btn ghost" data-files="${esc(s.id)}" data-name="${esc(s.name)}">Fichiers</button>
             </td>
         </tr>
     `).join('') || '<tr><td colspan="6">Aucun service.</td></tr>';
+}
+
+async function loadPlatform() {
+    const res = await fetch('/api/admin/platform');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Lecture plateforme impossible');
+    document.getElementById('discordEnabled').checked = data.discordEnabled !== false;
+    document.getElementById('minecraftEnabled').checked = data.minecraftEnabled !== false;
+    document.getElementById('webEnabled').checked = data.webEnabled !== false;
 }
 
 async function load() {
@@ -87,7 +163,7 @@ async function load() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) { setStatus(data.error || 'Panel injoignable'); return; }
     services = data.services || [];
-    setStatus(`${services.length} service(s)`);
+    setStatus(`${services.length} service(s) client`);
     render();
 }
 
@@ -100,8 +176,8 @@ async function listFiles() {
     document.getElementById('file-rows').innerHTML = (data.entries || []).map((e) => `
         <tr>
             <td>${e.type === 'directory' ? 'dossier' : 'fichier'}</td>
-            <td><a href="#" data-open="${e.path}" data-kind="${e.type}">${e.name}</a></td>
-            <td>${e.size}</td>
+            <td><a href="#" data-open="${esc(e.path)}" data-kind="${esc(e.type)}">${esc(e.name)}</a></td>
+            <td>${esc(e.size)}</td>
         </tr>
     `).join('');
 }
@@ -127,6 +203,13 @@ document.getElementById('rows').addEventListener('click', (e) => {
     }
 });
 
+document.getElementById('filters').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-filter]');
+    if (!btn) return;
+    typeFilter = btn.dataset.filter || '';
+    render();
+});
+
 document.getElementById('file-rows').addEventListener('click', (e) => {
     const a = e.target.closest('a[data-open]');
     if (!a) return;
@@ -136,6 +219,30 @@ document.getElementById('file-rows').addEventListener('click', (e) => {
         listFiles();
     } else {
         openFile(a.dataset.open);
+    }
+});
+
+document.getElementById('creation-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('creation-status');
+    try {
+        const res = await fetch('/api/admin/platform', {
+            method: 'PATCH',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+                discordEnabled: document.getElementById('discordEnabled').checked,
+                minecraftEnabled: document.getElementById('minecraftEnabled').checked,
+                webEnabled: document.getElementById('webEnabled').checked
+            })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Échec.');
+        document.getElementById('discordEnabled').checked = data.discordEnabled !== false;
+        document.getElementById('minecraftEnabled').checked = data.minecraftEnabled !== false;
+        document.getElementById('webEnabled').checked = data.webEnabled !== false;
+        status.textContent = 'Enregistré. Les services déjà créés ne changent pas.';
+    } catch (err) {
+        status.textContent = err.message;
     }
 });
 
@@ -155,7 +262,9 @@ document.getElementById('save-file').addEventListener('click', async () => {
     setStatus(res.ok ? 'Fichier enregistré' : (data.error || 'écriture impossible'));
 });
 
-load();
+Promise.all([load(), loadPlatform()]).catch((err) => {
+    setStatus(err.message);
+});
 </script>
 </body>
 </html>

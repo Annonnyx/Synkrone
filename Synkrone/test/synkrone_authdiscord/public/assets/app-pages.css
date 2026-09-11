@@ -419,3 +419,164 @@ h1, h2, h3 {
     background: rgba(27, 33, 30, 0.45);
     backdrop-filter: none;
 }
+
+.me-intro h1,
+.me-edit-head h2,
+.me-section h3 {
+    font-family: "Zilla Slab", Georgia, serif;
+    letter-spacing: -0.02em;
+}
+
+.me-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.me-intro h1 {
+    margin: 0 0 4px;
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+
+.me-intro p,
+.me-hint {
+    margin: 0;
+    color: #5c6a66;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.me-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.user-card.featured,
+.user-list-item.featured {
+    background: #f3e7d3 !important;
+    border-color: #b8823d !important;
+}
+
+.user-card .me-card-banner {
+    height: 72px;
+    margin: -20px -20px 14px;
+    background: #e3e6dd center/cover no-repeat;
+    border-bottom: 1px solid #5c6a661f;
+}
+
+.me-banner-frame {
+    height: 180px;
+    background: #e3e6dd center/cover no-repeat;
+}
+
+.me-banner-pick {
+    display: grid;
+    gap: 12px;
+}
+
+.me-banner-preview {
+    min-height: 140px;
+    border: 1px dashed #5c6a6640;
+    border-radius: 6px;
+    background: #e3e6dd center/cover no-repeat;
+}
+
+.me-banner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.me-banner-actions input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+}
+
+.me-preview {
+    overflow: hidden;
+    border: 1px solid #5c6a661f;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.me-preview-hero {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px 16px;
+    margin-top: -28px;
+}
+
+.me-preview-hero img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    background: #eef0ea;
+}
+
+.me-section {
+    margin-top: 22px;
+    padding-top: 4px;
+}
+
+.me-section h3 {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+}
+
+.me-privacy {
+    display: grid;
+    gap: 10px;
+}
+
+.me-privacy label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #eef0ea;
+    border-radius: 6px;
+}
+
+.rank-badge {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+
+.rank-base { background: #e3e6dd !important; color: #5c6a66 !important; }
+.rank-soutien { background: #e4ece4 !important; color: #2e5039 !important; }
+.rank-vip { background: #f3e7d3 !important; color: #b8823d !important; }
+.rank-premium { background: #f5e2dc !important; color: #a8462f !important; }
+
+.like-btn-mini,
+.like-main-btn.liked {
+    color: #a8462f !important;
+    border-color: #a8462f !important;
+    background: #f5e2dc !important;
+}
+
+.link-item {
+    background: #eef0ea !important;
+    border-color: #5c6a661f !important;
+}
+
+.link-texts strong { color: #1b211e !important; }
+.link-texts span { color: #5c6a66 !important; }
+
+.me-status {
+    min-height: 1.2em;
+    font-size: 13px;
+    color: #5c6a66;
+}

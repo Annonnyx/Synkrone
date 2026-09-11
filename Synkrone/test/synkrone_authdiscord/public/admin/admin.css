@@ -120,6 +120,22 @@ body.admin-body {
     flex: 1 1 12rem;
 }
 
+.admin-toolbar .admin-filters {
+    margin: 0;
+    flex: 1 1 auto;
+}
+
+.admin-toolbar .admin-filters > .sk-btn {
+    flex: 0 0 auto;
+}
+
+.sk-btn.is-active,
+.sk-btn.ghost.is-active {
+    border-color: var(--mousse, #3f6b52);
+    background: var(--mousse-clair, #e4ece4);
+    color: var(--basalte, #1b211e);
+}
+
 .admin-toolbar input,
 .row input[type="search"],
 .row input[type="text"] {

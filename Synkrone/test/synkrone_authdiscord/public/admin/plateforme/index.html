@@ -12,13 +12,16 @@
     <header class="admin-head">
         <div>
             <h1>Plateforme</h1>
-            <p class="admin-lead">Minecraft, plafonds CPU / RAM / stockage, et réductions limitées dans le temps.</p>
+            <p class="admin-lead">Création des bots, sites et serveurs, plafonds CPU / RAM / stockage, et réductions limitées dans le temps.</p>
         </div>
     </header>
 
     <section class="admin-card">
         <form id="form">
+            <p class="admin-lead">Décochez pour empêcher les nouvelles créations. Les services déjà créés restent inchangés.</p>
+            <label class="admin-check"><input type="checkbox" id="discordEnabled"> Autoriser la création de bots Discord</label>
             <label class="admin-check"><input type="checkbox" id="minecraftEnabled"> Autoriser la création de serveurs Minecraft</label>
+            <label class="admin-check"><input type="checkbox" id="webEnabled"> Autoriser la création de sites</label>
             <p class="admin-lead">Le global plafonne toute la plateforme. Les lignes dessous plafonnent chaque type.</p>
             <div class="admin-limits-wrap">
                 <table class="admin-limits">
@@ -125,7 +128,9 @@ document.getElementById('promo-targets').innerHTML = TARGETS.map((item) => `
 
 function fill(data) {
     platform = data;
+    document.getElementById('discordEnabled').checked = data.discordEnabled !== false;
     document.getElementById('minecraftEnabled').checked = data.minecraftEnabled !== false;
+    document.getElementById('webEnabled').checked = data.webEnabled !== false;
     document.getElementById('maxCpuMillicores').value = data.maxCpuMillicores;
     document.getElementById('maxMemoryMb').value = data.maxMemoryMb;
     document.getElementById('maxStorageMb').value = data.maxStorageMb;
@@ -187,7 +192,9 @@ document.getElementById('form').addEventListener('submit', async (e) => {
     }
     try {
         await save({
+            discordEnabled: document.getElementById('discordEnabled').checked,
             minecraftEnabled: document.getElementById('minecraftEnabled').checked,
+            webEnabled: document.getElementById('webEnabled').checked,
             maxCpuMillicores: Number(document.getElementById('maxCpuMillicores').value),
             maxMemoryMb: Number(document.getElementById('maxMemoryMb').value),
             maxStorageMb: Number(document.getElementById('maxStorageMb').value),

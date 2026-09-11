@@ -16,7 +16,7 @@ const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
 const DEFAULT_PORT = 3668;
-const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/design', '/api', '/hebergement'];
+const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/me-media', '/design', '/api', '/hebergement'];
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
 const CONTACT_COOLDOWN_MS = 10 * 60 * 1000;
 const DEFAULT_SUPPORT_GUILD_ID = '1368235294192570520';
@@ -26,6 +26,41 @@ const BOT_OWNER_CACHE_TTL_MS = 5 * 60 * 1000;
 const SESSION_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
 
 const USERS_DB_PATH = path.join(__dirname, 'data', 'users.json');
+const ME_UPLOADS_DIR = path.join(__dirname, 'data', 'uploads', 'me');
+const BANNER_MAX_BYTES = 3 * 1024 * 1024;
+const BANNER_TYPES = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif'
+};
+
+function isCustomBanner(url) {
+    return String(url || '').startsWith('/me-media/');
+}
+
+function bannerExtFromBuffer(buf) {
+    if (!buf || buf.length < 12) return null;
+    if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'jpg';
+    if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'png';
+    if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46) return 'gif';
+    if (buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46
+        && buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) return 'webp';
+    return null;
+}
+
+async function removeOldMeBanners(userId) {
+    const prefix = `${String(userId).replace(/[^a-zA-Z0-9_-]/g, '')}-`;
+    let names = [];
+    try {
+        names = await fs.readdir(ME_UPLOADS_DIR);
+    } catch {
+        return;
+    }
+    await Promise.all(names
+        .filter((name) => name.startsWith(prefix))
+        .map((name) => fs.unlink(path.join(ME_UPLOADS_DIR, name)).catch(() => undefined)));
+}
 let kronesApi = null;
 try {
     kronesApi = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'krones'));
@@ -309,14 +344,20 @@ function normalizeStoredUser(user, userId) {
         isTeamOwner: safeOwner, isGuest: false, createdAt: Number(user?.createdAt) || now,
         updatedAt: Number(user?.updatedAt) || now, lastSeenAt: Number(user?.lastSeenAt) || now, lastLoginAt: Number(user?.lastLoginAt) || now,
         customUrl: String(user?.customUrl || ''),
+        name: String(user?.name || user?.username || `Utilisateur ${safeId.slice(-4) || safeId}`),
         subtitle: String(user?.subtitle || 'Nouveau membre.'),
-        banner: String(user?.banner || 'https://placehold.co/800x200/181a1b/2d3033?text=Ma+Banni re'),
+        banner: isCustomBanner(user?.banner) || String(user?.banner || '').startsWith('http')
+            ? String(user.banner)
+            : '',
+        bannerCustom: Boolean(user?.bannerCustom) || isCustomBanner(user?.banner),
         privacy: String(user?.privacy || 'private'),
         unlockedPrivacies: Array.isArray(user?.unlockedPrivacies) ? user.unlockedPrivacies : ['private'],
         links: Array.isArray(user?.links) ? user.links : [],
-        customTheme: typeof user?.customTheme === 'object' ? user.customTheme : { active: false, bg: '#181a1b', text: '#ffffff', border: '#e14f4f', panelBg: 'rgba(0,0,0,0.2)' },
+        customTheme: typeof user?.customTheme === 'object' ? user.customTheme : { active: false, bg: '#eef0ea', text: '#1b211e', border: '#3f6b52', panelBg: '#ffffff' },
         extraLinkSlots: Number.isFinite(Number(user?.extraLinkSlots)) ? Math.max(0, Number(user.extraLinkSlots)) : 0,
         hasCustomization: Boolean(user?.hasCustomization),
+        featuredUntil: Number(user?.featuredUntil) || 0,
+        autoRenewFeatured: Boolean(user?.autoRenewFeatured),
         likedProfiles: Array.isArray(user?.likedProfiles) ? user.likedProfiles : [],
         stats: typeof user?.stats === 'object' ? user.stats : { visitsTotal: 0, visitsMonth: 0, likesTotal: 0, likesMonth: 0 }
     };
@@ -342,15 +383,21 @@ async function upsertUserFromDiscordAuth(discordUser, isTeamOwner) {
     const existing = normalizeStoredUser(db.users[userId], userId);
     const now = Date.now();
     
-    const bannerUrl = discordUser.banner 
-        ? `https://cdn.discordapp.com/banners/${userId}/${discordUser.banner}.png?size=512` 
-        : existing?.banner || 'https://placehold.co/800x200/181a1b/2d3033?text=Ma+Banni re';
+    const keepBanner = Boolean(existing?.bannerCustom) || isCustomBanner(existing?.banner);
+    const discordBanner = discordUser.banner
+        ? `https://cdn.discordapp.com/banners/${userId}/${discordUser.banner}.png?size=512`
+        : '';
+    const bannerUrl = keepBanner
+        ? existing.banner
+        : (discordBanner || existing?.banner || '');
         
     const nextUser = {
         ...(existing || {}),
         id: userId, username: String(discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${userId.slice(-4)}`),
+        name: String(existing?.name || discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${userId.slice(-4)}`),
         avatar: discordUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${discordUser.avatar}.png` : String(existing?.avatar || '/assets/images/logo.jpg'),
         banner: bannerUrl,
+        bannerCustom: keepBanner,
         role: isTeamOwner === true ? 'Admin' : (existing ? existing.role : 'Krobi'),
         grade: ALLOWED_USER_GRADES.has(String(existing?.grade || '')) ? String(existing.grade) : 'Aucun',
         krone: Number.isFinite(Number(existing?.krone)) ? Math.max(0, Math.trunc(Number(existing.krone))) : 0,
@@ -501,6 +548,8 @@ function mountPublic(app, options = {}) {
 
     const designDir = path.join(__dirname, '..', '..', '..', 'apps', 'www', 'design');
     app.use('/design', express.static(designDir));
+    app.use('/me-media', express.static(ME_UPLOADS_DIR, { fallthrough: true, maxAge: '7d' }));
+    void fs.mkdir(ME_UPLOADS_DIR, { recursive: true }).catch(() => undefined);
 
 async function fetchBotOwnerIds() {
     const token = String(process.env.DISCORD_BOT_TOKEN || '').trim();
@@ -765,20 +814,75 @@ app.post('/api/me/profile', async (req, res) => {
         }
     }
     
-    if (payload.subtitle !== undefined) existing.subtitle = String(payload.subtitle);
-    if (payload.banner !== undefined) existing.banner = String(payload.banner);
+    if (payload.name !== undefined) existing.name = String(payload.name).trim().slice(0, 40) || existing.username;
+    if (payload.subtitle !== undefined) existing.subtitle = String(payload.subtitle).slice(0, 160);
+    if (payload.banner !== undefined) {
+        const nextBanner = String(payload.banner || '').trim();
+        if (nextBanner && !isCustomBanner(nextBanner) && !/^https?:\/\//i.test(nextBanner)) {
+            return res.status(400).json({ ok: false, message: 'Bannière invalide.' });
+        }
+        existing.banner = nextBanner;
+        existing.bannerCustom = isCustomBanner(nextBanner);
+    }
     if (payload.privacy !== undefined) existing.privacy = String(payload.privacy);
     if (Array.isArray(payload.unlockedPrivacies)) existing.unlockedPrivacies = payload.unlockedPrivacies;
     if (Array.isArray(payload.links)) existing.links = payload.links;
     if (typeof payload.customTheme === 'object') existing.customTheme = payload.customTheme;
     if (payload.extraLinkSlots !== undefined) existing.extraLinkSlots = Number(payload.extraLinkSlots);
     if (payload.hasCustomization !== undefined) existing.hasCustomization = Boolean(payload.hasCustomization);
+    if (payload.autoRenewFeatured !== undefined) existing.autoRenewFeatured = Boolean(payload.autoRenewFeatured);
     if (Array.isArray(payload.likedProfiles)) existing.likedProfiles = payload.likedProfiles;
     if (typeof payload.stats === 'object') existing.stats = payload.stats;
     existing.updatedAt = Date.now();
     db.users[sessionUser.id] = existing;
     await writeUsersDb(db);
     return res.json({ ok: true, user: existing });
+});
+
+app.post('/api/me/banner', async (req, res) => {
+    const sessionUser = req.session?.user;
+    if (!sessionUser || sessionUser.isGuest) return res.status(401).json({ ok: false, message: 'Non authentifié' });
+    const db = await readUsersDb();
+    const existing = normalizeStoredUser(db.users[sessionUser.id], sessionUser.id);
+    if (!existing) return res.status(404).json({ ok: false, message: 'Utilisateur introuvable' });
+
+    if (req.body?.clear) {
+        await removeOldMeBanners(sessionUser.id);
+        existing.banner = '';
+        existing.bannerCustom = false;
+        existing.updatedAt = Date.now();
+        db.users[sessionUser.id] = existing;
+        await writeUsersDb(db);
+        return res.json({ ok: true, banner: '', user: existing });
+    }
+
+    const raw = String(req.body?.image || '');
+    const match = raw.match(/^data:(image\/(?:jpeg|png|webp|gif));base64,([A-Za-z0-9+/=\s]+)$/i);
+    if (!match) return res.status(400).json({ ok: false, message: 'Choisissez une image JPEG, PNG, WebP ou GIF.' });
+    const declared = BANNER_TYPES[match[1].toLowerCase()];
+    if (!declared) return res.status(400).json({ ok: false, message: 'Format d’image non pris en charge.' });
+    let buf;
+    try {
+        buf = Buffer.from(match[2].replace(/\s+/g, ''), 'base64');
+    } catch {
+        return res.status(400).json({ ok: false, message: 'Image illisible.' });
+    }
+    if (!buf.length) return res.status(400).json({ ok: false, message: 'Image vide.' });
+    if (buf.length > BANNER_MAX_BYTES) return res.status(413).json({ ok: false, message: 'Image trop lourde (3 Mo max).' });
+    const ext = bannerExtFromBuffer(buf);
+    if (!ext) return res.status(400).json({ ok: false, message: 'Le fichier n’est pas une image valide.' });
+
+    const safeId = String(sessionUser.id).replace(/[^a-zA-Z0-9_-]/g, '') || 'user';
+    await fs.mkdir(ME_UPLOADS_DIR, { recursive: true });
+    await removeOldMeBanners(safeId);
+    const filename = `${safeId}-${Date.now().toString(36)}.${ext}`;
+    await fs.writeFile(path.join(ME_UPLOADS_DIR, filename), buf);
+    existing.banner = `/me-media/${filename}`;
+    existing.bannerCustom = true;
+    existing.updatedAt = Date.now();
+    db.users[sessionUser.id] = existing;
+    await writeUsersDb(db);
+    return res.json({ ok: true, banner: existing.banner, user: existing });
 });
 
 app.get('/api/profiles', async (req, res) => {

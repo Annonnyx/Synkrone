@@ -9,6 +9,8 @@ import { useT } from "@/lib/i18n";
 import { usePoll } from "@/lib/use-poll";
 import { PageHeader } from "@/components/ui";
 import { Bar, EmptyState, ErrorText, Skeleton, StateBadge, TypeIcon } from "@/components/panel";
+import { useCreationFlags } from "@/lib/use-creation-flags";
+import { firstCreateHref, isCreationEnabled } from "@/lib/services/creation-flags";
 
 type Service = {
   id: string;
@@ -79,16 +81,13 @@ function List() {
   const t = useT();
   const [services, setServices] = useState<Service[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [minecraftEnabled, setMinecraftEnabled] = useState<boolean | null>(null);
+  const flags = useCreationFlags();
 
   const load = useCallback(async () => {
     try {
       const d = await api<{ services: Service[] }>("/api/dashboard", { silent: true });
       setServices(d.services);
       setError(null);
-      api<{ minecraftEnabled: boolean }>("/api/platform", { silent: true })
-        .then((p) => setMinecraftEnabled(p.minecraftEnabled))
-        .catch(() => setMinecraftEnabled(true));
     } catch (err) {
       setError((err as Error).message);
     }
@@ -97,7 +96,8 @@ function List() {
   usePoll(load, 10000);
 
   const filtered = (services ?? []).filter((s) => !type || s.type === type);
-  const createHref = createHrefFor(type);
+  const canCreateType = !type || isCreationEnabled(flags, type);
+  const createHref = canCreateType ? (type ? createHrefFor(type) : firstCreateHref(flags)) : null;
   const createLabel = type ? t("services.createInstance") : t("dashboard.createFirst");
 
   return (
@@ -108,17 +108,21 @@ function List() {
         actions={
           type ? undefined : (
             <div className="flex flex-wrap gap-2">
-              <Link href="/dashboard/new/discord" className="btn">
-                <Plus size={14} /> {t("services.newDiscord")}
-              </Link>
-              {minecraftEnabled !== false && (
+              {isCreationEnabled(flags, "discord") && (
+                <Link href="/dashboard/new/discord" className="btn">
+                  <Plus size={14} /> {t("services.newDiscord")}
+                </Link>
+              )}
+              {isCreationEnabled(flags, "minecraft") && (
                 <Link href="/dashboard/new/minecraft" className="btn">
                   <Plus size={14} /> {t("services.newMinecraft")}
                 </Link>
               )}
-              <Link href="/dashboard/new/web" className="btn">
-                <Plus size={14} /> {t("services.newWeb")}
-              </Link>
+              {isCreationEnabled(flags, "web") && (
+                <Link href="/dashboard/new/web" className="btn">
+                  <Plus size={14} /> {t("services.newWeb")}
+                </Link>
+              )}
             </div>
           )
         }
@@ -138,20 +142,26 @@ function List() {
         <div className="flex flex-col items-start gap-4">
           {type ? (
             <>
-              <p className="text-sm text-[var(--muted)]">{t("services.emptyTypeHint")}</p>
-              <Link href={createHref} className="btn btn-primary">
-                <Plus size={14} /> {createLabel}
-              </Link>
+              <p className="text-sm text-[var(--muted)]">
+                {canCreateType ? t("services.emptyTypeHint") : t("services.creationClosed")}
+              </p>
+              {createHref && (
+                <Link href={createHref} className="btn btn-primary">
+                  <Plus size={14} /> {createLabel}
+                </Link>
+              )}
             </>
           ) : (
             <EmptyState
               icon={Server}
               title={t("services.emptyAll")}
-              hint={t("services.emptyHint")}
+              hint={createHref ? t("services.emptyHint") : t("services.creationClosed")}
               action={
-                <Link href={createHref} className="btn btn-primary">
-                  <Plus size={14} /> {createLabel}
-                </Link>
+                createHref ? (
+                  <Link href={createHref} className="btn btn-primary">
+                    <Plus size={14} /> {createLabel}
+                  </Link>
+                ) : undefined
               }
             />
           )}
@@ -165,11 +175,13 @@ function List() {
               <ServiceCard key={s.id} s={s} />
             ))}
           </div>
-          <div className="mt-6">
-            <Link href={createHref} className="btn btn-primary">
-              <Plus size={14} /> {createLabel}
-            </Link>
-          </div>
+          {createHref && (
+            <div className="mt-6">
+              <Link href={createHref} className="btn btn-primary">
+                <Plus size={14} /> {createLabel}
+              </Link>
+            </div>
+          )}
         </>
       )}
     </div>

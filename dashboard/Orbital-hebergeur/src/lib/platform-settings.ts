@@ -20,7 +20,9 @@ export type PromoDiscount = {
 };
 
 export type PlatformSettings = {
+  discordEnabled: boolean;
   minecraftEnabled: boolean;
+  webEnabled: boolean;
   maxCpuMillicores: number;
   maxMemoryMb: number;
   maxStorageMb: number;
@@ -33,7 +35,9 @@ export type PlatformSettings = {
 };
 
 const DEFAULTS: PlatformSettings = {
+  discordEnabled: true,
   minecraftEnabled: true,
+  webEnabled: true,
   maxCpuMillicores: 4000,
   maxMemoryMb: 8192,
   maxStorageMb: 51200,
@@ -64,7 +68,9 @@ export function normalizePlatform(raw: unknown): PlatformSettings {
   const src = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   const limitsIn = src.limits && typeof src.limits === "object" ? (src.limits as Record<string, Record<string, unknown>>) : {};
   const out: PlatformSettings = {
+    discordEnabled: src.discordEnabled !== false,
     minecraftEnabled: src.minecraftEnabled !== false,
+    webEnabled: src.webEnabled !== false,
     maxCpuMillicores: asInt(src.maxCpuMillicores, DEFAULTS.maxCpuMillicores, 100, 16000),
     maxMemoryMb: asInt(src.maxMemoryMb, DEFAULTS.maxMemoryMb, 64, 65536),
     maxStorageMb: asInt(src.maxStorageMb, DEFAULTS.maxStorageMb, 512, 204800),
@@ -80,7 +86,9 @@ export function normalizePlatform(raw: unknown): PlatformSettings {
       storageMb: asInt(row.storageMb, fallback.storageMb, 512, out.maxStorageMb),
     };
   }
+  if (process.env.SYNKRONE_DISABLE_DISCORD === "1") out.discordEnabled = false;
   if (process.env.SYNKRONE_DISABLE_MINECRAFT === "1") out.minecraftEnabled = false;
+  if (process.env.SYNKRONE_DISABLE_WEB === "1") out.webEnabled = false;
   const allowed = new Set(["all", "discord", "minecraft", "web", "ram", "cpu", "storage"]);
   const discountsIn = Array.isArray(src.discounts) ? src.discounts : [];
   const discounts: PromoDiscount[] = [];

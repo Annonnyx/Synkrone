@@ -25,6 +25,8 @@ import { api, STATE_COLORS } from "@/lib/client";
 import { explainError } from "@/lib/errors";
 import { useEngineStatus } from "@/lib/engine-status";
 import { useI18n, useT, LOCALES, type Locale } from "@/lib/i18n";
+import { useCreationFlags } from "@/lib/use-creation-flags";
+import { firstCreateHref } from "@/lib/services/creation-flags";
 
 export function Logo({ size = 22 }: { size?: number }) {
   return (
@@ -214,13 +216,8 @@ export function Sidebar({
   const searchParams = useSearchParams();
   const router = useRouter();
   const t = useT();
-  const [minecraftEnabled, setMinecraftEnabled] = useState(true);
-
-  useEffect(() => {
-    void api<{ minecraftEnabled: boolean }>("/api/platform", { silent: true })
-      .then((p) => setMinecraftEnabled(p.minecraftEnabled !== false))
-      .catch(() => setMinecraftEnabled(true));
-  }, []);
+  const flags = useCreationFlags();
+  const createHref = firstCreateHref(flags);
 
   const NAV = [
     { section: null, items: [{ href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard }] },
@@ -228,7 +225,7 @@ export function Sidebar({
       section: t("nav.projects"),
       items: [
         { href: "/dashboard/services", label: t("nav.allServices"), icon: Server },
-        { href: "/dashboard/new/discord", label: t("nav.newService"), icon: Plus },
+        ...(createHref ? [{ href: createHref, label: t("nav.newService"), icon: Plus }] : []),
         { href: "/dashboard/krones", label: t("nav.krones"), icon: Coins },
       ],
     },
@@ -244,9 +241,7 @@ export function Sidebar({
       section: t("nav.advanced"),
       items: [
         { href: "/dashboard/services?type=discord", label: t("nav.discord"), icon: Bot },
-        ...(minecraftEnabled
-          ? [{ href: "/dashboard/services?type=minecraft", label: t("nav.minecraft"), icon: Boxes }]
-          : []),
+        { href: "/dashboard/services?type=minecraft", label: t("nav.minecraft"), icon: Boxes },
         { href: "/dashboard/services?type=web", label: t("nav.web"), icon: Globe },
         { href: "/dashboard/infrastructure/databases", label: t("nav.databases"), icon: Database },
         { href: "/dashboard/infrastructure/sftp", label: t("nav.sftp"), icon: HardDrive },

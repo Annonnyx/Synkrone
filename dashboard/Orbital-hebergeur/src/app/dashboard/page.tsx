@@ -19,6 +19,8 @@ import {
 } from "@/components/panel";
 import { Server } from "lucide-react";
 import { PageHeader } from "@/components/ui";
+import { useCreationFlags } from "@/lib/use-creation-flags";
+import { firstCreateHref } from "@/lib/services/creation-flags";
 
 type DashboardData = {
   services: Array<{
@@ -73,6 +75,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const t = useT();
   const { locale } = useI18n();
+  const flags = useCreationFlags();
+  const createHref = firstCreateHref(flags);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -98,9 +102,11 @@ export default function DashboardPage() {
             <button className="btn" onClick={() => void load()} disabled={loading}>
               {loading ? <span className="spinner" /> : <RefreshCw size={14} />} {t("common.refresh")}
             </button>
-            <Link href="/dashboard/new/discord" className="btn btn-primary">
-              <Plus size={14} /> {t("dashboard.newService")}
-            </Link>
+            {createHref && (
+              <Link href={createHref} className="btn btn-primary">
+                <Plus size={14} /> {t("dashboard.newService")}
+              </Link>
+            )}
           </div>
         }
       />
@@ -209,11 +215,13 @@ export default function DashboardPage() {
             <EmptyState
               icon={Server}
               title={t("dashboard.noServices")}
-              hint={t("dashboard.noServicesHint")}
+              hint={createHref ? t("dashboard.noServicesHint") : t("services.creationClosed")}
               action={
-                <Link href="/dashboard/new/discord" className="btn btn-primary">
-                  <Plus size={14} /> {t("dashboard.createFirst")}
-                </Link>
+                createHref ? (
+                  <Link href={createHref} className="btn btn-primary">
+                    <Plus size={14} /> {t("dashboard.createFirst")}
+                  </Link>
+                ) : undefined
               }
             />
           )}

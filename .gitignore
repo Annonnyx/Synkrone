@@ -10,3 +10,5 @@ apps/www/data/krones.json
 apps/www/data/krones-orders.json
 apps/www/data/uptime.json
 apps/www/data/*.lock
+Synkrone/test/synkrone_authdiscord/data/uploads/me/*
+!Synkrone/test/synkrone_authdiscord/data/uploads/me/.gitkeep

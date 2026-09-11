@@ -18,6 +18,7 @@ import { hostingCost } from "@/lib/krones/pricing";
 import { activeDiscounts, type PromoDiscount } from "@/lib/krones/discounts";
 import { withPanelBase } from "@/lib/panel-base";
 import { PageHeader } from "@/components/ui";
+import { isCreationEnabled } from "@/lib/services/creation-flags";
 
 const CREATE_TYPES = ["discord", "minecraft", "web"] as const;
 type CreateType = (typeof CREATE_TYPES)[number];
@@ -91,7 +92,9 @@ export default function CreateServicePage() {
   const [cpu, setCpu] = useState(type === "minecraft" ? 2000 : 1000);
   const [storageMb, setStorageMb] = useState(type === "minecraft" ? 20480 : 5120);
   const [platform, setPlatform] = useState<{
+    discordEnabled: boolean;
     minecraftEnabled: boolean;
+    webEnabled: boolean;
     maxCpuMillicores: number;
     maxMemoryMb: number;
     maxStorageMb: number;
@@ -867,11 +870,11 @@ export default function CreateServicePage() {
     }
   };
 
-  if (type === "minecraft" && platform && !platform.minecraftEnabled) {
+  if (platform && !isCreationEnabled(platform, type)) {
     return (
       <div className="mx-auto max-w-3xl">
-        <PageHeader title={t("create.title", { type: t("nav.minecraft") })} subtitle={t("create.costHint")} />
-        <ErrorText error="La création de serveurs Minecraft est désactivée." />
+        <PageHeader title={t("create.title", { type: t(`nav.${type}`) })} subtitle={t("create.disabledHint")} />
+        <ErrorText error={t("create.disabled", { label: t(`nav.${type}`) })} />
       </div>
     );
   }
@@ -880,7 +883,7 @@ export default function CreateServicePage() {
     <div className="mx-auto max-w-3xl">
       <PageHeader title={t("create.title", { type: t(`nav.${type}`) })} subtitle={t("create.costHint")} />
       <div className="mb-4 flex flex-wrap gap-2">
-        {CREATE_TYPES.filter((kind) => kind !== "minecraft" || platform?.minecraftEnabled !== false).map((kind) => (
+        {CREATE_TYPES.filter((kind) => isCreationEnabled(platform, kind)).map((kind) => (
           <button
             key={kind}
             type="button"

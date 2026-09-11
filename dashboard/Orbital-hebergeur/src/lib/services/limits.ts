@@ -1,5 +1,6 @@
 import { HttpError } from "@/lib/auth";
 import { readPlatformSettings, type PlatformSettings, type TypeLimits } from "@/lib/platform-settings";
+import { creationDisabledMessage, isCreationEnabled } from "@/lib/services/creation-flags";
 
 export type ServiceKind = "discord" | "minecraft" | "web";
 
@@ -9,8 +10,8 @@ export function limitsFor(settings: PlatformSettings, type: ServiceKind): TypeLi
 
 export async function assertCreationAllowed(type: string) {
   const settings = await readPlatformSettings();
-  if (type === "minecraft" && !settings.minecraftEnabled) {
-    throw new HttpError(403, "La création de serveurs Minecraft est désactivée.");
+  if (!isCreationEnabled(settings, type)) {
+    throw new HttpError(403, creationDisabledMessage(type));
   }
   return settings;
 }

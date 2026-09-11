@@ -8,7 +8,9 @@ const DATA_PATH = path.join(__dirname, '..', 'data', 'platform.json');
 const DISCOUNT_TARGETS = new Set(['all', 'discord', 'minecraft', 'web', 'ram', 'cpu', 'storage']);
 
 const DEFAULTS = {
+    discordEnabled: true,
     minecraftEnabled: true,
+    webEnabled: true,
     maxCpuMillicores: 4000,
     maxMemoryMb: 8192,
     maxStorageMb: 51200,
@@ -73,7 +75,9 @@ function normalize(raw) {
     const src = raw && typeof raw === 'object' ? raw : {};
     const limitsIn = src.limits && typeof src.limits === 'object' ? src.limits : {};
     const out = {
+        discordEnabled: src.discordEnabled !== false,
         minecraftEnabled: src.minecraftEnabled !== false,
+        webEnabled: src.webEnabled !== false,
         maxCpuMillicores: asInt(src.maxCpuMillicores, DEFAULTS.maxCpuMillicores, 100, 16000),
         maxMemoryMb: asInt(src.maxMemoryMb, DEFAULTS.maxMemoryMb, 64, 65536),
         maxStorageMb: asInt(src.maxStorageMb, DEFAULTS.maxStorageMb, 512, 204800),
@@ -89,7 +93,9 @@ function normalize(raw) {
             storageMb: asInt(row.storageMb, fallback.storageMb, 512, out.maxStorageMb)
         };
     }
+    if (process.env.SYNKRONE_DISABLE_DISCORD === '1') out.discordEnabled = false;
     if (process.env.SYNKRONE_DISABLE_MINECRAFT === '1') out.minecraftEnabled = false;
+    if (process.env.SYNKRONE_DISABLE_WEB === '1') out.webEnabled = false;
     const discountsIn = Array.isArray(src.discounts) ? src.discounts : [];
     out.discounts = discountsIn.map((row, index) => normalizeDiscount(row, index)).filter(Boolean);
     return out;

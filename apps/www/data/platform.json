@@ -1,5 +1,7 @@
 {
+  "discordEnabled": true,
   "minecraftEnabled": true,
+  "webEnabled": true,
   "maxCpuMillicores": 4000,
   "maxMemoryMb": 8192,
   "maxStorageMb": 51200,
