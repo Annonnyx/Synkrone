@@ -19,13 +19,45 @@
     <section class="admin-card">
         <form id="form">
             <label class="admin-check"><input type="checkbox" id="minecraftEnabled"> Autoriser la création de serveurs Minecraft</label>
-            <div class="grid-2">
-                <label>CPU max global (millicores)<input type="number" id="maxCpuMillicores" min="100" max="16000"></label>
-                <label>RAM max globale (Mo)<input type="number" id="maxMemoryMb" min="64" max="65536"></label>
-                <label>Stockage max global (Mo)<input type="number" id="maxStorageMb" min="512" max="204800"></label>
+            <p class="admin-lead">Le global plafonne toute la plateforme. Les lignes dessous plafonnent chaque type.</p>
+            <div class="admin-limits-wrap">
+                <table class="admin-limits">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>CPU <span>millicores</span></th>
+                            <th>RAM <span>Mo</span></th>
+                            <th>Stockage <span>Mo</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Global</th>
+                            <td><input type="number" id="maxCpuMillicores" min="100" max="16000" aria-label="CPU max global"></td>
+                            <td><input type="number" id="maxMemoryMb" min="64" max="65536" aria-label="RAM max globale"></td>
+                            <td><input type="number" id="maxStorageMb" min="512" max="204800" aria-label="Stockage max global"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bots</th>
+                            <td><input type="number" id="discord-cpu" min="64" aria-label="CPU max bots"></td>
+                            <td><input type="number" id="discord-ram" min="64" aria-label="RAM max bots"></td>
+                            <td><input type="number" id="discord-disk" min="64" aria-label="Stockage max bots"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Minecraft</th>
+                            <td><input type="number" id="minecraft-cpu" min="64" aria-label="CPU max Minecraft"></td>
+                            <td><input type="number" id="minecraft-ram" min="64" aria-label="RAM max Minecraft"></td>
+                            <td><input type="number" id="minecraft-disk" min="64" aria-label="Stockage max Minecraft"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Sites</th>
+                            <td><input type="number" id="web-cpu" min="64" aria-label="CPU max sites"></td>
+                            <td><input type="number" id="web-ram" min="64" aria-label="RAM max sites"></td>
+                            <td><input type="number" id="web-disk" min="64" aria-label="Stockage max sites"></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <h2>Plafonds par type</h2>
-            <div class="grid-2" id="types"></div>
             <div class="row"><button type="submit" class="sk-btn-primary">Enregistrer les plafonds</button></div>
             <p class="status" id="status"></p>
         </form>
@@ -85,17 +117,6 @@ const TARGETS = [
 const TARGET_LABEL = Object.fromEntries(TARGETS.map((item) => [item.id, item.label]));
 let platform = { discounts: [] };
 
-function field(id, label) {
-    return `<label>${label}<input type="number" id="${id}" min="64"></label>`;
-}
-document.getElementById('types').innerHTML = types.map((t) => `
-    <div>
-        <strong>${t.label}</strong>
-        ${field(`${t.id}-cpu`, 'CPU millicores')}
-        ${field(`${t.id}-ram`, 'RAM Mo')}
-        ${field(`${t.id}-disk`, 'Stockage Mo')}
-    </div>
-`).join('');
 document.getElementById('promo-targets').innerHTML = TARGETS.map((item) => `
     <label class="admin-check">
         <input type="checkbox" name="promo-target" value="${item.id}"> ${item.label}

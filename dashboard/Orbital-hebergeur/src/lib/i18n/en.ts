@@ -169,6 +169,8 @@ export const en: Dict = {
     empty: "No service in this category.",
     emptyAll: "No services yet.",
     emptyHint: "Create a Discord bot, a Minecraft server or a web project to get started.",
+    createInstance: "Create an instance",
+    emptyTypeHint: "No instance yet.",
     cores: "cores",
     imagePending: "image pending",
   },

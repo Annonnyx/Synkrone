@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createLineGate, createLineSplitter } from "../src/lib/console/line-gate";
+import { createLineGate, createLineSplitter, isConsoleNoise } from "../src/lib/console/line-gate";
 
 test("line gate drops overflow inside a window and reports it", () => {
   const gate = createLineGate(2, 60_000);
@@ -23,4 +23,12 @@ test("line splitter holds a partial tail until the newline", () => {
   ]);
   split.flush();
   assert.deepEqual(lines.at(-1), ["stdout", "wor"]);
+});
+
+test("console noise hides pip, voice and rate-limit chatter", () => {
+  assert.equal(isConsoleNoise("Dropped 1 log lines (rate limit)"), true);
+  assert.equal(isConsoleNoise("WARNING: Running pip as the 'root' user can result in broken permissions"), true);
+  assert.equal(isConsoleNoise("PyNaCl is not installed, voice will NOT be supported"), true);
+  assert.equal(isConsoleNoise("[bot] loaded cogs.ADMIN.moderation.ban.ban"), false);
+  assert.equal(isConsoleNoise("[synkrone] starting bot"), false);
 });

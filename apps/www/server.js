@@ -34,6 +34,7 @@ const {
     PANEL_PREFIX,
     panelPublicOrigin,
     mountPanelProxy,
+    mountPanelFallbacks,
     attachUpgrade,
     spawnPanel,
     shutdownPanel
@@ -132,6 +133,7 @@ mountKrones(app);
 mountStatus(app);
 mountDashbot(app);
 mountCommands(app);
+mountPanelFallbacks(app);
 mountPublic(app, { skipBodyParser: true, skipSession: true });
 
 function logOAuthRedirects(port) {

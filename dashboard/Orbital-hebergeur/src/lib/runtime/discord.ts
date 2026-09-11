@@ -26,8 +26,9 @@ export DISCORD_TOKEN="\$TOKEN"
 export BOT_TOKEN="\$TOKEN"
 if [ -f requirements.txt ]; then
   echo "[synkrone] installing python dependencies"
-  python -m pip install --user --no-cache-dir -r requirements.txt
+  python -m pip install --user --no-cache-dir --disable-pip-version-check --root-user-action=ignore -q -r requirements.txt
 fi
+export PATH="/root/.local/bin:\${PATH}"
 echo "[synkrone] starting bot"
 exec python -u main.py
 `;
@@ -244,18 +245,22 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     return token;
   }
 
+  private async containerHasToken(containerId: string): Promise<boolean | null> {
+    try {
+      const inspect = await ContainerManager.inspect(containerId);
+      const env = inspect.Config?.Env;
+      if (!Array.isArray(env)) return null;
+      return env.some((entry) => /^(BOT_TOKEN|DISCORD_TOKEN)=.+$/.test(entry));
+    } catch {
+      return null;
+    }
+  }
+
   private async ensureTokenInjected(serviceId: string) {
     const row = await currentContainer(serviceId);
     if (row?.dockerContainerId) {
-      try {
-        const inspect = await ContainerManager.inspect(row.dockerContainerId);
-        const env = inspect.Config.Env ?? [];
-        if (env.some((entry) => entry.startsWith("BOT_TOKEN=") && entry.length > "BOT_TOKEN=".length)) {
-          return;
-        }
-      } catch {
-        /* missing container — recreate below */
-      }
+      const hasToken = await this.containerHasToken(row.dockerContainerId);
+      if (hasToken !== false) return;
       await appendConsole(serviceId, "Recreating container to inject the Discord token...");
       await this.remove(serviceId);
     }

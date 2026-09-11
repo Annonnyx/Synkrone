@@ -44,6 +44,11 @@ body.admin-body {
     font-size: 14px;
 }
 
+.admin-lead + .admin-limits-wrap,
+.admin-card .admin-lead {
+    margin-bottom: 12px;
+}
+
 .admin-stats {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -284,6 +289,68 @@ body.admin-body {
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     gap: 12px;
     margin: 8px 0 12px;
+}
+
+.admin-limits-wrap {
+    overflow-x: auto;
+    margin: 4px 0 14px;
+}
+
+.admin-limits {
+    width: 100%;
+    min-width: 36rem;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.admin-limits th,
+.admin-limits td {
+    padding: 8px 8px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--ardoise-15, #5c6a661f);
+}
+
+.admin-limits thead th {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ardoise, #5c6a66);
+}
+
+.admin-limits thead th span {
+    display: block;
+    margin-top: 2px;
+    font-weight: 500;
+    color: var(--sk-text-faint, #7a8884);
+}
+
+.admin-limits tbody th {
+    width: 9rem;
+    font-family: var(--sk-serif, "Zilla Slab", Georgia, serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--basalte, #1b211e);
+}
+
+.admin-limits tbody tr:first-child th,
+.admin-limits tbody tr:first-child td {
+    background: var(--pierre, #eef0ea);
+}
+
+.admin-limits input {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+.admin-limits tbody tr:hover td,
+.admin-limits tbody tr:hover th {
+    background: var(--pierre-2, #e3e6dd);
+}
+
+.admin-limits tbody tr:first-child:hover th,
+.admin-limits tbody tr:first-child:hover td {
+    background: var(--pierre-2, #e3e6dd);
 }
 
 .admin-check,

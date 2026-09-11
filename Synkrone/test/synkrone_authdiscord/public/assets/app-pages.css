@@ -221,3 +221,201 @@ h1, h2, h3 {
     font-weight: 600;
     margin: 8px 0 0 !important;
 }
+
+.server-card.featured {
+    background: #f3e7d3 !important;
+    border-color: #b8823d !important;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: 6px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid #5c6a661f;
+    background: #e3e6dd;
+    color: #5c6a66;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.role-owner {
+    background: #f5e2dc;
+    border-color: transparent;
+    color: #a8462f;
+}
+
+.role-admin {
+    background: #e4ece4;
+    border-color: transparent;
+    color: #2e5039;
+}
+
+.role-member {
+    background: #e3e6dd;
+    border-color: transparent;
+    color: #5c6a66;
+}
+
+.role-featured {
+    background: #f3e7d3;
+    border-color: transparent;
+    color: #b8823d;
+}
+
+.profile-wrapper {
+    overflow: hidden;
+    background: #fff !important;
+    border: 1px solid #5c6a661f !important;
+    border-radius: 6px !important;
+    backdrop-filter: none !important;
+}
+
+.profile-banner {
+    height: 160px;
+    background: #e3e6dd;
+}
+
+.profile-content {
+    padding: 20px 24px 28px;
+}
+
+.profile-owner {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    background: #fff;
+    border: 1px solid #5c6a661f;
+    border-radius: 4px;
+}
+
+.profile-owner img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-owner small {
+    display: block;
+    font-size: 11px;
+    color: #5c6a66;
+}
+
+.profile-owner strong {
+    display: block;
+    font-size: 13px;
+    color: #1b211e;
+}
+
+.profile-controls,
+.profile-controls .btn {
+    backdrop-filter: none !important;
+}
+
+.hero-profile {
+    margin-top: -56px;
+}
+
+.hero-profile h1 {
+    font-family: "Zilla Slab", Georgia, serif !important;
+    font-size: 1.7rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em;
+}
+
+.avatar-wrap {
+    width: 104px;
+    height: 104px;
+    padding: 3px;
+    background: #fff !important;
+    border: 1px solid #5c6a661f !important;
+    border-radius: 6px;
+}
+
+.profile-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #5c6a66;
+}
+
+.profile-stats .is-online {
+    color: #2e5039;
+}
+
+.profile-desc {
+    max-width: 38rem;
+    margin: 14px auto 0;
+    line-height: 1.6;
+    color: #5c6a66;
+}
+
+.profile-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 14px;
+    background: #eef0ea;
+    border: 1px solid #5c6a661f;
+    border-radius: 6px;
+}
+
+.profile-section h3 {
+    margin: 0 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #5c6a661f;
+    font-family: "Zilla Slab", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.data-chip {
+    background: #fff;
+    border: 1px solid #5c6a661f;
+    color: #1b211e;
+    border-radius: 999px;
+}
+
+.synkrone-warning {
+    background: #f5e2dc;
+    border: 1px solid transparent;
+    color: #1b211e;
+}
+
+.synkrone-warning.is-ok {
+    background: #e4ece4;
+}
+
+.shop-item {
+    background: #eef0ea;
+    border: 1px solid #5c6a661f;
+}
+
+.list-section {
+    background: #eef0ea;
+    border: 1px solid #5c6a661f;
+}
+
+.modal-overlay {
+    background: rgba(27, 33, 30, 0.45);
+    backdrop-filter: none;
+}

@@ -8,28 +8,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #181a1b;
-            --surface: rgba(30, 32, 34, 0.78);
-            --surface-hover: rgba(45, 48, 51, 0.9);
-            --surface-active: rgba(109, 140, 255, 0.15);
-            --border: rgba(255, 255, 255, 0.12);
-            --border-hover: rgba(255, 255, 255, 0.28);
+            --bg: #eef0ea;
+            --surface: #ffffff;
+            --surface-hover: #e3e6dd;
+            --surface-active: #e4ece4;
+            --border: #5c6a661f;
+            --border-hover: #5c6a6640;
             
-            --accent: #e14f4f;
-            --accent-2: #6d8cff;
-            --accent-gold: #ffd700;
-            --krones: #4ade80;
+            --accent: #3f6b52;
+            --accent-2: #3f6b52;
+            --accent-gold: #b8823d;
+            --krones: #b8823d;
             
-            --text: #ffffff;
-            --text-dim: #a0a0a0;
+            --text: #1b211e;
+            --text-dim: #5c6a66;
             
-            --radius: 14px;
-            --radius-sm: 10px;
-            --transition: all 0.22s ease;
+            --radius: 6px;
+            --radius-sm: 4px;
+            --transition: background 0.15s ease, border-color 0.15s ease;
             
-            --role-owner: #e14f4f;
-            --role-admin: #6d8cff;
-            --role-member: #a0a0a0;
+            --role-owner: #a8462f;
+            --role-admin: #2e5039;
+            --role-member: #5c6a66;
         }
 
         /* Reset strict pour supprimer absolument toutes les marges */
@@ -43,7 +43,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
             color: var(--text);
             display: flex;
             background: var(--bg);
@@ -63,8 +63,7 @@
             position: absolute;
             inset: 0;
             z-index: -1;
-            background: radial-gradient(circle at 15% 0%, rgba(109, 140, 255, 0.08) 0%, transparent 40%),
-                        radial-gradient(circle at 85% 100%, rgba(225, 79, 79, 0.05) 0%, transparent 40%);
+            background: none;
             background-size: cover;
             background-position: center;
             transition: var(--transition);
@@ -83,7 +82,7 @@
         #main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 20px; position: relative; }
         .page-container { max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; }
         
-        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); backdrop-filter: blur(12px); padding: 20px; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
 
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; padding: 10px 18px; font-size: 14px; transition: var(--transition); }
         .btn-primary { background: var(--accent-2); color: #fff; }
@@ -119,19 +118,19 @@
 
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
         
-        .server-card { background: rgba(20, 22, 24, 0.6); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; gap: 12px; position: relative; }
-        .server-card:hover { transform: translateY(-3px); border-color: var(--border-hover); background: var(--surface-hover); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .server-card.featured { border-color: rgba(255, 215, 0, 0.4); background: linear-gradient(145deg, rgba(30,32,34,0.9), rgba(50,40,10,0.8)); box-shadow: 0 0 15px rgba(255,215,0,0.1); }
+        .server-card { background: var(--blanc, #fff); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; display: flex; flex-direction: column; gap: 12px; position: relative; }
+        .server-card:hover { border-color: var(--border-hover); background: var(--surface-hover); }
+        .server-card.featured { border-color: var(--accent-gold); background: var(--ambre-clair, #f3e7d3); }
         
         .server-top { display: flex; align-items: center; gap: 12px; }
         .server-icon { width: 54px; height: 54px; border-radius: var(--radius-sm); object-fit: cover; border: 1px solid var(--border); }
         .server-info { flex: 1; min-width: 0; }
-        .server-name { font-weight: 700; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px;}
+        .server-name { font-family: var(--sk-serif, "Zilla Slab", Georgia, serif); font-weight: 700; font-size: 16px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px;}
         
-        .role-badge { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; margin-bottom: 5px;}
-        .role-owner { background: rgba(225, 79, 79, 0.15); color: var(--role-owner); border: 1px solid rgba(225, 79, 79, 0.3); }
-        .role-admin { background: rgba(109, 140, 255, 0.15); color: var(--role-admin); border: 1px solid rgba(109, 140, 255, 0.3); }
-        .role-member { background: rgba(160, 160, 160, 0.15); color: var(--role-member); border: 1px solid rgba(160, 160, 160, 0.3); }
+        .role-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; margin-bottom: 5px;}
+        .role-owner { background: var(--brique-clair, #f5e2dc); color: var(--brique, #a8462f); }
+        .role-admin { background: var(--mousse-clair, #e4ece4); color: var(--mousse-fonce, #2e5039); }
+        .role-member { background: var(--pierre-2, #e3e6dd); color: var(--ardoise, #5c6a66); }
 
         .profile-wrapper { border-radius: var(--radius); overflow: hidden; transition: var(--transition); display: flex; flex-direction: column; border: 1px solid var(--border); background: var(--surface); }
         .profile-banner { width: 100%; height: 200px; position: relative; }
@@ -156,7 +155,7 @@
         .data-chip { background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px;}
 
         /* Modal Classique */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(27, 33, 30, 0.45); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; width: 90%; max-width: 420px; transform: scale(0.95); transition: transform 0.2s; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-overlay.active .modal-box { transform: scale(1); }
@@ -192,7 +191,7 @@
         <div class="modal-box" id="listModalBox">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
                 <div class="modal-title" style="margin:0;" id="listModalTitle">Liste Complète</div>
-                <button class="btn btn-outline" style="padding: 5px 10px;" onclick="closeListModal()"><i class="fa-solid fa-xmark"></i></button>
+                <button class="btn btn-outline" style="padding: 5px 10px;" onclick="closeListModal()">Fermer</button>
             </div>
             <div id="listModalContent">
                 <!-- Contenu injecté -->
@@ -240,7 +239,7 @@
                     dynBg.style.background = theme.bg;
                 }
             } else {
-                dynBg.style.background = `radial-gradient(circle at 15% 0%, rgba(109, 140, 255, 0.08) 0%, transparent 40%), radial-gradient(circle at 85% 100%, rgba(225, 79, 79, 0.05) 0%, transparent 40%), var(--bg)`;
+                dynBg.style.background = '';
             }
         }
 
@@ -276,7 +275,7 @@
                 } else {
                     return `
                         <div class="data-chip w-full" style="justify-content: flex-start; padding: 10px; gap:12px;">
-                            <img src="${item.avatar || 'https://placehold.co/40x40/313338/FFF?text=?'}" style="width:28px; height:28px; border-radius:50%;">
+                            <img src="${item.avatar || '/assets/images/logo.jpg'}" alt="" style="width:28px; height:28px; border-radius:50%;">
                             <span style="font-weight:bold;">${item.name}</span>
                         </div>
                     `;
@@ -450,25 +449,25 @@
 
         function createServerCard(server) {
             let roleHtml = '';
-            if(server.userRole === 'owner') roleHtml = `<span class="role-badge role-owner">Owner</span>`;
+            if(server.userRole === 'owner') roleHtml = `<span class="role-badge role-owner">Propriétaire</span>`;
             else if(server.userRole === 'admin') roleHtml = `<span class="role-badge role-admin">Admin</span>`;
             else if(server.userRole === 'member') roleHtml = `<span class="role-badge role-member">Membre</span>`;
 
             return `
                 <div class="server-card ${server.isFeatured ? 'featured' : ''}" onclick="navigate('server_profile', '${server.id}')">
-                    ${server.isFeatured ? '<span class="role-badge" style="background:rgba(255,215,0,0.2); color:var(--accent-gold); border:1px solid rgba(255,215,0,0.4); margin-bottom:8px; width:fit-content;"><i class="fa-solid fa-star"></i> Mis en avant</span>' : ''}
+                    ${server.isFeatured ? '<span class="role-badge role-featured">Mis en avant</span>' : ''}
                     <div class="server-top">
-                        <img src="${server.icon}" class="server-icon" alt="Icon" onerror="this.src='https://placehold.co/100x100/1e2022/6d8cff?text=S'">
+                        <img src="${server.icon}" class="server-icon" alt="" onerror="this.src='/assets/images/logo.jpg'">
                         <div class="server-info">
                             <div class="server-name">${server.name}</div>
                             ${roleHtml}
-                            <div style="font-size:12px; color:var(--text-dim); display:flex; gap:10px; margin-top:2px;">
-                                <span><i class="fa-solid fa-users"></i> ${server.stats.members}</span>
-                                <span><i class="fa-solid fa-circle text-green-500"></i> ${server.stats.online}</span>
+                            <div class="profile-stats" style="justify-content:flex-start; margin-top:4px;">
+                                <span>${server.stats.members} membres</span>
+                                <span class="is-online">${server.stats.online} en ligne</span>
                             </div>
                         </div>
                     </div>
-                    <p style="font-size:12px; color:var(--text-dim); margin-top:8px; line-height:1.4;">${server.desc.substring(0,70)}...</p>
+                    <p class="profile-desc" style="margin:0; text-align:left;">${server.desc.substring(0,70)}...</p>
                 </div>
             `;
         }
@@ -480,7 +479,7 @@
             let html = `
                 <div class="nav-controls">
                     <div class="nav-controls-left">
-                        <button class="btn btn-outline" onclick="navigate('explorer')"><i class="fa-solid fa-house"></i> Retour à l'accueil</button>
+                        <button class="btn btn-outline" onclick="navigate('explorer')">Retour à l'accueil</button>
                     </div>
                 </div>
                 <div class="panel">
@@ -522,18 +521,18 @@
 
         function createServerCardEdit(server) {
             let roleHtml = '';
-            if(server.userRole === 'owner') roleHtml = `<span class="role-badge role-owner">Owner</span>`;
+            if(server.userRole === 'owner') roleHtml = `<span class="role-badge role-owner">Propriétaire</span>`;
             else if(server.userRole === 'admin') roleHtml = `<span class="role-badge role-admin">Admin</span>`;
 
             let canEdit = server.userRole === 'owner' || server.userRole === 'admin';
             let actionBtn = canEdit 
-                ? `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px;" onclick="event.stopPropagation(); navigate('server_edit', '${server.id}')"><i class="fa-solid fa-gear"></i> Gérer le profil</button>`
-                : `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px;" onclick="event.stopPropagation(); navigate('server_profile', '${server.id}')"><i class="fa-solid fa-users"></i> Voir profil</button>`;
+                ? `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px;" onclick="event.stopPropagation(); navigate('server_edit', '${server.id}')">Gérer le profil</button>`
+                : `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px;" onclick="event.stopPropagation(); navigate('server_profile', '${server.id}')">Voir le profil</button>`;
 
             return `
                 <div class="server-card" onclick="navigate('server_profile', '${server.id}')">
                     <div class="server-top">
-                        <img src="${server.icon}" class="server-icon" alt="Icon" onerror="this.src='https://placehold.co/100x100/1e2022/6d8cff?text=S'">
+                        <img src="${server.icon}" class="server-icon" alt="" onerror="this.src='/assets/images/logo.jpg'">
                         <div class="server-info">
                             <div class="server-name">${server.name}</div>
                             ${roleHtml}
@@ -555,32 +554,28 @@
             let canEdit = server.userRole === 'owner' || server.userRole === 'admin';
             
             let isThemeActive = server.unlockedFeatures.includes('theme') && server.customTheme.active && !server.disabledFeatures.includes('theme');
-            let th = isThemeActive 
-                ? server.customTheme 
-                : { bg: 'var(--bg)', bgImg: '', text: 'var(--text)', border: 'var(--border)', panelBg: 'rgba(0,0,0,0.2)', bannerBg: '#2b2d31', inviteType: 'auto', customInviteUrl: '' };
+            let th = isThemeActive
+                ? server.customTheme
+                : { bg: '', bgImg: '', text: '', border: '', panelBg: '', bannerBg: '', inviteType: 'auto', customInviteUrl: '' };
 
-            // Mise à jour du background global
-            updateGlobalBackground(th);
+            updateGlobalBackground(isThemeActive ? th : null);
 
-            // Gestion de la bannière dynamique (Image ou Couleur unie)
             let bannerStyle = '';
             if (server.banner) {
                 bannerStyle = `background: url('${server.banner}') center/cover;`;
-            } else {
-                bannerStyle = `background: ${th.bannerBg || '#2b2d31'};`;
+            } else if (isThemeActive && th.bannerBg) {
+                bannerStyle = `background: ${th.bannerBg};`;
             }
 
-            // Gestion de l'affichage du Owner sur la bannière (si option activée)
             let ownerHtml = '';
             if (server.unlockedFeatures.includes('owners') && !server.disabledFeatures.includes('owners') && server.internalData.owners.length > 0) {
                 let owner = server.internalData.owners[0];
                 ownerHtml = `
-                    <div style="position:absolute; bottom:15px; left:15px; display:flex; align-items:center; gap:10px; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); padding:6px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
-                        <i class="fa-solid fa-crown" style="color: var(--accent-gold); font-size:12px;"></i>
-                        <img src="${owner.avatar || 'https://placehold.co/40x40/313338/FFF?text=O'}" style="width:30px; height:30px; border-radius:50%; border:1px solid rgba(255,255,255,0.2);">
+                    <div class="profile-owner">
+                        <img src="${owner.avatar || '/assets/images/logo.jpg'}" alt="">
                         <div>
-                            <div style="font-size:10px; color:#ccc; line-height:1;">Propriétaire</div>
-                            <div style="font-size:13px; font-weight:bold; color:#fff;">${owner.name || 'Inconnu'}</div>
+                            <small>Propriétaire</small>
+                            <strong>${owner.name || 'Inconnu'}</strong>
                         </div>
                     </div>
                 `;
@@ -589,52 +584,54 @@
             // Lien d'invitation
             let inviteLink = (th.inviteType === 'custom' && th.customInviteUrl) ? th.customInviteUrl : "https://discord.gg/p768u2Pgp3";
 
+            const wrapperStyle = isThemeActive
+                ? `background:${th.panelBg || '#fff'};color:${th.text || '#1b211e'};border-color:${th.border || '#5c6a661f'};`
+                : '';
+            const avatarStyle = isThemeActive ? `background:${th.bg || '#fff'};border-color:${th.border || '#5c6a661f'};` : '';
+            const titleStyle = isThemeActive && th.text ? `color:${th.text};` : '';
+
             let html = `
                 <div class="nav-controls">
                     <div class="nav-controls-left">
-                        <button class="btn btn-outline" onclick="navigate('explorer')"><i class="fa-solid fa-house"></i> Accueil</button>
-                        ${store.user ? `<button class="btn btn-outline" onclick="navigate('myservers')"><i class="fa-solid fa-shield-halved"></i> Mes Serveurs</button>` : ''}
+                        <button class="btn btn-outline" onclick="navigate('explorer')">Accueil</button>
+                        ${store.user ? `<button class="btn btn-outline" onclick="navigate('myservers')">Mes serveurs</button>` : ''}
                     </div>
                 </div>
                 
-                <div class="profile-wrapper" style="background: ${th.panelBg || 'var(--surface)'}; color: ${th.text}; border-color: ${th.border}; backdrop-filter: blur(12px);">
-                    
+                <div class="profile-wrapper" style="${wrapperStyle}">
                     <div class="profile-banner" style="${bannerStyle}">
                         ${ownerHtml}
                     </div>
                     
                     <div class="profile-content">
                         <div class="profile-controls">
-                            ${canEdit ? `<button class="btn btn-outline" style="background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); color:#fff; border-color:rgba(255,255,255,0.2);" onclick="navigate('server_edit', '${server.id}')"><i class="fa-solid fa-gear"></i> Gérer</button>` : ''}
-                            <button class="btn ${isLiked ? 'btn-primary' : 'btn-outline'}" style="background:${isLiked ? 'var(--accent)' : 'rgba(0,0,0,0.6)'}; backdrop-filter:blur(5px); color:#fff; border-color:${isLiked ? 'var(--accent)' : 'rgba(255,255,255,0.2)'};" onclick="toggleServerLike('${server.id}')">
-                                <i class="fa-solid fa-heart"></i> ${isLiked ? 'Liké' : 'Liker'} (${server.stats.likes})
+                            ${canEdit ? `<button class="btn btn-outline" onclick="navigate('server_edit', '${server.id}')">Gérer</button>` : ''}
+                            <button class="btn ${isLiked ? 'btn-primary' : 'btn-outline'}" onclick="toggleServerLike('${server.id}')">
+                                ${isLiked ? 'Aimé' : 'Aimer'} (${server.stats.likes})
                             </button>
                         </div>
 
                         <div class="hero-profile">
-                            <div class="avatar-wrap" style="background: ${th.bg || 'var(--bg)'}; border-color: ${th.border};">
-                                <img src="${server.icon}" alt="Icône" onerror="this.src='https://placehold.co/100x100/1e2022/6d8cff?text=S'">
+                            <div class="avatar-wrap" style="${avatarStyle}">
+                                <img src="${server.icon}" alt="" onerror="this.src='/assets/images/logo.jpg'">
                             </div>
-                            <h1 style="font-size: 26px; font-weight: 800; color: ${th.text}; margin-top:5px;">${server.name}</h1>
-                            
-                            <div style="display:flex; gap: 15px; margin-top: 5px; font-size: 13px; opacity: 0.8; flex-wrap: wrap; justify-content: center;">
-                                <span><i class="fa-solid fa-users"></i> ${server.stats.members.toLocaleString()} Membres</span>
-                                <span style="color: #4ade80;"><i class="fa-solid fa-circle text-xs"></i> ${server.stats.online.toLocaleString()} Connectés</span>
-                                <span><i class="fa-solid fa-eye"></i> ${server.stats.views.toLocaleString()} Vues</span>
+                            <h1 style="${titleStyle}">${server.name}</h1>
+                            <div class="profile-stats">
+                                <span>${server.stats.members.toLocaleString('fr-FR')} membres</span>
+                                <span class="is-online">${server.stats.online.toLocaleString('fr-FR')} en ligne</span>
+                                <span>${server.stats.views.toLocaleString('fr-FR')} vues</span>
                             </div>
-                            
-                            <p style="margin-top:15px; max-width:600px; line-height:1.6; opacity:0.9;">${server.desc}</p>
-                            
-                            <button onclick="window.open('${inviteLink}', '_blank')" class="btn-join" style="max-width: 300px;">
-                                <i class="fa-solid fa-right-to-bracket"></i> Rejoindre le serveur
+                            <p class="profile-desc">${server.desc}</p>
+                            <button type="button" onclick="window.open('${inviteLink}', '_blank')" class="btn-join" style="max-width: 300px;">
+                                Rejoindre le serveur
                             </button>
                         </div>
                         
-                        <div style="display:flex; flex-wrap: nowrap; overflow-x: auto; gap:20px; margin-top:20px; padding-bottom:10px;">
-                            ${renderPublicSection(server, 'admins', '🛡️ Administration', th.panelBg, (data) => data.map(u => `<div class="data-chip"><img src="${u.avatar}" style="width:20px; height:20px; border-radius:50%;">${u.name}</div>`).join(''))}
-                            ${renderPublicSection(server, 'bots', '🤖 Bots', th.panelBg, (data) => data.map(b => `<div class="data-chip"><img src="${b.avatar}" style="width:20px; height:20px; border-radius:50%;">${b.name}</div>`).join(''))}
-                            ${renderPublicSection(server, 'roles', '🎭 Rôles Principaux', th.panelBg, (data) => data.map(r => `<div class="data-chip">${r}</div>`).join(''))}
-                            ${renderPublicSection(server, 'channels', '💬 Salons Actifs', th.panelBg, (data) => data.map(c => `<div class="data-chip"><i class="fa-solid fa-hashtag text-gray-400"></i> ${c}</div>`).join(''))}
+                        <div class="profile-sections">
+                            ${renderPublicSection(server, 'admins', 'Administration', (data) => data.map(u => `<div class="data-chip"><img src="${u.avatar}" alt="" style="width:20px; height:20px; border-radius:50%;">${u.name}</div>`).join(''))}
+                            ${renderPublicSection(server, 'bots', 'Bots', (data) => data.map(b => `<div class="data-chip"><img src="${b.avatar}" alt="" style="width:20px; height:20px; border-radius:50%;">${b.name}</div>`).join(''))}
+                            ${renderPublicSection(server, 'roles', 'Rôles', (data) => data.map(r => `<div class="data-chip">${r}</div>`).join(''))}
+                            ${renderPublicSection(server, 'channels', 'Salons', (data) => data.map(c => `<div class="data-chip"># ${c}</div>`).join(''))}
                         </div>
                     </div>
                 </div>
@@ -643,7 +640,7 @@
         }
 
         // Modifie la génération des sections pour n'afficher que les 5 premiers, avec bouton "Voir la suite", et permet de s'aligner côte à côte
-        function renderPublicSection(server, featureKey, title, panelBg, renderFn) {
+        function renderPublicSection(server, featureKey, title, renderFn) {
             if(!server.unlockedFeatures.includes(featureKey) || server.disabledFeatures.includes(featureKey)) return '';
             let data = server.internalData[featureKey];
             if(!data || data.length === 0) return '';
@@ -653,17 +650,17 @@
             
             let btnHtml = '';
             if (data.length > 5) {
-                btnHtml = `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px; background:rgba(0,0,0,0.2);" onclick="showListModal('${server.id}', '${featureKey}', '${title}')">
-                                <i class="fa-solid fa-plus"></i> Voir les ${data.length - 5} autres
+                btnHtml = `<button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px;" onclick="showListModal('${server.id}', '${featureKey}', '${title}')">
+                                Voir les ${data.length - 5} autres
                            </button>`;
             }
             
             return `
-                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 15px; flex: 1; min-width: 200px; display: flex; flex-direction: column;">
-                    <h3 style="font-size:14px; font-weight:700; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; white-space: nowrap;">${title}</h3>
+                <section class="profile-section">
+                    <h3>${title}</h3>
                     <div class="data-list" style="display:flex; flex-direction:column; flex: 1;">${contentHtml}</div>
                     ${btnHtml}
-                </div>
+                </section>
             `;
         }
 
@@ -691,8 +688,8 @@
             let html = `
                 <div class="nav-controls">
                     <div class="nav-controls-left">
-                        <button class="btn btn-outline" onclick="navigate('explorer')"><i class="fa-solid fa-house"></i> Accueil</button>
-                        <button class="btn btn-outline" onclick="navigate('server_profile', '${server.id}')"><i class="fa-solid fa-play"></i> Retour au profil public</button>
+                        <button class="btn btn-outline" onclick="navigate('explorer')">Accueil</button>
+                        <button class="btn btn-outline" onclick="navigate('server_profile', '${server.id}')">Retour au profil</button>
                     </div>
                 </div>
                 
@@ -702,18 +699,16 @@
 
                     ${!server.hasSynkrone ? `
                         <div class="synkrone-warning">
-                            <span style="font-size:24px;">🚫</span>
                             <div>
                                 <strong style="display:block; margin-bottom:4px;">Le bot Synkrone n'est pas sur ce serveur.</strong>
-                                <span style="font-size:13px; opacity:0.8;">Vous ne pouvez pas activer de fonctionnalités internes tant que le bot n'est pas invité.</span>
+                                <span style="font-size:13px; color:var(--text-dim);">Vous ne pouvez pas activer de fonctionnalités internes tant que le bot n'est pas invité.</span>
                             </div>
                         </div>
                     ` : `
-                        <div class="synkrone-warning" style="background:rgba(74, 222, 128, 0.1); border-color:rgba(74, 222, 128, 0.4);">
-                            <span style="font-size:24px;">✅</span>
+                        <div class="synkrone-warning is-ok">
                             <div>
-                                <strong style="display:block; margin-bottom:4px; color:var(--krones)">Bot Synkrone détecté !</strong>
-                                <span style="font-size:13px; opacity:0.8;">Les statistiques en direct et listes dynamiques sont opérationnelles via l'API.</span>
+                                <strong style="display:block; margin-bottom:4px;">Bot Synkrone détecté</strong>
+                                <span style="font-size:13px; color:var(--text-dim);">Les statistiques en direct et les listes dynamiques sont opérationnelles.</span>
                             </div>
                         </div>
                     `}
@@ -771,7 +766,7 @@
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                 <div class="form-group">
                                     <label>Couleur de Fond Globale</label>
-                                    <input type="color" id="themeBg" class="color-picker" value="${server.customTheme.bg || '#181a1b'}">
+                                    <input type="color" id="themeBg" class="color-picker" value="${server.customTheme.bg || '#eef0ea'}">
                                 </div>
                                 <div class="form-group">
                                     <label>Image de fond (Prioritaire, URL)</label>
@@ -779,19 +774,19 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Couleur du Texte</label>
-                                    <input type="color" id="themeText" class="color-picker" value="${server.customTheme.text || '#ffffff'}">
+                                    <input type="color" id="themeText" class="color-picker" value="${server.customTheme.text || '#1b211e'}">
                                 </div>
                                 <div class="form-group">
                                     <label>Couleur d'Accentuation (Bordures)</label>
-                                    <input type="color" id="themeBorder" class="color-picker" value="${server.customTheme.border || '#e14f4f'}">
+                                    <input type="color" id="themeBorder" class="color-picker" value="${server.customTheme.border || '#3f6b52'}">
                                 </div>
                                 <div class="form-group">
                                     <label>Fond des Panneaux (Couleur) </label>
-                                    <input type="text" id="themePanelBg" class="form-control" value="${server.customTheme.panelBg || 'rgba(0,0,0,0.2)'}">
+                                    <input type="text" id="themePanelBg" class="form-control" value="${server.customTheme.panelBg || '#ffffff'}">
                                 </div>
                                 <div class="form-group">
                                     <label>Couleur Unie de la Bannière</label>
-                                    <input type="color" id="themeBannerBg" class="color-picker" value="${server.customTheme.bannerBg || '#2b2d31'}">
+                                    <input type="color" id="themeBannerBg" class="color-picker" value="${server.customTheme.bannerBg || '#e3e6dd'}">
                                 </div>
                             </div>
                             <button class="btn btn-primary" style="margin-top:15px;" onclick="saveServerTheme('${server.id}')">Sauvegarder les paramètres</button>
@@ -812,9 +807,9 @@
 
             if (item.id === 'featured') {
                 if (server.isFeatured) {
-                    actionHtml = `<button class="btn" style="width:100%; font-size:12px; background:rgba(255,215,0,0.1); border:1px solid var(--accent-gold); color:var(--accent-gold);" disabled>Déjà mis en avant</button>`;
+                    actionHtml = `<button class="btn" style="width:100%; font-size:12px;" disabled>Déjà mis en avant</button>`;
                 } else {
-                    actionHtml = `<button class="btn btn-outline" style="width:100%; font-size:12px; border-color:rgba(74,222,128,0.5); color:var(--krones);" onclick="buyServerFeature('${server.id}', '${item.id}')">Acheter (${item.cost} Kr)</button>`;
+                    actionHtml = `<button class="btn btn-outline" style="width:100%; font-size:12px;" onclick="buyServerFeature('${server.id}', '${item.id}')">Acheter (${item.cost} ₭)</button>`;
                 }
             } else {
                 if (isUnlocked) {
@@ -824,7 +819,7 @@
                         actionHtml = `<button class="btn btn-danger" style="width:100%; font-size:12px;" onclick="toggleServerFeature('${server.id}', '${item.id}', 'disable')">Désactiver</button>`;
                     }
                 } else {
-                    actionHtml = `<button class="btn btn-outline" style="width:100%; font-size:12px; border-color:rgba(74,222,128,0.5); color:var(--krones);" ${disabledStr} onclick="buyServerFeature('${server.id}', '${item.id}')">Acheter (${item.cost} Kr)</button>`;
+                    actionHtml = `<button class="btn btn-outline" style="width:100%; font-size:12px;" ${disabledStr} onclick="buyServerFeature('${server.id}', '${item.id}')">Acheter (${item.cost} ₭)</button>`;
                 }
             }
 
@@ -886,7 +881,7 @@
                             } else {
                                 server.unlockedFeatures.push(featureId);
                                 if(featureId === 'theme' && !server.customTheme.bg) {
-                                    server.customTheme = { active: false, bg: '#181a1b', bgImg: '', text: '#ffffff', border: '#e14f4f', panelBg: 'rgba(0,0,0,0.3)', bannerBg: '#2b2d31', customUrl: '', inviteType: 'auto', customInviteUrl: '' };
+                                    server.customTheme = { active: false, bg: '#eef0ea', bgImg: '', text: '#1b211e', border: '#3f6b52', panelBg: '#ffffff', bannerBg: '#e3e6dd', customUrl: '', inviteType: 'auto', customInviteUrl: '' };
                                 }
                             }
                             if (window.parent && window.parent.refreshSessionUserSilently) {
@@ -934,7 +929,7 @@
                         id: x.id, 
                         name: x.name, 
                         desc: "Serveur synchronisé avec l'infrastructure Synkrone.", 
-                        icon: x.icon ? ("https://cdn.discordapp.com/icons/" + x.id + "/" + x.icon + ".png") : "https://placehold.co/100x100/1e2022/6d8cff?text=S", 
+                        icon: x.icon ? ("https://cdn.discordapp.com/icons/" + x.id + "/" + x.icon + ".png") : "/assets/images/logo.jpg", 
                         banner: "", 
                         stats: {views:0, likes:0, members: 0, online: 0}, 
                         userRole: x.role, 

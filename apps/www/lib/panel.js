@@ -107,6 +107,36 @@ function mountPanelProxy(app) {
     app.use(/^\/hebergement(\/|$)/, handle);
 }
 
+function panelHostName(hostHeader) {
+    return String(hostHeader || '').split(':')[0].trim().toLowerCase();
+}
+
+function isPanelShortcutHost(hostHeader) {
+    const host = panelHostName(hostHeader);
+    return host === 'panel.synkrone.app' || host === 'pannel.synkrone.app';
+}
+
+function requestSearch(req) {
+    const url = String(req.url || '');
+    const q = url.indexOf('?');
+    return q >= 0 ? url.slice(q) : '';
+}
+
+/** Si Next perd le basePath (/dashboard) ou si on ouvre panel.synkrone.app/, ne pas servir l'accueil. */
+function mountPanelFallbacks(app) {
+    app.use((req, res, next) => {
+        const pathOnly = String(req.path || '/');
+        const search = requestSearch(req);
+        if (isPanelShortcutHost(req.headers.host) && (pathOnly === '/' || pathOnly === '/accueil')) {
+            return res.redirect(302, `${PANEL_PREFIX}${search}`);
+        }
+        if (pathOnly === '/dashboard' || pathOnly.startsWith('/dashboard/')) {
+            return res.redirect(302, `${PANEL_PREFIX}${pathOnly}${search}`);
+        }
+        return next();
+    });
+}
+
 function attachUpgrade(server) {
     if (server.__synkronePanelWrapped) return;
     server.__synkronePanelWrapped = true;
@@ -199,6 +229,7 @@ module.exports = {
     PANEL_PORT,
     panelPublicOrigin,
     mountPanelProxy,
+    mountPanelFallbacks,
     attachUpgrade,
     spawnPanel,
     shutdownPanel

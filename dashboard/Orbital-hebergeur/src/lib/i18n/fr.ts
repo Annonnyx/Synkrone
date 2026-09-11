@@ -167,6 +167,8 @@ export const fr = {
     empty: "Aucun service dans cette catégorie.",
     emptyAll: "Aucun service pour le moment.",
     emptyHint: "Créez un bot Discord, un serveur Minecraft ou un projet web pour commencer.",
+    createInstance: "Créer une instance",
+    emptyTypeHint: "Aucune instance pour le moment.",
     cores: "cœurs",
     imagePending: "image en attente",
   },

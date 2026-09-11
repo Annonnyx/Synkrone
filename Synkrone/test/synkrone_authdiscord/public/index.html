@@ -216,7 +216,6 @@
             try {
                 const res = await fetchJson('/api/me');
                 if (!res.ok) {
-                    store.user = null;
                     return;
                 }
                 const data = await res.json();
@@ -224,7 +223,6 @@
                 store.oauth = data.providers || { discord: Boolean(data.oauthConfigured), github: false, google: false };
             } catch (e) {
                 console.error("Erreur lors du chargement de la session", e);
-                store.user = null;
             }
         }
         function mergeSessionUserUpdate(incomingUser) {
@@ -565,6 +563,10 @@
             const section = APP_STRUCTURE[mainSection];
             if (!section) return;
             if (mainSection === 'admin' && !canAccessAdmin()) {
+                if (!store.user) {
+                    window.location.replace(siteLoginUrl(window.location.pathname));
+                    return;
+                }
                 await navigateToMainSection('accueil', { updateUrl: true, replaceHistory: true });
                 return;
             }
@@ -641,7 +643,13 @@
             const mainTabs = document.querySelectorAll('.nav-tab');
             mainTabs.forEach(tab => {
                 tab.addEventListener('click', async (e) => {
+                    if (tab.classList.contains('nav-tab-external') || tab.id === 'nav-hosting') {
+                        closeMobileNav();
+                        return;
+                    }
                     const mainSection = e.currentTarget.getAttribute('data-target');
+                    if (!mainSection) return;
+                    e.preventDefault();
                     closeMobileNav();
                     await navigateToMainSection(mainSection, { updateUrl: true });
                 });
@@ -746,6 +754,14 @@
                 rouletteModal.addEventListener('click', (event) => {
                     if (event.target === rouletteModal) closeRouletteModal();
                 });
+            }
+            const pathNow = normalizePath(window.location.pathname);
+            if (pathNow === '/hebergement' || pathNow.startsWith('/hebergement/')) {
+                return;
+            }
+            if (pathNow === '/dashboard' || pathNow.startsWith('/dashboard/')) {
+                window.location.replace(`/hebergement${pathNow}${window.location.search}${window.location.hash}`);
+                return;
             }
             const route = parseRoute(window.location.pathname);
             const needsGate = route.mainSection === 'admin' || route.mainSection === 'equipe';

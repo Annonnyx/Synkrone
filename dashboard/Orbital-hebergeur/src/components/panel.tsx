@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import {
   Activity,
   Bot,
@@ -188,6 +188,19 @@ function EngineStatusPill() {
   );
 }
 
+function navItemActive(
+  href: string,
+  pathname: string,
+  searchParams: { get: (key: string) => string | null },
+) {
+  const [path, query] = href.split("?");
+  const wantedType = query ? new URLSearchParams(query).get("type") : null;
+  const currentType = searchParams.get("type");
+  if (wantedType) return pathname === path && currentType === wantedType;
+  if (path === "/dashboard/services") return pathname === path && !currentType;
+  return pathname === path;
+}
+
 export function Sidebar({
   user,
   open = false,
@@ -198,6 +211,7 @@ export function Sidebar({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const t = useT();
   const [minecraftEnabled, setMinecraftEnabled] = useState(true);
@@ -229,11 +243,11 @@ export function Sidebar({
     {
       section: t("nav.advanced"),
       items: [
-        { href: "/dashboard/new/discord", label: t("nav.discord"), icon: Bot },
+        { href: "/dashboard/services?type=discord", label: t("nav.discord"), icon: Bot },
         ...(minecraftEnabled
-          ? [{ href: "/dashboard/new/minecraft", label: t("nav.minecraft"), icon: Boxes }]
+          ? [{ href: "/dashboard/services?type=minecraft", label: t("nav.minecraft"), icon: Boxes }]
           : []),
-        { href: "/dashboard/new/web", label: t("nav.web"), icon: Globe },
+        { href: "/dashboard/services?type=web", label: t("nav.web"), icon: Globe },
         { href: "/dashboard/infrastructure/databases", label: t("nav.databases"), icon: Database },
         { href: "/dashboard/infrastructure/sftp", label: t("nav.sftp"), icon: HardDrive },
         { href: "/dashboard/infrastructure/engine", label: t("nav.engine"), icon: Gauge },
@@ -265,7 +279,7 @@ export function Sidebar({
               </div>
             )}
             {group.items.map((item) => {
-              const active = pathname === item.href.split("?")[0];
+              const active = navItemActive(item.href, pathname, searchParams);
               const Icon = item.icon;
               return (
                 <Link
@@ -342,7 +356,9 @@ export function DashboardShell({
           onClick={() => setOpen(false)}
         />
       )}
-      <Sidebar user={user} open={open} onNavigate={() => setOpen(false)} />
+      <Suspense fallback={null}>
+        <Sidebar user={user} open={open} onNavigate={() => setOpen(false)} />
+      </Suspense>
       <div className="scroll min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-7xl px-4 py-4 md:px-6 md:py-6">{children}</div>
       </div>

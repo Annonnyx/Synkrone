@@ -22,7 +22,7 @@ import { audit } from "@/lib/audit";
 import { HttpError, requireUser, type SessionUser } from "@/lib/auth";
 import { encryptSecret, fingerprint } from "@/lib/crypto";
 import { FilesystemManager } from "@/lib/filesystem/manager";
-import { createLineGate, createLineSplitter } from "@/lib/console/line-gate";
+import { createLineGate, createLineSplitter, isConsoleNoise } from "@/lib/console/line-gate";
 import { authorizeService, getProvider, toRecord, type AuthorizedService } from "@/lib/runtime";
 import { appendConsole } from "@/lib/runtime/base";
 import { MINECRAFT_SOFTWARE, resolveGatewayIntents } from "@/lib/runtime/templates";
@@ -245,11 +245,14 @@ function streamConsole(svc: AuthorizedService) {
         history.filter((l) => l.createdAt.getTime() >= lastSeen.getTime()).map((l) => l.id),
       );
       for (const line of history) {
+        if (isConsoleNoise(line.message)) continue;
         send({ type: "line", stream: line.stream, message: line.message, at: line.createdAt });
       }
 
-      const gate = createLineGate(80, 200);
+      const gate = createLineGate(240, 1000);
+      let lastDropNotice = 0;
       const emitLive = (stream: string, message: string) => {
+        if (isConsoleNoise(message)) return;
         if (gate.allow(1) < 1) return;
         send({ type: "line", stream, message });
       };
@@ -263,11 +266,12 @@ function streamConsole(svc: AuthorizedService) {
             for await (const piece of iterable) {
               splitter.push(piece.stream, piece.text);
               const dropped = gate.takeDropped();
-              if (dropped > 0) {
+              const now = Date.now();
+              if (dropped > 0 && now - lastDropNotice > 2500) {
+                lastDropNotice = now;
                 send({
-                  type: "line",
-                  stream: "system",
-                  message: `Dropped ${dropped} log lines (rate limit)`,
+                  type: "info",
+                  message: `Condensed ${dropped} log lines`,
                 });
               }
             }
@@ -302,6 +306,7 @@ function streamConsole(svc: AuthorizedService) {
           for (const line of rows) {
             if (delivered.has(line.id)) continue;
             if (line.createdAt.getTime() > lastSeen.getTime()) lastSeen = line.createdAt;
+            if (isConsoleNoise(line.message)) continue;
             send({ type: "line", stream: line.stream, message: line.message, at: line.createdAt });
           }
           delivered = new Set(

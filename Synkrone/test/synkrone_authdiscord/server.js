@@ -100,7 +100,8 @@ const GRADE_KRONE_COSTS = {
 const contactCooldownByUser = new Map();
 let botOwnerCache = {
     ownerIds: new Set(),
-    expiresAt: 0
+    expiresAt: 0,
+    status: 'unknown'
 };
 
 function isManualStaffRole(roleValue) {
@@ -350,10 +351,11 @@ async function upsertUserFromDiscordAuth(discordUser, isTeamOwner) {
         id: userId, username: String(discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${userId.slice(-4)}`),
         avatar: discordUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${discordUser.avatar}.png` : String(existing?.avatar || '/assets/images/logo.jpg'),
         banner: bannerUrl,
-        role: isTeamOwner ? 'Admin' : (existing ? existing.role : 'Krobi'),
+        role: isTeamOwner === true ? 'Admin' : (existing ? existing.role : 'Krobi'),
         grade: ALLOWED_USER_GRADES.has(String(existing?.grade || '')) ? String(existing.grade) : 'Aucun',
         krone: Number.isFinite(Number(existing?.krone)) ? Math.max(0, Math.trunc(Number(existing.krone))) : 0,
-        isTeamOwner: Boolean(isTeamOwner), isGuest: false, createdAt: Number(existing?.createdAt) || now, updatedAt: now, lastSeenAt: now, lastLoginAt: now
+        isTeamOwner: isTeamOwner === null ? Boolean(existing?.isTeamOwner) : Boolean(isTeamOwner),
+        isGuest: false, createdAt: Number(existing?.createdAt) || now, updatedAt: now, lastSeenAt: now, lastLoginAt: now
     };
     db.users[userId] = nextUser;
     await writeUsersDb(db);
@@ -500,10 +502,12 @@ function mountPublic(app, options = {}) {
     const designDir = path.join(__dirname, '..', '..', '..', 'apps', 'www', 'design');
     app.use('/design', express.static(designDir));
 
-async function getBotOwnerIds() {
+async function fetchBotOwnerIds() {
     const token = String(process.env.DISCORD_BOT_TOKEN || '').trim();
-    if (!token) return new Set();
-    if (Date.now() < botOwnerCache.expiresAt) return botOwnerCache.ownerIds;
+    if (!token) return { status: 'unavailable', ownerIds: botOwnerCache.ownerIds };
+    if (botOwnerCache.status === 'ok' && Date.now() < botOwnerCache.expiresAt) {
+        return { status: 'ok', ownerIds: botOwnerCache.ownerIds };
+    }
     try {
         const response = await axios.get(`${DISCORD_API_BASE}/oauth2/applications/@me`, {
             headers: { Authorization: `Bot ${token}` },
@@ -521,38 +525,69 @@ async function getBotOwnerIds() {
             const membershipState = Number(member?.membership_state || 0);
             if (!membershipState || membershipState === 2) ownerIds.add(memberId);
         }
-        botOwnerCache = { ownerIds, expiresAt: Date.now() + BOT_OWNER_CACHE_TTL_MS };
-        return ownerIds;
+        botOwnerCache = { ownerIds, expiresAt: Date.now() + BOT_OWNER_CACHE_TTL_MS, status: 'ok' };
+        return { status: 'ok', ownerIds };
     } catch {
+        if (botOwnerCache.status === 'ok' && botOwnerCache.ownerIds.size) {
+            botOwnerCache.expiresAt = Date.now() + 30_000;
+            return { status: 'ok', ownerIds: botOwnerCache.ownerIds };
+        }
         botOwnerCache = {
             ownerIds: botOwnerCache.ownerIds || new Set(),
-            expiresAt: Date.now() + 30_000
+            expiresAt: Date.now() + 30_000,
+            status: 'unavailable'
         };
-        return botOwnerCache.ownerIds;
+        return { status: 'unavailable', ownerIds: botOwnerCache.ownerIds };
     }
 }
 
+/** true / false si Discord a répondu ; null si le lookup a échoué. */
 async function isBotOwnerUserId(userId) {
     const safeUserId = String(userId || '').trim();
     if (!safeUserId) return false;
     try {
-        const ownerIds = await getBotOwnerIds();
-        return ownerIds.has(safeUserId);
-    } catch (error) { 
-        return false; 
+        const lookup = await fetchBotOwnerIds();
+        if (lookup.status !== 'ok') return null;
+        return lookup.ownerIds.has(safeUserId);
+    } catch {
+        return null;
+    }
+}
+
+async function persistedAdminAccess(userId) {
+    const safeUserId = String(userId || '').trim();
+    if (!safeUserId) return false;
+    try {
+        const db = await readUsersDb();
+        const stored = normalizeStoredUser(db.users[safeUserId], safeUserId);
+        if (!stored) return false;
+        return Boolean(stored.isTeamOwner || stored.role === 'Admin');
+    } catch {
+        return false;
     }
 }
 
 async function resolveAdminAccessForSessionUser(user) {
     if (!user || user.isGuest) return false;
-    const isTeamOwner = await isBotOwnerUserId(user.id);
-    user.isTeamOwner = isTeamOwner;
-    if (isTeamOwner && user.role !== 'Admin') {
-        user.role = 'Admin';
-    } else if (!isTeamOwner && user.role === 'Admin') {
-        user.role = 'Équipe';
+    const discordOwner = await isBotOwnerUserId(user.id);
+    if (discordOwner === true) {
+        user.isTeamOwner = true;
+        if (user.role !== 'Admin') user.role = 'Admin';
+        return true;
     }
-    return isTeamOwner;
+    if (discordOwner === false) {
+        user.isTeamOwner = false;
+        if (user.role === 'Admin') user.role = 'Équipe';
+        return false;
+    }
+    if (user.isTeamOwner || user.role === 'Admin') return true;
+    const storedAdmin = await persistedAdminAccess(user.id);
+    if (storedAdmin) {
+        user.isTeamOwner = true;
+        user.role = 'Admin';
+        return true;
+    }
+    return false;
 }
 
 app.get('/auth/discord', (req, res) => {
@@ -580,9 +615,9 @@ app.get('/auth/discord/callback', async (req, res) => {
         req.session.user = {
             id: discordUser.id, username: persistedUser?.username || discordUser.global_name || discordUser.username,
             avatar: persistedUser?.avatar || (discordUser.avatar ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png` : '/assets/images/logo.jpg'),
-            role: persistedUser?.role || (isTeamOwner ? 'Admin' : 'Krobi'),
+            role: persistedUser?.role || (isTeamOwner === true ? 'Admin' : 'Krobi'),
             grade: persistedUser?.grade || 'Aucun', krone: Number.isFinite(Number(persistedUser?.krone)) ? Number(persistedUser.krone) : 0,
-            isGuest: false, isTeamOwner
+            isGuest: false, isTeamOwner: Boolean(persistedUser?.isTeamOwner)
         };
         res.redirect(consumeReturnTo(req));
     } catch (err) { 
@@ -1250,7 +1285,10 @@ app.get(/^\/(.*)$/i, async (req, res, next) => {
     const isShellRoute = SHELL_ROUTES.has(normalizedPath) || SHELL_PREFIXES.some(prefix => normalizedPath.startsWith(prefix));
     if (!isShellRoute) return next();
     if (normalizedPath.startsWith('/admin')) {
-        const hasAccess = await resolveAdminAccessForSessionUser(req.session?.user);
+        if (!req.session?.user || req.session.user.isGuest) {
+            return res.redirect(`/login?returnTo=${encodeURIComponent(normalizedPath)}`);
+        }
+        const hasAccess = await resolveAdminAccessForSessionUser(req.session.user);
         if (!hasAccess) return res.redirect('/accueil');
     }
     return res.sendFile(path.join(__dirname, 'public', 'index.html'));

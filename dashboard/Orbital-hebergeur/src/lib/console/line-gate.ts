@@ -29,6 +29,29 @@ export function createLineGate(maxPerWindow: number, windowMs: number): LineGate
   };
 }
 
+const NOISE = [
+  /Dropped \d+ log lines \(rate limit\)/i,
+  /WARNING: Running pip as the 'root' user/i,
+  /Use the --root-user-action option/i,
+  /It is recommended to use a virtual environment/i,
+  /\[notice\] A new release of pip/i,
+  /\[notice\] To update, run: pip install/i,
+  /which is not on PATH/i,
+  /Consider adding this directory to PATH/i,
+  /The script (dotenv|idna) is installed/i,
+  /PyNaCl is not installed/i,
+  /davey is not installed/i,
+  /voice will NOT be supported/i,
+];
+
+export function isConsoleNoise(line: string): boolean {
+  const text = String(line || "").trim();
+  if (!text) return true;
+  if (/^[━─\-|=. ]+$/u.test(text)) return true;
+  if (/\d+(?:\.\d+)?\s*MB\/s/i.test(text) && /[━─]/u.test(text)) return true;
+  return NOISE.some((re) => re.test(text));
+}
+
 export function createLineSplitter(onLine: (stream: string, line: string) => void) {
   const tails = new Map<string, string>();
   return {

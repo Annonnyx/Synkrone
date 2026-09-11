@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Copy, Download, Eraser, Search, WrapText } from "lucide-react";
+import { Check, Copy, Download, Eraser, Search, WrapText } from "lucide-react";
 import { api } from "@/lib/client";
 import { notify } from "@/lib/notify";
 import { useT } from "@/lib/i18n";
@@ -81,6 +81,7 @@ export function Console({
   const [historyCursor, setHistoryCursor] = useState(0);
   const [historyList, setHistoryList] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [copiedAll, setCopiedAll] = useState(false);
   const [intentsBannerDismissed, setIntentsBannerDismissed] = useState(false);
   const prefsRaw = useSyncExternalStore(
     subscribeConsolePrefs,
@@ -299,7 +300,7 @@ export function Console({
   const copyLine = async (line: Line) => {
     await navigator.clipboard.writeText(line.message);
     setCopiedId(line.id);
-    window.setTimeout(() => setCopiedId((id) => (id === line.id ? null : id)), 1200);
+    window.setTimeout(() => setCopiedId((id) => (id === line.id ? null : id)), 1600);
   };
 
   const copyLastCommand = async () => {
@@ -337,6 +338,12 @@ export function Console({
 
   const text = visible.map((line) => line.message).join("\n");
   const listId = serviceType === "minecraft" ? `mc-cmds-${serviceId}` : undefined;
+
+  const copyAll = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopiedAll(true);
+    window.setTimeout(() => setCopiedAll(false), 1600);
+  };
 
   return (
     <div
@@ -462,8 +469,13 @@ export function Console({
           <button type="button" className="btn" onClick={() => setLines([])}>
             <Eraser size={13} /> {t("console.clear")}
           </button>
-          <button type="button" className="btn" onClick={() => void navigator.clipboard.writeText(text)}>
-            <Copy size={13} /> {t("common.copy")}
+          <button
+            type="button"
+            className={`btn ${copiedAll ? "btn-copied" : ""}`}
+            onClick={() => void copyAll()}
+          >
+            {copiedAll ? <Check size={13} /> : <Copy size={13} />}
+            {copiedAll ? t("common.copied") : t("common.copy")}
           </button>
           <button
             type="button"
@@ -518,7 +530,11 @@ export function Console({
             <span className="min-w-0 flex-1">{line.message}</span>
             <button
               type="button"
-              className="shrink-0 text-[var(--muted)] opacity-0 group-hover:opacity-100"
+              className={`shrink-0 text-[11px] ${
+                copiedId === line.id
+                  ? "text-[var(--success)] opacity-100"
+                  : "text-[var(--muted)] opacity-0 group-hover:opacity-100"
+              }`}
               title={t("console.copyLine")}
               onClick={() => void copyLine(line)}
             >
