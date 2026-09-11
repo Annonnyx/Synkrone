@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone — Krônes</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/accueil.css">
+    <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="/assets/krones-page.css">
+</head>
+<body>
+    <section class="kr-hero">
+        <h1>Krônes.<br><em>Sans monnaie fiat.</em></h1>
+        <p class="lede" style="max-width:52ch;margin-top:14px;">Les packs s’achètent en euros. Les rangs et l’hébergement se paient en Krônes. Une fois crédités, les Krônes ne se reconvertissent pas.</p>
+        <div class="kr-balance">
+            <div>
+                <strong id="kr-amount">—</strong>
+                <span id="kr-label">Krônes</span>
+            </div>
+            <span id="kr-plan">Plan · —</span>
+        </div>
+        <p class="kr-note" id="kr-auth-note"></p>
+        <p class="status-line" id="kr-status"></p>
+    </section>
+
+    <section class="band" id="packs">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">01 · Packs</p>
+                <div>
+                    <h2>Recharger.</h2>
+                    <p>Prix TTC, TVA 20 %. Le portefeuille n’est crédité qu’après paiement confirmé. PayPal et Apple Pay se brancheront sur le même parcours.</p>
+                </div>
+            </div>
+            <div id="pack-row" class="offer-row"></div>
+        </div>
+    </section>
+
+    <section class="band" id="rangs">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">02 · Rangs</p>
+                <div>
+                    <h2>Abonnements.</h2>
+                    <p>Achat unique, pas de prélèvement. Vous payez en Krônes (solde) ou directement en euros TTC — sans passer par un pack. Pour monter de rang, seule la différence est due.</p>
+                </div>
+            </div>
+            <div class="compare-wrap">
+                <table class="compare" id="compare-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="grade-list" class="grade-list"></div>
+        </div>
+    </section>
+
+    <section class="band" id="minecraft">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">03 · Minecraft</p>
+                <div>
+                    <h2>Barème mensuel.</h2>
+                    <p>80 + RAM×40 + CPU×25 + ⌈stockage/10⌉×15 + (base ? 60 : 0). La réduction du rang s’applique à l’hébergement.</p>
+                </div>
+            </div>
+            <div class="mc-grid">
+                <label>RAM (Go)
+                    <input id="mc-ram" type="number" min="0" step="1" value="4">
+                </label>
+                <label>CPU
+                    <input id="mc-cpu" type="number" min="0" step="1" value="2">
+                </label>
+                <label>Stockage (Go)
+                    <input id="mc-storage" type="number" min="0" step="1" value="20">
+                </label>
+                <label class="check-row" style="margin-top: 28px;">
+                    <input id="mc-db" type="checkbox">
+                    Base de données (+60)
+                </label>
+            </div>
+            <p class="mc-quote" id="mc-quote">—</p>
+        </div>
+    </section>
+
+    <section class="band" id="orders">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">04 · Commandes</p>
+                <div>
+                    <h2>Factures.</h2>
+                    <p>Numéro, montant TTC, statut. Une commande n’est soldée que lorsque le paiement est confirmé.</p>
+                </div>
+            </div>
+            <div id="order-list" class="order-list"></div>
+        </div>
+    </section>
+
+    <section class="band" id="ledger">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">05 · Journal</p>
+                <div>
+                    <h2>Mouvements.</h2>
+                    <p>Crédit, débit, raisons. Les autres services s’y branchent.</p>
+                </div>
+            </div>
+            <table class="ledger">
+                <thead>
+                    <tr>
+                        <th>Quand</th>
+                        <th>Type</th>
+                        <th>Raison</th>
+                        <th>Montant</th>
+                        <th>Solde</th>
+                    </tr>
+                </thead>
+                <tbody id="ledger-body">
+                    <tr><td colspan="5" style="color:#6a737c">Aucun mouvement.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <dialog class="kr-dialog" id="kr-checkout" aria-labelledby="kr-checkout-title">
+        <div class="kr-dialog-inner">
+            <h2 id="kr-checkout-title">Commande</h2>
+            <p class="lede" id="kr-checkout-lede"></p>
+            <table class="kr-breakdown" id="kr-breakdown"></table>
+            <div id="kr-checkout-form">
+                <div class="kr-legal">
+                    <label>
+                        <input type="checkbox" id="consent-age">
+                        <span>J’ai 18 ans révolus, ou l’autorisation de la personne qui exerce l’autorité parentale.</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="consent-cgv">
+                        <span>J’accepte les <a href="/cgv" target="_top">conditions générales de vente</a> et les <a href="/cgu" target="_top">CGU</a>.</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="consent-waiver">
+                        <span>Je demande l’exécution immédiate et je renonce à mon droit de rétractation pour ce contenu numérique (art. L. 221-28 C. conso.). Les Krônes ne sont pas convertibles en euros.</span>
+                    </label>
+                </div>
+                <p class="status-line" id="kr-checkout-status"></p>
+                <div class="kr-dialog-actions">
+                    <button type="button" class="btn btn-red" id="kr-checkout-submit">Enregistrer la commande</button>
+                    <button type="button" class="btn" id="kr-checkout-close">Annuler</button>
+                </div>
+            </div>
+            <div id="kr-checkout-pay" hidden>
+                <p class="kr-note" id="kr-pay-hint"></p>
+                <div class="kr-pay-methods" id="kr-pay-methods"></div>
+                <div class="transfer-box" id="kr-transfer" hidden></div>
+                <p class="status-line" id="kr-pay-status"></p>
+                <div class="kr-dialog-actions">
+                    <button type="button" class="btn" id="kr-pay-close">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        const GRADE_COSTS = {
+            Aucun: 0, Kronium: 150, Synkral: 750, Kronalloy: 1500, Synkronite: 3000, Kronix: 6000
+        };
+        const STATUS_LABEL = {
+            awaiting_payment: 'En attente de paiement',
+            awaiting_transfer: 'En attente du virement',
+            fulfilled: 'Payée et créditée',
+            cancelled: 'Annulée',
+            expired: 'Expirée',
+            failed: 'Échouée',
+            refunded: 'Remboursée'
+        };
+
+        let wallet = { balance: 0, plan: 'Aucun', ledger: [], authenticated: false, demo: true };
+        let catalog = { packs: [], subscriptions: [], compare: { plans: [], rows: [] }, billing: {} };
+        let orders = [];
+        let checkoutPack = null;
+        let checkoutOrder = null;
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[ch]));
+        }
+
+        function formatKrones(value) {
+            return Number(value || 0).toLocaleString('fr-FR');
+        }
+
+        function formatEuro(cents) {
+            return (Number(cents || 0) / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+        }
+
+        function loginUrl() {
+            return catalog.billing?.loginUrl || '/hebergement/login';
+        }
+
+        function computeMcMonthly({ ramGb = 0, cpu = 0, storageGb = 0, db = false } = {}) {
+            return 80 + Number(ramGb) * 40 + Number(cpu) * 25 + Math.ceil(Number(storageGb) / 10) * 15 + (db ? 60 : 0);
+        }
+
+        function setStatus(text) {
+            const el = document.getElementById('kr-status');
+            if (el) el.textContent = text || '';
+        }
+
+        function notifyParent() {
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'synkrone:krones-updated', wallet }, window.location.origin);
+                }
+            } catch { /* iframe opaque */ }
+        }
+
+        function renderWallet() {
+            const amount = document.getElementById('kr-amount');
+            const label = document.getElementById('kr-label');
+            const plan = document.getElementById('kr-plan');
+            const note = document.getElementById('kr-auth-note');
+            const authed = Boolean(wallet.authenticated);
+            if (!authed) {
+                if (amount) amount.textContent = '—';
+                if (label) label.textContent = 'Krônes';
+                if (plan) plan.textContent = 'Plan · —';
+                if (note) {
+                    note.innerHTML = `Connectez-vous pour acheter et voir votre solde. <a href="${escapeHtml(loginUrl())}" target="_top">Se connecter</a>`;
+                }
+            } else {
+                const n = Math.max(0, Math.trunc(Number(wallet.balance || 0)));
+                if (amount) amount.textContent = formatKrones(n);
+                if (label) label.textContent = n <= 1 ? 'Krône' : 'Krônes';
+                if (plan) plan.textContent = `Plan · ${wallet.plan || 'Aucun'}`;
+                if (note) note.textContent = 'Les Krônes achetés sont un crédit d’usage interne, non remboursable en euros.';
+            }
+            const body = document.getElementById('ledger-body');
+            if (!body) return;
+            if (!authed) {
+                body.innerHTML = '<tr><td colspan="5" style="color:#6a737c">Connectez-vous pour le journal.</td></tr>';
+                return;
+            }
+            const rows = Array.isArray(wallet.ledger) ? wallet.ledger : [];
+            if (!rows.length) {
+                body.innerHTML = '<tr><td colspan="5" style="color:#6a737c">Aucun mouvement.</td></tr>';
+                return;
+            }
+            body.innerHTML = rows.map((entry) => {
+                const when = entry.at ? new Date(entry.at).toLocaleString('fr-FR') : '—';
+                const sign = entry.type === 'debit' ? '−' : '+';
+                const klass = entry.type === 'debit' ? 'debit' : 'credit';
+                return `<tr>
+                    <td>${escapeHtml(when)}</td>
+                    <td class="${klass}">${escapeHtml(entry.type || '—')}</td>
+                    <td>${escapeHtml(entry.reason || '—')}</td>
+                    <td class="${klass}">${sign}${formatKrones(entry.amount)} Krônes</td>
+                    <td>${formatKrones(entry.balanceAfter)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderPacks() {
+            const row = document.getElementById('pack-row');
+            if (!row) return;
+            const packs = catalog.packs || [];
+            const authed = Boolean(wallet.authenticated || catalog.billing?.authenticated);
+            row.innerHTML = packs.map((pack) => `
+                <button type="button" class="offer" data-pack="${escapeHtml(pack.id)}">
+                    <span class="offer-k">${formatKrones(pack.krones)} ₭</span>
+                    <span class="offer-e">${escapeHtml(pack.label || 'Pack')}</span>
+                    <span class="offer-r">${formatEuro(pack.eurCents)} TTC</span>
+                </button>
+            `).join('');
+            row.querySelectorAll('[data-pack]').forEach((btn) => {
+                btn.onclick = () => {
+                    if (!authed) {
+                        window.top.location.href = loginUrl();
+                        return;
+                    }
+                    openCheckout(btn.getAttribute('data-pack'));
+                };
+            });
+        }
+
+        function renderCompare() {
+            const table = document.getElementById('compare-table');
+            if (!table) return;
+            const plans = catalog.compare?.plans || (catalog.subscriptions || []).map((sub) => sub.name);
+            const rows = catalog.compare?.rows || [];
+            const current = wallet.authenticated ? (wallet.plan || 'Aucun') : '';
+            const thead = `<tr><th scope="col">Avantage</th>${plans.map((plan) =>
+                `<th scope="col" class="${plan === current ? 'is-current' : ''}">${escapeHtml(plan)}</th>`
+            ).join('')}</tr>`;
+            const tbody = rows.map((row) => {
+                const cells = plans.map((plan) => {
+                    const cell = row.cells?.[plan] || {};
+                    const klass = [
+                        plan === current ? 'is-current' : '',
+                        cell.type === 'bool' ? (cell.value ? 'yes' : 'no') : ''
+                    ].filter(Boolean).join(' ');
+                    let text = cell.label || cell.value;
+                    if (row.id === 'price') text = `${formatKrones(cell.value)} ₭`;
+                    if (row.id === 'price_eur') text = formatEuro(cell.value);
+                    return `<td class="${klass}">${escapeHtml(text)}</td>`;
+                }).join('');
+                return `<tr><th scope="row">${escapeHtml(row.label)}</th>${cells}</tr>`;
+            }).join('');
+            table.querySelector('thead').innerHTML = thead;
+            table.querySelector('tbody').innerHTML = tbody;
+        }
+
+        function renderGrades() {
+            const list = document.getElementById('grade-list');
+            if (!list) return;
+            const current = GRADE_COSTS[wallet.plan] !== undefined ? wallet.plan : 'Aucun';
+            const currentCost = GRADE_COSTS[current] || 0;
+            const currentIndex = GRADE_ORDER_INDEX(current);
+            const balance = wallet.authenticated ? Math.max(0, Math.trunc(Number(wallet.balance || 0))) : 0;
+            const subs = catalog.subscriptions || catalog.abonnements || [];
+            list.innerHTML = subs.map((sub) => {
+                const cost = Number(sub.krones || GRADE_COSTS[sub.name] || 0);
+                const index = GRADE_ORDER_INDEX(sub.name);
+                const upgrade = Math.max(0, cost - currentCost);
+                const isCurrent = wallet.authenticated && current !== 'Aucun' && index === currentIndex;
+                const included = wallet.authenticated && index < currentIndex;
+                const can = wallet.authenticated && !isCurrent && !included && balance >= upgrade;
+                const eur = Number(sub.eurCents || Math.round((cost / 150) * 100));
+                const currentEur = Number((catalog.subscriptions || []).find((item) => item.name === current)?.eurCents || 0);
+                const upgradeEur = Math.max(0, eur - currentEur);
+                let label = `Obtenir (${formatKrones(upgrade)} ₭)`;
+                if (!wallet.authenticated) label = 'Se connecter';
+                else if (isCurrent) label = 'Rang actuel';
+                else if (included) label = 'Déjà inclus';
+                else if (!can) label = `Solde insuffisant (${formatKrones(upgrade)} ₭)`;
+                const highlights = Array.isArray(sub.highlights) && sub.highlights.length
+                    ? sub.highlights
+                    : String(sub.perk || '').split('·').map((item) => item.trim()).filter(Boolean);
+                const klass = ['grade-card', isCurrent ? 'is-current' : ''].filter(Boolean).join(' ');
+                const disableBuy = isCurrent || included || (wallet.authenticated && !can);
+                const showEuro = !isCurrent && !included;
+                return `
+                    <article class="${klass}" data-grade="${escapeHtml(sub.name)}">
+                        <p class="grade-tag">${escapeHtml(sub.tagline || '')} · achat unique</p>
+                        <div class="grade-top">
+                            <span class="grade-name">${escapeHtml(sub.name)}</span>
+                            <span class="grade-price">${formatKrones(cost)} ₭<br><small>${formatEuro(eur)} TTC</small></span>
+                        </div>
+                        <div class="grade-perk">
+                            <ul>${highlights.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+                        </div>
+                        <div class="grade-actions">
+                            <button type="button" class="btn" data-sub="${escapeHtml(sub.name)}" ${disableBuy ? 'disabled' : ''}>${escapeHtml(label)}</button>
+                            ${showEuro ? `<button type="button" class="btn btn-red" data-grade-eur="${escapeHtml(sub.name)}">${wallet.authenticated ? `Payer ${formatEuro(upgradeEur)}` : 'Payer en euros'}</button>` : ''}
+                        </div>
+                    </article>
+                `;
+            }).join('');
+            list.querySelectorAll('[data-sub]').forEach((btn) => {
+                btn.onclick = () => {
+                    if (!wallet.authenticated) {
+                        window.top.location.href = loginUrl();
+                        return;
+                    }
+                    buyGrade(btn.getAttribute('data-sub'));
+                };
+            });
+            list.querySelectorAll('[data-grade-eur]').forEach((btn) => {
+                btn.onclick = () => {
+                    if (!wallet.authenticated) {
+                        window.top.location.href = loginUrl();
+                        return;
+                    }
+                    openGradeCheckout(btn.getAttribute('data-grade-eur'));
+                };
+            });
+        }
+
+        function GRADE_ORDER_INDEX(name) {
+            const order = ['Aucun', 'Kronium', 'Synkral', 'Kronalloy', 'Synkronite', 'Kronix'];
+            const i = order.indexOf(name);
+            return i < 0 ? 0 : i;
+        }
+
+        function renderMcQuote() {
+            const ramGb = Number(document.getElementById('mc-ram')?.value || 0);
+            const cpu = Number(document.getElementById('mc-cpu')?.value || 0);
+            const storageGb = Number(document.getElementById('mc-storage')?.value || 0);
+            const db = Boolean(document.getElementById('mc-db')?.checked);
+            const monthly = computeMcMonthly({ ramGb, cpu, storageGb, db });
+            const plan = wallet.plan || 'Aucun';
+            const discountMap = { Kronium: 0.005, Synkral: 0.03, Kronalloy: 0.07, Synkronite: 0.15, Kronix: 0.3 };
+            const rate = discountMap[plan] || 0;
+            const after = Math.round(monthly * (1 - rate));
+            const el = document.getElementById('mc-quote');
+            if (!el) return;
+            if (rate) {
+                el.textContent = `${formatKrones(monthly)} ₭ / mois → ${formatKrones(after)} ₭ avec ${plan} (−${Math.round(rate * 1000) / 10} %)`;
+            } else {
+                el.textContent = `${formatKrones(monthly)} Krônes / mois`;
+            }
+        }
+
+        function renderOrders() {
+            const root = document.getElementById('order-list');
+            if (!root) return;
+            if (!wallet.authenticated) {
+                root.innerHTML = `<p class="kr-note">Connectez-vous pour vos factures. <a href="${escapeHtml(loginUrl())}" target="_top">Se connecter</a></p>`;
+                return;
+            }
+            if (!orders.length) {
+                root.innerHTML = '<p class="kr-note">Aucune commande pour le moment.</p>';
+                return;
+            }
+            root.innerHTML = orders.map((order) => `
+                <article class="order-card">
+                    <div>
+                        <strong>${escapeHtml(order.invoiceNumber)}</strong>
+                        <div class="muted">${escapeHtml(order.packLabel)} · ${formatKrones(order.krones)} ₭ · ${escapeHtml(STATUS_LABEL[order.status] || order.status)}</div>
+                    </div>
+                    <span>${formatEuro(order.amountTtcCents)} TTC</span>
+                    <span class="muted">${order.createdAt ? new Date(order.createdAt).toLocaleString('fr-FR') : ''}</span>
+                </article>
+            `).join('');
+        }
+
+        function breakdownHtml(item) {
+            return `
+                <tr><td>${item.kind === 'grade' ? 'Rang' : 'Pack'}</td><td>${escapeHtml(item.label)} · ${formatKrones(item.krones)} ₭</td></tr>
+                <tr><td>Hors taxes</td><td>${formatEuro(item.htCents)}</td></tr>
+                <tr><td>TVA ${Math.round((item.vatRate || 0.2) * 100)} %</td><td>${formatEuro(item.vatCents)}</td></tr>
+                <tr><td>Total TTC</td><td>${formatEuro(item.eurCents)}</td></tr>
+            `;
+        }
+
+        function openCheckout(packId) {
+            const pack = (catalog.packs || []).find((item) => item.id === packId);
+            if (!pack) return;
+            checkoutPack = { kind: 'pack', packId: pack.id, ...pack };
+            checkoutOrder = null;
+            document.getElementById('consent-age').checked = false;
+            document.getElementById('consent-cgv').checked = false;
+            document.getElementById('consent-waiver').checked = false;
+            document.getElementById('kr-checkout-lede').textContent = 'Facture avant paiement. Aucun Krône n’est versé tant que le paiement n’est pas confirmé.';
+            document.getElementById('kr-breakdown').innerHTML = breakdownHtml(checkoutPack);
+            document.getElementById('kr-checkout-form').hidden = false;
+            document.getElementById('kr-checkout-pay').hidden = true;
+            document.getElementById('kr-checkout-status').textContent = '';
+            document.getElementById('kr-checkout').showModal();
+        }
+
+        function openGradeCheckout(name) {
+            const sub = (catalog.subscriptions || []).find((item) => item.name === name);
+            if (!sub) return;
+            const current = (catalog.subscriptions || []).find((item) => item.name === wallet.plan);
+            const eur = Math.max(0, Number(sub.eurCents || 0) - Number(current?.eurCents || 0));
+            const krones = Math.max(0, Number(sub.krones || 0) - Number(current?.krones || GRADE_COSTS[wallet.plan] || 0));
+            const vatRate = catalog.billing?.vatRate || 0.2;
+            const ht = Math.round(eur / (1 + vatRate));
+            checkoutPack = {
+                kind: 'grade',
+                grade: sub.name,
+                label: current ? `Complément ${sub.name}` : `Rang ${sub.name}`,
+                krones,
+                eurCents: eur,
+                htCents: ht,
+                vatCents: eur - ht,
+                vatRate
+            };
+            checkoutOrder = null;
+            document.getElementById('consent-age').checked = false;
+            document.getElementById('consent-cgv').checked = false;
+            document.getElementById('consent-waiver').checked = false;
+            document.getElementById('kr-checkout-lede').textContent = 'Achat unique du rang, en euros. Le rang est attribué après paiement confirmé — sans acheter un pack de Krônes.';
+            document.getElementById('kr-breakdown').innerHTML = breakdownHtml(checkoutPack);
+            document.getElementById('kr-checkout-form').hidden = false;
+            document.getElementById('kr-checkout-pay').hidden = true;
+            document.getElementById('kr-checkout-status').textContent = '';
+            document.getElementById('kr-checkout').showModal();
+        }
+
+        function showPayStep(order) {
+            checkoutOrder = order;
+            document.getElementById('kr-checkout-form').hidden = true;
+            document.getElementById('kr-checkout-pay').hidden = false;
+            document.getElementById('kr-checkout-lede').textContent = `Commande ${order.invoiceNumber} — ${STATUS_LABEL[order.status] || order.status}`;
+            document.getElementById('kr-pay-hint').textContent = 'Choisissez un moyen. PayPal, Apple Pay et la carte seront branchés sur cette étape, sans changer la facture.';
+            const methods = catalog.billing?.methods || [];
+            const root = document.getElementById('kr-pay-methods');
+            root.innerHTML = methods.map((method) => {
+                const disabled = !method.available ? 'disabled' : '';
+                const soon = method.soon ? '<span class="soon">Bientôt</span>' : '';
+                return `<button type="button" class="btn ${method.id === 'demo' || method.id === 'sepa' ? 'btn-red' : ''}" data-method="${escapeHtml(method.id)}" ${disabled}>
+                    <span>${escapeHtml(method.label)}</span>${soon}
+                </button>`;
+            }).join('');
+            root.querySelectorAll('[data-method]').forEach((btn) => {
+                btn.onclick = () => payOrder(btn.getAttribute('data-method'));
+            });
+            renderTransfer(order);
+        }
+
+        function renderTransfer(order) {
+            const box = document.getElementById('kr-transfer');
+            if (order.transfer) {
+                box.hidden = false;
+                box.innerHTML = `<p>Virement à l’ordre de <strong>${escapeHtml(order.transfer.beneficiary)}</strong></p>
+                    <p>IBAN <code>${escapeHtml(order.transfer.iban)}</code>${order.transfer.bic ? ` · BIC <code>${escapeHtml(order.transfer.bic)}</code>` : ''}</p>
+                    <p>Libellé obligatoire : <code>${escapeHtml(order.transfer.reference)}</code></p>
+                    <p class="muted">Les Krônes sont crédités à réception, par l’équipe.</p>`;
+            } else {
+                box.hidden = true;
+                box.innerHTML = '';
+            }
+        }
+
+        async function submitCheckout() {
+            const status = document.getElementById('kr-checkout-status');
+            if (!document.getElementById('consent-age').checked
+                || !document.getElementById('consent-cgv').checked
+                || !document.getElementById('consent-waiver').checked) {
+                status.textContent = 'Cochez les trois cases pour continuer. Elles ne peuvent pas être pré-cochées.';
+                return;
+            }
+            status.textContent = 'Enregistrement de la commande…';
+            try {
+                const res = await fetch('/api/krones/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        packId: checkoutPack.kind === 'grade' ? undefined : (checkoutPack.packId || checkoutPack.id),
+                        grade: checkoutPack.kind === 'grade' ? checkoutPack.grade : undefined,
+                        consents: { age: true, cgv: true, withdrawalWaiver: true }
+                    })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.status === 401) {
+                    window.top.location.href = data.loginUrl || loginUrl();
+                    return;
+                }
+                if (!res.ok) {
+                    status.textContent = data.error || 'Commande refusée.';
+                    return;
+                }
+                await loadOrders();
+                showPayStep(data);
+            } catch {
+                status.textContent = 'Erreur réseau pendant la commande.';
+            }
+        }
+
+        async function payOrder(method) {
+            if (!checkoutOrder) return;
+            const status = document.getElementById('kr-pay-status');
+            status.textContent = 'Paiement…';
+            try {
+                const res = await fetch(`/api/krones/orders/${encodeURIComponent(checkoutOrder.id)}/pay`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ method })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    status.textContent = data.error || 'Paiement refusé.';
+                    return;
+                }
+                checkoutOrder = data;
+                renderTransfer(data);
+                if (data.wallet) {
+                    wallet = data.wallet;
+                    renderWallet();
+                    renderGrades();
+                    renderCompare();
+                    renderMcQuote();
+                    notifyParent();
+                }
+                await loadOrders();
+                if (data.status === 'fulfilled') {
+                    status.textContent = `${formatKrones(data.krones)} Krônes crédités. Facture ${data.invoiceNumber}.`;
+                    setStatus(`Commande ${data.invoiceNumber} soldée.`);
+                } else if (data.status === 'awaiting_transfer') {
+                    status.textContent = 'Commande enregistrée. Envoyez le virement avec le n° de facture en libellé.';
+                    setStatus(`Commande ${data.invoiceNumber} en attente du virement.`);
+                } else {
+                    status.textContent = STATUS_LABEL[data.status] || data.status;
+                }
+                document.getElementById('kr-checkout-lede').textContent = `Commande ${data.invoiceNumber} — ${STATUS_LABEL[data.status] || data.status}`;
+            } catch {
+                status.textContent = 'Erreur réseau pendant le paiement.';
+            }
+        }
+
+        async function loadWallet() {
+            const res = await fetch('/api/krones');
+            if (!res.ok) throw new Error('wallet');
+            wallet = await res.json();
+            renderWallet();
+            renderPacks();
+            renderGrades();
+            renderCompare();
+            renderMcQuote();
+            notifyParent();
+        }
+
+        async function loadCatalog() {
+            const res = await fetch('/api/krones/catalog');
+            if (!res.ok) throw new Error('catalog');
+            catalog = await res.json();
+            if (catalog.billing?.authenticated && !wallet.authenticated) {
+                wallet.authenticated = true;
+                wallet.demo = false;
+            }
+            renderPacks();
+            renderCompare();
+            renderGrades();
+            renderMcQuote();
+        }
+
+        async function loadOrders() {
+            if (!wallet.authenticated && !catalog.billing?.authenticated) {
+                orders = [];
+                renderOrders();
+                return;
+            }
+            const res = await fetch('/api/krones/orders');
+            if (res.status === 401) {
+                orders = [];
+                renderOrders();
+                return;
+            }
+            if (!res.ok) return;
+            const data = await res.json();
+            orders = Array.isArray(data.orders) ? data.orders : [];
+            renderOrders();
+        }
+
+        async function buyGrade(name) {
+            setStatus('Achat du rang…');
+            try {
+                const res = await fetch('/api/grades/purchase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ grade: name })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    setStatus(data.message || data.error || 'Achat refusé.');
+                    return;
+                }
+                await loadWallet();
+                setStatus(data.message || `${name} acquis.`);
+            } catch {
+                setStatus('Erreur réseau pendant l’achat du rang.');
+            }
+        }
+
+        ['mc-ram', 'mc-cpu', 'mc-storage', 'mc-db'].forEach((id) => {
+            document.getElementById(id)?.addEventListener('input', renderMcQuote);
+            document.getElementById(id)?.addEventListener('change', renderMcQuote);
+        });
+
+        document.getElementById('kr-checkout-close')?.addEventListener('click', () => {
+            document.getElementById('kr-checkout').close();
+        });
+        document.getElementById('kr-pay-close')?.addEventListener('click', () => {
+            document.getElementById('kr-checkout').close();
+        });
+        document.getElementById('kr-checkout-submit')?.addEventListener('click', submitCheckout);
+
+        (async function init() {
+            try {
+                await loadCatalog();
+                await loadWallet();
+                await loadOrders();
+                setStatus('');
+            } catch {
+                setStatus('API Krônes injoignable. Redémarrez le serveur si les routes de commande viennent d’être ajoutées.');
+            }
+        })();
+    </script>
+</body>
+</html>

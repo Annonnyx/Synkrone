@@ -16,7 +16,7 @@ const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
 const DEFAULT_PORT = 3668;
-const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/design'];
+const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/design', '/api', '/hebergement'];
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
 const CONTACT_COOLDOWN_MS = 10 * 60 * 1000;
 const DEFAULT_SUPPORT_GUILD_ID = '1368235294192570520';
@@ -26,6 +26,26 @@ const BOT_OWNER_CACHE_TTL_MS = 5 * 60 * 1000;
 const SESSION_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
 
 const USERS_DB_PATH = path.join(__dirname, 'data', 'users.json');
+let kronesApi = null;
+try {
+    kronesApi = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'krones'));
+} catch {
+    kronesApi = null;
+}
+
+async function overlayWalletOnUser(user) {
+    if (!kronesApi || !user || user.isGuest) return user;
+    const id = String(user.id || '').trim();
+    if (!id || id === 'guest') return user;
+    try {
+        const wallet = await kronesApi.peekWallet(id);
+        user.krone = wallet.balance;
+        if (wallet.plan) user.grade = wallet.plan;
+    } catch {
+        /* keep cached krone */
+    }
+    return user;
+}
 const ROULETTE_DB_PATH = path.join(__dirname, 'data', 'roulette.json');
 const WORKSPACE_DB_PATH = path.join(__dirname, 'data', 'workspace.json');
 const CLOUD_DB_PATH = path.join(__dirname, 'data', 'cloud.json');
@@ -48,11 +68,11 @@ const ALLOWED_MANUAL_ROLES = new Set(['Initié', 'Krobi', 'Équipe', 'Admin']);
 const BASE_MEMBER_ROLES = new Set(['Initié', 'Krobi']);
 const GRADE_KRONE_COSTS = {
     Aucun: 0,
-    Kronium: 160,
-    Synkral: 780,
-    Kronalloy: 1450,
-    Synkronite: 2800,
-    Kronix: 6500
+    Kronium: 150,
+    Synkral: 750,
+    Kronalloy: 1500,
+    Synkronite: 3000,
+    Kronix: 6000
 };
 
 const contactCooldownByUser = new Map();
@@ -335,6 +355,7 @@ async function syncSessionUserWithDb(sessionUser, options = {}) {
         isTeamOwner: Boolean(sessionUser.isTeamOwner || existing?.isTeamOwner),
         isGuest: false, createdAt: Number(existing?.createdAt) || now, updatedAt: now, lastSeenAt: now, lastLoginAt: markLogin ? now : Number(existing?.lastLoginAt || now)
     };
+    await overlayWalletOnUser(nextUser);
     db.users[userId] = nextUser;
     await writeUsersDb(db);
     
@@ -353,6 +374,82 @@ function isDiscordOAuthConfigured() {
         && String(process.env.DISCORD_CLIENT_SECRET || '').trim()
         && String(process.env.DISCORD_REDIRECT_URI || '').trim()
     );
+}
+
+function isGithubOAuthConfigured() {
+    return Boolean(
+        String(process.env.GITHUB_CLIENT_ID || '').trim()
+        && String(process.env.GITHUB_CLIENT_SECRET || '').trim()
+    );
+}
+
+function isGoogleOAuthConfigured() {
+    return Boolean(
+        String(process.env.GOOGLE_CLIENT_ID || '').trim()
+        && String(process.env.GOOGLE_CLIENT_SECRET || '').trim()
+    );
+}
+
+function publicSiteOrigin(req) {
+    const fromEnv = String(process.env.PUBLIC_ORIGIN || '').trim().replace(/\/$/, '');
+    if (fromEnv) return fromEnv;
+    const host = req?.get?.('host');
+    if (host) return `${req.protocol || 'http'}://${host}`;
+    return 'http://127.0.0.1:3668';
+}
+
+function githubRedirectUri(req) {
+    return String(process.env.GITHUB_REDIRECT_URI || '').trim() || `${publicSiteOrigin(req)}/auth/github/callback`;
+}
+
+function googleRedirectUri(req) {
+    return String(process.env.GOOGLE_REDIRECT_URI || '').trim() || `${publicSiteOrigin(req)}/auth/google/callback`;
+}
+
+async function upsertUserFromOAuth(provider, profile) {
+    const providerId = String(profile.id || '').trim();
+    if (!providerId) return null;
+    const userId = `${provider}:${providerId}`;
+    const db = await readUsersDb();
+    const existing = Object.values(db.users || {}).find((u) => {
+        const providers = u?.providers && typeof u.providers === 'object' ? u.providers : {};
+        return String(u?.id) === userId || String(providers[provider] || '') === providerId;
+    });
+    const now = Date.now();
+    const id = existing?.id || userId;
+    const nextUser = {
+        ...(existing || {}),
+        id,
+        username: String(profile.username || existing?.username || `Utilisateur ${providerId.slice(-4)}`),
+        avatar: String(profile.avatar || existing?.avatar || '/assets/images/logo.jpg'),
+        role: existing?.role || 'Krobi',
+        grade: ALLOWED_USER_GRADES.has(String(existing?.grade || '')) ? String(existing.grade) : 'Aucun',
+        krone: Number.isFinite(Number(existing?.krone)) ? Math.max(0, Math.trunc(Number(existing.krone))) : 0,
+        isTeamOwner: Boolean(existing?.isTeamOwner),
+        isGuest: false,
+        providers: {
+            ...((existing && existing.providers) || {}),
+            [provider]: providerId
+        },
+        createdAt: Number(existing?.createdAt) || now,
+        updatedAt: now,
+        lastSeenAt: now,
+        lastLoginAt: now
+    };
+    db.users[id] = normalizeStoredUser(nextUser, id);
+    await writeUsersDb(db);
+    return db.users[id];
+}
+
+function oauthStatus() {
+    return {
+        oauthConfigured: isDiscordOAuthConfigured() || isGithubOAuthConfigured() || isGoogleOAuthConfigured(),
+        providers: {
+            discord: isDiscordOAuthConfigured(),
+            github: isGithubOAuthConfigured(),
+            google: isGoogleOAuthConfigured()
+        }
+    };
 }
 
 function isReservedPublicPath(pathname) {
@@ -458,19 +555,121 @@ app.get('/auth/discord/callback', async (req, res) => {
     }
 });
 
+app.get('/auth/github', (req, res) => {
+    if (!isGithubOAuthConfigured()) return res.redirect('/');
+    const url = new URL('https://github.com/login/oauth/authorize');
+    url.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID);
+    url.searchParams.set('redirect_uri', githubRedirectUri(req));
+    url.searchParams.set('scope', 'read:user user:email');
+    url.searchParams.set('allow_signup', 'true');
+    res.redirect(url.toString());
+});
+
+app.get('/auth/github/callback', async (req, res) => {
+    if (!isGithubOAuthConfigured()) return res.redirect('/');
+    const code = req.query.code;
+    if (!code) return res.redirect('/');
+    try {
+        const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
+            client_id: process.env.GITHUB_CLIENT_ID,
+            client_secret: process.env.GITHUB_CLIENT_SECRET,
+            code,
+            redirect_uri: githubRedirectUri(req)
+        }, { headers: { Accept: 'application/json' } });
+        const access = tokenResponse.data?.access_token;
+        if (!access) return res.redirect('/');
+        const userResponse = await axios.get('https://api.github.com/user', {
+            headers: { Authorization: `Bearer ${access}`, 'User-Agent': 'Synkrone' }
+        });
+        const gh = userResponse.data || {};
+        const persistedUser = await upsertUserFromOAuth('github', {
+            id: gh.id,
+            username: gh.login || gh.name,
+            avatar: gh.avatar_url
+        });
+        if (!persistedUser) return res.redirect('/');
+        req.session.user = {
+            id: persistedUser.id,
+            username: persistedUser.username,
+            avatar: persistedUser.avatar,
+            role: persistedUser.role,
+            grade: persistedUser.grade,
+            krone: persistedUser.krone,
+            isGuest: false,
+            isTeamOwner: persistedUser.isTeamOwner
+        };
+        res.redirect('/');
+    } catch (err) {
+        res.redirect('/');
+    }
+});
+
+app.get('/auth/google', (req, res) => {
+    if (!isGoogleOAuthConfigured()) return res.redirect('/');
+    const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    url.searchParams.set('client_id', process.env.GOOGLE_CLIENT_ID);
+    url.searchParams.set('redirect_uri', googleRedirectUri(req));
+    url.searchParams.set('response_type', 'code');
+    url.searchParams.set('scope', 'openid email profile');
+    url.searchParams.set('prompt', 'select_account');
+    res.redirect(url.toString());
+});
+
+app.get('/auth/google/callback', async (req, res) => {
+    if (!isGoogleOAuthConfigured()) return res.redirect('/');
+    const code = req.query.code;
+    if (!code) return res.redirect('/');
+    try {
+        const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
+            client_id: process.env.GOOGLE_CLIENT_ID,
+            client_secret: process.env.GOOGLE_CLIENT_SECRET,
+            code,
+            grant_type: 'authorization_code',
+            redirect_uri: googleRedirectUri(req)
+        });
+        const access = tokenResponse.data?.access_token;
+        if (!access) return res.redirect('/');
+        const userResponse = await axios.get('https://openidconnect.googleapis.com/v1/userinfo', {
+            headers: { Authorization: `Bearer ${access}` }
+        });
+        const g = userResponse.data || {};
+        const persistedUser = await upsertUserFromOAuth('google', {
+            id: g.sub,
+            username: g.name || g.email,
+            avatar: g.picture
+        });
+        if (!persistedUser) return res.redirect('/');
+        req.session.user = {
+            id: persistedUser.id,
+            username: persistedUser.username,
+            avatar: persistedUser.avatar,
+            role: persistedUser.role,
+            grade: persistedUser.grade,
+            krone: persistedUser.krone,
+            isGuest: false,
+            isTeamOwner: persistedUser.isTeamOwner
+        };
+        res.redirect('/');
+    } catch (err) {
+        res.redirect('/');
+    }
+});
+
 app.get('/auth/guest', (req, res) => {
     req.session.user = { id: 'guest', username: 'Visiteur', isGuest: true };
     res.redirect('/');
 });
 
 app.get('/api/me', async (req, res) => {
-    if (!req.session.user) return res.json({ authenticated: false, oauthConfigured: isDiscordOAuthConfigured() });
+    if (!req.session.user) return res.json({ authenticated: false, ...oauthStatus() });
     await resolveAdminAccessForSessionUser(req.session.user);
     const syncedUser = await syncSessionUserWithDb(req.session.user);
     
     const db = await readUsersDb();
     const fullUser = db.users[syncedUser.id];
-    return res.json({ authenticated: true, oauthConfigured: isDiscordOAuthConfigured(), user: fullUser || syncedUser });
+    if (fullUser) await overlayWalletOnUser(fullUser);
+    await overlayWalletOnUser(syncedUser);
+    return res.json({ authenticated: true, ...oauthStatus(), user: fullUser || syncedUser });
 });
 
 app.post('/api/me/profile', async (req, res) => {
@@ -500,11 +699,6 @@ app.post('/api/me/profile', async (req, res) => {
     if (payload.hasCustomization !== undefined) existing.hasCustomization = Boolean(payload.hasCustomization);
     if (Array.isArray(payload.likedProfiles)) existing.likedProfiles = payload.likedProfiles;
     if (typeof payload.stats === 'object') existing.stats = payload.stats;
-    
-    if (payload.krone !== undefined) {
-        existing.krone = Math.max(0, Math.trunc(Number(payload.krone)));
-        req.session.user.krone = existing.krone; 
-    }
     existing.updatedAt = Date.now();
     db.users[sessionUser.id] = existing;
     await writeUsersDb(db);
@@ -525,8 +719,8 @@ app.get('/logout', (req, res) => {
 
 // --- CLOUD ---
 registerCloudRoutes(app, { readCloudDb, writeCloudDb, isManualStaffRole });
-registerMeRoutes(app, { readUsersDb, writeUsersDb, isManualStaffRole });
-registerPublicbotRoutes(app, { readUsersDb, writeUsersDb, isManualStaffRole });
+registerMeRoutes(app, { readUsersDb, writeUsersDb, isManualStaffRole, krones: kronesApi });
+registerPublicbotRoutes(app, { readUsersDb, writeUsersDb, isManualStaffRole, krones: kronesApi });
 registerBumpRoutes(app, { readUsersDb, writeUsersDb, isManualStaffRole });
 
 // --- ESPACE DE TRAVAIL (WORKSPACE) ---
@@ -765,7 +959,11 @@ app.post('/api/roulette/spin', async (req, res) => {
     
     const usersDb = await readUsersDb();
     const existing = normalizeStoredUser(usersDb.users[userId], userId);
-    const nextKrone = Math.max(0, Number(existing?.krone || 0) + Number(prize.amount || 0));
+    let nextKrone = Math.max(0, Number(existing?.krone || 0) + Number(prize.amount || 0));
+    if (kronesApi) {
+        const credited = await kronesApi.creditAccount(userId, Number(prize.amount || 0), 'roulette');
+        if (credited.ok) nextKrone = credited.wallet.balance;
+    }
     
     const nextUser = {
         ...(existing || {}), id: userId, username: String(sessionUser.username || existing?.username || `Utilisateur ${userId.slice(-4)}`),
@@ -813,6 +1011,16 @@ app.post('/api/grades/purchase', async (req, res) => {
     if (targetCost <= currentCost) return res.status(400).json({ ok: false, message: 'Grade deja possede.' });
     
     const requiredKrone = targetCost - currentCost;
+    if (kronesApi) {
+        const spent = await kronesApi.debitAccount(userId, requiredKrone, `grade:${targetGrade}`);
+        if (!spent.ok) return res.status(409).json({ ok: false, message: spent.error || 'Solde insuffisant.' });
+        await kronesApi.setAccountPlan(userId, targetGrade);
+        const nextUser = { ...existing, grade: targetGrade, krone: spent.wallet.balance, updatedAt: Date.now(), lastSeenAt: Date.now() };
+        db.users[userId] = nextUser;
+        await writeUsersDb(db);
+        sessionUser.grade = nextUser.grade; sessionUser.krone = nextUser.krone;
+        return res.json({ ok: true, message: 'Achat valide.', user: toAdminUserDto(nextUser) });
+    }
     if (Math.max(0, Math.trunc(Number(existing.krone || 0))) < requiredKrone) return res.status(409).json({ ok: false, message: 'Solde insuffisant.' });
     
     const nextUser = { ...existing, grade: targetGrade, krone: existing.krone - requiredKrone, updatedAt: Date.now(), lastSeenAt: Date.now() };
@@ -832,7 +1040,8 @@ app.use('/api', utilisateurRoutes({
     isManualStaffRole,
     ALLOWED_USER_GRADES,
     ALLOWED_MANUAL_ROLES,
-    writeUsersDb
+    writeUsersDb,
+    krones: kronesApi
 }));
 
 app.get('/api/admin/pm2/servers', async (req, res) => {
@@ -875,8 +1084,12 @@ app.get(/^\/admin\/(utilisateur|annonce|pm2)\/index\.html$/i, async (req, res) =
     res.sendFile(path.join(__dirname, 'public', 'admin', String(req.params[0]).toLowerCase(), 'index.html'));
 });
 
+app.get(['/faq', '/faq/', '/krones', '/krones/', '/cgv', '/cgv/', '/stats', '/stats/'], (_req, res) => {
+    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // -- ROUTES SHELL --
-const SHELL_ROUTES = new Set(['/', '/accueil', '/discord', '/discord/bots', '/discord/publicbot', '/discord/dashbot', '/discord/me', '/discord/bump', '/minecraft', '/minecraft/serveur', '/minecraft/modpack', '/admin', '/admin/utilisateur', '/admin/annonce', '/admin/pm2', '/equipe', '/equipe/espace-travail', '/equipe/cloud', '/cgu', '/contact', '/parametre.html']);
+const SHELL_ROUTES = new Set(['/', '/accueil', '/discord', '/discord/bots', '/discord/publicbot', '/discord/dashbot', '/discord/commandes', '/discord/me', '/discord/bump', '/minecraft', '/minecraft/serveur', '/minecraft/modpack', '/admin', '/admin/utilisateur', '/admin/annonce', '/admin/pm2', '/equipe', '/equipe/espace-travail', '/equipe/cloud', '/cgu', '/cgv', '/contact', '/faq', '/krones', '/stats', '/parametre.html']);
 const SHELL_PREFIXES = ['/discord/bots/', '/minecraft/modpack/', '/equipe/espace-travail/', '/equipe/cloud/'];
 
 app.get(/^\/(.*)$/i, async (req, res, next) => {

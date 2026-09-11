@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="/design/synkrone.css">
     <style>
         html, body { width: 100%; height: 100%; overflow: hidden; }
+        .header-login-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+        button.badge-krone:hover,
+        .btn-krones:hover { border-color: var(--ambre); background: var(--ambre-clair); }
     </style>
 </head>
 <body>
@@ -32,9 +40,10 @@
             </div>
             <div class="footer-links">
                 <a href="/cgu" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('cgu', { updateUrl: true });">CGU</a>
-                <span class="footer-separator">·</span>
+                <a href="/cgv" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('cgv', { updateUrl: true });">CGV</a>
+                <a href="/faq" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('faq', { updateUrl: true });">FAQ</a>
                 <a href="/contact" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('contact', { updateUrl: true });">Contact</a>
-                <span class="footer-separator">·</span>
+                <a href="/hub" class="footer-link">Hub</a>
                 <a href="/vux/" class="footer-link">Vux</a>
             </div>
         </footer>
@@ -43,7 +52,9 @@
     <script>
         // --- ETAT SESSION FRONTEND ---
         const store = {
-            user: null
+            user: null,
+            oauth: { discord: false, github: false, google: false },
+            panelOrigin: '/hebergement'
         };
         const SUPPORT_GRADE_ORDER = {
             Aucun: 0,
@@ -86,15 +97,52 @@
             if (value >= 1e3) return (value / 1e3).toFixed(1).replace(/\.0$/, '') + ' K';
             return value.toString();
         }
-        function loginDiscord() {
-            window.location.href = '/auth/discord';
+        function kronesBadgeHtml() {
+            const fromUser = typeof store.user?.krone === 'number' ? store.user.krone : null;
+            const fromWallet = typeof store.krones?.balance === 'number' ? store.krones.balance : null;
+            const safeKrone = fromUser !== null ? fromUser : fromWallet;
+            const hasAmount = typeof safeKrone === 'number';
+            const kroneLabel = hasAmount && safeKrone <= 1 ? 'Krône' : 'Krônes';
+            const formatted = hasAmount ? formatKrones(safeKrone) : '—';
+            const title = hasAmount ? `${Number(safeKrone).toLocaleString('fr-FR')} ${kroneLabel}` : 'Portefeuille Krônes';
+            return `<button type="button" class="btn-krones" title="${title}" onclick="navigateToMainSection('krones', { updateUrl: true })">
+                <span class="btn-krones-label">${kroneLabel}</span>
+                <span class="btn-krones-value">
+                    <span class="btn-krones-amount">${formatted}</span>
+                    <span class="btn-krones-unit">₭</span>
+                </span>
+            </button>`;
+        }
+        async function loadKronesWallet() {
+            try {
+                const res = await fetch('/api/krones');
+                if (!res.ok) return;
+                store.krones = await res.json();
+                if (store.user && typeof store.krones?.balance === 'number') {
+                    store.user.krone = store.krones.balance;
+                    if (store.krones.plan) store.user.grade = store.krones.plan;
+                }
+            } catch {
+                // no-op
+            }
+        }
+        function panelLoginUrl() {
+            const origin = String(store.panelOrigin || '/hebergement').replace(/\/$/, '');
+            return `${origin}/login`;
+        }
+        function loginButtonsHtml() {
+            return `<a class="btn-login" href="${panelLoginUrl()}" target="_top">Se connecter</a>`;
+        }
+        function publicToolsHtml() {
+            return `<nav class="sk-app-nav" aria-label="Hub">
+                <a href="/hub">Hub</a>
+            </nav>`;
         }
         function internalNavHtml() {
+            if (typeof canAccessEquipe === 'function' && !canAccessEquipe()) return '';
             return `<nav class="sk-app-nav" aria-label="Outils internes">
-                <a href="/hub">hub</a>
                 <a href="/ui/">ui</a>
                 <a href="/sharing/">sharing</a>
-                <a href="/vux/">vux</a>
             </nav>`;
         }
         async function loadMenu() {
@@ -105,6 +153,15 @@
                 if (!res.ok) return;
                 menuContainer.innerHTML = await res.text();
                 bindNavToggle();
+                try {
+                    const cfg = await fetch('/api/config');
+                    if (cfg.ok) {
+                        const data = await cfg.json();
+                        if (data.panelOrigin) store.panelOrigin = data.panelOrigin;
+                        const hosting = menuContainer.querySelector('#nav-hosting');
+                        if (hosting && data.panelOrigin) hosting.setAttribute('href', data.panelOrigin);
+                    }
+                } catch { /* default localhost */ }
             } catch (e) {
                 console.error("Erreur lors du chargement du menu", e);
             }
@@ -118,6 +175,7 @@
                 }
                 const data = await res.json();
                 store.user = data.authenticated ? data.user : null;
+                store.oauth = data.providers || { discord: Boolean(data.oauthConfigured), github: false, google: false };
             } catch (e) {
                 console.error("Erreur lors du chargement de la session", e);
                 store.user = null;
@@ -165,9 +223,13 @@
         async function logout() {
             await fetch('/logout');
             store.user = null;
+            store.krones = null;
+            await loadKronesWallet();
             renderUI();
         }
         
+        const DISCORD_BOT_PAGES = new Set(['vax', 'arceus', 'asuna', 'kayaba', 'yui', 'bot']);
+
         const APP_STRUCTURE = {
             accueil: {
                 route: '/accueil',
@@ -180,12 +242,14 @@
                 pages: {
                     bots: '/discord/bots/index.html',
                     publicbot: '/discord/publicbot/index.html',
-                    dashbot: '/discord/dashbot/index.html'
+                    dashbot: '/discord/dashbot/index.html',
+                    commandes: '/discord/commandes/index.html'
                 },
                 routes: {
                     bots: '/discord/bots',
                     publicbot: '/discord/publicbot',
-                    dashbot: '/discord/dashbot'
+                    dashbot: '/discord/dashbot',
+                    commandes: '/discord/commandes'
                 }
             },
             bump: {
@@ -241,9 +305,25 @@
                 route: '/cgu',
                 page: '/cgu.html'
             },
+            cgv: {
+                route: '/cgv',
+                page: '/cgv.html'
+            },
             contact: {
                 route: '/contact',
                 page: '/contact.html'
+            },
+            faq: {
+                route: '/faq',
+                page: '/faq/index.html'
+            },
+            krones: {
+                route: '/krones',
+                page: '/krones/index.html'
+            },
+            stats: {
+                route: '/stats',
+                page: '/stats/index.html'
             }
         };
 
@@ -265,8 +345,7 @@
                 return {
                     mainSection: 'discord',
                     subTab: 'bots',
-                    botsTab: 'discord',
-                    canonical: '/discord/bots/discord'
+                    canonical: '/discord/bots'
                 };
             }
             if (currentPath === '/minecraft/modpack') {
@@ -281,6 +360,9 @@
             const botsPrefix = '/discord/bots/';
             if (currentPath.startsWith(botsPrefix)) {
                 const botsTab = currentPath.slice(botsPrefix.length);
+                if (!DISCORD_BOT_PAGES.has(botsTab)) {
+                    return { mainSection: 'discord', subTab: 'bots', canonical: '/discord/bots' };
+                }
                 return {
                     mainSection: 'discord',
                     subTab: 'bots',
@@ -455,8 +537,8 @@
             setActiveSubTab(resolvedSubTab);
             let framePath = section.pages[resolvedSubTab];
             
-            if (mainSection === 'discord' && resolvedSubTab === 'bots' && botsTab) {
-                framePath = `${framePath}?tab=${encodeURIComponent(botsTab)}`;
+            if (mainSection === 'discord' && resolvedSubTab === 'bots' && DISCORD_BOT_PAGES.has(botsTab)) {
+                framePath = `/discord/bots/${botsTab}.html`;
             }
             if (mainSection === 'minecraft' && resolvedSubTab === 'modpack' && modpackTab) {
                 framePath = `${framePath}?tab=${encodeURIComponent(modpackTab)}`;
@@ -471,7 +553,7 @@
                 const sectionRoutes = section.routes || {};
                 let targetRoute = sectionRoutes[resolvedSubTab] || section.route;
                 if (mainSection === 'discord' && resolvedSubTab === 'bots') {
-                    targetRoute = `/discord/bots/${botsTab || 'discord'}`;
+                    targetRoute = DISCORD_BOT_PAGES.has(botsTab) ? `/discord/bots/${botsTab}` : '/discord/bots';
                 }
                 if (mainSection === 'minecraft' && resolvedSubTab === 'modpack') {
                     targetRoute = `/minecraft/modpack/${modpackTab || 'accueil'}`;
@@ -526,25 +608,20 @@
                         <button type="button" class="header-brand" onclick="navigateToMainSection('accueil', { updateUrl: true })" aria-label="Synkrone accueil">
                             <img src="/assets/images/logo.jpg" alt="">
                             <span class="brand-title">Synkrone</span><span class="brand-tld">.app</span>
-                            ${internalNavHtml()}
                         </button>
+                        ${publicToolsHtml()}
+                        ${internalNavHtml()}
                     </div>
                     <div class="header-bottom">
                         <div class="header-user">
-                            <button class="btn-login-small" onclick="loginDiscord()">
-                                <img class="discord-icon" src="https://cdn.simpleicons.org/discord/FFFFFF" alt="Discord">
-                                <span>Se connecter</span>
-                            </button>
+                            <div class="krones-center-section">${kronesBadgeHtml()}</div>
+                            ${loginButtonsHtml()}
                         </div>
                     </div>
                 `;
             } else {
-                const safeKrone = typeof user.krone === 'number' ? user.krone : 0;
                 const safeRole = resolveHeaderRoleBadge(user);
                 const safeAvatar = user.avatar || '/assets/images/logo.jpg';
-                const kroneLabel = safeKrone <= 1 ? "Krône" : "Krônes";
-                
-                const formattedKrone = formatKrones(safeKrone);
                 const badgeClass = safeRole === 'Admin' ? 'badge badge-admin' : 'badge badge-role';
                 
                 header.innerHTML = `
@@ -552,14 +629,15 @@
                         <button type="button" class="header-brand" onclick="navigateToMainSection('accueil', { updateUrl: true })" aria-label="Synkrone accueil">
                             <img src="/assets/images/logo.jpg" alt="">
                             <span class="brand-title">Synkrone</span><span class="brand-tld">.app</span>
-                            ${internalNavHtml()}
                         </button>
+                        ${publicToolsHtml()}
+                        ${internalNavHtml()}
                     </div>
                     <div class="header-bottom">
                         <div class="header-user">
                             
                             <button class="btn-roulette" onclick="openRouletteModal()" title="Roulette">
-                                🎰<span class="roulette-text"> Roulette</span>
+                                Roulette
                             </button>
                             
                             <div class="user-left-section">
@@ -570,12 +648,7 @@
                                 <span class="user-name">${user.username}</span>
                             </div>
                             
-                            <div class="krones-center-section">
-                                <div class="badge badge-krone" title="${safeKrone.toLocaleString('fr-FR')} ${kroneLabel}">
-                                    <span class="currency-icon">🪙</span>
-                                    <span>${formattedKrone} ${kroneLabel}</span>
-                                </div>
-                            </div>
+                            <div class="krones-center-section">${kronesBadgeHtml()}</div>
                             
                             <div class="header-actions">
                                 <button class="btn-symbol logout" title="Déconnexion" onclick="logout()">
@@ -612,6 +685,7 @@
         (async function init() {
             await loadMenu();
             await loadSessionUser();
+            await loadKronesWallet();
             renderUI();
             initMainNavigation();
             
@@ -647,9 +721,12 @@
                 const payload = event.data;
                 if (!payload || payload.type !== 'synkrone:bots-route') return;
                 const rawTab = typeof payload.tab === 'string' ? payload.tab.trim().toLowerCase() : '';
-                if (!rawTab) return;
-                const targetPath = `/discord/bots/${rawTab}`;
-                syncBrowserPath(targetPath, Boolean(payload.replaceHistory));
+                navigateToMainSection('discord', {
+                    subTab: 'bots',
+                    botsTab: DISCORD_BOT_PAGES.has(rawTab) ? rawTab : null,
+                    updateUrl: true,
+                    replaceHistory: Boolean(payload.replaceHistory)
+                });
             });
             window.addEventListener('message', (event) => {
                 if (event.origin !== window.location.origin) return;
@@ -674,13 +751,28 @@
                 if (!payload || payload.type !== 'synkrone:user-updated') return;
                 mergeSessionUserUpdate(payload.user || null);
             });
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) return;
+                const payload = event.data;
+                if (!payload || payload.type !== 'synkrone:krones-updated') return;
+                if (payload.wallet && typeof payload.wallet === 'object') {
+                    store.krones = payload.wallet;
+                    if (store.user && typeof payload.wallet.balance === 'number') {
+                        store.user.krone = payload.wallet.balance;
+                        if (payload.wallet.plan) store.user.grade = payload.wallet.plan;
+                    }
+                    renderUI();
+                }
+            });
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
                     refreshSessionUserSilently();
+                    loadKronesWallet().then(() => renderUI());
                 }
             });
             window.setInterval(() => {
                 refreshSessionUserSilently();
+                loadKronesWallet().then(() => renderUI());
             }, 15000);
             window.addEventListener('resize', applyMobileHeaderBrandVisibility);
         })();

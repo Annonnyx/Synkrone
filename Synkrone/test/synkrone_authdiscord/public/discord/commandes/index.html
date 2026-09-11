@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone — Commandes</title>
+    <link rel="icon" type="image/jpeg" href="../../assets/images/logo.jpg">
+    <link rel="stylesheet" href="/design/synkrone.css">
+    <style>
+        html, body { height: 100%; margin: 0; }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+            background: var(--sk-bg);
+        }
+        .page {
+            flex: 1;
+            display: grid;
+            grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+            min-height: 100%;
+        }
+        .rail {
+            border-right: 1px solid var(--sk-border);
+            background: var(--sk-bg-elevated);
+            padding: 20px 16px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow-y: auto;
+        }
+        .kicker {
+            margin: 0;
+            font-family: var(--sk-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: var(--sk-text-muted);
+        }
+        .kicker .live {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin-right: 8px;
+            border-radius: 50%;
+            background: var(--sk-accent);
+            box-shadow: 0 0 0 3px var(--sk-accent-soft);
+        }
+        h1 {
+            margin: 4px 0 0;
+            font-family: var(--sk-serif);
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.15;
+        }
+        h1 em { font-style: italic; color: var(--mousse-fonce, #2e5039); }
+        .lede {
+            margin: 8px 0 0;
+            color: var(--sk-text-muted);
+            font-size: 13px;
+        }
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        .seg {
+            display: flex;
+            gap: 2px;
+            padding: 2px;
+            background: var(--sk-bg);
+            border: 1px solid var(--sk-border);
+            border-radius: var(--sk-radius);
+        }
+        .seg button {
+            flex: 1;
+            min-height: 34px;
+            padding: 0 8px;
+            border: 0;
+            background: transparent;
+            color: var(--sk-text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            border-radius: var(--sk-radius);
+            cursor: pointer;
+        }
+        .seg button.is-on {
+            background: var(--sk-accent);
+            color: #fff;
+        }
+        .hint { margin: 0; font-size: 12px; color: var(--sk-text-faint); }
+        .cost-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 12px;
+            background: var(--sk-surface);
+            border: 1px solid var(--sk-border);
+        }
+        .cost-row strong {
+            font-family: var(--sk-mono);
+            color: var(--sk-gold);
+            font-size: 16px;
+        }
+        .builds { display: flex; flex-direction: column; gap: 6px; }
+        .build-chip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            border: 1px solid var(--sk-border);
+            background: var(--sk-surface);
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .build-chip.is-on { border-color: var(--sk-accent); background: var(--sk-accent-soft); }
+        .build-chip small { color: var(--sk-text-faint); font-family: var(--sk-mono); }
+        .stage {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .stage-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--sk-border);
+            flex-shrink: 0;
+        }
+        .stage-bar input[type="search"] { flex: 1; max-width: 420px; }
+        .count-pill {
+            font-family: var(--sk-mono);
+            font-size: 11px;
+            color: var(--sk-text-muted);
+            white-space: nowrap;
+        }
+        .cats {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 18px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .cat {
+            border: 1px solid var(--sk-border);
+            background: var(--sk-surface);
+        }
+        .cat-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--sk-border);
+        }
+        .cat-head h2 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            flex: 1;
+        }
+        .cat-head p { margin: 0; font-size: 12px; color: var(--sk-text-muted); }
+        .cmd-list { display: flex; flex-direction: column; }
+        .cmd {
+            display: grid;
+            grid-template-columns: 28px minmax(0, 140px) minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--sk-border);
+        }
+        .cmd:last-child { border-bottom: 0; }
+        .cmd code {
+            font-size: 12px;
+            color: var(--sk-text);
+        }
+        .cmd span { font-size: 12px; color: var(--sk-text-muted); }
+        .switch {
+            position: relative;
+            width: 28px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .switch i {
+            display: block;
+            width: 28px;
+            height: 16px;
+            background: var(--sk-surface-2);
+            border: 1px solid var(--sk-border-strong);
+            border-radius: 99px;
+            cursor: pointer;
+        }
+        .switch i::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--sk-text-muted);
+            border-radius: 50%;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .switch input:checked + i {
+            background: var(--sk-accent-soft);
+            border-color: var(--sk-accent);
+        }
+        .switch input:checked + i::after {
+            transform: translateX(12px);
+            background: var(--sk-accent);
+        }
+        .toast {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            padding: 10px 14px;
+            background: var(--sk-surface-2);
+            border: 1px solid var(--sk-border-strong);
+            color: var(--sk-text);
+            font-size: 13px;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .toast.show { opacity: 1; }
+        .toast.err { border-color: var(--sk-danger); color: var(--sk-danger); }
+        .ghost { background: transparent; }
+        @media (max-width: 860px) {
+            .page { grid-template-columns: 1fr; }
+            .rail { border-right: 0; border-bottom: 1px solid var(--sk-border); }
+            .cmd { grid-template-columns: 28px minmax(0, 1fr) auto; }
+            .cmd span { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <aside class="rail">
+            <div>
+                <p class="kicker"><span class="live" aria-hidden="true"></span>BAY-C · commandes</p>
+                <h1>Assembler <em>le pack</em></h1>
+                <p class="lede">Choisis les commandes, puis slash, préfixe, ou les deux. Rien n’est lancé : c’est un build local.</p>
+            </div>
+
+            <div class="field">
+                <label for="build-name">Nom du pack</label>
+                <input id="build-name" class="sk-input" type="text" maxlength="64" value="Pack commandes" autocomplete="off">
+            </div>
+
+            <div class="field">
+                <label>Invocation</label>
+                <div class="seg" id="invocation" role="group" aria-label="Type d'invocation">
+                    <button type="button" data-inv="slash">Slash</button>
+                    <button type="button" data-inv="prefix">Préfixe</button>
+                    <button type="button" data-inv="both" class="is-on">Les deux</button>
+                </div>
+                <p class="hint" id="inv-hint">Hybride : slash et préfixe en même temps</p>
+            </div>
+
+            <div class="field" id="prefix-field">
+                <label for="prefix">Préfixe</label>
+                <input id="prefix" class="sk-input" type="text" maxlength="8" value="*" autocomplete="off" spellcheck="false">
+            </div>
+
+            <div class="cost-row">
+                <span id="cost-label">Création</span>
+                <strong id="cost-value">2 ₭</strong>
+            </div>
+            <p class="hint" id="krones-hint">Krônes : en attente du portefeuille.</p>
+
+            <button type="button" class="sk-btn-primary" id="save-btn">Enregistrer le pack</button>
+            <button type="button" class="sk-btn ghost" id="new-btn">Nouveau pack</button>
+
+            <div>
+                <p class="kicker" style="margin-bottom:8px">Packs locaux</p>
+                <div class="builds" id="builds"></div>
+            </div>
+        </aside>
+
+        <section class="stage">
+            <div class="stage-bar">
+                <input type="search" id="search" placeholder="Filtrer une commande…" autocomplete="off">
+                <span class="count-pill" id="sel-count">0 / 0</span>
+                <button type="button" class="sk-btn" id="all-on">Tout</button>
+                <button type="button" class="sk-btn" id="all-off">Rien</button>
+            </div>
+            <div class="cats" id="cats"></div>
+        </section>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+        const state = {
+            catalog: null,
+            builds: [],
+            currentId: null,
+            selected: new Set(),
+            invocation: 'both',
+            krones: null
+        };
+
+        const $ = (id) => document.getElementById(id);
+
+        function toast(msg, err) {
+            const el = $('toast');
+            el.textContent = msg;
+            el.classList.toggle('err', Boolean(err));
+            el.classList.add('show');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => el.classList.remove('show'), 2800);
+        }
+
+        function costOf(n, isNew) {
+            const c = state.catalog && state.catalog.cost || { base: 2, perCommand: 1 };
+            if (!isNew) return 0;
+            return Math.max(0, Number(c.base || 0) + Number(c.perCommand || 0) * n);
+        }
+
+        function refreshCost() {
+            const isNew = !state.currentId;
+            const n = state.selected.size;
+            const cost = costOf(n, isNew);
+            $('cost-label').textContent = isNew ? 'Création' : 'Mise à jour';
+            $('cost-value').textContent = isNew ? `${cost} ₭` : 'gratuit';
+            const total = state.catalog ? state.catalog.count : 0;
+            $('sel-count').textContent = `${n} / ${total}`;
+        }
+
+        function setInvocation(id) {
+            state.invocation = id;
+            document.querySelectorAll('#invocation button').forEach((btn) => {
+                btn.classList.toggle('is-on', btn.dataset.inv === id);
+            });
+            const meta = (state.catalog && state.catalog.invocation || []).find((x) => x.id === id);
+            $('inv-hint').textContent = meta ? meta.hint : '';
+            $('prefix-field').hidden = id === 'slash';
+        }
+
+        function cmdPreview(name) {
+            if (state.invocation === 'slash') return `/${name}`;
+            const p = $('prefix').value || '*';
+            if (state.invocation === 'prefix') return `${p}${name}`;
+            return `/${name} · ${p}${name}`;
+        }
+
+        function renderCatalog() {
+            const q = ($('search').value || '').trim().toLowerCase();
+            const root = $('cats');
+            root.innerHTML = '';
+            for (const cat of state.catalog.categories) {
+                const cmds = cat.commands.filter((c) => {
+                    if (!q) return true;
+                    return c.name.includes(q) || (c.description || '').toLowerCase().includes(q);
+                });
+                if (!cmds.length) continue;
+                const onCount = cmds.filter((c) => state.selected.has(c.id)).length;
+                const wrap = document.createElement('article');
+                wrap.className = 'cat';
+                wrap.innerHTML = `
+                    <div class="cat-head">
+                        <label class="switch" title="Toute la catégorie">
+                            <input type="checkbox" data-cat="${cat.id}" ${onCount === cmds.length ? 'checked' : ''}>
+                            <i></i>
+                        </label>
+                        <div>
+                            <h2>${cat.name}</h2>
+                            <p>${cat.description || ''} · ${onCount}/${cmds.length}</p>
+                        </div>
+                    </div>
+                    <div class="cmd-list"></div>
+                `;
+                const list = wrap.querySelector('.cmd-list');
+                for (const cmd of cmds) {
+                    const row = document.createElement('label');
+                    row.className = 'cmd';
+                    row.innerHTML = `
+                        <span class="switch">
+                            <input type="checkbox" data-cmd="${cmd.id}" ${state.selected.has(cmd.id) ? 'checked' : ''}>
+                            <i></i>
+                        </span>
+                        <code>${cmdPreview(cmd.name)}</code>
+                        <span>${cmd.description || ''}</span>
+                    `;
+                    list.appendChild(row);
+                }
+                wrap.querySelector('[data-cat]').addEventListener('change', (e) => {
+                    const on = e.target.checked;
+                    cmds.forEach((c) => on ? state.selected.add(c.id) : state.selected.delete(c.id));
+                    renderCatalog();
+                    refreshCost();
+                });
+                wrap.querySelectorAll('[data-cmd]').forEach((box) => {
+                    box.addEventListener('change', (e) => {
+                        if (e.target.checked) state.selected.add(e.target.dataset.cmd);
+                        else state.selected.delete(e.target.dataset.cmd);
+                        renderCatalog();
+                        refreshCost();
+                    });
+                });
+                root.appendChild(wrap);
+            }
+        }
+
+        function renderBuilds() {
+            const root = $('builds');
+            if (!state.builds.length) {
+                root.innerHTML = '<p class="hint">Aucun pack enregistré.</p>';
+                return;
+            }
+            root.innerHTML = state.builds.map((b) => `
+                <button type="button" class="build-chip ${b.id === state.currentId ? 'is-on' : ''}" data-id="${b.id}">
+                    <span>${b.name}</span>
+                    <small>${b.invocation} · ${b.commands.length}</small>
+                </button>
+            `).join('');
+            root.querySelectorAll('.build-chip').forEach((btn) => {
+                btn.addEventListener('click', () => loadBuild(btn.dataset.id));
+            });
+        }
+
+        function payload() {
+            return {
+                name: $('build-name').value.trim() || 'Pack commandes',
+                invocation: state.invocation,
+                prefix: $('prefix').value.trim() || '*',
+                commands: [...state.selected]
+            };
+        }
+
+        function applyBuild(build) {
+            state.currentId = build ? build.id : null;
+            state.selected = new Set(build ? build.commands : []);
+            state.invocation = (build && build.invocation) || 'both';
+            $('build-name').value = (build && build.name) || 'Pack commandes';
+            $('prefix').value = (build && build.prefix) || (state.catalog.defaultPrefix || '*');
+            setInvocation(state.invocation);
+            renderCatalog();
+            renderBuilds();
+            refreshCost();
+        }
+
+        async function loadBuild(id) {
+            const build = state.builds.find((b) => b.id === id);
+            if (build) applyBuild(build);
+        }
+
+        async function fetchJson(url, opts) {
+            const res = await fetch(url, opts);
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || data.message || `HTTP ${res.status}`);
+            return data;
+        }
+
+        async function probeKrones() {
+            try {
+                const res = await fetch('/api/krones');
+                if (!res.ok) {
+                    state.krones = null;
+                    $('krones-hint').textContent = 'Krônes indisponibles — le pack se sauve sans débit.';
+                    return;
+                }
+                state.krones = await res.json();
+                const bal = Number(state.krones.balance);
+                $('krones-hint').textContent = Number.isFinite(bal)
+                    ? `Solde : ${bal} ₭. Création : 2 ₭ + 1 ₭ / commande.`
+                    : 'Portefeuille Krônes détecté.';
+            } catch {
+                state.krones = null;
+                $('krones-hint').textContent = 'Krônes indisponibles — le pack se sauve sans débit.';
+            }
+        }
+
+        async function debitIfNeeded(amount, reason) {
+            if (!amount || state.krones == null) return { skipped: true };
+            try {
+                const res = await fetch('/api/krones/debit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, reason })
+                });
+                if (res.status === 404) return { skipped: true };
+                const data = await res.json().catch(() => ({}));
+                if (res.status === 403) return { error: data.error || data.message || 'Solde insuffisant.' };
+                if (!res.ok) return { skipped: true };
+                if (Number.isFinite(Number(data.balance))) {
+                    $('krones-hint').textContent = `Solde : ${data.balance} ₭.`;
+                }
+                return { ok: true };
+            } catch {
+                return { skipped: true };
+            }
+        }
+
+        async function refreshBuilds() {
+            const data = await fetchJson('/api/commands/builds');
+            state.builds = data.builds || [];
+            renderBuilds();
+        }
+
+        async function save() {
+            const body = payload();
+            if ((body.invocation === 'prefix' || body.invocation === 'both') && !/^[^\s]{1,8}$/.test(body.prefix)) {
+                toast('Préfixe invalide (1 à 8 caractères, sans espace).', true);
+                return;
+            }
+            const isNew = !state.currentId;
+            const amount = costOf(body.commands.length, isNew);
+            if (isNew && amount) {
+                const paid = await debitIfNeeded(amount, `command-build:${body.name}`);
+                if (paid.error) {
+                    toast(paid.error, true);
+                    return;
+                }
+            }
+            const url = isNew ? '/api/commands/builds' : `/api/commands/builds/${state.currentId}`;
+            const method = isNew ? 'POST' : 'PUT';
+            try {
+                const data = await fetchJson(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (isNew && amount && state.krones != null) {
+                    await fetch(`/api/commands/builds/${data.build.id}/charged`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount })
+                    }).catch(() => {});
+                }
+                state.currentId = data.build.id;
+                await refreshBuilds();
+                applyBuild(data.build);
+                toast(isNew ? `Pack enregistré (${data.build.commands.length} commandes, ${data.build.invocation}).` : 'Pack mis à jour.');
+            } catch (err) {
+                toast(err.message || 'Enregistrement impossible.', true);
+            }
+        }
+
+        async function init() {
+            try {
+                state.catalog = await fetchJson('/api/commands/catalog');
+            } catch (err) {
+                $('cats').innerHTML = `<p class="hint">${err.message}</p>`;
+                return;
+            }
+            $('prefix').value = state.catalog.defaultPrefix || '*';
+            setInvocation('both');
+            await probeKrones();
+            await refreshBuilds();
+            if (state.builds.length) applyBuild(state.builds[0]);
+            else applyBuild(null);
+
+            $('invocation').addEventListener('click', (e) => {
+                const btn = e.target.closest('button[data-inv]');
+                if (!btn) return;
+                setInvocation(btn.dataset.inv);
+                renderCatalog();
+            });
+            $('prefix').addEventListener('input', () => renderCatalog());
+            $('search').addEventListener('input', () => renderCatalog());
+            $('all-on').addEventListener('click', () => {
+                state.catalog.categories.forEach((cat) => cat.commands.forEach((c) => state.selected.add(c.id)));
+                renderCatalog();
+                refreshCost();
+            });
+            $('all-off').addEventListener('click', () => {
+                state.selected.clear();
+                renderCatalog();
+                refreshCost();
+            });
+            $('save-btn').addEventListener('click', save);
+            $('new-btn').addEventListener('click', () => applyBuild(null));
+        }
+
+        init();
+    </script>
+</body>
+</html>

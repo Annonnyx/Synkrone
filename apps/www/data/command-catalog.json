@@ -1,0 +1,1183 @@
+{
+  "version": 1,
+  "defaultPrefix": "*",
+  "invocation": [
+    {
+      "id": "slash",
+      "label": "Slash",
+      "hint": "/commande — n’apparaît que dans le menu Discord"
+    },
+    {
+      "id": "prefix",
+      "label": "Préfixe",
+      "hint": "*commande — message texte avec préfixe"
+    },
+    {
+      "id": "both",
+      "label": "Les deux",
+      "hint": "Hybride : slash et préfixe en même temps"
+    }
+  ],
+  "cost": {
+    "base": 2,
+    "perCommand": 1,
+    "currency": "krones",
+    "note": "2 ₭ de base + 1 ₭ par commande à la création du pack. Les mises à jour sont gratuites."
+  },
+  "count": 177,
+  "categories": [
+    {
+      "id": "moderation",
+      "name": "Modération",
+      "description": "Sanctions, mutes, salons et avertissements.",
+      "commands": [
+        {
+          "id": "ban",
+          "name": "ban",
+          "description": "Bannir un utilisateur du serveur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "banlist",
+          "name": "banlist",
+          "description": "Afficher la liste des bannis",
+          "source": "templates/discord"
+        },
+        {
+          "id": "derank",
+          "name": "derank",
+          "description": "Retirer tous les rôles d'un utilisateur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "kick",
+          "name": "kick",
+          "description": "Expulser un utilisateur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "lock",
+          "name": "lock",
+          "description": "Verrouiller un salon",
+          "source": "templates/discord"
+        },
+        {
+          "id": "lockall",
+          "name": "lockall",
+          "description": "Verrouiller tous les salons",
+          "source": "templates/discord"
+        },
+        {
+          "id": "mute",
+          "name": "mute",
+          "description": "Rendre un utilisateur muet",
+          "source": "templates/discord"
+        },
+        {
+          "id": "mutelist",
+          "name": "mutelist",
+          "description": "Afficher la liste des muets",
+          "source": "templates/discord"
+        },
+        {
+          "id": "purge",
+          "name": "purge",
+          "description": "Nettoie chirurgicalement des parties du serveur",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "rmute",
+          "name": "rmute",
+          "description": "Mute local / rôle",
+          "source": "templates/discord"
+        },
+        {
+          "id": "slowmode",
+          "name": "slowmode",
+          "description": "Définir le mode lent",
+          "source": "templates/discord"
+        },
+        {
+          "id": "tempban",
+          "name": "tempban",
+          "description": "Bannir temporairement un utilisateur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "tempmute",
+          "name": "tempmute",
+          "description": "Mute temporaire",
+          "source": "templates/discord"
+        },
+        {
+          "id": "temprmute",
+          "name": "temprmute",
+          "description": "Mute local temporaire",
+          "source": "templates/discord"
+        },
+        {
+          "id": "unban",
+          "name": "unban",
+          "description": "Débannir un utilisateur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "unlock",
+          "name": "unlock",
+          "description": "Déverrouiller un salon",
+          "source": "templates/discord"
+        },
+        {
+          "id": "unlockall",
+          "name": "unlockall",
+          "description": "Déverrouiller tous les salons",
+          "source": "templates/discord"
+        },
+        {
+          "id": "unmute",
+          "name": "unmute",
+          "description": "Rendre la parole à un utilisateur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "warn",
+          "name": "warn",
+          "description": "Avertir un utilisateur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "warninfo",
+          "name": "warninfo",
+          "description": "Détails d'un avertissement",
+          "source": "templates/discord"
+        },
+        {
+          "id": "warnlist",
+          "name": "warnlist",
+          "description": "Liste des avertissements",
+          "source": "templates/discord"
+        }
+      ]
+    },
+    {
+      "id": "configuration",
+      "name": "Configuration",
+      "description": "Salons, modules et automatisations du serveur.",
+      "commands": [
+        {
+          "id": "anniversaire",
+          "name": "anniversaire",
+          "description": "Gérez et configurez les anniversaires du serveur.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "antiscam",
+          "name": "antiscam",
+          "description": "Configurer le mode antiscam",
+          "source": "templates/discord"
+        },
+        {
+          "id": "aurevoir",
+          "name": "aurevoir",
+          "description": "Configurer le message et le salon de départ",
+          "source": "templates/discord"
+        },
+        {
+          "id": "autoping",
+          "name": "autoping",
+          "description": "Ouvre le panneau de configuration des pings automatiques",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "autorole",
+          "name": "autorole",
+          "description": "Ouvre l'interface de gestion de l'attribution automatique des rôles",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "autostats",
+          "name": "autostats",
+          "description": "Configure le panneau dynamique des statistiques du serveur.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "bienvenue",
+          "name": "bienvenue",
+          "description": "Configurer le message et le salon des nouveaux membres",
+          "source": "templates/discord"
+        },
+        {
+          "id": "bonjour",
+          "name": "bonjour",
+          "description": "Configurer l'heure, le salon et les messages de bonjour",
+          "source": "templates/discord"
+        },
+        {
+          "id": "boost",
+          "name": "boost",
+          "description": "Configuration du système de boosters.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "confess",
+          "name": "confess",
+          "description": "Gérer le système de confessions anonymes",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "custom",
+          "name": "custom",
+          "description": "Configurer les messages customs par mots-clés",
+          "source": "templates/discord"
+        },
+        {
+          "id": "infinite",
+          "name": "infinite",
+          "description": "Menu de gestion du jeu de compte",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "log",
+          "name": "log",
+          "description": "Créer les salons de logs du serveur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "notif",
+          "name": "notif",
+          "description": "Mettre en avant les vidéos, lives et streams",
+          "source": "templates/discord"
+        },
+        {
+          "id": "reward",
+          "name": "reward",
+          "description": "Affiche votre profil Reward ou configure le système.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "secur",
+          "name": "secur",
+          "description": "🛡️ Ouvrir le panel de sécurité.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "servembed",
+          "name": "servembed",
+          "description": "Configurer le style de l'embed du serveur",
+          "source": "templates/discord"
+        },
+        {
+          "id": "statsserver",
+          "name": "statsserver",
+          "description": "Configurer les salons vocaux de statistiques",
+          "source": "templates/discord"
+        },
+        {
+          "id": "ticket",
+          "name": "ticket",
+          "description": "Configurer le système de tickets",
+          "source": "templates/discord"
+        },
+        {
+          "id": "voice",
+          "name": "voice",
+          "description": "Configurer le système de vocaux personnalisés",
+          "source": "templates/discord"
+        }
+      ]
+    },
+    {
+      "id": "admin",
+      "name": "Utilitaires staff",
+      "description": "Outils d'administration au quotidien.",
+      "commands": [
+        {
+          "id": "addmembre",
+          "name": "addmembre",
+          "description": "Ajouter rapidement un utilisateur dans un salon",
+          "source": "templates/discord"
+        },
+        {
+          "id": "addrole",
+          "name": "addrole",
+          "description": "Cree un role ou attribue un role a un membre.",
+          "source": "bots/Vax,Yui"
+        },
+        {
+          "id": "admininfo",
+          "name": "admininfo",
+          "description": "👑 Affiche les administrateurs et bots du serveur.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "annonce",
+          "name": "annonce",
+          "description": "Poster une annonce",
+          "source": "templates/discord"
+        },
+        {
+          "id": "clear",
+          "name": "clear",
+          "description": "Effacer des lots de messages",
+          "source": "templates/discord"
+        },
+        {
+          "id": "delmembre",
+          "name": "delmembre",
+          "description": "Retirer un utilisateur d'un salon",
+          "source": "templates/discord"
+        },
+        {
+          "id": "delrole",
+          "name": "delrole",
+          "description": "Retire un role specifique a un utilisateur.",
+          "source": "bots/Vax,Yui"
+        },
+        {
+          "id": "embed",
+          "name": "embed",
+          "description": "Créer ou modifier un embed",
+          "source": "templates/discord"
+        },
+        {
+          "id": "emoji",
+          "name": "emoji",
+          "description": "Ajouter ou récupérer un emoji",
+          "source": "templates/discord"
+        },
+        {
+          "id": "giveaway",
+          "name": "giveaway",
+          "description": "Créer et configurer un nouveau giveaway.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "note",
+          "name": "note",
+          "description": "Affiche le panel de gestion des notes ou le contenu d'une note spécifique.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "partenariat",
+          "name": "partenariat",
+          "description": "Génère et configure un message de partenariat dans le salon désigné.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "rolemembre",
+          "name": "rolemembre",
+          "description": "Gérer les rôles massivement.",
+          "source": "bots/Vax,Yui"
+        },
+        {
+          "id": "rolemenu",
+          "name": "rolemenu",
+          "description": "Créer un menu de rôles",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "say",
+          "name": "say",
+          "description": "Faire parler le bot",
+          "source": "templates/discord"
+        }
+      ]
+    },
+    {
+      "id": "public",
+      "name": "Public",
+      "description": "Commandes accessibles à tout le monde.",
+      "commands": [
+        {
+          "id": "bot",
+          "name": "bot",
+          "description": "Afficher le profil du bot",
+          "source": "templates/discord"
+        },
+        {
+          "id": "dice",
+          "name": "dice",
+          "description": "Lancer des dés (nombre et faces au choix)",
+          "source": "templates/discord"
+        },
+        {
+          "id": "feedback",
+          "name": "feedback",
+          "description": "Soumettre une idée, une amélioration ou signaler un bug à l'équipe de développement.",
+          "source": "bots/Arceus,Asuna,Kayaba,Vax,Yui"
+        },
+        {
+          "id": "help",
+          "name": "help",
+          "description": "Menu d'aide interactif",
+          "source": "templates/discord"
+        },
+        {
+          "id": "invitation",
+          "name": "invitation",
+          "description": "Panneau invitations: profil, classement et configuration.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "ping",
+          "name": "ping",
+          "description": "Afficher la latence du bot",
+          "source": "templates/discord"
+        },
+        {
+          "id": "prefix",
+          "name": "prefix",
+          "description": "Afficher ou changer le préfixe",
+          "source": "templates/discord"
+        }
+      ]
+    },
+    {
+      "id": "fun",
+      "name": "Fun & jeux",
+      "description": "Divertissement, mini-jeux, interactions.",
+      "commands": [
+        {
+          "id": "2048",
+          "name": "2048",
+          "description": "Jouer au jeu 2048",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "8ball",
+          "name": "8ball",
+          "description": "Ouvre la fenêtre pour poser une question à la boule magique.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "amour",
+          "name": "amour",
+          "description": "Calcule le pourcentage d'amour entre deux membres",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "anagram",
+          "name": "anagram",
+          "description": "Lance une anagramme.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "ascii",
+          "name": "ascii",
+          "description": "Transforme un texte en art ASCII.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "flags",
+          "name": "flags",
+          "description": "Lancer un quiz sur les drapeaux du monde !",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "hack",
+          "name": "hack",
+          "description": "Simule un hack sur un utilisateur spécifié",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "hug",
+          "name": "hug",
+          "description": "Envoie un câlin à un membre.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "kiss",
+          "name": "kiss",
+          "description": "Envoie un bisou à un membre.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "marry",
+          "name": "marry",
+          "description": "Affiche votre menu de mariage ou celui d'un autre utilisateur.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "marryme",
+          "name": "marryme",
+          "description": "Fait une demande en mariage à un autre membre.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "mastermind",
+          "name": "mastermind",
+          "description": "Jouer au mastermind",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "meme",
+          "name": "meme",
+          "description": "Affiche un meme aléatoire provenant de Reddit.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "morpion",
+          "name": "morpion",
+          "description": "Ouvre un salon de Morpion",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "nombre",
+          "name": "nombre",
+          "description": "Devine un nombre entre 1 et 100.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "pfc",
+          "name": "pfc",
+          "description": "Pierre-feuille-ciseaux",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "play",
+          "name": "play",
+          "description": "Lancer une partie",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "puissance4",
+          "name": "puissance4",
+          "description": "Ouvre un salon de Puissance 4",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "punch",
+          "name": "punch",
+          "description": "Frappe un membre.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "rate",
+          "name": "rate",
+          "description": "Ouvre un menu pour noter quelque chose.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "reverse",
+          "name": "reverse",
+          "description": "🔁 Renverse un texte avec style !",
+          "source": "bots/Vax"
+        }
+      ]
+    },
+    {
+      "id": "casino",
+      "name": "Casino",
+      "description": "Économie Asuna : jeux, soldes, récompenses.",
+      "commands": [
+        {
+          "id": "admin",
+          "name": "admin",
+          "description": "Ouvre le panel d'administration pour gérer la visibilité des salons.",
+          "source": "bots/Asuna,Yui"
+        },
+        {
+          "id": "adminshop",
+          "name": "adminshop",
+          "description": "Gérer la boutique administrateur du serveur.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "balance",
+          "name": "balance",
+          "description": "Affiche votre solde.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "blackjack",
+          "name": "blackjack",
+          "description": "Jouez au blackjack contre le casino.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "chest",
+          "name": "chest",
+          "description": "Ouvrez un coffre mystère.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "coinflip",
+          "name": "coinflip",
+          "description": "Tentez de doubler vos gains au jeu de la pièce.",
+          "source": "bots/Asuna,Vax"
+        },
+        {
+          "id": "convert",
+          "name": "convert",
+          "description": "Convertir vos Cols en Honneur ou votre Honneur en Cols.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "give",
+          "name": "give",
+          "description": "💰 Transférer des Cols à un autre joueur du casino",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "lanternfall",
+          "name": "lanternfall",
+          "description": "Jeu de la lanterne tombante avec des multiplicateurs variables",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "lvl",
+          "name": "lvl",
+          "description": "Affiche votre niveau actuel et progression XP.",
+          "source": "bots/Asuna,Vax"
+        },
+        {
+          "id": "mines",
+          "name": "mines",
+          "description": "Explorez une zone piégée et tentez d'en repartir indemne.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "mysteribox",
+          "name": "mysteribox",
+          "description": "Ouvrez un coffre mystérieux du Grand Casino d'Aincrad.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "rob",
+          "name": "rob",
+          "description": "🦹 Tentez de voler des Cols à un autre joueur !",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "roulette",
+          "name": "roulette",
+          "description": "Jouer à la roulette avec limite horaire ajustée selon votre niveau",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "shop",
+          "name": "shop",
+          "description": "Consulter la boutique du serveur.",
+          "source": "bots/Asuna,Kayaba"
+        },
+        {
+          "id": "slots",
+          "name": "slots",
+          "description": "🎰 Jouez aux machines à sous.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "solde",
+          "name": "solde",
+          "description": "Affiche votre solde.",
+          "source": "bots/Asuna"
+        },
+        {
+          "id": "succes",
+          "name": "succes",
+          "description": "Affiche l'avancé des succès.",
+          "source": "bots/Asuna"
+        }
+      ]
+    },
+    {
+      "id": "pokemon",
+      "name": "Pokémon",
+      "description": "Pokédex, captures et économie Arceus.",
+      "commands": [
+        {
+          "id": "comparer",
+          "name": "comparer",
+          "description": "Compare deux Pokémon.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "faiblesses",
+          "name": "faiblesses",
+          "description": "Affiche le tableau des faiblesses stratégiques.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "fusion",
+          "name": "fusion",
+          "description": "Fusionne deux Pokémon.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "pokemon",
+          "name": "pokemon",
+          "description": "Affiche la fiche d'un Pokémon.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "randomteam",
+          "name": "randomteam",
+          "description": "Génère une équipe de 6 Pokémon aléatoires immédiatement.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "recherche",
+          "name": "recherche",
+          "description": "Recherche des Pokémon par filtres.",
+          "source": "bots/Arceus"
+        }
+      ]
+    },
+    {
+      "id": "economie",
+      "name": "Économie",
+      "description": "Échanges, daily, shop et ressources.",
+      "commands": [
+        {
+          "id": "add",
+          "name": "add",
+          "description": "Ajouter une entrée",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "capture",
+          "name": "capture",
+          "description": "Fait apparaitre 1 Pokémon sauvage et tente une capture.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "charme",
+          "name": "charme",
+          "description": "Affiche et permet de consommer vos charmes.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "commerce",
+          "name": "commerce",
+          "description": "Marché joueur à joueur pour Pokémon.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "daily",
+          "name": "daily",
+          "description": "Gagne des Pokédollars tous les jours.",
+          "source": "bots/Arceus,Asuna,Kayaba"
+        },
+        {
+          "id": "don",
+          "name": "don",
+          "description": "Fais un don à un autre joueur.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "doublon",
+          "name": "doublon",
+          "description": "Gère tes doublons Pokémon.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "drop",
+          "name": "drop",
+          "description": "[Admin] Ajoute des Pokémon normaux.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "echange",
+          "name": "echange",
+          "description": "Ouvre le menu d'échange Pokémon en message privé.",
+          "source": "bots/Arceus,Kayaba"
+        },
+        {
+          "id": "enigme",
+          "name": "enigme",
+          "description": "Mini-jeu Pokémon : devine les stats, types ou descriptions !",
+          "source": "bots/Arceus,Vax"
+        },
+        {
+          "id": "farm",
+          "name": "farm",
+          "description": "Défie un Pokémon sauvage avec ta team.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "hourly",
+          "name": "hourly",
+          "description": "Gagne des Pokédollars toutes les heures.",
+          "source": "bots/Arceus,Asuna"
+        },
+        {
+          "id": "leader",
+          "name": "leader",
+          "description": "Affiche le classement du Grand Casino d'Aincrad.",
+          "source": "bots/Arceus,Asuna,Kayaba,Vax"
+        },
+        {
+          "id": "mail",
+          "name": "mail",
+          "description": "Ouvre l'interface de Modmail.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "monthly",
+          "name": "monthly",
+          "description": "Gagne des Pokédollars tous les mois.",
+          "source": "bots/Arceus,Asuna"
+        },
+        {
+          "id": "pokedex",
+          "name": "pokedex",
+          "description": "Affiche le Pokédex visuel interactif d'un membre ou le vôtre.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "sdrop",
+          "name": "sdrop",
+          "description": "[Admin] Ajoute des Pokémon shiny.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "search",
+          "name": "search",
+          "description": "Cherche les doublons des autres joueurs que tu n'as pas.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "sleep",
+          "name": "sleep",
+          "description": "Gérez votre garderie pour gagner de l'XP et des Col passifs",
+          "source": "bots/Arceus,Kayaba"
+        },
+        {
+          "id": "teams",
+          "name": "teams",
+          "description": "Affiche et configure ton équipe PvP.",
+          "source": "bots/Arceus"
+        },
+        {
+          "id": "vote",
+          "name": "vote",
+          "description": "Vérifie si tu as voté sur Top.gg et te récompense si c'est le cas.",
+          "source": "bots/Arceus,Asuna"
+        },
+        {
+          "id": "weekly",
+          "name": "weekly",
+          "description": "Gagne des Pokédollars une fois par semaine.",
+          "source": "bots/Arceus,Asuna"
+        }
+      ]
+    },
+    {
+      "id": "collection",
+      "name": "Collection",
+      "description": "Cartes, shop et progression Kayaba.",
+      "commands": [
+        {
+          "id": "boutique",
+          "name": "boutique",
+          "description": "Ouvrir la boutique",
+          "source": "bots/Kayaba"
+        },
+        {
+          "id": "choicemp",
+          "name": "choicemp",
+          "description": "Choisir un message privé de collection",
+          "source": "bots/Kayaba"
+        },
+        {
+          "id": "collect",
+          "name": "collect",
+          "description": "Collecter une carte",
+          "source": "bots/Kayaba"
+        },
+        {
+          "id": "collection",
+          "name": "collection",
+          "description": "Consultez la collection de cartes",
+          "source": "bots/Kayaba"
+        },
+        {
+          "id": "dev",
+          "name": "dev",
+          "description": "Commande de développement réservée aux owners.",
+          "source": "bots/Kayaba"
+        },
+        {
+          "id": "guide",
+          "name": "guide",
+          "description": "Affiche le Centre de Contrôle Administratif et le guide des commandes.",
+          "source": "bots/Kayaba,Yui"
+        },
+        {
+          "id": "pvp",
+          "name": "pvp",
+          "description": "Lancer un PvP",
+          "source": "bots/Kayaba"
+        },
+        {
+          "id": "sell",
+          "name": "sell",
+          "description": "Vendez vos cartes contre des Col",
+          "source": "bots/Kayaba"
+        },
+        {
+          "id": "stage",
+          "name": "stage",
+          "description": "Affiche les informations de progression.",
+          "source": "bots/Kayaba"
+        }
+      ]
+    },
+    {
+      "id": "stats",
+      "name": "Statistiques",
+      "description": "Niveaux, profils et XP.",
+      "commands": [
+        {
+          "id": "lvlup",
+          "name": "lvlup",
+          "description": "Configurer le salon pour les annonces de niveau supérieur.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "profil",
+          "name": "profil",
+          "description": "Affiche ton profil complet avec ta carte de dresseur.",
+          "source": "bots/Arceus,Asuna,Kayaba,Vax"
+        },
+        {
+          "id": "stats",
+          "name": "stats",
+          "description": "Pilote analytique de monitoring du serveur.",
+          "source": "bots/Vax"
+        }
+      ]
+    },
+    {
+      "id": "utilitaires",
+      "name": "Utilitaires",
+      "description": "Infos, rappels, sondages, outils.",
+      "commands": [
+        {
+          "id": "calc",
+          "name": "calc",
+          "description": "Ouvre la calculatrice interactive.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "channel",
+          "name": "channel",
+          "description": "Affiche les informations détaillées d'un salon.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "choose",
+          "name": "choose",
+          "description": "Lancer un tirage au sort entre plusieurs propositions.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "copy",
+          "name": "copy",
+          "description": "Copie le message ciblé avec tout son formatage Markdown.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "everyone",
+          "name": "everyone",
+          "description": "Affiche les stats des pings everyone/here",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "font",
+          "name": "font",
+          "description": "Changer la police d'un texte",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "guild",
+          "name": "guild",
+          "description": "Affiche les informations détaillées du serveur.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "mytodo",
+          "name": "mytodo",
+          "description": "Ouvre votre gestionnaire de Todo List personnel.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "rappel",
+          "name": "rappel",
+          "description": "Gérez vos rappels et minuteries personnels ou ceux du serveur",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "role",
+          "name": "role",
+          "description": "Affiche les informations détaillées d'un rôle.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "snipe",
+          "name": "snipe",
+          "description": "Afficher le dernier message supprimé",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "sondage",
+          "name": "sondage",
+          "description": "Permet de créer un sondage public.",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "whois",
+          "name": "whois",
+          "description": "Affiche les informations d'un membre.",
+          "source": "bots/Vax"
+        }
+      ]
+    },
+    {
+      "id": "yui",
+      "name": "Yui / IA",
+      "description": "Construction, rôles et outils Yui.",
+      "commands": [
+        {
+          "id": "accesadd",
+          "name": "accesadd",
+          "description": "Ajoute acces lecture/ecriture au salon actuel.",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "accesdel",
+          "name": "accesdel",
+          "description": "Retire l'acces lecture/ecriture au salon actuel.",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "backup",
+          "name": "backup",
+          "description": "Sauvegarder la configuration",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "build",
+          "name": "build",
+          "description": "Menu avancé et dynamique pour construire le serveur.",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "create",
+          "name": "create",
+          "description": "Créer un élément",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "edit",
+          "name": "edit",
+          "description": "Lance l'assistant de style/theme serveur.",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "ia-reset",
+          "name": "ia-reset",
+          "description": "Réinitialiser le contexte IA",
+          "source": "bots/Vax,Yui"
+        },
+        {
+          "id": "info",
+          "name": "info",
+          "description": "Ouvre le panneau d'inspection du serveur",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "newserv",
+          "name": "newserv",
+          "description": "Crée un serveur Discord premium de A à Z via l'IA.",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "reorga",
+          "name": "reorga",
+          "description": "Ouvre le panel interactif pour réorganiser votre serveur.",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "sup",
+          "name": "sup",
+          "description": "Supprime un salon ou un role apres confirmation.",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "unbuild",
+          "name": "unbuild",
+          "description": "Menu avancé pour nettoyer proprement rôles, salons ou catégories entières.",
+          "source": "bots/Yui"
+        },
+        {
+          "id": "view",
+          "name": "view",
+          "description": "Verrouille le salon: lecture oui, ecriture non.",
+          "source": "bots/Yui"
+        }
+      ]
+    },
+    {
+      "id": "owner",
+      "name": "Propriétaire",
+      "description": "Identité et style global du bot.",
+      "commands": [
+        {
+          "id": "blacklist",
+          "name": "blacklist",
+          "description": "Gérer la sécurité de Vax Développeur.",
+          "source": "bots/Arceus,Asuna,Kayaba,Vax,Yui"
+        },
+        {
+          "id": "botacces",
+          "name": "botacces",
+          "description": "Gère les permissions globales du bot.",
+          "source": "bots/Arceus,Kayaba,Vax"
+        },
+        {
+          "id": "checklist",
+          "name": "checklist",
+          "description": "Checklist développeur",
+          "source": "bots/Kayaba"
+        },
+        {
+          "id": "devembed",
+          "name": "devembed",
+          "description": "Configurer le style de l'embed global",
+          "source": "templates/discord"
+        },
+        {
+          "id": "devstats",
+          "name": "devstats",
+          "description": "Menu statistiques de développement",
+          "source": "bots/Arceus,Asuna,Kayaba,Vax,Yui"
+        },
+        {
+          "id": "owner",
+          "name": "owner",
+          "description": "Gérer les propriétaires du bot.",
+          "source": "bots/Arceus,Asuna,Kayaba,Vax,Yui"
+        },
+        {
+          "id": "panelbot",
+          "name": "panelbot",
+          "description": "Configurer l'identité globale du bot",
+          "source": "templates/discord"
+        },
+        {
+          "id": "perm",
+          "name": "perm",
+          "description": "Affiche les permissions disponibles avec un sélecteur",
+          "source": "bots/Vax"
+        },
+        {
+          "id": "premium",
+          "name": "premium",
+          "description": "Affiche les avantages premium et votre statut",
+          "source": "bots/Kayaba"
+        }
+      ]
+    }
+  ]
+}

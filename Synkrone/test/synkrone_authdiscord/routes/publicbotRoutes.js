@@ -38,7 +38,7 @@ function normalizeTags(tagString) {
 }
 
 module.exports = function registerPublicbotRoutes(app, deps) {
-    const { readUsersDb, writeUsersDb, isManualStaffRole } = deps;
+    const { readUsersDb, writeUsersDb, isManualStaffRole, krones } = deps;
     const DISCORD_API_BASE = 'https://discord.com/api/v10';
     const COST_NEW_BOT = 60;
     const COST_FEATURED = 50;
@@ -102,7 +102,8 @@ module.exports = function registerPublicbotRoutes(app, deps) {
 
         const usersDb = await readUsersDb();
         const userData = usersDb.users[user.id];
-        if (!userData || userData.krone < cost) return res.status(400).json({ error: 'Krones insuffisants.' });
+        if (!userData) return res.status(400).json({ error: 'Krones insuffisants.' });
+        if (!krones && userData.krone < cost) return res.status(400).json({ error: 'Krones insuffisants.' });
 
         const botToken = process.env.DISCORD_BOT_TOKEN;
         let botName = "Bot " + botId.slice(-4);
@@ -119,7 +120,13 @@ module.exports = function registerPublicbotRoutes(app, deps) {
             return res.status(404).json({ error: 'Bot introuvable sur Discord. Vérifiez l\'ID.' });
         }
 
-        userData.krone -= cost;
+        if (cost > 0 && krones) {
+            const spent = await krones.debitAccount(user.id, cost, 'publicbot:create');
+            if (!spent.ok) return res.status(400).json({ error: spent.error || 'Krones insuffisants.' });
+            userData.krone = spent.wallet.balance;
+        } else {
+            userData.krone -= cost;
+        }
         await writeUsersDb(usersDb);
         req.session.user.krone = userData.krone;
 
@@ -262,9 +269,15 @@ module.exports = function registerPublicbotRoutes(app, deps) {
 
         const usersDb = await readUsersDb();
         const userData = usersDb.users[user.id];
-        if (!userData || userData.krone < COST_FEATURED) return res.status(400).json({ error: 'Krones insuffisants.' });
-
-        userData.krone -= COST_FEATURED;
+        if (!userData) return res.status(400).json({ error: 'Krones insuffisants.' });
+        if (krones) {
+            const spent = await krones.debitAccount(user.id, COST_FEATURED, 'publicbot:feature');
+            if (!spent.ok) return res.status(400).json({ error: spent.error || 'Krones insuffisants.' });
+            userData.krone = spent.wallet.balance;
+        } else {
+            if (userData.krone < COST_FEATURED) return res.status(400).json({ error: 'Krones insuffisants.' });
+            userData.krone -= COST_FEATURED;
+        }
         await writeUsersDb(usersDb);
         req.session.user.krone = userData.krone;
 

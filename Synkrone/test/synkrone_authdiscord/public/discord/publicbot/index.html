@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone Bots | Annuaire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,16 +14,16 @@
             theme: {
                 extend: {
                     colors: {
-                        base: '#0f1114',
-                        surface: 'rgba(30, 32, 34, 0.78)',
-                        surfaceHover: 'rgba(45, 48, 51, 0.9)',
-                        sysBorder: 'rgba(255, 255, 255, 0.12)',
-                        borderHover: 'rgba(255, 255, 255, 0.28)',
-                        accentRed: '#ff0013',
-                        accentBlue: '#6d8cff',
-                        accentGold: '#ffd700',
-                        krones: '#4ade80',
-                        textDim: '#a0a0a0'
+                        base: '#EEF0EA',
+                        surface: '#FFFFFF',
+                        surfaceHover: '#E3E6DD',
+                        sysBorder: '#5C6A661F',
+                        borderHover: '#5C6A6640',
+                        accentRed: '#A8462F',
+                        accentBlue: '#3F6B52',
+                        accentGold: '#B8823D',
+                        krones: '#B8823D',
+                        textDim: '#5C6A66'
                     }
                 }
             }
@@ -32,7 +35,7 @@
     <script src="/assets/mosaique.js" defer></script>
     
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; background-color: var(--tw-colors-base); color: #ffffff; margin: 0; padding: 0;}
+        body { font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; background-color: var(--tw-colors-base); color: #1B211E; margin: 0; padding: 0;}
         ::-webkit-scrollbar { width: 6px; height: 6px; display: none; }
         
         #app-layout { display: flex; width: 100%; height: 100%; flex-direction: column; }
@@ -42,63 +45,63 @@
         /* Navigation fine (si non inclus dans une iframe Synkrone complète) */
         .sub-nav { display: none; } /* On cache la nav ici car Synkrone gère sa propre nav, mais on simule les onglets dans le panel Home */
 
-        .panel { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 12px; backdrop-filter: blur(8px); padding: 24px; position: relative; overflow: hidden; }
+        .panel { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 6px; padding: 24px; position: relative; overflow: hidden; }
         
         /* Formulaires */
         .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
         .form-group label { font-size: 13px; font-weight: 600; color: var(--tw-colors-textDim); }
-        .form-control { background: rgba(0,0,0,0.3); border: 1px solid var(--tw-colors-sysBorder); color: #fff; padding: 10px 14px; border-radius: 8px; font-family: inherit; width: 100%; transition: 0.22s ease; outline: none; }
-        .form-control:focus { border-color: var(--tw-colors-accentBlue); background: rgba(0,0,0,0.5); }
+        .form-control { background: #FFFFFF; border: 1px solid var(--tw-colors-sysBorder); color: #1B211E; padding: 10px 14px; border-radius: 8px; font-family: inherit; width: 100%; transition: 0.22s ease; outline: none; }
+        .form-control:focus { border-color: var(--tw-colors-accentBlue); background: #E3E6DD; }
         
         /* Boutons */
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; padding: 10px 18px; font-size: 14px; transition: 0.22s ease; }
-        .btn-slim-gray { background: rgba(255,255,255,0.05); border: 1px solid var(--tw-colors-sysBorder); color: var(--tw-colors-textDim); padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.22s ease; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-slim-gray:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .btn-primary { background: var(--tw-colors-accentBlue); color: #fff; }
-        .btn-primary:hover { background: #5c7ae6; }
+        .btn-slim-gray { background: #E3E6DD; border: 1px solid var(--tw-colors-sysBorder); color: var(--tw-colors-textDim); padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.22s ease; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-slim-gray:hover { background: #d8dcd3; color: #1B211E; }
+        .btn-primary { background: var(--tw-colors-accentBlue); color: #1B211E; }
+        .btn-primary:hover { background: #2E5039; }
         .btn-danger { background: rgba(225, 79, 79, 0.2); border: 1px solid var(--tw-colors-accentRed); color: var(--tw-colors-accentRed); }
         .btn-danger:hover { background: rgba(225, 79, 79, 0.4); }
 
         /* Filtres et Onglets (Tabs) */
-        .tabs { display: flex; gap: 10px; overflow-x: auto; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 12px; border: 1px solid var(--tw-colors-sysBorder); width: fit-content; }
+        .tabs { display: flex; gap: 10px; overflow-x: auto; background: #E3E6DD; padding: 6px; border-radius: 6px; border: 1px solid var(--tw-colors-sysBorder); width: fit-content; }
         .tab-btn { background: none; border: none; color: var(--tw-colors-textDim); padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: 0.22s ease; white-space: nowrap; }
-        .tab-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .tab-btn.active { background: var(--tw-colors-surfaceHover); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .tab-btn:hover { background: #E3E6DD; color: #1B211E; }
+        .tab-btn.active { background: var(--tw-colors-surfaceHover); color: #1B211E; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
         /* Grille & Cartes */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .user-card { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.22s ease; display: flex; flex-direction: column; gap: 12px; position: relative; }
+        .user-card { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 6px; padding: 16px; cursor: pointer; transition: 0.22s ease; display: flex; flex-direction: column; gap: 12px; position: relative; }
         .user-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.3); background: var(--tw-colors-surfaceHover); }
-        .user-card.featured { border-color: rgba(255, 215, 0, 0.3); background: linear-gradient(145deg, rgba(30,32,34,0.9), rgba(40,35,15,0.9)); }
+        .user-card.featured { border-color: #3F6B52; background: #FFFFFF; box-shadow: 0 2px 12px rgba(63,107,82,0.12); }
         
         .user-card-header { display: flex; align-items: center; gap: 12px; }
         .user-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--tw-colors-sysBorder); background: var(--tw-colors-base); }
         .user-info { flex: 1; min-width: 0; }
-        .user-name { font-weight: bold; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
+        .user-name { font-weight: bold; font-size: 16px; color: #1B211E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
         
-        .like-btn-mini { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--tw-colors-sysBorder); color: var(--tw-colors-textDim); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 12px; z-index: 10;}
+        .like-btn-mini { position: absolute; top: 12px; right: 12px; background: #FFFFFF; border: 1px solid var(--tw-colors-sysBorder); color: var(--tw-colors-textDim); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 12px; z-index: 10;}
         .like-btn-mini:hover { color: var(--tw-colors-accentRed); border-color: var(--tw-colors-accentRed); }
         .like-btn-mini.liked { color: var(--tw-colors-accentRed); background: rgba(225, 79, 79, 0.15); border-color: var(--tw-colors-accentRed); }
 
         /* Profil complet */
-        .profile-wrapper { border-radius: 12px; overflow: hidden; transition: 0.22s ease; min-height: 500px; display: flex; flex-direction: column; position: relative; background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); }
+        .profile-wrapper { border-radius: 6px; overflow: hidden; transition: 0.22s ease; min-height: 500px; display: flex; flex-direction: column; position: relative; background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); }
         .profile-banner { width: 100%; height: 180px; object-fit: cover; background: #1e2022; display: block; }
         .profile-content { padding: 24px; flex: 1; position: relative; display: flex; flex-direction: column; }
         .hero-profile { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-top: -70px; margin-bottom: 20px; }
         .avatar-wrap { width: 118px; height: 118px; border-radius: 50%; padding: 4px; background: var(--tw-colors-base); position: relative; z-index: 2; border: 1px solid var(--tw-colors-sysBorder); }
         .avatar-wrap img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .nav-btn-floating { position: absolute; top: 15px; left: 15px; z-index: 10; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .nav-btn-floating { position: absolute; top: 15px; left: 15px; z-index: 10; background: #E3E6DD; }
         .profile-controls { position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
         
         .fade-in { animation: fadeIn 0.2s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Modale */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-box { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 12px; padding: 24px; width: 90%; max-width: 420px; transform: scale(0.95); transition: transform 0.2s; text-align: center; }
+        .modal-box { background: var(--tw-colors-surface); border: 1px solid var(--tw-colors-sysBorder); border-radius: 6px; padding: 24px; width: 90%; max-width: 420px; transform: scale(0.95); transition: transform 0.2s; text-align: center; }
         .modal-overlay.active .modal-box { transform: scale(1); }
-        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 12px; color: #fff; }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 12px; color: #1B211E; }
         .modal-text { color: var(--tw-colors-textDim); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
     </style>
@@ -112,7 +115,7 @@
             <div class="modal-title" id="modalTitle">Titre</div>
             <div class="modal-text" id="modalText">Texte</div>
             <div class="modal-actions">
-                <button class="btn btn-outline" id="modalCancelBtn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--tw-colors-sysBorder); color: #fff;" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-outline" id="modalCancelBtn" style="background: #E3E6DD; border: 1px solid var(--tw-colors-sysBorder); color: #1B211E;" onclick="closeModal()">Annuler</button>
                 <button class="btn btn-primary" id="modalConfirmBtn">Confirmer</button>
             </div>
         </div>
@@ -301,7 +304,7 @@
                             <div class="avatar-wrap">
                                 <img src="${bot.avatar}" alt="Avatar" onerror="this.src='/assets/images/logo.jpg'">
                             </div>
-                            <h1 style="font-size: 26px; font-weight: 800; color: #fff; margin-top:5px; display:flex; align-items:center; gap:10px;">
+                            <h1 style="font-size: 26px; font-weight: 800; color: #1B211E; margin-top:5px; display:flex; align-items:center; gap:10px;">
                                 ${bot.name}
                                 ${isFeatured ? '<span style="font-size:12px; background:rgba(255,215,0,0.2); color:var(--tw-colors-accentGold); padding:4px 10px; border-radius:12px; border:1px solid rgba(255,215,0,0.4);">⭐ Vedette</span>' : ''}
                             </h1>
@@ -311,8 +314,8 @@
                             <p style="color: #a0a0a0; font-size: 14px; max-width: 600px; line-height: 1.5;">${bot.description}</p>
                             
                             <div style="display:flex; gap: 10px; margin-top: 15px; font-size: 12px; flex-wrap: wrap; justify-content: center;">
-                                <span style="background: rgba(255,255,255,0.05); border: 1px solid var(--tw-colors-sysBorder); padding: 6px 12px; border-radius: 8px;">Préfixe: <strong style="color: var(--tw-colors-accentBlue);">${bot.prefix}</strong></span>
-                                ${bot.servers && bot.servers > 0 ? `<span style="background: rgba(255,255,255,0.05); border: 1px solid var(--tw-colors-sysBorder); padding: 6px 12px; border-radius: 8px;">🌐 ${bot.servers.toLocaleString()} Serveurs</span>` : ''}
+                                <span style="background: #E3E6DD; border: 1px solid var(--tw-colors-sysBorder); padding: 6px 12px; border-radius: 8px;">Préfixe: <strong style="color: var(--tw-colors-accentBlue);">${bot.prefix}</strong></span>
+                                ${bot.servers && bot.servers > 0 ? `<span style="background: #E3E6DD; border: 1px solid var(--tw-colors-sysBorder); padding: 6px 12px; border-radius: 8px;">🌐 ${bot.servers.toLocaleString()} Serveurs</span>` : ''}
                             </div>
                             <div style="display:flex; gap: 15px; margin-top: 10px; font-size: 13px; opacity: 0.7;">
                                 <span>👁️ ${bot.visits || 0} visites</span>
@@ -325,19 +328,19 @@
                             <button class="btn btn-primary" onclick="trackAndInvite('${bot.id}')" style="padding: 10px 20px;">
                                 <i class="fa-solid fa-arrow-up-right-from-square"></i> Ajouter le Bot
                             </button>
-                            <button class="btn" style="background: ${isLiked ? 'var(--tw-colors-accentRed)' : 'rgba(0,0,0,0.5)'}; color: #fff; border: 1px solid ${isLiked ? 'var(--tw-colors-accentRed)' : 'var(--tw-colors-sysBorder)'}; padding: 10px 20px;" onclick="toggleLike('${bot.id}')">
+                            <button class="btn" style="background: ${isLiked ? 'var(--tw-colors-accentRed)' : 'rgba(0,0,0,0.5)'}; color: #1B211E; border: 1px solid ${isLiked ? 'var(--tw-colors-accentRed)' : 'var(--tw-colors-sysBorder)'}; padding: 10px 20px;" onclick="toggleLike('${bot.id}')">
                                 ❤️ ${isLiked ? 'Liké' : 'Liker'}
                             </button>
                         </div>
 
                         ${bot.tags && bot.tags.length > 0 ? `
                         <div style="display:flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 25px;">
-                            ${bot.tags.map(tag => `<span style="background: rgba(0,0,0,0.3); border: 1px solid var(--tw-colors-sysBorder); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #a0a0a0;">${tag}</span>`).join('')}
+                            ${bot.tags.map(tag => `<span style="background: #FFFFFF; border: 1px solid var(--tw-colors-sysBorder); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #a0a0a0;">${tag}</span>`).join('')}
                         </div>
                         ` : ''}
 
                         ${bot.longDescription ? `
-                        <div class="panel" style="background: rgba(0,0,0,0.2);">
+                        <div class="panel" style="background: #E3E6DD;">
                             <h3 style="font-size:16px; font-weight:700; margin-bottom:15px; border-bottom:1px solid var(--tw-colors-sysBorder); padding-bottom:10px;">À propos</h3>
                             <div style="font-size: 14px; color: #a0a0a0; line-height: 1.6; white-space: pre-wrap;">${bot.longDescription}</div>
                         </div>
@@ -366,7 +369,7 @@
                     <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
                         <div>
                             <button class="btn-slim-gray" style="margin-bottom: 10px;" onclick="navigate('explorer')">← Explorer</button>
-                            <h2 style="font-size: 20px; font-weight: 800; color: #fff;">Gérer mes créations</h2>
+                            <h2 style="font-size: 20px; font-weight: 800; color: #1B211E;">Gérer mes créations</h2>
                             <p style="font-size: 13px; color: var(--tw-colors-textDim); margin-top:4px;">Mettez à jour les informations ou boostez la visibilité.</p>
                         </div>
                         <button class="btn btn-primary" onclick="navigate('addbot')"><i class="fa-solid fa-plus"></i> Nouveau Bot</button>
@@ -398,7 +401,7 @@
                         <button class="btn-slim-gray" onclick="navigate('mybots')">Retour</button>
                     </div>
 
-                    ${isCorrection ? `<div style="background: rgba(225, 79, 79, 0.1); border: 1px solid var(--tw-colors-accentRed); padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #fff; font-size:14px;"><strong style="display:block; margin-bottom:4px;"><i class="fa-solid fa-triangle-exclamation"></i> Bot refusé (À corriger) :</strong>${botToEdit.feedback}</div>` : ''}
+                    ${isCorrection ? `<div style="background: rgba(225, 79, 79, 0.1); border: 1px solid var(--tw-colors-accentRed); padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #1B211E; font-size:14px;"><strong style="display:block; margin-bottom:4px;"><i class="fa-solid fa-triangle-exclamation"></i> Bot refusé (À corriger) :</strong>${botToEdit.feedback}</div>` : ''}
 
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <div style="display:flex; gap:16px; flex-wrap:wrap;">

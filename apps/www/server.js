@@ -1,3 +1,4 @@
+const os = require('os');
 const path = require('path');
 const Module = require('module');
 
@@ -24,10 +25,40 @@ const { mountUi } = require('../ui/server');
 const { mountSharing, DATA_DIR } = require('../sharing/server');
 const { mountPublic, isDiscordOAuthConfigured } = require(path.join(PUBLIC_DIR, 'server.js'));
 const { mountVux } = require(path.join(VUX_DIR, 'server.js'));
+// krones-api: wallet JSON (pas Stripe) — module Krônes
+const { mountKrones } = require('./lib/krones');
+const { mountDashbot } = require('./lib/dashbot');
+const { mountCommands } = require('./lib/commands');
+const { mountStatus } = require('./lib/status');
+const {
+    PANEL_PREFIX,
+    panelPublicOrigin,
+    mountPanelProxy,
+    attachUpgrade,
+    spawnPanel,
+    shutdownPanel
+} = require('./lib/panel');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3668);
+const LISTEN_HOST = String(process.env.SYNKRONE_LISTEN_HOST || '127.0.0.1').trim() || '127.0.0.1';
+const IS_PROD = process.env.NODE_ENV === 'production';
+const INTERNAL_TOOLS = process.env.SYNKRONE_INTERNAL === '1' || !IS_PROD;
 const SESSION_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
+
+function lanUrls(port) {
+    const urls = [];
+    for (const addrs of Object.values(os.networkInterfaces())) {
+        for (const a of addrs || []) {
+            const v4 = a.family === 'IPv4' || a.family === 4;
+            if (v4 && !a.internal) urls.push(`http://${a.address}:${port}/`);
+        }
+    }
+    return urls;
+}
+
+// Avant le parser JSON : le body du panel Next ne doit pas être consommé ici.
+mountPanelProxy(app);
 
 if (!process.env.PASSWORD) {
     console.warn('[local] PASSWORD manquant (apps/ui/.env ou apps/www/.env) — /ui/ refuse les connexions');
@@ -39,6 +70,15 @@ if (!isDiscordOAuthConfigured()) {
     console.warn('[local] Discord OAuth non configuré — le site se parcourt sans login');
 }
 
+if (IS_PROD) {
+    const secret = String(process.env.SESSION_SECRET || '').trim();
+    if (!secret || secret === 'synkrone_secret' || secret === 'change-me-local') {
+        console.error('[prod] SESSION_SECRET manquant ou trop faible — refus de démarrer');
+        process.exit(1);
+    }
+}
+
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
 app.use(session({
@@ -46,38 +86,85 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     rolling: true,
-    cookie: { maxAge: SESSION_MAX_AGE_MS, httpOnly: true, sameSite: 'lax' }
+    cookie: {
+        maxAge: SESSION_MAX_AGE_MS,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: IS_PROD
+    }
 }));
 
-mountUi(app);
-mountSharing(app);
+if (INTERNAL_TOOLS) {
+    mountUi(app);
+    mountSharing(app);
+    app.get('/hub', (req, res) => {
+        res.sendFile(path.join(WWW_DIR, 'index.html'));
+    });
+    app.get(['/ui', '/ui/'], (req, res) => {
+        res.sendFile(path.join(UI_DIR, 'index.html'));
+    });
+    app.get(['/sharing', '/sharing/'], (req, res) => {
+        res.sendFile(path.join(SHARING_DIR, 'index.html'));
+    });
+    app.use('/ui', express.static(UI_DIR));
+    app.use('/sharing', express.static(SHARING_DIR));
+} else {
+    console.log('[prod] /ui /sharing /hub désactivés (SYNKRONE_INTERNAL=1 pour les ouvrir)');
+}
+
 mountVux(app);
-
-app.get('/hub', (req, res) => {
-    res.sendFile(path.join(WWW_DIR, 'index.html'));
-});
-
-app.get(['/ui', '/ui/'], (req, res) => {
-    res.sendFile(path.join(UI_DIR, 'index.html'));
-});
-
-app.get(['/sharing', '/sharing/'], (req, res) => {
-    res.sendFile(path.join(SHARING_DIR, 'index.html'));
-});
-
-app.use('/ui', express.static(UI_DIR));
-app.use('/sharing', express.static(SHARING_DIR));
 app.use('/logo', express.static(path.join(WWW_DIR, 'logo')));
 app.use('/design', express.static(path.join(WWW_DIR, 'design')));
 
+app.get('/api/config', (_req, res) => {
+    res.json({
+        panelOrigin: panelPublicOrigin(PORT)
+    });
+});
+
+mountKrones(app);
+mountStatus(app);
+mountDashbot(app);
+mountCommands(app);
 mountPublic(app, { skipBodyParser: true, skipSession: true });
 
-app.listen(PORT, '127.0.0.1', () => {
-    console.log(`local (JSON + SQLite disque, aucune base distante)`);
-    console.log(`  site     : http://127.0.0.1:${PORT}/`);
-    console.log(`  vux      : http://127.0.0.1:${PORT}/vux/`);
-    console.log(`  hub      : http://127.0.0.1:${PORT}/hub`);
-    console.log(`  ui       : http://127.0.0.1:${PORT}/ui/`);
-    console.log(`  sharing  : http://127.0.0.1:${PORT}/sharing/`);
-    console.log(`  catalogue: ${DATA_DIR}`);
+function logOAuthRedirects(port) {
+    const site = String(process.env.PUBLIC_ORIGIN || `http://127.0.0.1:${port}`).replace(/\/$/, '');
+    const panel = panelPublicOrigin(port);
+    console.log('  OAuth site');
+    console.log(`    Discord     ${process.env.DISCORD_REDIRECT_URI || `${site}/auth/discord/callback`}`);
+    console.log(`    GitHub      ${process.env.GITHUB_REDIRECT_URI || `${site}/auth/github/callback`}`);
+    console.log(`    Google      ${process.env.GOOGLE_REDIRECT_URI || `${site}/auth/google/callback`}`);
+    console.log('  OAuth panel');
+    console.log(`    Discord     ${panel}/api/auth/oauth/discord/callback`);
+    console.log(`    GitHub      ${panel}/api/auth/oauth/github/callback`);
+    console.log(`    Google      ${panel}/api/auth/oauth/google/callback`);
+}
+
+const panelChild = spawnPanel({ publicPort: PORT });
+const server = app.listen(PORT, LISTEN_HOST, () => {
+    attachUpgrade(server);
+    console.log(`synkrone — un process, un port (écoute ${LISTEN_HOST}:${PORT}${IS_PROD ? ', production' : ''})`);
+    console.log(`  site        : http://127.0.0.1:${PORT}/`);
+    if (LISTEN_HOST === '0.0.0.0' || LISTEN_HOST === '::') {
+        for (const url of lanUrls(PORT)) console.log(`  réseau      : ${url}`);
+    }
+    console.log(`  hébergement : http://127.0.0.1:${PORT}${PANEL_PREFIX}`);
+    console.log(`  vux         : http://127.0.0.1:${PORT}/vux/`);
+    if (INTERNAL_TOOLS) {
+        console.log(`  hub         : http://127.0.0.1:${PORT}/hub`);
+        console.log(`  ui          : http://127.0.0.1:${PORT}/ui/`);
+        console.log(`  sharing     : http://127.0.0.1:${PORT}/sharing/`);
+    }
+    console.log(`  catalogue   : ${DATA_DIR}`);
+    logOAuthRedirects(PORT);
 });
+
+function shutdown(signal) {
+    shutdownPanel(panelChild);
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 4000).unref();
+    if (signal) console.log(`[synkrone] arrêt (${signal})`);
+}
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));

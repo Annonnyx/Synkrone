@@ -160,6 +160,7 @@
         #listModalContent { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-right: 5px; }
     </style>
     <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="/assets/app-pages.css">
 </head>
 <body>
 
@@ -364,45 +365,46 @@
             const marqueeServers = featuredServers.length > 0 ? featuredServers : AllServers.slice(0, 10);
             
             let html = `
+                <section class="panel bump-intro">
+                    <h1>Bump</h1>
+                    <p>Listing public de serveurs Discord, sur le même principe que Disboard : parcourir, rejoindre, mettre le sien en avant.</p>
+                    <p>Pour ajouter un serveur, connectez-vous et invitez au moins un bot officiel Synkrone (Vax, Arceus, Asuna, Kayaba ou Yui). Sans ça, le serveur n’apparaît pas dans Mes serveurs.</p>
+                    <ol>
+                        <li><strong>1. Compte</strong>Se connecter (Discord, Google ou GitHub). Discord doit être lié.</li>
+                        <li><strong>2. Bot officiel</strong>Un des cinq sur le serveur, et vous admin ou propriétaire.</li>
+                        <li><strong>3. Publier</strong>Mes serveurs → fiche, bump, mise en avant en Krônes.</li>
+                    </ol>
+                </section>
                 <div class="nav-controls">
                     <div class="nav-controls-right">
                         ${store.user ? `
-                            <button class="btn btn-primary" style="background: var(--krones); color: #000;" onclick="navigate('myservers')">
-                                <i class="fa-solid fa-shield-halved"></i> Accéder à mes serveurs
-                            </button>
+                            <button class="btn btn-primary" onclick="navigate('myservers')">Mes serveurs</button>
                         ` : `
-                            <button class="btn btn-outline" onclick="window.parent && window.parent.loginDiscord ? window.parent.loginDiscord() : window.location.href='/auth/discord'">
-                                Connexion requise pour vos serveurs
-                            </button>
+                            <button class="btn btn-outline" onclick="window.top.location.href='/hebergement/login'">Se connecter pour ajouter un serveur</button>
                         `}
                     </div>
                 </div>
 
+                ${marqueeServers.length ? `
                 <section class="panel marquee-container">
                     <div class="marquee-track">
                         ${[...marqueeServers, ...marqueeServers, ...marqueeServers].map(s => `
                             <div class="marquee-item" onclick="navigate('server_profile', '${s.id}')">
-                                <img class="marquee-avatar" src="${s.icon}" alt="Serveur" onerror="this.src='https://placehold.co/100x100/1e2022/6d8cff?text=S'">
+                                <img class="marquee-avatar" src="${s.icon}" alt="">
                                 <span style="font-size:13px; font-weight:700; color:var(--text);">${s.name}</span>
-                                ${s.isFeatured ? '<span style="font-size:12px;">⭐</span>' : ''}
                             </div>
                         `).join('')}
                     </div>
                 </section>
+                ` : ''}
 
-                <div class="panel" style="background: linear-gradient(135deg, rgba(109, 140, 255, 0.08), transparent);">
-                    <div>
-                        <h1 style="font-size: 26px; font-weight: 800; margin-bottom: 15px;">Explorateur Synkrone</h1>
-                        <div style="display:flex; gap: 20px; font-size: 13px; color: var(--text-dim); font-weight: 600; margin-bottom: 20px;">
-                            <span>🌍 ${totalServers.toLocaleString()} Serveurs listés</span>
-                            <span>👥 ${totalMembers.toLocaleString()} Membres touchés</span>
-                        </div>
-                    </div>
-                    
+                <div class="panel">
+                    <h1>Serveurs listés</h1>
+                    <p class="bump-stats">${totalServers.toLocaleString('fr-FR')} serveur${totalServers > 1 ? 's' : ''} · ${totalMembers.toLocaleString('fr-FR')} membres</p>
                     <div class="tabs" style="margin-bottom: 0; border:none;">
-                        <button class="tab-btn ${currentExplorerTab === 'featured' ? 'active' : ''}" onclick="setExplorerTab('featured')"><i class="fa-solid fa-star"></i> Mis en avant</button>
-                        <button class="tab-btn ${currentExplorerTab === 'top' ? 'active' : ''}" onclick="setExplorerTab('top')"><i class="fa-solid fa-trophy"></i> Top Classement</button>
-                        <button class="tab-btn ${currentExplorerTab === 'all' ? 'active' : ''}" onclick="setExplorerTab('all')">Tous les serveurs</button>
+                        <button class="tab-btn ${currentExplorerTab === 'featured' ? 'active' : ''}" onclick="setExplorerTab('featured')">Mis en avant</button>
+                        <button class="tab-btn ${currentExplorerTab === 'top' ? 'active' : ''}" onclick="setExplorerTab('top')">Classement</button>
+                        <button class="tab-btn ${currentExplorerTab === 'all' ? 'active' : ''}" onclick="setExplorerTab('all')">Tous</button>
                     </div>
                 </div>
                 
@@ -427,7 +429,10 @@
             }
 
             if(list.length === 0) {
-                content.innerHTML = `<div class="panel" style="text-align:center; padding: 40px; color:var(--text-dim);">Aucun serveur trouvé dans cette catégorie.</div>`;
+                const hint = currentExplorerTab === 'featured'
+                    ? 'Aucun serveur n’est mis en avant pour le moment. Parcourez Tous, ou ajoutez le vôtre depuis Mes serveurs.'
+                    : 'Aucun serveur dans cette liste. Connectez-vous, invitez un bot officiel, puis ouvrez Mes serveurs.';
+                content.innerHTML = `<div class="panel" style="padding: 28px; color:var(--text-dim); line-height:1.55;">${hint}</div>`;
                 return;
             }
 
@@ -470,7 +475,8 @@
                     </div>
                 </div>
                 <div class="panel">
-                    <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 20px;">Mes Serveurs</h1>
+                    <h1>Mes serveurs</h1>
+                    <p style="color:var(--text-dim); max-width:62ch; line-height:1.55; margin: 0 0 20px;">Serveurs où vous êtes propriétaire ou admin, et où un bot officiel Synkrone est présent. De là vous publiez la fiche, vous bumper et vous achetez une mise en avant.</p>
                     
                     <div class="tabs">
                         <button class="tab-btn ${currentMyServersFilter === 'all' ? 'active' : ''}" onclick="setMyServersFilter('all')">Tous</button>
@@ -498,7 +504,7 @@
             if(currentMyServersFilter === 'admin') list = list.filter(s => s.userRole === 'admin' || s.userRole === 'owner');
 
             if(list.length === 0) {
-                content.innerHTML = `<p style="color:var(--text-dim); text-align:center; padding: 20px;">Aucun serveur trouvé. Vérifiez que vous êtes bien admin sur les serveurs possédant le bot.</p>`;
+                content.innerHTML = `<p style="color:var(--text-dim); line-height:1.55; padding: 8px 0 20px;">Aucun serveur ici. Vérifiez que vous êtes connecté avec Discord, que vous êtes admin ou propriétaire, et qu’au moins un bot officiel (Vax, Arceus, Asuna, Kayaba ou Yui) est sur le serveur.</p>`;
                 return;
             }
 

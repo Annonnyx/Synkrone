@@ -3,234 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synkrone.app</title>
-    <!-- Utilisation de logo.jpg pour le favicon -->
+    <title>Synkrone — Fiches bots</title>
     <link rel="icon" type="image/jpeg" href="../../assets/images/logo.jpg">
-    
+    <link rel="stylesheet" href="/assets/accueil.css">
     <style>
-        /* =========================================
-           VARIABLES & RÉINITIALISATION
-           ========================================= */
-        :root {
-            --bg-main: #181a1b;
-            --bg-panel: rgba(34, 37, 39, 0.85);
-            --bg-panel-hover: rgba(42, 46, 48, 0.95);
-            --text-main: #d1cdc7;
-            --text-muted: #8b8f92;
-            --accent: #d32f2f;
-            --border: #383c3f;
-            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        body { min-height: 100%; }
+        .band { padding-top: 40px; padding-bottom: 48px; border-top: 0; }
+        .bot-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 16px;
+            background: transparent;
+            border: 0;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            scrollbar-width: none; /* Firefox */
-        }
-
-        *::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden; 
-        }
-
-        /* =========================================
-           FOND UNI (Mosaïque supprimée)
-           ========================================= */
-        body {
-            background-color: var(--bg-main);
-            font-family: var(--font-family);
-            color: var(--text-main);
+        .bot-tile {
             display: flex;
             flex-direction: column;
-            color-scheme: dark; /* Force le rendu sombre natif pour éviter les flashs blancs */
+            gap: 12px;
+            padding: 24px 20px 20px;
+            background: var(--hall-elev);
+            border: 1px solid var(--hall-line);
+            border-radius: 6px;
+            text-decoration: none;
+            color: inherit;
+            min-height: 200px;
+            transition: background 0.15s ease;
         }
-
-        /* =========================================
-           NAVIGATION (SCROLLABLE MOBILE)
-           ========================================= */
-        nav.tabs {
-            display: flex;
-            gap: 6px;
-            background-color: rgba(24, 26, 27, 0.90);
-            padding: 8px 20px;
-            border-bottom: 1px solid var(--border);
-            width: 100%;
-            overflow-x: auto;
-            flex-wrap: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        button.tab-btn {
-            flex: 1;
-            min-width: 110px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background-color: var(--bg-panel);
-            color: var(--text-muted);
-            border: 1px solid transparent;
-            padding: 8px 12px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-
-        button.tab-btn img {
-            width: 18px;
-            height: 18px;
-            border-radius: 4px;
+        .bot-tile:hover { background: var(--pierre-2, #e3e6dd); }
+        .bot-tile:hover .u-open { color: var(--hall-red); }
+        .bot-tile img {
+            width: 44px;
+            height: 44px;
+            border-radius: 2px;
             object-fit: cover;
+            border: 1px solid var(--hall-line);
         }
-
-        button.tab-btn:hover {
-            background-color: var(--bg-panel-hover);
-            color: var(--text-main);
-            border-color: var(--border);
+        .bot-tile .u-id { margin: 0; }
+        .bot-tile .u-role { margin: 2px 0 0; }
+        .bot-tile-desc {
+            margin: 8px 0 0;
+            font-size: 13px;
+            line-height: 1.45;
+            color: var(--hall-mute, #5c6a66);
         }
-
-        button.tab-btn.active {
-            background-color: rgba(211, 47, 47, 0.15);
-            color: #fff;
-            border: 1px solid var(--accent);
+        .bot-tile .u-pre { width: fit-content; margin-top: auto; }
+        .bot-tile .u-open {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--basalte, #1b211e);
         }
-
-        /* =========================================
-           ZONE DE CONTENU IFRAME
-           ========================================= */
-        main {
-            flex: 1;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
+        .fiche-tuto {
+            margin-top: 0;
         }
-
-        iframe#content-frame {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: transparent;
-            transition: opacity 0.2s ease-in-out;
+        .fiche-tuto .btn {
+            min-height: 34px;
+            padding: 0 12px;
+            font-size: 12px;
         }
-
-        .fade-out { opacity: 0 !important; }
+        @media (max-width: 1100px) {
+            .bot-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        @media (max-width: 720px) {
+            .bot-grid { grid-template-columns: 1fr; }
+            .bot-tile { min-height: 0; }
+        }
     </style>
-    <link rel="stylesheet" href="/design/synkrone.css">
 </head>
 <body>
-
-    <nav class="tabs">
-        <button class="tab-btn" id="btn-discord" onclick="loadTab('discord')">
-            <img src="../../assets/images/discord.png" alt=""> Support
-        </button>
-        <button class="tab-btn" id="btn-vax" onclick="loadTab('vax')">
-            <img src="../../assets/images/vax.png" alt=""> Vax
-        </button>
-        <button class="tab-btn" id="btn-arceus" onclick="loadTab('arceus')">
-            <img src="../../assets/images/arceus.png" alt=""> Arceus
-        </button>
-        <button class="tab-btn" id="btn-asuna" onclick="loadTab('asuna')">
-            <img src="../../assets/images/asuna.png" alt=""> Asuna
-        </button>
-        <button class="tab-btn" id="btn-kayaba" onclick="loadTab('kayaba')">
-            <img src="../../assets/images/kayaba.png" alt=""> Kayaba
-        </button>
-        <button class="tab-btn" id="btn-yui" onclick="loadTab('yui')">
-            <img src="../../assets/images/yui.png" alt=""> Yui
-        </button>
-        <button class="tab-btn" id="btn-bot" onclick="loadTab('bot')">
-            <img id="img-tuto" src="../../assets/images/js.png" alt=""> Tuto
-        </button>
-    </nav>
-
-    <main>
-        <iframe id="content-frame" title="Contenu Synkrone"></iframe>
-    </main>
-
-    <script>
-        function resolveInitialTab() {
-            const params = new URLSearchParams(window.location.search);
-            const queryTab = (params.get('tab') || '').trim().toLowerCase();
-            const knownRoutes = new Set(['discord', 'asuna', 'vax', 'yui', 'kayaba', 'arceus', 'bot']);
-            return knownRoutes.has(queryTab) ? queryTab : 'discord';
-        }
-
-        function notifyParentRoute(routeName, replaceHistory = false) {
-            if (window.parent === window) return;
-
-            window.parent.postMessage(
-                {
-                    type: 'synkrone:bots-route',
-                    tab: routeName,
-                    replaceHistory
-                },
-                window.location.origin
-            );
-        }
-
-        function loadTab(routeName, options = {}) {
-            const { notifyParent = true, replaceParentHistory = false } = options;
-
-            // Compatibilité avec les anciens liens: accueil devient discord.
-            if (routeName === 'accueil') {
-                routeName = 'discord';
-            }
-
-            const iframe = document.getElementById('content-frame');
-            const btnId = 'btn-' + routeName;
-
-            if (notifyParent) {
-                notifyParentRoute(routeName, replaceParentHistory);
-            }
-
-            // Animation et chargement du fichier
-            iframe.classList.add('fade-out');
-            setTimeout(() => {
-                iframe.src = `/discord/bots/${routeName}.html`;
-                iframe.onload = () => {
-                    iframe.classList.remove('fade-out');
-                };
-            }, 150);
-
-            // Mise à jour visuelle des onglets standards
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(btnId);
-            
-            if (activeBtn && activeBtn.classList.contains('tab-btn')) {
-                activeBtn.classList.add('active');
-                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
-        }
-
-        // Chargement automatique au démarrage & gestion du timer d'icône
-        window.addEventListener('DOMContentLoaded', () => {
-            const initialTab = resolveInitialTab();
-            loadTab(initialTab, { notifyParent: true, replaceParentHistory: true });
-
-            // Alternance d'image pour l'onglet Tuto (1 seconde)
-            const tutoImg = document.getElementById('img-tuto');
-            const tutoImages = ['../../assets/images/js.png', '../../assets/images/py.png'];
-            let imgIndex = 0;
-
-            if (tutoImg) {
-                setInterval(() => {
-                    imgIndex = (imgIndex + 1) % tutoImages.length;
-                    tutoImg.src = tutoImages[imgIndex];
-                }, 1000);
-            }
-        });
-
-    </script>
+    <section class="band">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">Fiches</p>
+                <div>
+                    <h2>Cinq bots officiels.</h2>
+                    <p>Chaque fiche liste les commandes, le préfixe et le rôle du bot. Le catalogue public, Dashbot et les packs de commandes restent dans la barre au-dessus.</p>
+                </div>
+            </div>
+            <div class="bot-grid">
+                <a class="bot-tile" href="/discord/bots/vax" onclick="goBots(event, 'vax')">
+                    <span class="u-id">U01</span>
+                    <img src="/assets/images/vax.png" alt="">
+                    <div>
+                        <div class="u-name">Vax</div>
+                        <p class="u-role">Modération</p>
+                        <p class="bot-tile-desc">Warns, mutes, bans, tickets et logs. Préfixe ! et slash.</p>
+                    </div>
+                    <code class="u-pre">!</code>
+                    <span class="u-open">Fiche</span>
+                </a>
+                <a class="bot-tile" href="/discord/bots/arceus" onclick="goBots(event, 'arceus')">
+                    <span class="u-id">U02</span>
+                    <img src="/assets/images/arceus.png" alt="">
+                    <div>
+                        <div class="u-name">Arceus</div>
+                        <p class="u-role">Pokémon</p>
+                        <p class="bot-tile-desc">Capture, combat et collection. Préfixe '</p>
+                    </div>
+                    <code class="u-pre">'</code>
+                    <span class="u-open">Fiche</span>
+                </a>
+                <a class="bot-tile" href="/discord/bots/asuna" onclick="goBots(event, 'asuna')">
+                    <span class="u-id">U03</span>
+                    <img src="/assets/images/asuna.png" alt="">
+                    <div>
+                        <div class="u-name">Asuna</div>
+                        <p class="u-role">Jeux</p>
+                        <p class="bot-tile-desc">Mini-jeux et économie ludique. Préfixe $</p>
+                    </div>
+                    <code class="u-pre">$</code>
+                    <span class="u-open">Fiche</span>
+                </a>
+                <a class="bot-tile" href="/discord/bots/kayaba" onclick="goBots(event, 'kayaba')">
+                    <span class="u-id">U04</span>
+                    <img src="/assets/images/kayaba.png" alt="">
+                    <div>
+                        <div class="u-name">Kayaba</div>
+                        <p class="u-role">Combat</p>
+                        <p class="bot-tile-desc">Combats et progression. Préfixe .</p>
+                    </div>
+                    <code class="u-pre">.</code>
+                    <span class="u-open">Fiche</span>
+                </a>
+                <a class="bot-tile" href="/discord/bots/yui" onclick="goBots(event, 'yui')">
+                    <span class="u-id">U05</span>
+                    <img src="/assets/images/yui.png" alt="">
+                    <div>
+                        <div class="u-name">Yui</div>
+                        <p class="u-role">Architecture</p>
+                        <p class="bot-tile-desc">Outils de structure et d’organisation. Préfixe ?</p>
+                    </div>
+                    <code class="u-pre">?</code>
+                    <span class="u-open">Fiche</span>
+                </a>
+            </div>
+            <div class="bay-foot fiche-tuto">
+                <span>Créer son propre bot</span>
+                <div class="pack-actions">
+                    <a class="btn" href="/discord/bots/bot" onclick="goBots(event, 'bot')">Tutoriel</a>
+                    <a class="btn btn-red" href="/hebergement/dashboard/new/discord" target="_top">Créer dans le panel</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="/assets/go-bots.js"></script>
 </body>
 </html>

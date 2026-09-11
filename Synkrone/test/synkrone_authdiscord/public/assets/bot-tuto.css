@@ -1,0 +1,206 @@
+/* Tutoriel création de bot — DA Racine, chargé après synkrone.css. */
+
+html, body {
+    color-scheme: light !important;
+    background: #eef0ea !important;
+    color: #1b211e !important;
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: auto !important;
+}
+
+body.mosaic-bg {
+    background: #eef0ea !important;
+}
+
+.mosaic-layer {
+    display: none !important;
+}
+
+.page,
+.frame {
+    min-height: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+
+.create-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 20px 20px 0;
+    padding: 18px 20px;
+    background: #fff;
+    border: 1px solid #5c6a661f;
+    border-radius: 6px;
+}
+
+.create-bar strong {
+    display: block;
+    font-family: "Zilla Slab", Georgia, serif;
+    font-size: 1.15rem;
+    color: #1b211e;
+}
+
+.create-bar p {
+    margin: 6px 0 0;
+    color: #5c6a66;
+    font-size: 0.95rem;
+    max-width: 62ch;
+    line-height: 1.5;
+}
+
+.create-bar .btn-panel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 16px;
+    background: #3f6b52;
+    border: 1px solid #3f6b52;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.create-bar .btn-panel:hover {
+    background: #2e5039;
+    border-color: #2e5039;
+    color: #fff;
+}
+
+.top-nav {
+    justify-content: flex-start !important;
+    gap: 4px !important;
+    padding: 8px 20px !important;
+    background: #eef0ea !important;
+    border-bottom: 1px solid #5c6a661f !important;
+    overflow-y: visible !important;
+    min-height: 48px;
+    height: auto !important;
+}
+
+.page .top-nav .tab-btn,
+button.tab-btn {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    color: #5c6a66 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 0 !important;
+    border-radius: 4px !important;
+    min-height: 36px !important;
+    padding: 8px 12px !important;
+    box-shadow: none !important;
+}
+
+.page .top-nav .tab-btn:hover,
+button.tab-btn:hover {
+    color: #1b211e !important;
+    background: #e3e6dd !important;
+}
+
+.page .top-nav .tab-btn.active,
+button.tab-btn.active {
+    color: #1b211e !important;
+    background: transparent !important;
+    box-shadow: inset 0 -1px 0 #3f6b52 !important;
+    border: 0 !important;
+}
+
+.content {
+    padding: 24px 20px 56px !important;
+    overflow: visible !important;
+}
+
+.section-title,
+h2.section-title,
+h3.card-title {
+    font-family: "Zilla Slab", Georgia, serif !important;
+    color: #1b211e !important;
+    font-weight: 700 !important;
+    border-left: 0 !important;
+    padding-left: 0 !important;
+    text-transform: none !important;
+}
+
+.section-desc,
+.card p,
+li {
+    color: #5c6a66 !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+}
+
+.grid {
+    gap: 16px !important;
+}
+
+.card,
+details {
+    background: #fff !important;
+    border: 1px solid #5c6a661f !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+}
+
+.card {
+    padding: 20px !important;
+}
+
+summary {
+    color: #1b211e !important;
+    background: #fff !important;
+    font-weight: 600 !important;
+    padding: 14px 16px !important;
+}
+
+.details-body {
+    padding: 0 16px 16px !important;
+}
+
+.details-body h4 {
+    color: #1b211e !important;
+}
+
+pre {
+    background: #e3e6dd !important;
+    color: #1b211e !important;
+    border: 1px solid #5c6a661f !important;
+    border-radius: 4px !important;
+}
+
+.toolbar button {
+    background: #fff !important;
+    color: #1b211e !important;
+    border: 1px solid #5c6a6640 !important;
+    border-radius: 4px !important;
+}
+
+.tag {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    background: #e4ece4 !important;
+    color: #2e5039 !important;
+    border-color: transparent !important;
+}
+
+@media (max-width: 720px) {
+    .create-bar {
+        margin: 12px 12px 0;
+        padding: 16px;
+    }
+    .content { padding: 16px 12px 40px !important; }
+    .grid.cols-3,
+    .grid.cols-2 { grid-template-columns: 1fr !important; }
+}

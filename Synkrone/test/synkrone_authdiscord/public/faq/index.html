@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone — FAQ</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/accueil.css">
+    <style>
+        .band { padding-top: 40px; border-top: 0; }
+        .faq { display: grid; gap: 12px; }
+        details.faq-item {
+            background: var(--blanc);
+            border: 1px solid var(--hall-line);
+            border-radius: 6px;
+            padding: 18px 20px;
+        }
+        details.faq-item summary {
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.05rem;
+            list-style: none;
+        }
+        details.faq-item summary::-webkit-details-marker { display: none; }
+        details.faq-item summary::after {
+            content: "+";
+            float: right;
+            font-family: var(--mono);
+            color: var(--ardoise);
+            font-weight: 400;
+        }
+        details.faq-item[open] summary::after { content: "–"; }
+        details.faq-item p,
+        details.faq-item ul {
+            margin: 12px 0 0;
+            color: var(--hall-mute);
+            max-width: 66ch;
+            font-size: 0.98rem;
+            line-height: 1.6;
+        }
+        details.faq-item ul { padding-left: 1.2rem; }
+        details.faq-item li { margin: 6px 0; }
+        .faq-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    </style>
+</head>
+<body>
+    <section class="band">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">Questions fréquentes</p>
+                <div>
+                    <h2>FAQ</h2>
+                    <p>Réponses courtes sur le compte, l’hébergement, les Krônes, les bots et Minecraft. Si ce n’est pas ici, ouvrez un ticket.</p>
+                </div>
+            </div>
+
+            <div class="faq">
+                <details class="faq-item" open>
+                    <summary>Qu’est-ce que Synkrone ?</summary>
+                    <p>Synkrone est une plateforme d’hébergement et un écosystème autour de Discord et Minecraft : panel pour bots, serveurs et sites, monnaie Krônes, cinq bots officiels, listing Bump, profils Me, serveur Cantale et modpacks CurseForge.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Comment créer un compte ?</summary>
+                    <p>Cliquez sur « Se connecter » dans le header. La page du panel propose Discord, Google ou GitHub, ou un compte e-mail. Une fois connecté, le même solde Krônes sert au site et à l’hébergement si Discord est lié.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Où gérer un bot, un serveur Minecraft ou un site ?</summary>
+                    <p>Ouvrez Hébergement dans la barre, ou le bouton « Ouvrir le panel » de l’accueil. Vous créez le service, voyez la console, les fichiers et la facturation en Krônes.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Les rangs sont-ils un abonnement mensuel ?</summary>
+                    <p>Non : Kronium, Synkral, Kronalloy, Synkronite et Kronix sont un achat unique. Pas de renouvellement automatique. Chaque palier inclut le précédent : pour monter, vous ne payez que la différence.</p>
+                    <p>Deux moyens : en Krônes (solde) ou directement en euros TTC, sans acheter un pack. À 150 ₭ = 1 € : Kronium 1,00 €, Synkral 5,00 €, Kronalloy 10,00 €, Synkronite 20,00 €, Kronix 40,00 €. Les packs de Krônes restent pour l’hébergement et le reste de la boutique.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>À quoi servent les Krônes ?</summary>
+                    <p>Les Krônes (₭) paient l’hébergement, les packs de commandes, les grades, la mise en avant Me et certaines actions Dashbot. Vous les achetez par packs en euros TTC (facture, TVA, consentements). Une fois crédités, ils ne se reconvertissent pas en euros. Le bouton en haut à droite ouvre le portefeuille.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Comment payer un pack de Krônes ?</summary>
+                    <p>Connectez-vous, choisissez un pack, acceptez les CGV et renoncez au droit de rétractation (contenu numérique immédiat). Une facture est créée. Le portefeuille n’est crédité qu’après paiement confirmé. PayPal, Apple Pay et la carte seront branchés sur cette étape. En local, un paiement de test valide le parcours. Un virement SEPA s’active dès qu’un IBAN vendeur est renseigné.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Quels sont les bots officiels ?</summary>
+                    <ul>
+                        <li>Vax — modération, tickets, logs (préfixe !)</li>
+                        <li>Arceus — Pokémon (préfixe ')</li>
+                        <li>Asuna — jeux (préfixe $)</li>
+                        <li>Kayaba — combat (préfixe .)</li>
+                        <li>Yui — architecture / structure (préfixe ?)</li>
+                    </ul>
+                    <p>Les fiches listent les commandes. Le catalogue public permet de publier un bot communautaire. Dashbot gère les invitations. Les packs se construisent dans Commandes.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>C’est quoi Bump ?</summary>
+                    <p>Un listing de serveurs Discord, comme Disboard. Tout le monde peut parcourir la liste. Pour y ajouter le sien : se connecter, inviter au moins un bot officiel (Vax, Arceus, Asuna, Kayaba ou Yui), être admin ou propriétaire, puis ouvrir Mes serveurs dans Bump pour publier, bumper et mettre en avant.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Comment jouer sur Cantale ?</summary>
+                    <p>Minecraft Java 1.21. Adresse : play.cantale.world (repli 82.66.173.236:25580). Le serveur est un factions à trois vies. Le site cantale.world détaille le lore, l’économie Cantox et l’adresse à jour. Les modpacks Xenus, The French Baguette et Vanipack se téléchargent depuis l’onglet Minecraft → Modpacks.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Comment contacter le support ?</summary>
+                    <p>Page Contact : ticket Discord si vous êtes connecté et présent sur le serveur Synkrone. Sinon, rejoignez d’abord le Discord indiqué sur la page. Les CGU encadrent l’usage de la plateforme, des bots et des modpacks.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Le panel ne s’ouvre pas / page blanche</summary>
+                    <p>Vérifiez que vous êtes bien sur synkrone.app (ou 127.0.0.1:3668 en local) et l’URL /hebergement. Un bloqueur d’iframe ou un onglet resté sur un ancien processus peut servir l’accueil à la place du panel : rechargez après un redémarrage du serveur.</p>
+                </details>
+            </div>
+
+            <div class="faq-actions">
+                <a class="btn btn-red" href="/contact" onclick="goPage(event, 'contact')">Ouvrir un ticket</a>
+                <a class="btn" href="/cgu" onclick="goPage(event, 'cgu')">Lire les CGU</a>
+                <a class="btn" href="/cgv" onclick="goPage(event, 'cgv')">Lire les CGV</a>
+                <a class="btn" href="/hebergement" target="_top">Ouvrir le panel</a>
+            </div>
+        </div>
+    </section>
+    <script>
+        function goPage(event, section) {
+            if (event) event.preventDefault();
+            try {
+                if (window.parent && typeof window.parent.navigateToMainSection === 'function') {
+                    window.parent.navigateToMainSection(section, { updateUrl: true });
+                    return;
+                }
+            } catch { /* fall through */ }
+            window.top.location.href = '/' + section;
+        }
+    </script>
+</body>
+</html>

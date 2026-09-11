@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone — Conditions générales de vente</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/accueil.css">
+    <style>
+        .band { padding-top: 40px; border-top: 0; }
+        .legal h2 {
+            margin: 32px 0 10px;
+            font-family: var(--serif);
+            font-size: 1.35rem;
+        }
+        .legal h2:first-child { margin-top: 0; }
+        .legal p, .legal li {
+            color: var(--hall-mute);
+            max-width: 68ch;
+            font-size: 0.98rem;
+            line-height: 1.65;
+        }
+        .legal ul { padding-left: 1.2rem; }
+        .legal li { margin: 6px 0; }
+        .legal-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 28px;
+        }
+    </style>
+</head>
+<body>
+    <section class="band">
+        <div class="band-inner legal">
+            <div class="band-head">
+                <p class="sect-id">Vente</p>
+                <div>
+                    <h2>Conditions générales de vente</h2>
+                    <p>Ces CGV encadrent l’achat de packs de Krônes sur Synkrone. Les CGU restent applicables. En cas de contradiction sur un achat payant, les CGV prévalent.</p>
+                </div>
+            </div>
+
+            <h2>1. Vendeur</h2>
+            <p>Les packs sont proposés par Synkrone. L’identité complète du vendeur (forme, adresse, SIRET, n° de TVA, e-mail) est affichée à la commande dès qu’elle est renseignée dans la configuration. Tant que ces mentions manquent, les ventes en production restent fermées ; l’environnement de test peut enregistrer une commande pour valider le parcours.</p>
+
+            <h2>2. Objet</h2>
+            <p>Les Krônes sont un crédit d’usage exclusivement interne à Synkrone (hébergement, rangs, boutique de la plateforme). Ce n’est pas une monnaie ayant cours légal, ni un instrument financier, ni de la monnaie électronique remboursable. Ils ne peuvent pas être échangés contre des euros, cédés hors de la plateforme, ni retirés.</p>
+
+            <h2>3. Compte</h2>
+            <p>L’achat exige un compte Synkrone (connexion via le panel). Le crédit est rattaché à ce compte. Un mineur de moins de 18 ans ne commande qu’avec l’autorisation de la personne qui exerce l’autorité parentale.</p>
+
+            <h2>4. Prix et TVA</h2>
+            <p>Les prix des packs sont indiqués en euros TTC, TVA française 20 % (taux en vigueur, sauf mention contraire). Le détail hors taxes / TVA / TTC figure avant validation. Une commande crée une facture numérotée (SK-AAAA-n). Les rangs (Kronium à Kronix) s’achètent ensuite en Krônes, pas en euros.</p>
+
+            <h2>5. Commande et paiement</h2>
+            <ul>
+                <li>Vous choisissez un pack, prenez connaissance du prix TTC, puis cochez les consentements.</li>
+                <li>La commande est enregistrée avant le paiement. Aucun Krône n’est versé tant que le paiement n’est pas confirmé.</li>
+                <li>Moyens prévus : virement SEPA (dès IBAN publié), puis PayPal, Apple Pay et carte via un prestataire de paiement. Ces prestataires se branchent sur la même commande et la même facture.</li>
+                <li>En virement, le libellé doit reprendre le numéro de facture. Le crédit a lieu après réception des fonds.</li>
+            </ul>
+
+            <h2>6. Délivrance</h2>
+            <p>Dès confirmation du paiement, le pack est crédité sur le portefeuille. La délivrance est numérique et immédiate. Conservez le numéro de facture ; le journal du portefeuille en fait mention.</p>
+
+            <h2>7. Droit de rétractation</h2>
+            <p>Conformément à l’article L. 221-28 du code de la consommation, le droit de rétractation ne s’applique pas aux contenus numériques fournis sur un support immatériel dont l’exécution a commencé avant la fin du délai de quatorze jours, dès lors que vous avez donné votre accord exprès et reconnu perdre ce droit. Ces deux mentions sont demandées, non pré-cochées, avant l’enregistrement de la commande.</p>
+            <p>En conséquence, un pack crédité n’est ni repris ni remboursé en euros, sauf défaut de délivrance ou obligation légale contraire.</p>
+
+            <h2>8. Défaut de délivrance</h2>
+            <p>Si le paiement est encaissé sans crédit du portefeuille, contactez le support (page Contact / ticket Discord) avec le numéro de facture. Le vendeur régularise le crédit ou, si c’est impossible, rembourse le montant TTC payé par le même moyen lorsque c’est possible.</p>
+
+            <h2>9. Données</h2>
+            <p>La commande enregistre l’identifiant de compte, le pack, les montants, les consentements, la date et, pour la facturation et la lutte contre la fraude, l’adresse IP. Les factures sont conservées conformément aux obligations comptables. Les droits d’accès, de rectification et d’effacement s’exercent via le support, dans les limites légales de conservation des pièces.</p>
+
+            <h2>10. Médiation et droit applicable</h2>
+            <p>Droit français. En cas de litige, vous pouvez d’abord saisir le support. Un consommateur peut recourir au médiateur de la consommation désigné par le vendeur (nom et adresse publiés dès désignation) et à la plateforme européenne de règlement en ligne des litiges. Les tribunaux français sont compétents, sous réserve des règles impératives de protection du consommateur.</p>
+
+            <div class="legal-nav">
+                <a class="btn" href="/cgu" onclick="goPage(event, 'cgu')">CGU</a>
+                <a class="btn" href="/krones" onclick="goPage(event, 'krones')">Krônes</a>
+                <a class="btn" href="/faq" onclick="goPage(event, 'faq')">FAQ</a>
+                <a class="btn btn-red" href="/contact" onclick="goPage(event, 'contact')">Contact</a>
+            </div>
+        </div>
+    </section>
+    <script>
+        function goPage(event, section) {
+            if (event) event.preventDefault();
+            try {
+                if (window.parent && typeof window.parent.navigateToMainSection === 'function') {
+                    window.parent.navigateToMainSection(section, { updateUrl: true });
+                    return;
+                }
+            } catch { /* fall through */ }
+            window.top.location.href = '/' + section;
+        }
+    </script>
+</body>
+</html>

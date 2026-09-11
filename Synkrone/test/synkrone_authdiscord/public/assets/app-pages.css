@@ -1,0 +1,223 @@
+/* Me / Bump — tokens Racine + lecture aérée. Chargé en dernier. */
+
+:root {
+    --bg: #eef0ea !important;
+    --surface: #ffffff !important;
+    --surface-hover: #e3e6dd !important;
+    --surface-active: #e4ece4 !important;
+    --border: #5c6a661f !important;
+    --border-hover: #5c6a6640 !important;
+    --accent: #3f6b52 !important;
+    --accent-2: #3f6b52 !important;
+    --accent-gold: #b8823d !important;
+    --krones: #b8823d !important;
+    --text: #1b211e !important;
+    --text-dim: #5c6a66 !important;
+    --radius: 6px !important;
+    --radius-sm: 4px !important;
+}
+
+html, body {
+    color-scheme: light !important;
+    background: #eef0ea !important;
+    color: #1b211e !important;
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif !important;
+}
+
+#dynamic-bg {
+    background: none !important;
+}
+
+#main-content {
+    padding: 32px 28px 64px !important;
+}
+
+.page-container {
+    max-width: 1040px !important;
+    gap: 28px !important;
+}
+
+.panel {
+    background: #fff !important;
+    border: 1px solid #5c6a661f !important;
+    border-radius: 6px !important;
+    backdrop-filter: none !important;
+    padding: 24px !important;
+}
+
+.tabs {
+    gap: 8px !important;
+    margin-bottom: 24px !important;
+    padding: 0 0 12px !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 1px solid #5c6a661f !important;
+    border-radius: 0 !important;
+}
+
+.filter-bar,
+.nav-controls {
+    background: #fff !important;
+    border-color: #5c6a661f !important;
+}
+
+.modal-title,
+.modal-box .modal-title {
+    color: #1b211e !important;
+    font-family: "Zilla Slab", Georgia, serif !important;
+}
+
+.modal-box {
+    background: #fff !important;
+    color: #1b211e !important;
+}
+
+h1, h2, h3 {
+    color: #1b211e !important;
+}
+
+.time-toggle,
+.view-btn {
+    background: #fff !important;
+    border: 1px solid #5c6a6640 !important;
+}
+
+.panel[style*="linear-gradient"] {
+    background: #fff !important;
+}
+
+.tab-btn {
+    color: #5c6a66 !important;
+    border-radius: 4px !important;
+}
+
+.tab-btn:hover,
+.tab-btn.active {
+    background: #e4ece4 !important;
+    color: #1b211e !important;
+    border-color: #3f6b52 !important;
+}
+
+.form-control {
+    background: #fff !important;
+    border: 1px solid #5c6a6640 !important;
+    color: #1b211e !important;
+    border-radius: 4px !important;
+}
+
+.form-control:focus {
+    border-color: #3f6b52 !important;
+    background: #fff !important;
+    outline: 2px solid #3f6b52 !important;
+    outline-offset: 1px;
+}
+
+.grid-cards {
+    gap: 20px !important;
+}
+
+.server-card,
+.user-card {
+    background: #fff !important;
+    border: 1px solid #5c6a661f !important;
+    border-radius: 6px !important;
+    padding: 20px !important;
+}
+
+.server-card:hover,
+.user-card:hover {
+    transform: none !important;
+    background: #e3e6dd !important;
+    box-shadow: none !important;
+}
+
+.server-name,
+.user-name {
+    color: #1b211e !important;
+}
+
+.btn-primary,
+.btn-join {
+    background: #3f6b52 !important;
+    color: #fff !important;
+}
+
+.btn-primary:hover,
+.btn-join:hover {
+    background: #2e5039 !important;
+}
+
+.btn-success {
+    background: #b8823d !important;
+    color: #fff !important;
+}
+
+.btn-outline,
+.btn-slim-gray {
+    background: transparent !important;
+    border: 1px solid #5c6a6640 !important;
+    color: #1b211e !important;
+}
+
+.marquee-item {
+    background: #fff !important;
+    border-color: #5c6a661f !important;
+}
+
+.marquee-item:hover {
+    border-color: #b8823d !important;
+    background: #f3e7d3 !important;
+}
+
+.bump-intro h1 {
+    font-family: "Zilla Slab", Georgia, serif !important;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px !important;
+}
+
+.bump-intro p {
+    color: #5c6a66 !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    max-width: 64ch;
+    margin: 0 0 12px !important;
+}
+
+.bump-intro p:last-child {
+    margin-bottom: 0 !important;
+}
+
+.bump-intro ol {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.bump-intro li {
+    padding: 12px 14px;
+    background: #eef0ea;
+    border-radius: 4px;
+    color: #5c6a66;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.bump-intro li strong {
+    display: block;
+    color: #1b211e;
+    margin-bottom: 2px;
+}
+
+.bump-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px !important;
+    color: #5c6a66 !important;
+    font-weight: 600;
+    margin: 8px 0 0 !important;
+}

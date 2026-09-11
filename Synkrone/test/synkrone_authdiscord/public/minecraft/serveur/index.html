@@ -3,40 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft - Serveur</title>
+    <title>Synkrone — Minecraft</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/accueil.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        .band { padding-top: 40px; border-top: 0; }
+        .project {
+            display: grid;
+            gap: 12px;
+            padding: 28px 24px;
+            background: var(--blanc);
+            border: 1px solid var(--hall-line);
+            border-radius: 6px;
         }
-
-        html, body {
-            width: 100%;
-            height: 100%;
+        .project h3 { margin: 0; font-family: var(--serif); font-size: 1.5rem; }
+        .project p { margin: 0; color: var(--hall-mute); max-width: 66ch; line-height: 1.6; }
+        .project-meta { font-family: var(--mono); font-size: 0.85rem; color: var(--ardoise); }
+        .project-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+        .ip-box {
+            font-family: var(--mono);
+            font-size: 1.05rem;
+            padding: 12px 14px;
+            background: var(--pierre-2);
+            border-radius: 4px;
+            color: var(--basalte);
+            width: fit-content;
+        }
+        .preview {
+            margin-top: 8px;
+            border: 1px solid var(--hall-line);
+            border-radius: 6px;
             overflow: hidden;
-            background: #111314;
-            color: #d1cdc7;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--basalte);
+            min-height: 520px;
         }
-
-        .server-frame {
+        .preview iframe {
+            display: block;
             width: 100%;
-            height: 100%;
-            border: none;
-            background: #111314;
+            height: 640px;
+            border: 0;
+            background: #1b211e;
+        }
+        .projects { display: grid; gap: 16px; }
+        .preview-note { margin: 10px 0 0; font-size: 0.9rem; color: var(--ardoise); }
+        @media (max-width: 720px) {
+            .preview iframe { height: 420px; }
         }
     </style>
-    <link rel="stylesheet" href="/design/synkrone.css">
 </head>
 <body>
-    <iframe
-        class="server-frame"
-        src="https://www.cantale.world"
-        title="Serveur Cantale"
-        loading="eager"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen
-    ></iframe>
+    <section class="band">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">01 — Serveur</p>
+                <div>
+                    <h2>Cantale</h2>
+                    <p>Serveur Minecraft Java officiel de Synkrone. Factions, trois vies, économie Cantox. Le site du projet est prévisualisé plus bas.</p>
+                </div>
+            </div>
+
+            <div class="projects">
+                <article class="project">
+                    <div class="project-meta">Minecraft Java · 1.21 · Semi-RP · Factions</div>
+                    <h3>Rejoindre Cantale</h3>
+                    <p>Cantale est un serveur factions pensé pour que chaque mort compte : trois vies, une monnaie gagnée en jeu, des items forgés pour le serveur. Copiez l’adresse, lancez Minecraft Java 1.21, ajoutez le serveur. En cas de doute, utilisez l’adresse affichée sur cantale.world.</p>
+                    <div class="ip-box" id="cantale-ip">play.cantale.world</div>
+                    <p class="project-meta">Adresse de repli : 82.66.173.236:25580</p>
+                    <div class="project-actions">
+                        <a class="btn btn-red" href="https://www.cantale.world" target="_blank" rel="noopener noreferrer">Site Cantale</a>
+                        <a class="btn" href="https://discord.gg/eDTfYWtuYp" target="_blank" rel="noopener noreferrer">Discord Cantale</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="band">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">02 — Modpacks</p>
+                <div>
+                    <h2>Trois packs officiels</h2>
+                    <p>Téléchargements CurseForge. Les fiches (lore, mods, versions) sont dans l’onglet Modpacks.</p>
+                </div>
+            </div>
+            <div class="projects">
+                <article class="project">
+                    <div class="project-meta">Skyblock · 1.19.2 · Xenus 1.1.0</div>
+                    <h3>Xenus</h3>
+                    <p>Skyblock où magie (Ars Nouveau, Botania, Mystical Agriculture) et technologie (Mekanism, Create, AE2) se croisent. Plus de 200 mods, quêtes FR, équipe Mod In French.</p>
+                    <div class="project-actions">
+                        <a class="btn btn-red" href="https://www.curseforge.com/minecraft/modpacks/xenus/download/6889261" target="_blank" rel="noopener noreferrer">Télécharger Xenus</a>
+                        <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/xenus" target="_blank" rel="noopener noreferrer">Fiche CurseForge</a>
+                        <a class="btn" href="/minecraft/modpack" onclick="goMc(event, 'xenus')">Fiche Synkrone</a>
+                    </div>
+                </article>
+                <article class="project">
+                    <div class="project-meta">Aventure FR · 1.16.5 · The French Baguette 1.2.0</div>
+                    <h3>The French Baguette</h3>
+                    <p>Modpack immersif orienté communauté francophone, avec livre de quêtes en français. Magie, techno et automation, recettes rééquilibrées pour le multi.</p>
+                    <div class="project-actions">
+                        <a class="btn btn-red" href="https://www.curseforge.com/minecraft/modpacks/the-french-baguette/download/7629554" target="_blank" rel="noopener noreferrer">Télécharger The French Baguette</a>
+                        <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/the-french-baguette" target="_blank" rel="noopener noreferrer">Fiche CurseForge</a>
+                        <a class="btn" href="/minecraft/modpack" onclick="goMc(event, 'thefrenchbaguette')">Fiche Synkrone</a>
+                    </div>
+                </article>
+                <article class="project">
+                    <div class="project-meta">Vanilla+ · 1.21.7 / 1.21.8 · Vanipack 1.2</div>
+                    <h3>Vanipack</h3>
+                    <p>Vanilla+ léger : confort, performances, JourneyMap, chat vocal, sans casser l’esprit vanilla. Idéal pour jouer proche du jeu de base.</p>
+                    <div class="project-actions">
+                        <a class="btn btn-red" href="https://www.curseforge.com/minecraft/modpacks/vanipack/download/6889206" target="_blank" rel="noopener noreferrer">Télécharger Vanipack</a>
+                        <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/vanipack" target="_blank" rel="noopener noreferrer">Fiche CurseForge</a>
+                        <a class="btn" href="/minecraft/modpack" onclick="goMc(event, 'vanipack')">Fiche Synkrone</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="band" id="cantale-preview">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">03 — Preview</p>
+                <div>
+                    <h2>cantale.world</h2>
+                    <p>Aperçu du site officiel. Ouvrez-le dans un onglet pour voter, lire le lore et copier l’adresse à jour.</p>
+                </div>
+            </div>
+            <div class="preview">
+                <iframe
+                    src="https://www.cantale.world"
+                    title="Aperçu du site Cantale"
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                ></iframe>
+            </div>
+            <p class="preview-note">Si l’aperçu reste vide (certains navigateurs bloquent l’iframe), utilisez le bouton Site Cantale plus haut.</p>
+        </div>
+    </section>
+    <script>
+        function goMc(event, subTab) {
+            if (event) event.preventDefault();
+            try {
+                if (window.parent && window.parent !== window && typeof window.parent.navigateToMainSection === 'function') {
+                    window.parent.navigateToMainSection('minecraft', { updateUrl: true, subTab: 'modpack', modpackTab: subTab || 'accueil' });
+                    return;
+                }
+            } catch { /* fall through */ }
+            window.top.location.href = '/minecraft/modpack/' + (subTab || 'accueil');
+        }
+    </script>
 </body>
 </html>

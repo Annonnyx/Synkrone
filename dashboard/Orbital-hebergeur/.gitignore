@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+build/
+next-env.d.ts
+
+# Secrets and local configuration
+.env
+.env.local
+.env.*.local
+
+# Service volumes and backups created by the platform at runtime
+.data/
+
+*.tsbuildinfo
+npm-debug.log*
+.DS_Store

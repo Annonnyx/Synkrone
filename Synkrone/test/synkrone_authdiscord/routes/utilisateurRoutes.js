@@ -10,7 +10,8 @@ module.exports = function (dependencies) {
         isManualStaffRole,
         ALLOWED_USER_GRADES,
         ALLOWED_MANUAL_ROLES,
-        writeUsersDb
+        writeUsersDb,
+        krones
     } = dependencies;
 
     router.get('/admin/users', async (req, res) => {
@@ -75,6 +76,14 @@ module.exports = function (dependencies) {
         if (Object.hasOwn(req.body || {}, 'krone')) {
             if (!Number.isFinite(Number(req.body.krone))) return res.status(400).json({ ok: false, message: 'Krone invalide.' });
             nextKrone = Math.max(0, Math.trunc(Number(req.body.krone)));
+            if (krones) {
+                const set = await krones.setAccountBalance(userId, nextKrone, 'admin:set');
+                if (!set.ok) return res.status(400).json({ ok: false, message: set.error || 'Krone invalide.' });
+                nextKrone = set.wallet.balance;
+            }
+        }
+        if (krones && Object.hasOwn(req.body || {}, 'grade')) {
+            await krones.setAccountPlan(userId, rawGrade || existing.grade);
         }
         
         const nextUser = { ...existing, role: nextRole, grade: rawGrade || existing.grade, krone: nextKrone, updatedAt: Date.now() };

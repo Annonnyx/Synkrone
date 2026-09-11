@@ -1,8 +1,8 @@
 # Synkrone
 
-**synkrone.app** — en local, un seul processus Node. Le site public (celui de production) est la porte d’entrée. Hub / ui / sharing restent internes.
+**synkrone.app** — en local, un seul `npm start` : site public + panel d’hébergement. Le site est la porte d’entrée ; le panel est servi sur `/hebergement`.
 
-Pas de Docker, pas de Postgres/Mongo/Redis, pas de VPS. Données sur le disque (JSON + SQLite Vux).
+Le site public stocke JSON + SQLite. Le panel a besoin de **Postgres** (déjà sur `:5432` en local) pour les comptes / services.
 
 ## Lancer
 
@@ -10,14 +10,16 @@ Il faut **Node.js** (v22 va). À la racine du dépôt :
 
 ```bash
 npm install --prefix apps/www
+npm install --prefix dashboard/Orbital-hebergeur
 npm start
 ```
 
-Écoute **127.0.0.1:3668**.
+Écoute **127.0.0.1:3668** (le panel Next tourne en interne et est proxifié).
 
 | URL | Rôle |
 | --- | --- |
 | [http://127.0.0.1:3668/](http://127.0.0.1:3668/) | **Site public** (Accueil, Discord/bots, Minecraft, Admin, Équipe, CGU, contact, roulette, bump, me, dashbot UI) |
+| [http://127.0.0.1:3668/hebergement](http://127.0.0.1:3668/hebergement) | **Panel d’hébergement** (bots, Minecraft, web, Krônes) |
 | [http://127.0.0.1:3668/vux/](http://127.0.0.1:3668/vux/) | Page Vux + téléchargement `Vux.exe` |
 | [http://127.0.0.1:3668/hub](http://127.0.0.1:3668/hub) | Hub interne |
 | [http://127.0.0.1:3668/ui/](http://127.0.0.1:3668/ui/) | Médiathèque interne |

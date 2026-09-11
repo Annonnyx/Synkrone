@@ -1,0 +1,1067 @@
+{
+  "version": 1,
+  "cogs": {
+    "2048": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "ban": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/ban/ban.py",
+      "custom": true
+    },
+    "banlist": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/ban/banlist.py",
+      "custom": true
+    },
+    "derank": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/derank/derank.py",
+      "custom": true
+    },
+    "kick": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/kick.py",
+      "custom": true
+    },
+    "lock": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/lock/lock.py",
+      "custom": true
+    },
+    "lockall": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/lock/lockall.py",
+      "custom": true
+    },
+    "mute": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/mute/mute.py",
+      "custom": true
+    },
+    "mutelist": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/mute/mutelist.py",
+      "custom": true
+    },
+    "purge": {
+      "category": "moderation",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "rmute": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/mute/rmute.py",
+      "custom": true
+    },
+    "slowmode": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/slowmode.py",
+      "custom": true
+    },
+    "tempban": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/ban/tempban.py",
+      "custom": true
+    },
+    "tempmute": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/mute/tempmute.py",
+      "custom": true
+    },
+    "temprmute": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/mute/temprmute.py",
+      "custom": true
+    },
+    "unban": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/ban/unban.py",
+      "custom": true
+    },
+    "unlock": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/lock/unlock.py",
+      "custom": true
+    },
+    "unlockall": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/lock/unlockall.py",
+      "custom": true
+    },
+    "unmute": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/mute/unmute.py",
+      "custom": true
+    },
+    "warn": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/warn/warn.py",
+      "custom": true
+    },
+    "warninfo": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/warn/warninfo.py",
+      "custom": true
+    },
+    "warnlist": {
+      "category": "moderation",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/warn/warnlist.py",
+      "custom": true
+    },
+    "anniversaire": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "antiscam": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/antiscam.py",
+      "custom": true
+    },
+    "aurevoir": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/joinleave/aurevoir/aurevoir.py",
+      "custom": true
+    },
+    "autoping": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "autorole": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "autostats": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "bienvenue": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/joinleave/bienvenue/bienvenue.py",
+      "custom": true
+    },
+    "bonjour": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/bonjour.py",
+      "custom": true
+    },
+    "boost": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "confess": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "custom": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/custom.py",
+      "custom": true
+    },
+    "infinite": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "log": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/logserver/logserver.py",
+      "custom": true
+    },
+    "notif": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/notif.py",
+      "custom": true
+    },
+    "reward": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "secur": {
+      "category": "configuration",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "servembed": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/config_manager/servembed.py",
+      "custom": true
+    },
+    "statsserver": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/statsserver/statsserver.py",
+      "custom": true
+    },
+    "ticket": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/ticket/ticket.py",
+      "custom": true
+    },
+    "voice": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/voice/voice.py",
+      "custom": true
+    },
+    "addmembre": {
+      "category": "admin",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/adddelmembre/addmembre.py",
+      "custom": true
+    },
+    "addrole": {
+      "category": "admin",
+      "source": "bots/Vax,Yui",
+      "file": null,
+      "custom": false
+    },
+    "admininfo": {
+      "category": "admin",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "annonce": {
+      "category": "admin",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/divers/annonce.py",
+      "custom": true
+    },
+    "clear": {
+      "category": "admin",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/clear/clear.py",
+      "custom": true
+    },
+    "delmembre": {
+      "category": "admin",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/moderation/adddelmembre/delmembre.py",
+      "custom": true
+    },
+    "delrole": {
+      "category": "admin",
+      "source": "bots/Vax,Yui",
+      "file": null,
+      "custom": false
+    },
+    "embed": {
+      "category": "admin",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/divers/embed/embed.py",
+      "custom": true
+    },
+    "emoji": {
+      "category": "admin",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/divers/emoji/emoji.py",
+      "custom": true
+    },
+    "giveaway": {
+      "category": "admin",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "note": {
+      "category": "admin",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "partenariat": {
+      "category": "admin",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "rolemembre": {
+      "category": "admin",
+      "source": "bots/Vax,Yui",
+      "file": null,
+      "custom": false
+    },
+    "rolemenu": {
+      "category": "admin",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "say": {
+      "category": "admin",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/divers/say/say.py",
+      "custom": true
+    },
+    "bot": {
+      "category": "public",
+      "source": "templates/discord",
+      "file": null,
+      "custom": true
+    },
+    "dice": {
+      "category": "public",
+      "source": "templates/discord",
+      "file": "cogs/PUBLIC/dice.py",
+      "custom": true
+    },
+    "feedback": {
+      "category": "public",
+      "source": "bots/Arceus,Asuna,Kayaba,Vax,Yui",
+      "file": null,
+      "custom": false
+    },
+    "help": {
+      "category": "public",
+      "source": "templates/discord",
+      "file": "cogs/help.py",
+      "custom": true
+    },
+    "invitation": {
+      "category": "public",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "ping": {
+      "category": "public",
+      "source": "templates/discord",
+      "file": "cogs/PUBLIC/ping/pingpong.py",
+      "custom": true
+    },
+    "prefix": {
+      "category": "public",
+      "source": "templates/discord",
+      "file": null,
+      "custom": true
+    },
+    "8ball": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "amour": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "anagram": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "ascii": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "flags": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "hack": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "hug": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "kiss": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "marry": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "marryme": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "mastermind": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "meme": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "morpion": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "nombre": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "pfc": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "play": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "puissance4": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "punch": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "rate": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "reverse": {
+      "category": "fun",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "admin": {
+      "category": "casino",
+      "source": "bots/Asuna,Yui",
+      "file": "cogs/ADMIN/configuration/antiscam.py",
+      "custom": false
+    },
+    "adminshop": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "balance": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "blackjack": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "chest": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "coinflip": {
+      "category": "casino",
+      "source": "bots/Asuna,Vax",
+      "file": null,
+      "custom": false
+    },
+    "convert": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "give": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "lanternfall": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "lvl": {
+      "category": "casino",
+      "source": "bots/Asuna,Vax",
+      "file": null,
+      "custom": false
+    },
+    "mines": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "mysteribox": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "rob": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "roulette": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "shop": {
+      "category": "casino",
+      "source": "bots/Asuna,Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "slots": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "solde": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "succes": {
+      "category": "casino",
+      "source": "bots/Asuna",
+      "file": null,
+      "custom": false
+    },
+    "comparer": {
+      "category": "pokemon",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "faiblesses": {
+      "category": "pokemon",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "fusion": {
+      "category": "pokemon",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "pokemon": {
+      "category": "pokemon",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "randomteam": {
+      "category": "pokemon",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "recherche": {
+      "category": "pokemon",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "add": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "capture": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "charme": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "commerce": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "daily": {
+      "category": "economie",
+      "source": "bots/Arceus,Asuna,Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "don": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "doublon": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "drop": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "echange": {
+      "category": "economie",
+      "source": "bots/Arceus,Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "enigme": {
+      "category": "economie",
+      "source": "bots/Arceus,Vax",
+      "file": null,
+      "custom": false
+    },
+    "farm": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "hourly": {
+      "category": "economie",
+      "source": "bots/Arceus,Asuna",
+      "file": null,
+      "custom": false
+    },
+    "leader": {
+      "category": "economie",
+      "source": "bots/Arceus,Asuna,Kayaba,Vax",
+      "file": null,
+      "custom": false
+    },
+    "mail": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "monthly": {
+      "category": "economie",
+      "source": "bots/Arceus,Asuna",
+      "file": null,
+      "custom": false
+    },
+    "pokedex": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "sdrop": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "search": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "sleep": {
+      "category": "economie",
+      "source": "bots/Arceus,Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "teams": {
+      "category": "economie",
+      "source": "bots/Arceus",
+      "file": null,
+      "custom": false
+    },
+    "vote": {
+      "category": "economie",
+      "source": "bots/Arceus,Asuna",
+      "file": null,
+      "custom": false
+    },
+    "weekly": {
+      "category": "economie",
+      "source": "bots/Arceus,Asuna",
+      "file": null,
+      "custom": false
+    },
+    "boutique": {
+      "category": "collection",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "choicemp": {
+      "category": "collection",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "collect": {
+      "category": "collection",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "collection": {
+      "category": "collection",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "dev": {
+      "category": "collection",
+      "source": "bots/Kayaba",
+      "file": "cogs/DEV/panelbot/panelbot.py",
+      "custom": false
+    },
+    "guide": {
+      "category": "collection",
+      "source": "bots/Kayaba,Yui",
+      "file": null,
+      "custom": false
+    },
+    "pvp": {
+      "category": "collection",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "sell": {
+      "category": "collection",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "stage": {
+      "category": "collection",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "lvlup": {
+      "category": "stats",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "profil": {
+      "category": "stats",
+      "source": "bots/Arceus,Asuna,Kayaba,Vax",
+      "file": null,
+      "custom": false
+    },
+    "stats": {
+      "category": "stats",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "calc": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "channel": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "choose": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "copy": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "everyone": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "font": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "guild": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "mytodo": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "rappel": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "role": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "snipe": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "sondage": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "whois": {
+      "category": "utilitaires",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "accesadd": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "accesdel": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "backup": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "build": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "create": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "edit": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "ia-reset": {
+      "category": "yui",
+      "source": "bots/Vax,Yui",
+      "file": null,
+      "custom": false
+    },
+    "info": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "newserv": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "reorga": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "sup": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "unbuild": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "view": {
+      "category": "yui",
+      "source": "bots/Yui",
+      "file": null,
+      "custom": false
+    },
+    "blacklist": {
+      "category": "owner",
+      "source": "bots/Arceus,Asuna,Kayaba,Vax,Yui",
+      "file": null,
+      "custom": false
+    },
+    "botacces": {
+      "category": "owner",
+      "source": "bots/Arceus,Kayaba,Vax",
+      "file": null,
+      "custom": false
+    },
+    "checklist": {
+      "category": "owner",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    },
+    "devembed": {
+      "category": "owner",
+      "source": "templates/discord",
+      "file": "cogs/config_manager/devembed.py",
+      "custom": true
+    },
+    "devstats": {
+      "category": "owner",
+      "source": "bots/Arceus,Asuna,Kayaba,Vax,Yui",
+      "file": null,
+      "custom": false
+    },
+    "owner": {
+      "category": "owner",
+      "source": "bots/Arceus,Asuna,Kayaba,Vax,Yui",
+      "file": null,
+      "custom": false
+    },
+    "panelbot": {
+      "category": "owner",
+      "source": "templates/discord",
+      "file": "cogs/DEV/panelbot/panelbot.py",
+      "custom": true
+    },
+    "perm": {
+      "category": "owner",
+      "source": "bots/Vax",
+      "file": null,
+      "custom": false
+    },
+    "premium": {
+      "category": "owner",
+      "source": "bots/Kayaba",
+      "file": null,
+      "custom": false
+    }
+  }
+}

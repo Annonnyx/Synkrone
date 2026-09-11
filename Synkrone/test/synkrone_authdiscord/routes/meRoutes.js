@@ -1,7 +1,7 @@
 const express = require('express');
 
 module.exports = function registerMeRoutes(app, deps) {
-    const { readUsersDb, writeUsersDb, isManualStaffRole } = deps;
+    const { readUsersDb, writeUsersDb, isManualStaffRole, krones } = deps;
 
     // Informations du Bot Bump
     app.get('/api/discord/me/bump-info', async (req, res) => {
@@ -46,10 +46,14 @@ module.exports = function registerMeRoutes(app, deps) {
             const existing = db.users[userId];
             
             if (!existing) return res.status(404).json({ error: 'Utilisateur introuvable' });
-            if (existing.krone < cost) return res.status(400).json({ error: 'Fonds insuffisants' });
-            
-            // Déduction du coût et calcul de la nouvelle date de fin
-            existing.krone -= cost;
+            if (krones) {
+                const spent = await krones.debitAccount(userId, cost, 'me:featured');
+                if (!spent.ok) return res.status(400).json({ error: spent.error || 'Fonds insuffisants' });
+                existing.krone = spent.wallet.balance;
+            } else {
+                if (existing.krone < cost) return res.status(400).json({ error: 'Fonds insuffisants' });
+                existing.krone -= cost;
+            }
             const currentUntil = existing.featuredUntil || Date.now();
             existing.featuredUntil = Math.max(currentUntil, Date.now()) + (days * 24 * 60 * 60 * 1000);
             existing.featured = true;

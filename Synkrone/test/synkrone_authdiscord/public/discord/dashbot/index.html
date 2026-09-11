@@ -3,1039 +3,512 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synkrone Panel | Gestion Avancée</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            bg: '#0f1114',
-                            surface: 'rgba(30, 32, 34, 0.78)',
-                            accentRed: '#ff0013',
-                            accentBlue: '#6d8cff',
-                            success: '#3ba55c',
-                            warning: '#faa61a',
-                            border: 'rgba(255, 255, 255, 0.12)',
-                            krone: '#ffd700',
-                            tier1: '#a3a3a3', // Standard
-                            tier2: '#3ba55c', // Soutien
-                            tier3: '#faa61a', // VIP
-                            tier4: '#ff0013'  // Premium
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'Segoe UI', 'sans-serif'],
-                        mono: ['Consolas', 'Monaco', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Synkrone — Dashbot</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/accueil.css">
+    <link rel="stylesheet" href="/design/synkrone.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        
-        body {
-            background: 
-                radial-gradient(circle at 15% 0%, rgba(109, 140, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 85% 100%, rgba(225, 79, 79, 0.05) 0%, transparent 50%),
-                #0f1114;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+        body { min-height: 100%; }
+        .band { padding-top: 40px; border-top: 0; }
+        .dash-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 28px;
         }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.15); border-radius: 10px; }
-        
-        .glass-panel {
-            background: rgba(24, 26, 27, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+        .dash-mode {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            padding: 6px 10px;
+            border: 1px solid var(--hall-line-strong);
+            color: var(--hall-mute);
         }
-        
-        .modal-overlay {
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+        .dash-mode.demo {
+            color: var(--hall-gold);
+            border-color: rgba(184, 130, 61, 0.45);
+            background: var(--ambre-clair, #f3e7d3);
         }
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .dash-mode.real {
+            color: var(--mousse-fonce, #2e5039);
+            border-color: rgba(63, 107, 82, 0.35);
+            background: var(--mousse-clair, #e4ece4);
         }
-        .modal-content {
-            transform: translateY(20px) scale(0.95);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .dash-krones {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--hall-gold);
+            padding: 6px 10px;
+            border: 1px solid rgba(184, 130, 61, 0.35);
         }
-        .modal-overlay.active .modal-content {
-            transform: translateY(0) scale(1);
+        .dash-krones.off { color: var(--hall-faint); border-color: var(--hall-line); }
+        .dash-hint {
+            margin: 0;
+            flex: 1 1 220px;
+            font-size: 13px;
+            color: var(--hall-mute);
         }
-
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Custom Toggle Switch */
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #3ba55c;
+        .guilds {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1px;
+            background: var(--hall-line);
+            border: 1px solid var(--hall-line);
+            margin-bottom: 28px;
         }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #3ba55c;
+        .guild {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 18px 16px;
+            background: var(--hall-elev);
+            border: 0;
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
         }
-        
-        /* Barres de progression */
-        .progress-bar-ram::-webkit-progress-value { background-color: #6d8cff; border-radius: 99px; }
-        .progress-bar-rom::-webkit-progress-value { background-color: #faa61a; border-radius: 99px; }
-        .progress-bar-sub::-webkit-progress-value { background-color: #3ba55c; border-radius: 99px; }
-        .progress-bar::-webkit-progress-bar { background-color: rgba(0,0,0,0.5); border-radius: 99px; }
-
-        /* Fake Notifications */
+        .guild:hover { background: var(--pierre-2, #e3e6dd); }
+        .guild.is-on {
+            background: var(--mousse-clair, #e4ece4);
+            box-shadow: inset 0 0 0 1px var(--hall-red);
+        }
+        .guild-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .guild img {
+            width: 36px;
+            height: 36px;
+            border-radius: 2px;
+            object-fit: cover;
+            border: 1px solid var(--hall-line);
+        }
+        .guild h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--basalte, #1b211e);
+        }
+        .guild p {
+            margin: 2px 0 0;
+            font-size: 12px;
+            color: var(--hall-mute);
+        }
+        .guild-meta {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.02em;
+            color: var(--hall-faint);
+        }
+        .matrix { width: 100%; }
+        .status-on { color: var(--mousse-fonce, #2e5039); font-weight: 700; }
+        .status-off { color: var(--hall-faint); }
+        .dash-row {
+            display: grid;
+            grid-template-columns: 64px 52px minmax(0, 1fr) auto auto auto;
+            gap: 16px;
+            align-items: center;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--hall-line);
+            background: var(--hall-elev);
+        }
+        .dash-row:last-child { border-bottom: 0; }
+        .log {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            border: 1px solid var(--hall-line);
+        }
+        .log li {
+            display: grid;
+            grid-template-columns: 160px minmax(0, 1fr);
+            gap: 12px;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--hall-line);
+            background: var(--hall-elev);
+            font-size: 13px;
+        }
+        .log li:last-child { border-bottom: 0; }
+        .log time {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--hall-faint);
+        }
         .toast {
             position: fixed;
-            bottom: -100px;
-            right: 20px;
-            transition: bottom 0.3s ease;
-            z-index: 100;
+            right: 18px;
+            bottom: 18px;
+            z-index: 40;
+            padding: 10px 14px;
+            background: var(--hall-elev);
+            border: 1px solid var(--hall-line-strong);
+            color: var(--basalte, #1b211e);
+            font-size: 13px;
+            font-weight: 600;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: transform 0.2s ease, opacity 0.2s ease;
         }
-        .toast.show {
-            bottom: 20px;
+        .toast.show { transform: none; opacity: 1; }
+        .empty {
+            padding: 28px 18px;
+            border: 1px solid var(--hall-line);
+            background: var(--hall-elev);
+            color: var(--hall-mute);
+            font-size: 14px;
+        }
+        @media (max-width: 900px) {
+            .guilds { grid-template-columns: 1fr; }
+            .dash-row {
+                grid-template-columns: 44px minmax(0, 1fr);
+                gap: 10px;
+            }
+            .dash-row .u-id { display: none; }
+            .dash-row .u-add,
+            .dash-row .btn { justify-self: start; }
+            .log li { grid-template-columns: 1fr; }
         }
     </style>
-    <link rel="stylesheet" href="/design/synkrone.css">
 </head>
-<body class="text-white h-screen flex flex-col md:flex-row overflow-hidden font-sans">
+<body>
+    <section class="band">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">Dashbot</p>
+                <div>
+                    <h2>Cinq bots. Vos serveurs.</h2>
+                    <p>Inviter Vax, Arceus, Asuna, Kayaba et Yui. Pas d’hébergeur distant : l’état (invites, slots, journal) reste sur cette machine.</p>
+                </div>
+            </div>
 
-    <!-- HEADER MOBILE -->
-    <header class="md:hidden flex items-center justify-between p-4 glass-panel border-b border-brand-border z-30 shrink-0">
-        <div class="flex items-center gap-3">
-            <h1 class="text-lg">
-                <span class="text-brand-accentBlue font-extrabold">Synkrone</span><span class="font-semibold">.App</span>
-            </h1>
+            <div class="dash-toolbar" id="toolbar"></div>
+
+            <div class="bay" id="botsBay"></div>
+            <p class="coords" id="botsFoot" style="margin-top:12px;margin-bottom:36px;"></p>
+
+            <div class="band-head" style="margin-bottom:16px;">
+                <p class="sect-id">Serveurs</p>
+                <div>
+                    <h2 style="font-size: clamp(1.4rem, 3vw, 2rem);">Où les poser</h2>
+                    <p id="guildsHint"></p>
+                </div>
+            </div>
+            <div id="guildsBox"></div>
+
+            <div class="dash-toolbar" id="slotBar" style="margin-top:8px;"></div>
+
+            <div class="band-head" style="margin-bottom:16px;margin-top:28px;">
+                <p class="sect-id">Invites</p>
+                <div>
+                    <h2 style="font-size: clamp(1.4rem, 3vw, 2rem);" id="matrixTitle">Présence</h2>
+                    <p>Marquer présent enregistre l’état ici. En mode réel, Inviter ouvre Discord.</p>
+                </div>
+            </div>
+            <div class="bay" id="matrixBox"></div>
+
+            <div class="band-head" style="margin-bottom:16px;margin-top:36px;">
+                <p class="sect-id">Journal</p>
+                <div>
+                    <h2 style="font-size: clamp(1.4rem, 3vw, 2rem);">Actions</h2>
+                    <p>Chaque clic utile laisse une ligne. Rien n’est simulé en silence.</p>
+                </div>
+            </div>
+            <ul class="log" id="logBox"></ul>
         </div>
-        <button id="mobileMenuBtn" class="p-2 bg-white/5 rounded-lg border border-brand-border">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-    </header>
-
-    <!-- SIDEBAR GAUCHE -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-[240px] transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out glass-panel flex flex-col h-full shrink-0 border-r border-brand-border">
-        
-        <button id="closeSidebarBtn" class="md:hidden absolute top-4 right-4 p-2 text-gray-400 hover:text-white bg-black/40 rounded-lg">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-
-        <div class="p-4 border-b border-brand-border space-y-3 mt-12 md:mt-0">
-            <!-- Bouton Ajouter Bot en haut -->
-            <button onclick="openModal('addBotModal')" class="flex items-center justify-center gap-2 w-full rounded-lg border border-brand-accentBlue text-brand-accentBlue bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 p-2.5 text-xs font-bold transition-all">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Ajouter une instance
-            </button>
-            
-            <!-- Points Modules (Compact) -->
-            <div class="bg-black/30 p-2 rounded-lg border border-brand-border/50 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-krone"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                    <span class="text-[10px] font-bold text-gray-400">Pts Modules</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-white">12/20</span>
-                    <button onclick="openModal('buyPointsModal')" class="p-1 bg-brand-accentBlue/20 text-brand-accentBlue rounded hover:bg-brand-accentBlue/40 transition-colors" title="Acheter des points">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Liste des Instances Compacte -->
-        <div class="flex flex-col gap-1 p-3 overflow-y-auto flex-1 hide-scroll" id="botSidebarList">
-            <div class="text-[9px] font-bold text-gray-500 uppercase mb-1 px-1">Vos Instances</div>
-            
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-brand-accentBlue/10 border border-brand-accentBlue/40 cursor-pointer transition-colors hover:bg-brand-accentBlue/20">
-                <div class="relative shrink-0">
-                    <img src="https://placehold.co/30x30/1a1c1e/ffffff?text=SB" alt="Bot" class="w-8 h-8 rounded-full border border-brand-border">
-                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-brand-success border-2 border-[#0f1114]"></div>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <div class="font-bold text-xs truncate text-white">Synkrone Bot</div>
-                    <div class="text-[9px] text-brand-accentBlue truncate">Connecté</div>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-2 p-2 rounded-lg border border-transparent hover:bg-white/5 cursor-pointer text-gray-400 transition-colors">
-                <div class="relative shrink-0">
-                    <img src="https://placehold.co/30x30/1a1c1e/ffffff?text=VM" alt="Bot" class="w-8 h-8 rounded-full border border-brand-border opacity-70">
-                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-500 border-2 border-[#0f1114]"></div>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <div class="font-bold text-xs truncate">Vex Moderation</div>
-                    <div class="text-[9px] truncate">Hors ligne</div>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
-
-    <!-- ZONE PRINCIPALE -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
-            
-            <!-- PROFIL DU BOT -->
-            <section class="glass-panel rounded-2xl p-4 md:p-6 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-lg relative overflow-hidden">
-                
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 w-full flex-1 min-w-0 text-center sm:text-left">
-                    <img src="https://placehold.co/80x80/1a1c1e/ffffff?text=SB" alt="Synkrone Bot" class="w-20 h-20 rounded-xl border-2 border-brand-border object-cover shrink-0 shadow-md">
-                    
-                    <div class="flex-1 min-w-0 flex flex-col gap-4 w-full">
-                        <!-- Nom & Badges -->
-                        <div class="flex flex-col sm:flex-row flex-wrap items-center sm:items-center gap-3">
-                            <h2 class="text-xl md:text-2xl font-bold truncate">Synkrone Bot</h2>
-                            
-                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                                <div class="inline-flex items-center gap-1.5 text-[10px] font-bold bg-brand-success/10 text-brand-success px-2 py-1 rounded-lg border border-brand-success/30">
-                                    <span class="w-2 h-2 rounded-full bg-current animate-pulse"></span>
-                                    En ligne
-                                </div>
-                                
-                                <div class="inline-flex items-center gap-1.5 text-[10px] font-bold bg-purple-500/10 text-purple-400 px-2 py-1 rounded-lg border border-purple-500/30" title="Limite globale Discord">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                                    Slash Cmds : 85 / 100
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stats RAM / ROM / Abo (Cliquable pour l'abonnement) -->
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-black/30 p-3 rounded-xl border border-brand-border w-full">
-                            <!-- RAM -->
-                            <div>
-                                <div class="flex justify-between text-[10px] text-gray-400 font-bold mb-1 uppercase tracking-wider">
-                                    <span>RAM</span>
-                                    <span>450 MB / 1 GB</span>
-                                </div>
-                                <progress value="45" max="100" class="progress-bar progress-bar-ram w-full h-1.5"></progress>
-                            </div>
-                            <!-- ROM -->
-                            <div>
-                                <div class="flex justify-between text-[10px] text-gray-400 font-bold mb-1 uppercase tracking-wider">
-                                    <span>Stockage</span>
-                                    <span>5 GB / 20 GB</span>
-                                </div>
-                                <progress value="25" max="100" class="progress-bar progress-bar-rom w-full h-1.5"></progress>
-                            </div>
-                            <!-- Abonnement / Plan -->
-                            <div class="relative cursor-pointer group" onclick="openModal('changePlanModal')">
-                                <div class="flex justify-between text-[10px] text-gray-400 font-bold mb-1 uppercase tracking-wider">
-                                    <span>Abo (Standard)</span>
-                                    <span class="text-brand-success">3j restants</span>
-                                </div>
-                                <progress value="60" max="100" class="progress-bar progress-bar-sub w-full h-1.5"></progress>
-                                <!-- Tooltip/Hover indication pour changer de plan -->
-                                <div class="absolute inset-0 bg-black/70 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm border border-brand-accentBlue/30">
-                                    <span class="text-[10px] font-bold text-white flex items-center gap-1">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                        Gérer le Plan
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Boutons d'action : Plus compacts et jolis -->
-                <div class="flex sm:flex-col flex-row gap-2 w-full lg:w-40 shrink-0">
-                    <button onclick="simulateAction('Bot démarré avec succès !')" class="flex-1 justify-center flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg bg-brand-success/10 text-brand-success hover:bg-brand-success/20 border border-brand-success/30 transition-colors shadow-sm">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                        Démarrer
-                    </button>
-                    <button onclick="simulateAction('Bot en cours de redémarrage...')" class="flex-1 justify-center flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg bg-brand-warning/10 text-brand-warning hover:bg-brand-warning/20 border border-brand-warning/30 transition-colors shadow-sm">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
-                        Redémarrer
-                    </button>
-                    <button onclick="simulateAction('Bot arrêté.')" class="flex-1 justify-center flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg bg-brand-accentRed/10 text-brand-accentRed hover:bg-brand-accentRed/20 border border-brand-accentRed/30 transition-colors shadow-sm">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
-                        Arrêter
-                    </button>
-                </div>
-            </section>
-
-            <section class="glass-panel rounded-2xl flex-1 flex flex-col min-h-[600px] overflow-hidden shadow-lg relative">
-                <!-- En-tête des onglets -->
-                <div class="flex overflow-x-auto hide-scroll border-b border-brand-border bg-black/30 shrink-0">
-                    <button class="tab-btn active whitespace-nowrap px-6 py-4 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition-colors" data-tab="terminal">Terminal</button>
-                    <button class="tab-btn whitespace-nowrap px-6 py-4 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition-colors" data-tab="modules">Modules Installés</button>
-                    <button class="tab-btn whitespace-nowrap px-6 py-4 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition-colors" data-tab="config">Configuration</button>
-                </div>
-
-                <div class="flex-1 overflow-y-auto relative flex flex-col">
-                    
-                    <!-- ONGLET TERMINAL -->
-                    <div class="tab-content flex-1 flex flex-col p-4 md:p-6" id="terminal">
-                        <div class="bg-[#0a0a0c] border border-brand-border/50 rounded-xl p-4 font-mono text-xs md:text-sm text-gray-300 h-full overflow-y-auto space-y-1.5 shadow-inner">
-                            <div><span class="text-gray-500">[14:30:02]</span> <span class="text-brand-accentBlue">[PM2]</span> Application SynkroneBot démarrée.</div>
-                            <div><span class="text-gray-500">[14:30:03]</span> <span class="text-brand-accentBlue">[Discord.js]</span> Connexion à l'API via wss://gateway.discord.gg/</div>
-                            <div><span class="text-gray-500">[14:30:04]</span> <span class="text-brand-success">[Client]</span> Connecté avec succès en tant que Synkrone Bot#1234</div>
-                            <div><span class="text-gray-500">[14:30:04]</span> <span class="text-brand-accentBlue">[Slash]</span> Synchronisation de 85 commandes sur 100.</div>
-                        </div>
-                    </div>
-
-                    <!-- ONGLET MODULES INSTALLÉS -->
-                    <div class="tab-content hidden flex-1 p-4 md:p-6" id="modules">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                            <div>
-                                <h3 class="text-lg font-bold">Modules Actifs</h3>
-                                <p class="text-xs text-gray-400 mt-1">Gérez les modules installés sur cette instance.</p>
-                            </div>
-                            <button onclick="openModal('moduleManagerModal')" class="px-5 py-2.5 bg-brand-accentBlue text-white rounded-xl text-sm font-bold hover:bg-blue-600 transition-colors shadow-[0_0_15px_rgba(109,140,255,0.3)] whitespace-nowrap w-full sm:w-auto flex items-center justify-center gap-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-                                Bibliothèque de Modules
-                            </button>
-                        </div>
-
-                        <div class="flex flex-col gap-3" id="installedModulesList">
-                            <!-- Généré en JS -->
-                        </div>
-                    </div>
-
-                    <!-- ONGLET CONFIGURATION -->
-                    <div class="tab-content hidden flex-1 p-4 md:p-6" id="config">
-                        <form class="max-w-2xl space-y-6 mx-auto w-full">
-                            
-                            <!-- Avertissement API Discord -->
-                            <div class="bg-brand-accentBlue/5 border border-brand-accentBlue/20 rounded-xl p-4 flex gap-3">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-accentBlue shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                <div>
-                                    <p class="text-xs md:text-sm text-brand-accentBlue/90 font-bold mb-1">Synchronisation Portal Developer</p>
-                                    <p class="text-[11px] text-gray-300">Les modifications esthétiques (Nom, Avatar, Bannière) sont poussées directement via l'API Discord. <span class="font-bold text-brand-warning">Limite API : 1 modification par heure.</span></p>
-                                </div>
-                            </div>
-
-                            <!-- Fichiers Visuels (Upload depuis ordi) -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Avatar du Bot (.png/.jpg)</label>
-                                    <div class="relative group">
-                                        <input type="file" id="botAvatarFile" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                        <div class="bg-black/40 border border-brand-border border-dashed rounded-xl px-4 py-3 flex items-center justify-center gap-2 text-sm text-gray-400 group-hover:text-white group-hover:border-brand-accentBlue transition-colors shadow-inner">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                            Importer depuis l'ordinateur
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Bannière du Bot (.png/.jpg/.gif)</label>
-                                    <div class="relative group">
-                                        <input type="file" id="botBannerFile" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                        <div class="bg-black/40 border border-brand-border border-dashed rounded-xl px-4 py-3 flex items-center justify-center gap-2 text-sm text-gray-400 group-hover:text-white group-hover:border-brand-accentBlue transition-colors shadow-inner">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                            Importer depuis l'ordinateur
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Nom du Bot</label>
-                                    <input type="text" class="w-full bg-black/40 border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-accentBlue text-sm transition-colors shadow-inner" value="Synkrone Bot">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">État de connexion</label>
-                                    <select class="w-full bg-black/40 border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-accentBlue text-sm transition-colors shadow-inner appearance-none">
-                                        <option value="online">En ligne (Vert)</option>
-                                        <option value="idle">Inactif (Lune orange)</option>
-                                        <option value="dnd">Ne pas déranger (Rouge)</option>
-                                        <option value="invisible">Invisible (Gris)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Type de Présence</label>
-                                    <select class="w-full bg-black/40 border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-accentBlue text-sm transition-colors shadow-inner appearance-none">
-                                        <option value="PLAYING">Joue à</option>
-                                        <option value="WATCHING">Regarde</option>
-                                        <option value="LISTENING">Écoute</option>
-                                        <option value="COMPETING">Participe à</option>
-                                        <option value="CUSTOM">Personnalisé</option>
-                                    </select>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Texte de Présence</label>
-                                    <input type="text" placeholder="ex: /help pour commencer" class="w-full bg-black/40 border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-accentBlue text-sm transition-colors shadow-inner" value="Synkrone.App | /help">
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-2">
-                                <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Bio du Bot (À Propos)</label>
-                                <textarea rows="2" placeholder="Bio affichée sur le profil Discord du bot..." class="w-full bg-black/40 border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-accentBlue text-sm transition-colors shadow-inner resize-none">Géré par Synkrone Panel V2.</textarea>
-                            </div>
-
-                            <button type="button" onclick="simulateAction('Configuration appliquée avec succès !')" class="w-full px-8 py-3 bg-brand-accentBlue text-white font-bold rounded-xl hover:bg-blue-600 transition-colors shadow-[0_0_15px_rgba(109,140,255,0.3)]">
-                                Appliquer la Configuration
-                            </button>
-                        </form>
-                    </div>
-
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- MODAL: AJOUTER UN BOT -->
-    <div id="addBotModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-2xl bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-            <div class="p-5 border-b border-brand-border flex justify-between items-center bg-black/20 shrink-0">
-                <h3 class="text-lg font-bold flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                    Créer une nouvelle instance
-                </h3>
-                <button onclick="closeModal('addBotModal')" class="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-            
-            <div class="p-6 space-y-6 overflow-y-auto hide-scroll flex-1">
-                
-                <!-- Token & Dev Phase -->
-                <div class="space-y-3">
-                    <div class="flex justify-between items-end">
-                        <label class="text-sm font-bold text-gray-300">Token Discord du Bot</label>
-                        <button type="button" onclick="generateDevBot()" class="text-[10px] text-brand-warning border border-brand-warning/30 bg-brand-warning/10 px-2 py-1 rounded hover:bg-brand-warning/20 transition-colors">
-                            Générer bot de test (Mode Dev)
-                        </button>
-                    </div>
-                    <input type="password" id="devBotToken" placeholder="Collez le token du bot ici..." class="w-full bg-black/50 border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-accentBlue transition-colors shadow-inner">
-                    <p class="text-[11px] text-gray-500">Le token n'est pas stocké en clair, il est placé dans des fichiers protégés inaccessibles. Nom et Avatar sont récupérés automatiquement via l'API.</p>
-                </div>
-
-                <!-- Langage -->
-                <div class="space-y-2">
-                    <label class="text-sm font-bold text-gray-300">Langage d'exécution</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="botLang" value="js" class="peer sr-only" checked>
-                            <div class="p-3 rounded-xl border border-brand-border bg-black/40 peer-checked:border-brand-accentBlue peer-checked:bg-brand-accentBlue/10 transition-all text-center">
-                                <span class="font-bold text-sm">JavaScript</span>
-                                <span class="block text-[10px] text-gray-500 mt-0.5">Node.js</span>
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="botLang" value="py" class="peer sr-only">
-                            <div class="p-3 rounded-xl border border-brand-border bg-black/40 peer-checked:border-brand-accentBlue peer-checked:bg-brand-accentBlue/10 transition-all text-center">
-                                <span class="font-bold text-sm">Python</span>
-                                <span class="block text-[10px] text-gray-500 mt-0.5">Discord.py</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Prix de création -->
-                <div class="bg-brand-krone/10 border border-brand-krone/30 p-4 rounded-xl flex items-center justify-between">
-                    <div>
-                        <h4 class="text-sm font-bold text-brand-krone">Frais de création de l'instance</h4>
-                        <p class="text-xs text-gray-400">Paiement unique. Le choix du plan RAM/ROM se fera ensuite.</p>
-                    </div>
-                    <div class="text-xl font-bold text-brand-krone">75 ₭</div>
-                </div>
-
-            </div>
-            
-            <div class="p-5 border-t border-brand-border bg-black/20 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
-                <div class="text-xs text-brand-success font-bold bg-brand-success/10 px-3 py-1.5 rounded-lg border border-brand-success/30">Solde Mode Dev (Illimité)</div>
-                <div class="flex gap-3 w-full sm:w-auto">
-                    <button onclick="closeModal('addBotModal')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-white/10 transition-colors border border-transparent hover:border-brand-border">Annuler</button>
-                    <button onclick="simulateCreateBot()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-bold bg-brand-accentBlue text-white flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors shadow-[0_0_15px_rgba(109,140,255,0.3)]">
-                        Payer 75 ₭ & Créer
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: CHANGER DE PLAN -->
-    <div id="changePlanModal" class="modal-overlay fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-4xl bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-            <div class="p-5 border-b border-brand-border flex justify-between items-center bg-black/20 shrink-0">
-                <h3 class="text-lg font-bold">Gérer l'abonnement du Bot</h3>
-                <button onclick="closeModal('changePlanModal')" class="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-            
-            <div class="p-6 space-y-5 overflow-y-auto hide-scroll flex-1">
-                
-                <div class="bg-brand-warning/10 border border-brand-warning/30 p-4 rounded-xl text-sm text-brand-warning/90">
-                    <strong>Règle de prorata :</strong> Si vous changez de plan alors qu'une semaine est déjà active, vous ne payez que la différence. Si vous rétrogradez, le nouveau tarif s'appliquera au prochain cycle. En cas de dépassement des limites, le bot s'arrêtera après une heure de tolérance.
-                </div>
-                
-                <div class="space-y-3">
-                    <h4 class="text-sm font-bold text-gray-300">Plan d'hébergement (Facturation Hebdomadaire)</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="upgradePlansContainer">
-                        <!-- Généré en JS -->
-                    </div>
-                </div>
-
-                <!-- Auto Renew (Déplacé ici) -->
-                <div class="bg-black/30 border border-brand-border p-4 rounded-xl flex items-center justify-between mt-4">
-                    <div>
-                        <h4 class="text-sm font-bold">Renouvellement automatique</h4>
-                        <p class="text-xs text-gray-400">Prélever chaque semaine si le solde le permet pour éviter l'arrêt du bot.</p>
-                    </div>
-                    <div class="relative inline-block w-10 h-5 align-middle select-none transition duration-200 ease-in">
-                        <input type="checkbox" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-500 transition-all z-10" />
-                        <label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-600 cursor-pointer transition-colors"></label>
-                    </div>
-                </div>
-
-            </div>
-            <div class="p-5 border-t border-brand-border bg-black/20 flex justify-end gap-3 shrink-0">
-                <button onclick="closeModal('changePlanModal')" class="px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent hover:border-brand-border">Annuler</button>
-                <button onclick="simulateAction('Abonnement modifié avec succès !'); closeModal('changePlanModal')" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-brand-success text-white hover:bg-green-600 shadow-[0_0_15px_rgba(59,165,92,0.3)]">Confirmer le changement</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: BIBLIOTHÈQUE DE MODULES (Format Liste CurseForge) -->
-    <div id="moduleManagerModal" class="modal-overlay fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 md:p-4">
-        <div class="modal-content w-full max-w-[1200px] h-[95vh] bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            
-            <div class="p-4 border-b border-brand-border flex flex-wrap justify-between items-center bg-black/20 shrink-0 gap-3">
-                <div class="flex items-center gap-4 w-full sm:w-auto">
-                    <h3 class="text-lg md:text-xl font-bold text-brand-accentBlue shrink-0">Marketplace</h3>
-                    <div class="flex bg-black/50 rounded-lg p-1 border border-brand-border items-center px-3 flex-1 sm:flex-none">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-400 shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="libSearch" placeholder="Rechercher par nom, dev..." class="bg-transparent border-none outline-none text-xs text-white px-2 py-1 w-full sm:w-48">
-                    </div>
-                </div>
-                <div class="flex gap-2 w-full sm:w-auto justify-end">
-                    <button onclick="openModal('devShareModal'); closeModal('moduleManagerModal')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-accentBlue/10 text-brand-accentBlue border border-brand-accentBlue/40 hover:bg-brand-accentBlue/20 transition-colors flex items-center gap-1.5">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                        Soumettre Script
-                    </button>
-                    <button onclick="closeModal('moduleManagerModal')" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Liste Mods (CurseForge style) -->
-            <div class="flex-1 overflow-y-auto p-4 bg-black/20 hide-scroll">
-                <div class="flex flex-col gap-2" id="moduleLibraryContainer">
-                    <!-- Généré en JS -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL VERSIONS DE MODULES -->
-    <div id="moduleVersionsModal" class="modal-overlay fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-4xl bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col max-h-[85vh]">
-            <div class="p-4 border-b border-brand-border flex justify-between items-center bg-black/20">
-                <h3 class="text-lg font-bold" id="versionsModalTitle">Versions</h3>
-                <button onclick="closeModal('moduleVersionsModal')" class="text-gray-400 hover:text-white">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line></svg>
-                </button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-2" id="versionsListContainer">
-                <!-- Injecté en JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DETAILS MODULE -->
-    <div id="moduleDetailsModal" class="modal-overlay fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-lg bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl p-6">
-            <h3 class="text-xl font-bold mb-2 text-brand-accentBlue" id="detailModalTitle">Titre Module</h3>
-            <p class="text-xs text-gray-400 mb-4 font-mono" id="detailModalMeta">Par Dev • v1.0 • Slash</p>
-            <div class="bg-black/50 p-4 rounded-xl text-sm text-gray-300 border border-brand-border/50 mb-6" id="detailModalDesc">
-                Description complète ici...
-            </div>
-            <div class="flex justify-end">
-                <button onclick="closeModal('moduleDetailsModal')" class="px-5 py-2 rounded-xl text-sm font-bold border border-brand-border hover:bg-white/5">Fermer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL GERER COMMANDES GROUPE -->
-    <div id="manageCommandsModal" class="modal-overlay fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-md bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl p-6">
-            <h3 class="text-lg font-bold mb-2">Gérer les commandes du groupe</h3>
-            <p class="text-xs text-gray-400 mb-4">Désactivez les sous-commandes dont vous n'avez pas besoin.</p>
-            
-            <div class="space-y-3 mb-6" id="subCommandsContainer">
-                <!-- Injecté en JS -->
-            </div>
-
-            <div class="flex justify-end">
-                <button onclick="closeModal('manageCommandsModal')" class="px-5 py-2 bg-brand-accentBlue text-white rounded-xl text-sm font-bold hover:bg-blue-600">Terminer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: SOUMETTRE SCRIPT DEV -->
-    <div id="devShareModal" class="modal-overlay fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-3xl bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[95vh]">
-            <div class="p-5 border-b border-brand-border flex justify-between items-center bg-black/20">
-                <h3 class="text-lg md:text-xl font-bold flex items-center gap-2">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-accentBlue"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                    Soumettre un Script
-                </h3>
-                <button onclick="closeModal('devShareModal'); openModal('moduleManagerModal')" class="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-            
-            <div class="p-5 space-y-4 overflow-y-auto hide-scroll">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-gray-400 uppercase">Nom du module</label>
-                        <input type="text" placeholder="ex: Ticket Pro" class="w-full bg-black/50 border border-brand-border rounded-xl px-4 py-2 text-white focus:outline-none focus:border-brand-accentBlue text-sm">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-gray-400 uppercase">Langage</label>
-                        <select class="w-full bg-black/50 border border-brand-border rounded-xl px-4 py-2 text-white focus:outline-none focus:border-brand-accentBlue text-sm appearance-none">
-                            <option value="js">JavaScript (Node.js)</option>
-                            <option value="py">Python (Discord.py)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-bold text-gray-400 uppercase">Catégorie</label>
-                        <select id="devCategory" class="w-full bg-black/50 border border-brand-border rounded-xl px-4 py-2 text-white focus:outline-none focus:border-brand-accentBlue text-sm appearance-none">
-                            <option value="" disabled selected>Choisir...</option>
-                            <option value="Bots">Bots</option>
-                            <option value="Owner">Owner</option>
-                            <option value="Serveur">Serveur</option>
-                            <option value="Staff">Staff</option>
-                            <option value="Public">Public</option>
-                        </select>
-                    </div>
-                    <div class="space-y-1 hidden" id="devSubCategoryContainer">
-                        <label class="text-[11px] font-bold text-gray-400 uppercase">Sous-Catégorie</label>
-                        <select id="devSubCategory" class="w-full bg-black/50 border border-brand-border rounded-xl px-4 py-2 text-white focus:outline-none focus:border-brand-accentBlue text-sm appearance-none"></select>
-                    </div>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-gray-400 uppercase">Présentation Courte (100 char max)</label>
-                    <input type="text" placeholder="Phrase d'accroche visible dans la liste..." class="w-full bg-black/50 border border-brand-border rounded-xl px-4 py-2 text-white focus:outline-none focus:border-brand-accentBlue text-sm">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-gray-400 uppercase">Présentation détaillée & Test</label>
-                    <textarea rows="3" placeholder="Expliquez comment fonctionne le module, les commandes incluses..." class="w-full bg-black/50 border border-brand-border rounded-xl px-4 py-2 text-white focus:outline-none focus:border-brand-accentBlue text-sm resize-none"></textarea>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-gray-400 uppercase">Code Source Brute</label>
-                    <textarea rows="4" placeholder="Collez votre code ici..." class="w-full bg-[#0a0a0c] border border-brand-border/50 rounded-xl px-4 py-2 text-gray-300 focus:outline-none focus:border-brand-accentBlue font-mono text-xs resize-none"></textarea>
-                </div>
-
-                <div class="bg-brand-warning/10 border border-brand-warning/30 p-3 rounded-xl text-xs text-gray-300">
-                    <strong class="text-brand-warning">Notification :</strong> Le script sera analysé et certainement retouché pour correspondre à l'architecture Synkrone. Vous recevrez une notification du résultat.
-                </div>
-            </div>
-            
-            <div class="p-4 border-t border-brand-border bg-black/20 flex justify-end gap-3">
-                <button onclick="closeModal('devShareModal'); openModal('moduleManagerModal')" class="px-5 py-2 rounded-xl text-sm font-bold border border-transparent hover:border-brand-border">Retour</button>
-                <button onclick="simulateAction('Script soumis pour analyse !'); closeModal('devShareModal')" class="px-5 py-2 rounded-xl text-sm font-bold bg-brand-accentBlue text-white hover:bg-blue-600">Soumettre l'analyse</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL CONFIRMATION SUPPRESSION MODULE -->
-    <div id="confirmDeleteModal" class="modal-overlay fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-sm bg-[#0f1114] border border-brand-accentRed/30 rounded-2xl shadow-2xl p-6 text-center">
-            <div class="w-16 h-16 bg-brand-accentRed/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-accentRed/30">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-accentRed"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </div>
-            <h3 class="text-lg font-bold mb-2">Retirer le module ?</h3>
-            <p class="text-sm text-gray-400 mb-6">Le module sera supprimé de cette instance. Vos paramètres sauvegardés ne sont pas perdus.</p>
-            <div class="flex gap-3">
-                <button onclick="closeModal('confirmDeleteModal')" class="flex-1 px-4 py-2 rounded-xl text-sm font-bold border border-brand-border hover:bg-white/5">Annuler</button>
-                <button onclick="simulateAction('Module retiré'); closeModal('confirmDeleteModal')" class="flex-1 px-4 py-2 rounded-xl text-sm font-bold bg-brand-accentRed text-white hover:bg-red-600">Confirmer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL ACHAT POINTS MODULES -->
-    <div id="buyPointsModal" class="modal-overlay fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="modal-content w-full max-w-sm bg-[#0f1114] border border-brand-border rounded-2xl shadow-2xl p-6 text-center">
-            <h3 class="text-lg font-bold mb-2">Étendre les limites de Modules</h3>
-            <p class="text-sm text-gray-400 mb-6">Achetez 10 points de modules supplémentaires universels pour 40 ₭. Utilisables sur n'importe quel bot.</p>
-            <button onclick="simulateAction('Points de modules achetés !'); closeModal('buyPointsModal')" class="w-full px-4 py-2.5 rounded-xl text-sm font-bold bg-brand-accentBlue text-white hover:bg-blue-600 shadow-[0_0_15px_rgba(109,140,255,0.3)]">
-                Acheter 10 Pts (40 ₭)
-            </button>
-            <button onclick="closeModal('buyPointsModal')" class="mt-3 text-xs text-gray-500 hover:text-white">Annuler</button>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast bg-brand-success/90 border border-brand-success text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 backdrop-blur-sm">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        <span id="toastMessage" class="text-sm font-bold">Action réussie</span>
-    </div>
+    </section>
+    <div class="toast" id="toast" role="status"></div>
 
     <script>
-        // --- LOGIQUE DES ONGLETS ---
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                tabBtns.forEach(b => {
-                    b.classList.remove('active', 'border-brand-accentBlue', 'text-white');
-                    b.classList.add('border-transparent', 'text-gray-400');
-                });
-                tabContents.forEach(c => c.classList.add('hidden'));
-
-                btn.classList.add('active', 'border-brand-accentBlue', 'text-white');
-                btn.classList.remove('border-transparent', 'text-gray-400');
-                document.getElementById(btn.getAttribute('data-tab')).classList.remove('hidden');
-            });
-        });
-
-        // --- MENU MOBILE ---
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        const sidebar = document.getElementById('sidebar');
-        const mobileOverlay = document.getElementById('mobileOverlay');
-
-        function toggleSidebar() {
-            if (sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.remove('-translate-x-full');
-                mobileOverlay.classList.remove('hidden');
-                setTimeout(() => mobileOverlay.classList.add('opacity-100'), 10);
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                mobileOverlay.classList.remove('opacity-100');
-                setTimeout(() => mobileOverlay.classList.add('hidden'), 300);
-            }
-        }
-        mobileMenuBtn.addEventListener('click', toggleSidebar);
-        closeSidebarBtn.addEventListener('click', toggleSidebar);
-        mobileOverlay.addEventListener('click', toggleSidebar);
-
-        // --- GESTION MODALS & TOASTS ---
-        function openModal(id) {
-            const m = document.getElementById(id);
-            if(m) {
-                m.classList.remove('hidden');
-                void m.offsetWidth;
-                m.classList.add('active');
-            }
-        }
-        function closeModal(id) {
-            const m = document.getElementById(id);
-            if(m) {
-                m.classList.remove('active');
-            }
-        }
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) closeModal(overlay.id);
-            });
-        });
-
-        function simulateAction(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
-        }
-
-        // --- SIMULATION CREATION BOT ---
-        function simulateCreateBot() {
-            const list = document.getElementById('botSidebarList');
-            const newBotHtml = `
-            <div class="flex items-center gap-2 p-2 rounded-lg border border-transparent hover:bg-white/5 cursor-pointer text-gray-400 transition-colors">
-                <div class="relative shrink-0">
-                    <img src="https://placehold.co/30x30/1a1c1e/ffffff?text=NB" alt="Bot" class="w-8 h-8 rounded-full border border-brand-border opacity-70">
-                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-500 border-2 border-[#0f1114]"></div>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <div class="font-bold text-xs truncate">Nouveau Bot Dev</div>
-                    <div class="text-[9px] truncate">Hors ligne</div>
-                </div>
-            </div>`;
-            list.insertAdjacentHTML('beforeend', newBotHtml);
-            closeModal('addBotModal');
-            simulateAction('Instance de bot créée avec succès ! (-75 ₭)');
-        }
-
-        // --- PLANS HEBERGEMENT (Facturation Hebdomadaire - Ratio 600K = 5€ / Mois, calculé par semaine) ---
-        const plans = [
-            { name: "Micro", ram: "128MB", rom: "1GB", priceM: "0.50€", kronesSem: 15 },
-            { name: "Starter", ram: "256MB", rom: "5GB", priceM: "1.50€", kronesSem: 45 },
-            { name: "Basic", ram: "512MB", rom: "10GB", priceM: "3.00€", kronesSem: 90 },
-            { name: "Standard", ram: "1GB", rom: "20GB", priceM: "5.00€", kronesSem: 150 },
-            { name: "Advanced", ram: "2GB", rom: "50GB", priceM: "8.00€", kronesSem: 240 },
-            { name: "Pro", ram: "4GB", rom: "100GB", priceM: "14.00€", kronesSem: 420 },
-            { name: "Elite", ram: "8GB", rom: "200GB", priceM: "20.00€", kronesSem: 600 },
-            { name: "Enterprise", ram: "16GB", rom: "500GB", priceM: "30.00€", kronesSem: 900 }
-        ];
-
-        function renderPlans(containerId, groupName) {
-            const container = document.getElementById(containerId);
-            if(!container) return;
-            container.innerHTML = plans.map((p, i) => `
-                <label class="cursor-pointer">
-                    <input type="radio" name="${groupName}" value="${p.name}" class="peer sr-only" ${i===3 ? 'checked' : ''}>
-                    <div class="p-3 rounded-xl border border-brand-border bg-black/40 peer-checked:border-brand-accentBlue peer-checked:bg-brand-accentBlue/10 transition-all text-center sm:text-left h-full flex flex-col justify-between">
-                        <div>
-                            <div class="font-bold text-sm text-white mb-1">${p.name}</div>
-                            <div class="text-[10px] text-gray-400 mb-2">${p.ram} / ${p.rom}</div>
-                        </div>
-                        <div class="text-xs font-bold text-brand-krone">${p.kronesSem} ₭ <span class="text-[9px] text-gray-500">/sem</span></div>
-                    </div>
-                </label>
-            `).join('');
-        }
-        renderPlans('upgradePlansContainer', 'upgradePlan');
-
-        // --- GENERER BOT DE TEST ---
-        function generateDevBot() {
-            const input = document.getElementById('devBotToken');
-            input.value = "DEV_" + Math.random().toString(36).substring(2, 15) + "_MODE";
-            input.type = "text";
-            setTimeout(() => { input.type = "password"; }, 2000);
-        }
-
-        // --- SOUS CATÉGORIES DEV SHARE ---
-        const subCategoriesMap = {
-            'Staff': ['Configuration', 'Modération', 'Divers'],
-            'Public': ['Jeux', 'Utilitaires', 'Divertissement', 'Statistiques', 'Economie']
+        const state = {
+            data: null,
+            krones: { available: false, balance: null }
         };
-        const catSelect = document.getElementById('devCategory');
-        const subCatSelect = document.getElementById('devSubCategory');
-        const subCatContainer = document.getElementById('devSubCategoryContainer');
-        
-        if(catSelect) {
-            catSelect.addEventListener('change', (e) => {
-                const subCats = subCategoriesMap[e.target.value];
-                if (subCats) {
-                    subCatContainer.classList.remove('hidden');
-                    subCatSelect.innerHTML = subCats.map(sc => `<option value="${sc}">${sc}</option>`).join('');
-                } else {
-                    subCatContainer.classList.add('hidden');
+
+        function $(id) { return document.getElementById(id); }
+
+        function esc(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function toast(message) {
+            const el = $('toast');
+            el.textContent = message;
+            el.classList.add('show');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => el.classList.remove('show'), 2800);
+        }
+
+        function parseKrones(payload) {
+            if (payload == null) return null;
+            if (typeof payload === 'number') return payload;
+            const raw = payload.balance ?? payload.krones ?? payload.krone ?? payload.solde
+                ?? payload.amount ?? payload.user?.krone ?? payload.user?.krones ?? payload.data?.balance;
+            const value = Number(raw);
+            return Number.isFinite(value) ? value : null;
+        }
+
+        async function loadKrones() {
+            try {
+                const res = await fetch('/api/krones', { credentials: 'same-origin' });
+                if (res.status === 404 || !res.ok) {
+                    state.krones = { available: false, balance: null };
+                    return;
                 }
-            });
-        }
-
-        // --- STREAMING_CHUNK:Loading and parsing modules data... ---
-        // --- DONNEES MODULES ---
-        const modules = [
-            { id: 1, base: "Modération", name: "Modération Base", dev: "Synkrone", v: "v2.1", desc: "Ban, Kick, Tempban essentiels avec logs.", tier: "Standard", price: 0, pts: 2, cat: "Staff", type: "Hybride", likes: 1450, groupCmds: ['ban','kick','tempban','clear'] },
-            { id: 2, base: "Ticket", name: "Ticket Simple", dev: "Community", v: "v1.0", desc: "Création de ticket basique avec logs txt.", tier: "Standard", price: 0, pts: 1, cat: "Serveur", type: "Slash", likes: 850 },
-            { id: 3, base: "Ticket", name: "Ticket Avancé", dev: "DevMaster", v: "v2.4", desc: "Tickets avec transcripts HTML et boutons réactifs.", tier: "Soutien", price: 12, pts: 2, cat: "Serveur", type: "Hybride", likes: 210 },
-            { id: 4, base: "Ticket", name: "Ticket VIP", dev: "DevMaster", v: "v3.0", desc: "Tickets Multi-panels, claim automatique et stats.", tier: "VIP", price: 24, pts: 2, cat: "Serveur", type: "Hybride", likes: 405 },
-            { id: 5, base: "Ticket", name: "Ticket Premium AI", dev: "Synkrone", v: "v4.0.1", desc: "Tickets intelligents via IA (OpenAI) et triage auto.", tier: "Premium", price: 36, pts: 3, cat: "Serveur", type: "Hybride", likes: 1205 },
-            { id: 6, base: "Economie", name: "Economie SQL", dev: "GigaDev", v: "v1.2", desc: "Banque, shop et inventaire complet synchronisé.", tier: "VIP", price: 24, pts: 4, cat: "Public", type: "Slash", likes: 312, groupCmds: ['bal','work','shop','buy','pay'] },
-            { id: 7, base: "Economie", name: "Eco Basique", dev: "Community", v: "v1.0", desc: "Commandes argent basiques (work, balance).", tier: "Standard", price: 0, pts: 1, cat: "Public", type: "Prefix", likes: 125 },
-            { id: 8, base: "Giveaway", name: "Giveaways", dev: "Community", v: "v3.1", desc: "Tirage au sort automatisé avec conditions.", tier: "Standard", price: 0, pts: 1, cat: "Public", type: "Prefix", likes: 890 },
-            { id: 9, base: "Logs", name: "Logs Complets", dev: "Synkrone", v: "v1.5", desc: "Log de toutes les actions du serveur dans des salons dédiés.", tier: "Soutien", price: 12, pts: 2, cat: "Staff", type: "Hybride", likes: 440 },
-            { id: 10, base: "Anti-Raid", name: "Anti-Raid Pro", dev: "SecuriBot", v: "v2.0", desc: "Protection puissante contre les attaques et spam.", tier: "Premium", price: 36, pts: 3, cat: "Serveur", type: "Slash", likes: 980 },
-            { id: 11, base: "Leveling", name: "Leveling XP", dev: "Community", v: "v1.1", desc: "Système de niveaux avec cartes d'XP générées.", tier: "Standard", price: 0, pts: 2, cat: "Public", type: "Slash", likes: 550 },
-            { id: 12, base: "Rôles", name: "Auto-Rôle", dev: "Synkrone", v: "v2.0", desc: "Rôle à la connexion ou via réaction sur message.", tier: "Standard", price: 0, pts: 1, cat: "Serveur", type: "Slash/Prefix", likes: 340 },
-            { id: 13, base: "Bienvenue", name: "Bienvenue Custom", dev: "ArtisteDev", v: "v1.8", desc: "Images générées dynamiquement à l'arrivée d'un membre.", tier: "Soutien", price: 12, pts: 1, cat: "Serveur", type: "Hybride", likes: 670 },
-            { id: 14, base: "Sécurité", name: "Captcha Vérif", dev: "SecuriBot", v: "v1.0", desc: "Vérification par image ou web avant l'accès au serveur.", tier: "VIP", price: 24, pts: 2, cat: "Serveur", type: "Slash", likes: 215 },
-            { id: 15, base: "Warn", name: "Système de Warn", dev: "Community", v: "v1.2", desc: "Avertissements avec sanctions automatiques graduées.", tier: "Standard", price: 0, pts: 1, cat: "Staff", type: "Prefix", likes: 432 },
-            { id: 16, base: "Fun", name: "Commandes Fun", dev: "MemeLord", v: "v1.0", desc: "8ball, blagues, meme generator et jeux de mots.", tier: "Standard", price: 0, pts: 1, cat: "Public", type: "Slash", likes: 290, groupCmds: ['8ball','meme','joke','coinflip'] },
-            { id: 17, base: "Jeu", name: "RPG Textuel", dev: "GameDev", v: "v2.3", desc: "Mini RPG complet dans discord (Quêtes, Boss, Loot).", tier: "Premium", price: 36, pts: 4, cat: "Public", type: "Hybride", likes: 512 },
-            { id: 18, base: "Suggestions", name: "Suggestions Pro", dev: "Community", v: "v1.1", desc: "Boîte à idées avec votes interactifs et tri.", tier: "Standard", price: 0, pts: 1, cat: "Serveur", type: "Slash", likes: 180 },
-            { id: 19, base: "Sondages", name: "Sondages Avancés", dev: "Synkrone", v: "v2.0", desc: "Sondages anonymes, multiples et programmés.", tier: "Soutien", price: 12, pts: 1, cat: "Serveur", type: "Slash", likes: 330 },
-            { id: 20, base: "Musique", name: "Musique Pro", dev: "AudioDev", v: "v3.0", desc: "Lecteur YT/Spotify haute qualité 24/7 avec filtres audio.", tier: "Premium", price: 36, pts: 3, cat: "Public", type: "Slash", likes: 2100 }
-        ];
-
-        function getTierColor(tier) {
-            if(tier==="Soutien") return "text-brand-tier2 border-brand-tier2/30 bg-brand-tier2/10";
-            if(tier==="VIP") return "text-brand-tier3 border-brand-tier3/30 bg-brand-tier3/10";
-            if(tier==="Premium") return "text-brand-tier4 border-brand-tier4/30 bg-brand-tier4/10";
-            return "text-brand-tier1 border-brand-tier1/30 bg-brand-tier1/10";
-        }
-
-        // --- SIMULATION ACTIONS MODULES ---
-        function handleModuleAction(btn, price) {
-            if(btn.innerText === "Acheter") {
-                btn.innerText = "Ajouter";
-                btn.classList.remove('bg-white/5', 'text-white', 'hover:bg-white/10');
-                btn.classList.add('bg-brand-accentBlue/10', 'text-brand-accentBlue', 'border-brand-accentBlue/30', 'hover:bg-brand-accentBlue/20');
-                simulateAction(`Module acheté pour ${price} ₭ !`);
-            } else if (btn.innerText === "Ajouter") {
-                btn.innerText = "Ajouté";
-                btn.classList.remove('bg-brand-accentBlue/10', 'text-brand-accentBlue', 'border-brand-accentBlue/30', 'hover:bg-brand-accentBlue/20');
-                btn.classList.add('bg-brand-success/10', 'text-brand-success', 'border-brand-success/30');
-                simulateAction('Module ajouté à votre instance.');
+                const payload = await res.json();
+                state.krones = { available: true, balance: parseKrones(payload) };
+            } catch {
+                state.krones = { available: false, balance: null };
             }
         }
 
-        function likeModule(iconElement) {
-            iconElement.classList.toggle('text-brand-accentRed');
-            iconElement.classList.toggle('fill-current');
-            const numSpan = iconElement.nextElementSibling;
-            let current = parseInt(numSpan.innerText);
-            if(iconElement.classList.contains('text-brand-accentRed')) {
-                numSpan.innerText = current + 1;
+        async function tryDebitSlot(amount) {
+            if (!state.krones.available) return { skipped: true };
+            const attempts = [
+                ['/api/krones/debit', { amount, reason: 'dashbot-slot' }],
+                ['/api/krones/spend', { amount, reason: 'dashbot-slot' }],
+                ['/api/krones', { amount, action: 'debit', reason: 'dashbot-slot' }]
+            ];
+            for (const [url, body] of attempts) {
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    if (res.status === 404) continue;
+                    const payload = await res.json().catch(() => ({}));
+                    if (res.status === 403) return { ok: false, payload };
+                    if (!res.ok) return { ok: false, payload };
+                    const next = parseKrones(payload);
+                    if (next != null) state.krones.balance = next;
+                    return { ok: true };
+                } catch {
+                    continue;
+                }
+            }
+            return { skipped: true };
+        }
+
+        async function api(url, options) {
+            const res = await fetch(url, {
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) },
+                ...options
+            });
+            const payload = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                const error = new Error(payload.message || payload.error || 'request');
+                error.payload = payload;
+                error.status = res.status;
+                throw error;
+            }
+            return payload;
+        }
+
+        function isInvited(guildId, botId) {
+            return Boolean(state.data?.invites?.[guildId]?.[botId]?.invited);
+        }
+
+        function selectedGuild() {
+            const data = state.data;
+            if (!data) return null;
+            return data.guilds.find((g) => g.id === data.selectedGuildId) || data.guilds[0] || null;
+        }
+
+        function formatTime(at) {
+            if (!at) return '—';
+            try {
+                return new Date(at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+            } catch {
+                return '—';
+            }
+        }
+
+        function render() {
+            const data = state.data;
+            if (!data) return;
+            const demo = data.mode === 'demo';
+            const guild = selectedGuild();
+
+            $('toolbar').innerHTML = `
+                <span class="dash-mode ${demo ? 'demo' : 'real'}">${demo ? 'Mode démo' : 'Mode réel'}</span>
+                <span class="dash-krones ${state.krones.available ? '' : 'off'}">
+                    ${state.krones.available
+                        ? `Krônes ${state.krones.balance == null ? '—' : state.krones.balance}`
+                        : 'Krônes indisponibles'}
+                </span>
+                ${demo ? `<a class="btn btn-red" href="${esc(data.loginUrl)}">Connexion Discord</a>
+                    <button type="button" class="btn" data-act="reset">Réinitialiser la démo</button>` : ''}
+                ${!demo && data.user ? `<span class="dash-hint">${esc(data.user.username)}</span>` : ''}
+            `;
+
+            $('botsBay').innerHTML = data.bots.map((bot, i) => `
+                <div class="dash-row">
+                    <span class="u-id">U${String(i + 1).padStart(2, '0')}</span>
+                    <img src="${esc(bot.icon)}" alt="">
+                    <div>
+                        <div class="u-name">${esc(bot.name)}</div>
+                        <p class="u-role">${esc(bot.role)} · ${esc(bot.prefix)}</p>
+                    </div>
+                    <span class="u-pre">${esc(bot.prefix)}</span>
+                    <a class="u-add" href="${esc(bot.inviteUrl)}" target="_blank" rel="noopener noreferrer">Inviter</a>
+                    <a class="u-open" href="/discord/bots?tab=${esc(bot.slug)}">Fiche</a>
+                </div>
+            `).join('');
+            $('botsFoot').innerHTML = demo
+                ? '<span>Démo</span><span>Les 5 IDs sont les vrais bots du site</span>'
+                : '<span>Réel</span><span>Lien Discord officiel, serveur pré-sélectionné si possible</span>';
+
+            $('guildsHint').textContent = data.guildsHint || '';
+            if (!data.guilds.length) {
+                $('guildsBox').innerHTML = `<div class="empty">Aucun serveur listé. Utilisez Inviter ci-dessus : Discord affichera vos serveurs.</div>`;
             } else {
-                numSpan.innerText = current - 1;
+                $('guildsBox').innerHTML = `<div class="guilds">${data.guilds.map((g) => `
+                    <button type="button" class="guild ${g.id === data.selectedGuildId ? 'is-on' : ''}" data-act="select" data-guild="${esc(g.id)}">
+                        <div class="guild-top">
+                            <img src="${esc(g.icon || '/assets/images/logo.jpg')}" alt="">
+                            <div>
+                                <h3>${esc(g.name)}</h3>
+                                <p>${esc(g.role || 'serveur')}${g.memberCount ? ' · ' + g.memberCount + ' membres' : ''}</p>
+                            </div>
+                        </div>
+                        <div class="guild-meta">${Object.values(data.invites[g.id] || {}).filter((x) => x?.invited).length}/5 bots</div>
+                    </button>
+                `).join('')}</div>`;
+            }
+
+            $('slotBar').innerHTML = `
+                <span class="dash-hint">Slots ${data.managedCount}/${data.slotCount} — un slot = un serveur suivi. Le premier est libre.</span>
+                <button type="button" class="btn" data-act="slot">Acheter un slot (${Number(data.slotCost) || 10} ₭)</button>
+            `;
+
+            $('matrixTitle').textContent = guild ? String(guild.name) : 'Aucun serveur';
+            if (!guild) {
+                $('matrixBox').innerHTML = '<div class="empty" style="border:0;">Choisissez un serveur, ou invitez depuis la liste des bots.</div>';
+            } else {
+                $('matrixBox').innerHTML = data.bots.map((bot, i) => {
+                    const on = isInvited(guild.id, bot.id);
+                    return `
+                        <div class="dash-row">
+                            <span class="u-id">B${String(i + 1).padStart(2, '0')}</span>
+                            <img src="${esc(bot.icon)}" alt="">
+                            <div>
+                                <div class="u-name">${esc(bot.name)}</div>
+                                <p class="u-role">${on ? 'Présent (suivi local)' : 'Pas encore suivi'}</p>
+                            </div>
+                            <span class="${on ? 'status-on' : 'status-off'}">${on ? 'ON' : 'OFF'}</span>
+                            ${on
+                                ? `<button type="button" class="btn" data-act="uninvite" data-bot="${esc(bot.id)}">Retirer le suivi</button>`
+                                : `<button type="button" class="btn btn-red" data-act="invite" data-bot="${esc(bot.id)}">${demo ? 'Marquer invité' : 'Inviter'}</button>`}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const actions = data.actions || [];
+            $('logBox').innerHTML = actions.length
+                ? actions.map((row) => `<li><time>${esc(formatTime(row.at))}</time><span>${esc(row.message)}</span></li>`).join('')
+                : '<li><time>—</time><span>Aucune action pour l’instant.</span></li>';
+        }
+
+        async function refresh() {
+            const data = await api('/api/dashbot');
+            state.data = data;
+            render();
+        }
+
+        async function onInvite(botId, invited) {
+            const guild = selectedGuild();
+            if (!guild) {
+                toast('Choisissez un serveur.');
+                return;
+            }
+            try {
+                const payload = await api('/api/dashbot/invite', {
+                    method: 'POST',
+                    body: JSON.stringify({ guildId: guild.id, botId, invited })
+                });
+                state.data = payload;
+                if (invited && payload.inviteUrl) {
+                    window.open(payload.inviteUrl, '_blank', 'noopener,noreferrer');
+                }
+                render();
+                toast(invited ? 'Invite enregistrée.' : 'Suivi retiré.');
+            } catch (error) {
+                if (error.status === 409) {
+                    toast(error.payload?.message || 'Slot manquant.');
+                    return;
+                }
+                toast('Action impossible.');
             }
         }
 
-        // --- AFFICHAGE BIBLIOTHEQUE (CurseForge Style) ---
-        function renderLibraryItem(m, isGroupedView = false) {
-            const btnAction = isGroupedView 
-                ? `<button onclick="openVersionsModal('${m.base}')" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white/5 border border-brand-border hover:bg-white/10 transition-colors">Versions</button>`
-                : `<button onclick="handleModuleAction(this, ${m.price})" class="px-4 py-1.5 rounded-lg text-xs font-bold ${m.price > 0 ? 'bg-white/5 border border-brand-border hover:bg-white/10' : 'bg-brand-accentBlue/10 text-brand-accentBlue border border-brand-accentBlue/30 hover:bg-brand-accentBlue/20'} transition-colors">${m.price > 0 ? 'Acheter' : 'Ajouter'}</button>`;
-            
-            return `
-                <div class="bg-[#0f1114] border border-brand-border rounded-xl p-3 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between hover:bg-white/[0.02] transition-colors group">
-                    <div class="flex items-center gap-4 w-full md:w-auto">
-                        <div class="w-12 h-12 rounded-xl bg-black/50 border border-brand-border flex items-center justify-center shrink-0">
-                            <span class="font-bold text-gray-500 text-sm">${m.name.substring(0,2).toUpperCase()}</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <h4 class="font-bold text-sm text-white truncate group-hover:text-brand-accentBlue transition-colors cursor-pointer" onclick="openModuleDetails(${m.id})">${m.name}</h4>
-                                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${getTierColor(m.tier)} shrink-0">${m.tier.toUpperCase()}</span>
-                            </div>
-                            <p class="text-[11px] text-gray-400 truncate">${m.desc}</p>
-                            <div class="flex flex-wrap items-center gap-2 mt-1 text-[10px] text-gray-500 font-mono">
-                                <span>Par ${m.dev}</span> • 
-                                <span class="text-white">${m.v}</span> • 
-                                <span>${m.cat}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center justify-between md:justify-end w-full md:w-auto gap-4 pt-3 md:pt-0 border-t md:border-none border-brand-border/50 shrink-0">
-                        <div class="flex items-center gap-1 text-[11px] text-gray-400 cursor-pointer transition-colors group/like" title="Liker ce module">
-                            <svg onclick="likeModule(this)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hover:text-brand-accentRed transition-colors"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                            <span>${m.likes}</span>
-                        </div>
-                        <div class="text-right w-16">
-                            <div class="text-xs font-bold ${m.price > 0 ? 'text-brand-krone' : 'text-gray-400'}">${m.price > 0 ? m.price + ' ₭' : 'Gratuit'}</div>
-                            <div class="text-[9px] text-gray-500">${m.pts} Pt(s)</div>
-                        </div>
-                        ${btnAction}
-                    </div>
-                </div>
-            `;
+        async function onSlot() {
+            const cost = state.data?.slotCost || 10;
+            const debit = await tryDebitSlot(cost);
+            if (debit.ok === false) {
+                toast(debit.payload?.error || debit.payload?.message || 'Krônes insuffisants.');
+                return;
+            }
+            try {
+                state.data = await api('/api/dashbot/slot', { method: 'POST', body: '{}' });
+                if (state.krones.available) await loadKrones();
+                render();
+                toast(debit.skipped ? 'Slot ajouté (sans débit Krônes).' : `Slot ajouté (−${cost} ₭).`);
+            } catch {
+                toast('Slot impossible.');
+            }
         }
 
-        function renderLibrary(filterText = "") {
-            const container = document.getElementById('moduleLibraryContainer');
-            const grouped = {};
-            
-            modules.forEach(m => {
-                if (filterText && !m.name.toLowerCase().includes(filterText.toLowerCase()) && !m.dev.toLowerCase().includes(filterText.toLowerCase())) return;
-                if (!grouped[m.base]) grouped[m.base] = [];
-                grouped[m.base].push(m);
-            });
-
-            let htmlOutput = "";
-            for (const base in grouped) {
-                const group = grouped[base];
-                if (group.length > 1 && !filterText) {
-                    const mostPopular = group.reduce((prev, current) => (prev.likes > current.likes) ? prev : current);
-                    htmlOutput += renderLibraryItem(mostPopular, true);
-                } else {
-                    group.forEach(m => { htmlOutput += renderLibraryItem(m, false); });
+        document.body.addEventListener('click', async (event) => {
+            const btn = event.target.closest('[data-act]');
+            if (!btn) return;
+            const act = btn.getAttribute('data-act');
+            if (act === 'select') {
+                try {
+                    state.data = await api('/api/dashbot/select', {
+                        method: 'POST',
+                        body: JSON.stringify({ guildId: btn.getAttribute('data-guild') })
+                    });
+                    render();
+                } catch {
+                    toast('Sélection impossible.');
+                }
+            } else if (act === 'invite') {
+                onInvite(btn.getAttribute('data-bot'), true);
+            } else if (act === 'uninvite') {
+                onInvite(btn.getAttribute('data-bot'), false);
+            } else if (act === 'slot') {
+                onSlot();
+            } else if (act === 'reset') {
+                try {
+                    state.data = await api('/api/dashbot/demo/reset', { method: 'POST', body: '{}' });
+                    render();
+                    toast('Démo réinitialisée.');
+                } catch {
+                    toast('Reset réservé au mode démo.');
                 }
             }
-            container.innerHTML = htmlOutput || '<div class="text-center text-sm text-gray-500 py-10">Aucun module trouvé.</div>';
-        }
+        });
 
-        function openVersionsModal(baseName) {
-            document.getElementById('versionsModalTitle').innerText = `Versions de: ${baseName}`;
-            const targetModules = modules.filter(m => m.base === baseName).sort((a, b) => b.likes - a.likes);
-            document.getElementById('versionsListContainer').innerHTML = targetModules.map(m => renderLibraryItem(m, false)).join('');
-            openModal('moduleVersionsModal');
-        }
-
-        const libSearchInput = document.getElementById('libSearch');
-        if(libSearchInput) libSearchInput.addEventListener('input', (e) => renderLibrary(e.target.value));
-
-        // --- STREAMING_CHUNK:Rendering installed modules... ---
-        // --- AFFICHAGE MODULES INSTALLES ---
-        const installed = [modules[0], modules[3]]; 
-
-        function renderInstalledModules() {
-            const container = document.getElementById('installedModulesList');
-            container.innerHTML = installed.map(m => `
-                <div class="bg-black/40 border border-brand-border rounded-xl p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-lg bg-black/60 border border-brand-border flex items-center justify-center shrink-0 text-sm font-bold text-gray-500">
-                            ${m.name.substring(0,2).toUpperCase()}
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h4 class="font-bold text-sm text-white">${m.name}</h4>
-                                <span class="px-1.5 py-0.5 rounded text-[8px] font-bold ${getTierColor(m.tier)} uppercase">${m.tier}</span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-0.5">${m.v} • ${m.pts} Pt(s) utilisés</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                        <button onclick="openModuleDetails(${m.id})" class="text-[10px] text-gray-400 hover:text-white px-2 py-1 border border-transparent hover:border-brand-border rounded transition-colors shrink-0">Détails</button>
-                        
-                        ${m.groupCmds ? `<button onclick="openManageCommands(${m.id})" class="text-[10px] bg-brand-accentBlue/10 text-brand-accentBlue border border-brand-accentBlue/30 hover:bg-brand-accentBlue/20 px-2 py-1 rounded transition-colors shrink-0">Gérer</button>` : ''}
-                        
-                        <select class="bg-black/60 border border-brand-border rounded-lg px-2 py-1 text-[11px] text-gray-300 outline-none focus:border-brand-accentBlue shrink-0">
-                            <option value="slash" ${m.type==='Slash'?'selected':''}>Slash Cmd</option>
-                            <option value="prefix" ${m.type==='Prefix'?'selected':''}>Prefix Cmd</option>
-                            <option value="hybrid" ${m.type==='Hybride'?'selected':''}>Hybride (Slash+Prefix)</option>
-                        </select>
-                        
-                        <div class="relative inline-block w-8 h-4 align-middle select-none transition duration-200 ease-in shrink-0 ml-1">
-                            <input type="checkbox" checked class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-[3px] appearance-none cursor-pointer border-gray-500 transition-all z-10" />
-                            <label class="toggle-label block overflow-hidden h-4 rounded-full bg-gray-600 cursor-pointer transition-colors"></label>
-                        </div>
-                        
-                        <button onclick="openModal('confirmDeleteModal')" class="p-1.5 text-gray-500 hover:text-brand-accentRed hover:bg-brand-accentRed/10 rounded-lg transition-colors shrink-0 ml-1">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openModuleDetails(id) {
-            const m = modules.find(mod => mod.id === id);
-            if(!m) return;
-            document.getElementById('detailModalTitle').innerText = m.name;
-            document.getElementById('detailModalMeta').innerText = `Créé par ${m.dev} • Version ${m.v} • Type par défaut: ${m.type}`;
-            document.getElementById('detailModalDesc').innerHTML = `
-                <p><strong>Description :</strong> ${m.desc}</p>
-                <p class="mt-2 text-[11px] text-gray-400">Coût permanent : ${m.price > 0 ? m.price + ' ₭' : 'Gratuit'}</p>
-                <p class="text-[11px] text-gray-400">Points Module consommés : ${m.pts}</p>
-            `;
-            openModal('moduleDetailsModal');
-        }
-
-        function openManageCommands(id) {
-            const m = modules.find(mod => mod.id === id);
-            if(!m || !m.groupCmds) return;
-            const container = document.getElementById('subCommandsContainer');
-            container.innerHTML = m.groupCmds.map(cmd => `
-                <div class="flex justify-between items-center bg-black/40 p-2 rounded-lg border border-brand-border/50">
-                    <span class="text-sm font-mono text-gray-300">/${cmd}</span>
-                    <div class="relative inline-block w-8 h-4 align-middle select-none transition duration-200 ease-in shrink-0">
-                        <input type="checkbox" checked class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-[3px] appearance-none cursor-pointer border-gray-500 transition-all z-10" />
-                        <label class="toggle-label block overflow-hidden h-4 rounded-full bg-gray-600 cursor-pointer transition-colors"></label>
-                    </div>
-                </div>
-            `).join('');
-            openModal('manageCommandsModal');
-        }
-
-        // INIT
-        renderLibrary();
-        renderInstalledModules();
+        (async function init() {
+            try {
+                await Promise.all([refresh(), loadKrones()]);
+                render();
+            } catch {
+                $('toolbar').innerHTML = '<p class="dash-hint">Dashbot injoignable. Relancez <code>npm start</code>.</p>';
+            }
+        })();
     </script>
 </body>
 </html>

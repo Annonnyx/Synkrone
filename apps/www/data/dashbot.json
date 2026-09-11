@@ -1,0 +1,46 @@
+{
+  "slotCost": 10,
+  "demo": {
+    "slotCount": 1,
+    "selectedGuildId": "demo-alpha",
+    "invites": {
+      "demo-alpha": {
+        "1367891720871874560": {
+          "invited": true,
+          "at": 1789153074227
+        }
+      }
+    },
+    "actions": [
+      {
+        "at": 1789153074227,
+        "type": "seed",
+        "message": "Vax marqué présent sur Atelier Kronium (démo)."
+      }
+    ],
+    "guilds": [
+      {
+        "id": "demo-alpha",
+        "name": "Atelier Kronium",
+        "icon": "/assets/images/logo.jpg",
+        "role": "owner",
+        "memberCount": 128
+      },
+      {
+        "id": "demo-beta",
+        "name": "Guilde Synkral",
+        "icon": "/assets/images/logo.jpg",
+        "role": "admin",
+        "memberCount": 42
+      },
+      {
+        "id": "demo-gamma",
+        "name": "Salon Test",
+        "icon": "/assets/images/logo.jpg",
+        "role": "owner",
+        "memberCount": 8
+      }
+    ]
+  },
+  "users": {}
+}

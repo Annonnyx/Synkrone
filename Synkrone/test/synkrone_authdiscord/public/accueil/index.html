@@ -6,73 +6,123 @@
     <title>Synkrone — Accueil</title>
     <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg">
     <link rel="stylesheet" href="../assets/accueil.css">
+    <link rel="stylesheet" href="../assets/stats-page.css">
 </head>
 <body>
-    <a class="skip" href="#faire">Aller aux actions</a>
+    <a class="skip" href="#hebergement">Aller au contenu</a>
 
     <section class="hero" id="scene-hero">
+        <div class="hero-mosaic" aria-hidden="true"></div>
         <div class="scene" aria-hidden="true">
+            <div class="scene-fade"></div>
             <div class="grid-plane"></div>
             <div class="grid-glow"></div>
-            <div class="horizon"></div>
-            <div class="fiber"><div class="fiber-pulse"></div></div>
             <div class="cabinets">
                 <div class="cabinet c1"></div>
                 <div class="cabinet c2"></div>
                 <div class="cabinet c3"></div>
                 <div class="cabinet c4"></div>
-                <div class="cabinet c5"></div>
             </div>
-            <div class="scene-fade"></div>
+            <img class="hero-logo" src="/logo/Synk_2B9348.png" alt="">
         </div>
         <div class="hero-copy">
-            <p class="kicker"><span class="live" aria-hidden="true"></span>SYN-01 · salle</p>
-            <h1>
-                <span class="line">La salle</span>
-                <span class="line">est <em>allumée</em><span class="dot" aria-hidden="true"></span></span>
-            </h1>
-            <p class="lede">Cinq bots. Trois packs. Un serveur. Tenus comme une baie : froid, précis, sans bruit.</p>
+            <h1>Synkrone</h1>
+            <p class="lede">Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et modpacks. Un compte, un panel, un solde Krônes.</p>
             <div class="cta">
-                <a class="btn btn-red" href="/discord/bots" onclick="goSection(event, 'discord')">Voir les bots</a>
-                <a class="btn" href="/minecraft/serveur" onclick="goSection(event, 'minecraft')">Minecraft</a>
-                <a class="btn" href="/discord/bump" onclick="goSection(event, 'bump')">Bump</a>
-                <a class="btn" href="/contact" onclick="goSection(event, 'contact')">Contact</a>
+                <a class="btn btn-red" id="hero-panel" href="/hebergement" target="_top">Ouvrir le panel</a>
+                <a class="btn" href="/hub" target="_top">Hub</a>
             </div>
-            <p class="coords">
-                <span>Inviter</span>
-                <span>Télécharger</span>
-                <span>Se connecter</span>
-            </p>
+            <a class="scroll-hint" href="#hebergement">Voir l'hébergement</a>
         </div>
     </section>
 
-    <section class="band" id="faire">
+    <section class="band" id="hebergement">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">01 · Faire</p>
+                <p class="sect-id">01 — Hébergement</p>
                 <div>
-                    <h2>Les gestes utiles.</h2>
-                    <p>Pas une vitrine. Inviter, jouer, bumper, ouvrir le compte.</p>
+                    <h2>Vos services, sur Synkrone.</h2>
+                    <p>Un panel pour bots, Minecraft et sites — payé en Krônes.</p>
                 </div>
             </div>
-            <div class="plates reveal">
-                <a class="plate" href="/discord/bots" onclick="goSection(event, 'discord')">
-                    <div class="plate-meta"><span>BAY-D</span><span>5 unités</span></div>
-                    <h3>Bots</h3>
-                    <p>Vax, Arceus, Asuna, Kayaba, Yui. Fiches, catalogue, Dashbot.</p>
-                    <span class="go">Inviter →</span>
+            <div class="prose reveal">
+                <p>Le panel est l’atelier : vous y créez un bot Discord, un serveur Minecraft ou un site, puis vous le pilotez (console, fichiers, domaine, arrêt, relance).</p>
+                <p>Chaque service est une machine à part. Le même compte ouvre le site public et l’hébergement. Ici, rien n’est débité en carte : le temps machine se paie en Krônes, la monnaie du portefeuille.</p>
+            </div>
+            <div class="plates cols-2 reveal">
+                <a class="plate" id="hosting-link" href="/hebergement" target="_top">
+                    <div class="plate-meta"><span>Panel</span><span>Hébergement</span></div>
+                    <h3>Ouvrir le panel</h3>
+                    <p>Créer un bot, un serveur Minecraft ou un site, puis les administrer.</p>
+                    <span class="go">Ouvrir le panel</span>
                 </a>
-                <a class="plate" href="/minecraft/serveur" onclick="goSection(event, 'minecraft')">
-                    <div class="plate-meta"><span>BAY-M</span><span>Cantale + 3</span></div>
-                    <h3>Minecraft</h3>
-                    <p>Serveur cantale.world. Xenus, Baguette, Vanipack sur CurseForge.</p>
-                    <span class="go">Jouer →</span>
+                <a class="plate" href="/krones" onclick="goSection(event, 'krones')">
+                    <div class="plate-meta"><span>₭</span><span>Krônes</span></div>
+                    <h3>Krônes</h3>
+                    <p>Monnaie interne : hébergement, packs de commandes, grades, mise en avant Me.</p>
+                    <span class="go">Portefeuille</span>
                 </a>
-                <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')">
-                    <div class="plate-meta"><span>BAY-B</span><span>Bump</span></div>
-                    <h3>Bump</h3>
-                    <p>Le bump n’est plus enterré dans Discord. Il est ici, en clair.</p>
-                    <span class="go">Bumper →</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="band" id="statut">
+        <div class="band-inner">
+            <div class="band-head reveal">
+                <p class="sect-id">02 — Statut</p>
+                <div>
+                    <h2>La plateforme, mesurée.</h2>
+                    <p>Uptime, machines Minecraft / Discord / web, bots et listings.</p>
+                </div>
+            </div>
+            <div class="stat-strip reveal" id="home-stats">
+                <div class="stat-chip"><strong id="hs-up">—</strong><span>Uptime 7 j</span></div>
+                <div class="stat-chip"><strong id="hs-run">—</strong><span>Services en cours</span></div>
+                <div class="stat-chip"><strong id="hs-mc">—</strong><span>Minecraft</span></div>
+                <div class="stat-chip"><strong id="hs-dc">—</strong><span>Discord</span></div>
+            </div>
+            <div class="plates cols-2 reveal" style="margin-top:16px">
+                <a class="plate" href="/stats" onclick="goSection(event, 'stats')">
+                    <div class="plate-meta"><span>Live</span><span>Stats</span></div>
+                    <h3>Voir les stats</h3>
+                    <p>Uptime global, barres sur 7 jours, totaux d’hébergement, catalogue, Bump, comptes.</p>
+                    <span class="go">Ouvrir le statut</span>
+                </a>
+                <a class="plate" href="/hebergement" target="_top">
+                    <div class="plate-meta"><span>Panel</span><span>Machines</span></div>
+                    <h3>Créer un service</h3>
+                    <p>Les compteurs d’hébergement suivent les bots, serveurs et sites réellement créés.</p>
+                    <span class="go">Ouvrir le panel</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="band" id="compte">
+        <div class="band-inner">
+            <div class="band-head reveal">
+                <p class="sect-id">03 — Compte</p>
+                <div>
+                    <h2>Se connecter</h2>
+                    <p>Discord, Google ou GitHub — un compte pour tout Synkrone.</p>
+                </div>
+            </div>
+            <div class="prose reveal">
+                <p>Le bouton Se connecter (en haut à droite) ouvre la page de connexion et de création de compte. Vous pouvez entrer avec Discord, Google ou GitHub, ou avec un e-mail.</p>
+                <p>Ce compte débloque le panel d’hébergement, le solde Krônes, Bump, Me, les packs de commandes et le reste de la plateforme. Pour lister un serveur sur Bump, Discord doit être lié et au moins un bot officiel doit être sur le serveur. Pour un ticket support, Discord lié et le serveur Synkrone sont requis.</p>
+            </div>
+            <div class="plates cols-2 reveal">
+                <a class="plate" id="login-link" href="/hebergement/login" target="_top">
+                    <div class="plate-meta"><span>Compte</span><span>Login</span></div>
+                    <h3>Se connecter</h3>
+                    <p>Discord, Google, GitHub ou e-mail. Un compte ouvre panel, Krônes, Bump et Me.</p>
+                    <span class="go">Ouvrir la connexion</span>
+                </a>
+                <a class="plate" href="/faq" onclick="goSection(event, 'faq')">
+                    <div class="plate-meta"><span>Aide</span><span>FAQ</span></div>
+                    <h3>Questions fréquentes</h3>
+                    <p>Compte, Krônes, panel, bots, Cantale, tickets. Les réponses courtes avant le support.</p>
+                    <span class="go">Lire la FAQ</span>
                 </a>
             </div>
         </div>
@@ -81,60 +131,63 @@
     <section class="band" id="bots">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">02 · Bots</p>
+                <p class="sect-id">04 — Bots</p>
                 <div>
-                    <h2>Cinq machines.</h2>
-                    <p>Préfixe, rôle, invitation. Les commandes sont dans les fiches.</p>
+                    <h2>Cinq bots officiels.</h2>
+                    <p>Chaque fiche liste les commandes, le préfixe et le rôle. Catalogue public, Dashbot et packs restent dans Bots, au-dessus des fiches.</p>
                 </div>
             </div>
             <div class="bay reveal">
-                <a class="u" href="/discord/bots/vax" onclick="goSection(event, 'discord', { subTab: 'bots', botsTab: 'vax' })">
+                <a class="u" href="/discord/bots/vax" onclick="goSection(event, 'discord', { botsTab: 'vax' })">
                     <span class="u-id">U01</span>
                     <img src="/assets/images/vax.png" alt="">
-                    <div><div class="u-name">Vax</div><p class="u-role">Modération</p></div>
+                    <div>
+                        <div class="u-name">Vax</div>
+                        <p class="u-role">Modération, tickets, logs. Préfixe !</p>
+                    </div>
                     <code class="u-pre">!</code>
                     <span class="u-open">Fiche</span>
                 </a>
-                <a class="u" href="/discord/bots/arceus" onclick="goSection(event, 'discord', { subTab: 'bots', botsTab: 'arceus' })">
+                <a class="u" href="/discord/bots/arceus" onclick="goSection(event, 'discord', { botsTab: 'arceus' })">
                     <span class="u-id">U02</span>
                     <img src="/assets/images/arceus.png" alt="">
-                    <div><div class="u-name">Arceus</div><p class="u-role">Pokémon</p></div>
+                    <div>
+                        <div class="u-name">Arceus</div>
+                        <p class="u-role">Pokémon. Préfixe '</p>
+                    </div>
                     <code class="u-pre">'</code>
                     <span class="u-open">Fiche</span>
                 </a>
-                <a class="u" href="/discord/bots/asuna" onclick="goSection(event, 'discord', { subTab: 'bots', botsTab: 'asuna' })">
+                <a class="u" href="/discord/bots/asuna" onclick="goSection(event, 'discord', { botsTab: 'asuna' })">
                     <span class="u-id">U03</span>
                     <img src="/assets/images/asuna.png" alt="">
-                    <div><div class="u-name">Asuna</div><p class="u-role">Jeux</p></div>
+                    <div>
+                        <div class="u-name">Asuna</div>
+                        <p class="u-role">Jeux. Préfixe $</p>
+                    </div>
                     <code class="u-pre">$</code>
                     <span class="u-open">Fiche</span>
                 </a>
-                <a class="u" href="/discord/bots/kayaba" onclick="goSection(event, 'discord', { subTab: 'bots', botsTab: 'kayaba' })">
+                <a class="u" href="/discord/bots/kayaba" onclick="goSection(event, 'discord', { botsTab: 'kayaba' })">
                     <span class="u-id">U04</span>
                     <img src="/assets/images/kayaba.png" alt="">
-                    <div><div class="u-name">Kayaba</div><p class="u-role">Combat</p></div>
+                    <div>
+                        <div class="u-name">Kayaba</div>
+                        <p class="u-role">Combat. Préfixe .</p>
+                    </div>
                     <code class="u-pre">.</code>
                     <span class="u-open">Fiche</span>
                 </a>
-                <a class="u" href="/discord/bots/yui" onclick="goSection(event, 'discord', { subTab: 'bots', botsTab: 'yui' })">
+                <a class="u" href="/discord/bots/yui" onclick="goSection(event, 'discord', { botsTab: 'yui' })">
                     <span class="u-id">U05</span>
                     <img src="/assets/images/yui.png" alt="">
-                    <div><div class="u-name">Yui</div><p class="u-role">Architecture</p></div>
+                    <div>
+                        <div class="u-name">Yui</div>
+                        <p class="u-role">Architecture / structure. Préfixe ?</p>
+                    </div>
                     <code class="u-pre">?</code>
                     <span class="u-open">Fiche</span>
                 </a>
-                <div class="bay-foot">
-                    <span>Support · tutoriel bot · catalogue public · Dashbot</span>
-                    <span>
-                        <a href="https://discord.gg/p768u2Pgp3" target="_blank" rel="noopener noreferrer">discord.gg</a>
-                        ·
-                        <a href="/discord/bots/bot" onclick="goSection(event, 'discord', { subTab: 'bots', botsTab: 'bot' })">Tuto</a>
-                        ·
-                        <a href="/discord/publicbot" onclick="goSection(event, 'discord', { subTab: 'publicbot' })">Catalogue</a>
-                        ·
-                        <a href="/discord/dashbot" onclick="goSection(event, 'discord', { subTab: 'dashbot' })">Dashbot</a>
-                    </span>
-                </div>
             </div>
         </div>
     </section>
@@ -142,109 +195,144 @@
     <section class="band" id="minecraft">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">03 · Minecraft</p>
+                <p class="sect-id">05 — Minecraft</p>
                 <div>
-                    <h2>Un serveur. Trois packs.</h2>
-                    <p>Les liens CurseForge restent. Rien n’est perdu.</p>
+                    <h2>Cantale et trois modpacks.</h2>
+                    <p>Serveur Java 1.21 factions à trois vies. Xenus, The French Baguette et Vanipack se téléchargent sur CurseForge.</p>
                 </div>
             </div>
             <div class="play-grid reveal">
-                <a class="world" href="https://www.cantale.world" target="_blank" rel="noopener noreferrer">
-                    <p class="kicker" style="margin:0">cantale.world</p>
+                <a class="world" href="/minecraft/serveur" onclick="goSection(event, 'minecraft')">
                     <h3>Cantale</h3>
-                    <p>Le serveur. S’ouvre aussi dans Minecraft → Serveur.</p>
+                    <p>play.cantale.world — Java 1.21, factions, Cantox. Le site cantale.world est prévisualisé sur la page Minecraft.</p>
                 </a>
                 <div class="packs">
                     <div class="pack-row">
                         <div>
-                            <h3>Xenus</h3>
-                            <p>Skyblock · tech · magie · 1.19.2</p>
+                            <h3>Xenus 1.1.0</h3>
+                            <p>Skyblock 1.19.2, magie et techno.</p>
                         </div>
                         <div class="pack-actions">
-                            <a class="btn" href="/minecraft/modpack/xenus" onclick="goSection(event, 'minecraft', { subTab: 'modpack', modpackTab: 'xenus' })">Fiche</a>
-                            <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/xenus" target="_blank" rel="noopener noreferrer">CurseForge</a>
                             <a class="btn btn-red" href="https://www.curseforge.com/minecraft/modpacks/xenus/download/6889261" target="_blank" rel="noopener noreferrer">Télécharger</a>
                         </div>
                     </div>
                     <div class="pack-row">
                         <div>
-                            <h3>The French Baguette</h3>
-                            <p>Aventure FR · 1.16.5</p>
+                            <h3>The French Baguette 1.2.0</h3>
+                            <p>Aventure FR, quêtes, 1.16.5.</p>
                         </div>
                         <div class="pack-actions">
-                            <a class="btn" href="/minecraft/modpack/thefrenchbaguette" onclick="goSection(event, 'minecraft', { subTab: 'modpack', modpackTab: 'thefrenchbaguette' })">Fiche</a>
-                            <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/the-french-baguette" target="_blank" rel="noopener noreferrer">CurseForge</a>
                             <a class="btn btn-red" href="https://www.curseforge.com/minecraft/modpacks/the-french-baguette/download/7629554" target="_blank" rel="noopener noreferrer">Télécharger</a>
                         </div>
                     </div>
                     <div class="pack-row">
                         <div>
-                            <h3>Vanipack</h3>
-                            <p>Vanilla+ · 1.21.7 / 1.21.8</p>
+                            <h3>Vanipack 1.2</h3>
+                            <p>Vanilla+ 1.21.7 / 1.21.8.</p>
                         </div>
                         <div class="pack-actions">
-                            <a class="btn" href="/minecraft/modpack/vanipack" onclick="goSection(event, 'minecraft', { subTab: 'modpack', modpackTab: 'vanipack' })">Fiche</a>
-                            <a class="btn" href="https://www.curseforge.com/minecraft/modpacks/vanipack" target="_blank" rel="noopener noreferrer">CurseForge</a>
                             <a class="btn btn-red" href="https://www.curseforge.com/minecraft/modpacks/vanipack/download/6889206" target="_blank" rel="noopener noreferrer">Télécharger</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="vux-row reveal">
+        </div>
+    </section>
+
+    <section class="band" id="bump">
+        <div class="band-inner">
+            <div class="band-head reveal">
+                <p class="sect-id">06 — Bump</p>
                 <div>
-                    <strong>Vux</strong>
-                    <span>Navigateur. Téléchargement Vux.exe.</span>
+                    <h2>Bump</h2>
+                    <p>Un listing de serveurs Discord, comme Disboard.</p>
                 </div>
-                <div class="pack-actions">
-                    <a class="btn" href="/vux/" target="_top">Ouvrir Vux</a>
-                    <a class="btn btn-red" href="/vux/vux.exe" download>Télécharger Vux.exe</a>
-                </div>
+            </div>
+            <div class="prose reveal">
+                <p>Bump est l’annuaire public des serveurs de la communauté. Vous y voyez la liste, vous cliquez, vous rejoignez. Pas besoin de compte pour parcourir.</p>
+                <p>Pour y ajouter le vôtre : connectez-vous, invitez au moins un des cinq bots officiels (Vax, Arceus, Asuna, Kayaba ou Yui) sur le serveur, puis ouvrez Mes serveurs. Vous publiez la fiche, vous bumper pour remonter dans la liste, et vous pouvez payer une mise en avant en Krônes.</p>
+            </div>
+            <ol class="how reveal">
+                <li>
+                    <strong>Se connecter</strong>
+                    Discord, Google ou GitHub. Discord lié est nécessaire pour reconnaître vos serveurs.
+                </li>
+                <li>
+                    <strong>Inviter un bot officiel</strong>
+                    Un des cinq suffit. Sans bot Synkrone sur le serveur, il n’apparaît pas dans Mes serveurs.
+                </li>
+                <li>
+                    <strong>Publier et bumper</strong>
+                    Depuis Bump → Mes serveurs, vous gérez la fiche et relancez la visibilité.
+                </li>
+            </ol>
+            <div class="plates cols-2 reveal">
+                <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')">
+                    <div class="plate-meta"><span>Bump</span><span>Listing</span></div>
+                    <h3>Voir les serveurs</h3>
+                    <p>Liste publique, classement, mises en avant.</p>
+                    <span class="go">Ouvrir Bump</span>
+                </a>
+                <a class="plate" href="/discord/bots" onclick="goSection(event, 'discord')">
+                    <div class="plate-meta"><span>Bots</span><span>5 unités</span></div>
+                    <h3>Inviter un bot</h3>
+                    <p>Vax, Arceus, Asuna, Kayaba, Yui — fiches et préfixes.</p>
+                    <span class="go">Voir les bots</span>
+                </a>
             </div>
         </div>
     </section>
 
-    <section class="band" id="compte">
+    <section class="band" id="decouverte">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">04 · Compte</p>
+                <p class="sect-id">07 — Communauté</p>
                 <div>
-                    <h2>Me. Login. Krone.</h2>
-                    <p>Le rang est un métal, pas un tableur collé en haut de page.</p>
+                    <h2>Me et catalogue.</h2>
+                    <p>Profils publics, bots communautaires.</p>
                 </div>
             </div>
-            <div class="plates reveal" style="margin-bottom: 28px;">
+            <div class="plates cols-2 reveal">
                 <a class="plate" href="/discord/me" onclick="goSection(event, 'me')">
-                    <div class="plate-meta"><span>ME</span><span>Profil</span></div>
+                    <div class="plate-meta"><span>Me</span><span>Profils</span></div>
                     <h3>Me</h3>
-                    <p>Le compte, en nav principale. Plus dans le sous-menu Discord.</p>
-                    <span class="go">Ouvrir →</span>
+                    <p>Profils publics Synkrone, visites, likes, mise en avant.</p>
+                    <span class="go">Ouvrir Me</span>
                 </a>
-                <a class="plate" href="/auth/discord" target="_top">
-                    <div class="plate-meta"><span>AUTH</span><span>Discord</span></div>
-                    <h3>Login</h3>
-                    <p>Optionnel. Le site se parcourt sans. Le header le garde.</p>
-                    <span class="go">Se connecter →</span>
-                </a>
-                <a class="plate" href="/contact" onclick="goSection(event, 'contact')">
-                    <div class="plate-meta"><span>LEGAL</span><span>CGU</span></div>
-                    <h3>Contact</h3>
-                    <p>Support. CGU en pied de coquille, avec Vux.</p>
-                    <span class="go">Écrire →</span>
+                <a class="plate" href="/discord/publicbot" onclick="goSection(event, 'discord', { subTab: 'publicbot' })">
+                    <div class="plate-meta"><span>Bots</span><span>Catalogue</span></div>
+                    <h3>Catalogue</h3>
+                    <p>Bots communautaires, Dashbot pour les invitations, packs de commandes.</p>
+                    <span class="go">Voir le catalogue</span>
                 </a>
             </div>
+        </div>
+    </section>
 
-            <div class="ladder reveal" id="krone-ladder"></div>
-            <div class="krone-split reveal">
-                <div class="recharge">
-                    <h3>Recharger</h3>
-                    <p>Packs Krônes. Plus le pack est haut, plus le taux l’est.</p>
-                    <div id="krone-cards" class="offer-row"></div>
+    <section class="band" id="apps">
+        <div class="band-inner">
+            <div class="band-head reveal">
+                <p class="sect-id">08 — Applications</p>
+                <div>
+                    <h2>Tout Synkrone.</h2>
+                    <p>Un lien par application, y compris FAQ et Contact.</p>
                 </div>
-                <div class="grades-col">
-                    <h3>Rangs</h3>
-                    <p>Kronium → Kronix. <button type="button" class="linkish" onclick="openGradeInfoModal()">Comparer</button></p>
-                    <div id="grade-list" class="grade-list"></div>
-                </div>
+            </div>
+            <div class="apps-grid reveal" id="apps-grid">
+                <a class="plate" id="app-hosting" href="/hebergement" target="_top"><h3>Hébergement</h3><p>Panel</p></a>
+                <a class="plate" href="/hebergement/login" target="_top"><h3>Se connecter</h3><p>Compte</p></a>
+                <a class="plate" href="/discord/bots" onclick="goSection(event, 'discord')"><h3>Bots</h3><p>Fiches</p></a>
+                <a class="plate" href="/discord/dashbot" onclick="goSection(event, 'discord', { subTab: 'dashbot' })"><h3>Dashbot</h3><p>Invitations</p></a>
+                <a class="plate" href="/discord/commandes" onclick="goSection(event, 'discord', { subTab: 'commandes' })"><h3>Commandes</h3><p>Packs</p></a>
+                <a class="plate" href="/minecraft" onclick="goSection(event, 'minecraft')"><h3>Minecraft</h3><p>Serveur</p></a>
+                <a class="plate" href="/krones" onclick="goSection(event, 'krones')"><h3>Krônes</h3><p>Portefeuille</p></a>
+                <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')"><h3>Bump</h3><p>Listing</p></a>
+                <a class="plate" href="/discord/me" onclick="goSection(event, 'me')"><h3>Me</h3><p>Profil</p></a>
+                <a class="plate" href="/stats" onclick="goSection(event, 'stats')"><h3>Stats</h3><p>Uptime</p></a>
+                <a class="plate" href="/faq" onclick="goSection(event, 'faq')"><h3>FAQ</h3><p>Questions</p></a>
+                <a class="plate" href="/contact" onclick="goSection(event, 'contact')"><h3>Contact</h3><p>Tickets</p></a>
+                <a class="plate hub-plate" href="/hub" target="_top"><h3>Hub</h3><p>Outils internes</p></a>
+                <a class="plate" href="/vux/" target="_top"><h3>Vux</h3><p>Client</p></a>
             </div>
         </div>
     </section>
@@ -252,10 +340,10 @@
     <section class="band" id="journal">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">05 · Journal</p>
+                <p class="sect-id">09 — Journal</p>
                 <div>
                     <h2>Ce qui change.</h2>
-                    <p>Annonces publiées depuis Admin. Rien d’inventé ici.</p>
+                    <p>Annonces publiées depuis Admin.</p>
                 </div>
             </div>
             <div class="journal-tools reveal">
@@ -268,17 +356,41 @@
                     <select id="type-filter" class="filter-select" onchange="onFilterChange()"></select>
                 </div>
             </div>
-            <div id="news-list" class="news-list reveal"></div>
+            <div id="news-list" class="news-list reveal">            </div>
+        </div>
+    </section>
+
+    <section class="band" id="aide">
+        <div class="band-inner">
+            <div class="band-head reveal">
+                <p class="sect-id">10 — Aide</p>
+                <div>
+                    <h2>FAQ et contact.</h2>
+                    <p>Les réponses d’abord, un ticket ensuite. Les CGU encadrent l’usage de la plateforme, des bots et des modpacks.</p>
+                </div>
+            </div>
+            <div class="plates cols-2 reveal">
+                <a class="plate" href="/faq" onclick="goSection(event, 'faq')">
+                    <div class="plate-meta"><span>FAQ</span><span>Aide</span></div>
+                    <h3>Foire aux questions</h3>
+                    <p>Compte, hébergement, Krônes, bots, Minecraft, support.</p>
+                    <span class="go">Ouvrir la FAQ</span>
+                </a>
+                <a class="plate" href="/contact" onclick="goSection(event, 'contact')">
+                    <div class="plate-meta"><span>Contact</span><span>Support</span></div>
+                    <h3>Contacter l’équipe</h3>
+                    <p>Ticket Discord si vous êtes connecté et présent sur le serveur Synkrone.</p>
+                    <span class="go">Ouvrir Contact</span>
+                </a>
+            </div>
         </div>
     </section>
 
     <div class="home-end">
-        <span>Synkrone.app</span>
-        <span>La salle reste allumée</span>
+        <span>synkrone.app</span>
     </div>
 
     <div id="toast" class="toast"></div>
-
     <div id="announcement-modal" class="modal" aria-hidden="true" aria-labelledby="modal-title">
         <article class="modal-content">
             <div class="modal-top">
@@ -290,62 +402,6 @@
                 <button type="button" class="btn" onclick="closeModal()">Fermer</button>
             </div>
             <div id="modal-body" class="modal-body"></div>
-        </article>
-    </div>
-
-    <div id="grade-info-modal" class="modal" aria-hidden="true" aria-labelledby="grade-modal-title">
-        <article class="modal-content" style="width: min(850px, 100%);">
-            <div class="modal-top">
-                <div>
-                    <p class="modal-kicker">Rangs</p>
-                    <h4 id="grade-modal-title" class="modal-title">Comparatif</h4>
-                </div>
-                <button type="button" class="btn" onclick="closeGradeInfoModal()">Fermer</button>
-            </div>
-            <div class="modal-body table-container">
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Avantage</th>
-                            <th class="color-kronium">Kronium<br><span style="font-size:10px;font-weight:normal;color:#6a737c">150 Krônes</span></th>
-                            <th class="color-synkral">Synkral<br><span style="font-size:10px;font-weight:normal;color:#6a737c">750 Krônes</span></th>
-                            <th class="color-kronalloy">Kronalloy<br><span style="font-size:10px;font-weight:normal;color:#6a737c">1 500 Krônes</span></th>
-                            <th class="color-synkronite">Synkronite<br><span style="font-size:10px;font-weight:normal;color:#6a737c">3 000 Krônes</span></th>
-                            <th class="color-kronix">Kronix<br><span style="font-size:10px;font-weight:normal;color:#6a737c">6 000 Krônes</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Réduction Boutique</td>
-                            <td>0.5%</td><td>3%</td><td>7%</td><td>15%</td><td>30%</td>
-                        </tr>
-                        <tr>
-                            <td>Rôle Discord</td>
-                            <td>Soutien</td><td>Soutien</td><td>VIP</td><td>VIP</td><td>Premium</td>
-                        </tr>
-                        <tr>
-                            <td>Salon dédié contributeurs</td>
-                            <td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓</td>
-                        </tr>
-                        <tr>
-                            <td>Accès Giveaway mensuel</td>
-                            <td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓</td>
-                        </tr>
-                        <tr>
-                            <td>Kits spéciaux serveurs MC</td>
-                            <td class="no-perk">-</td><td class="no-perk">-</td><td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓ (Premium)</td>
-                        </tr>
-                        <tr>
-                            <td>Cosmétiques/Fonctionnalités Me &amp; Bump</td>
-                            <td class="no-perk">-</td><td class="no-perk">-</td><td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓ (Premium)</td>
-                        </tr>
-                        <tr>
-                            <td>Modules Dashbot restreints</td>
-                            <td class="no-perk">-</td><td class="no-perk">-</td><td class="has-perk">✓</td><td class="has-perk">✓</td><td class="has-perk">✓ (Premium)</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </article>
     </div>
 
@@ -362,37 +418,13 @@
             if (href) window.top.location.href = href;
         }
 
-        const kroneOffers = [
-            { price: 5, krone: 600 },
-            { price: 10, krone: 1250 },
-            { price: 20, krone: 2600 },
-            { price: 30, krone: 4000 },
-            { price: 40, krone: 5500 }
-        ];
-
-        const grades = [
-            { name: 'Kronium', kroneCost: 150, perk: 'Réduction: 0.5% | Discord: Soutien + Salons dédiés + Giveaways' },
-            { name: 'Synkral', kroneCost: 750, perk: 'Réduction: 3% | Discord: Soutien + Avantages Kronium' },
-            { name: 'Kronalloy', kroneCost: 1500, perk: 'Réduction: 7% | Discord: VIP | Kits MC, Avantages Me/Bump, Dashbot' },
-            { name: 'Synkronite', kroneCost: 3000, perk: 'Réduction: 15% | Discord: VIP | Tous les avantages Kronalloy' },
-            { name: 'Kronix', kroneCost: 6000, perk: 'Réduction: 30% | Discord: Premium | Accès complet aux avantages Premium' }
-        ];
-
-        const GRADE_KRONE_COSTS = {
-            Aucun: 0, Kronium: 150, Synkral: 750, Kronalloy: 1500, Synkronite: 3000, Kronix: 6000
-        };
-
         const STORAGE_TYPES = 'synkroneAnnouncementTypes';
         const STORAGE_ITEMS = 'synkroneAnnouncements';
         const ALLOWED_SCOPES = new Set(['synkrone', 'bots', 'bump', 'me', 'dashbot', 'serveur', 'modpack']);
-
         let announcementsData = [];
-        let currentViewer = null;
         let currentScopeFilter = 'all';
         let currentTypeFilter = 'all';
         let toastTimer;
-
-        function euro(value) { return `${value} EUR`; }
 
         function normalizeTypeLabel(value) {
             if (!value) return 'Type';
@@ -455,59 +487,12 @@
                     option.textContent = normalizeTypeLabel(type);
                     typeSelect.appendChild(option);
                 });
-                const knownTypes = new Set(types);
-                typeSelect.value = knownTypes.has(currentTypeFilter) ? currentTypeFilter : 'all';
             }
-        }
-
-        function refreshAnnouncementsFromEquipe() {
-            announcementsData = loadEquipeAnnouncements().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        }
-
-        async function loadViewerProfile() {
-            try {
-                const res = await fetch('/api/me');
-                if (!res.ok) { currentViewer = null; return; }
-                const data = await res.json();
-                currentViewer = data?.authenticated ? data.user : null;
-            } catch {
-                currentViewer = null;
-            }
-        }
-
-        function renderLadder() {
-            const el = document.getElementById('krone-ladder');
-            if (!el) return;
-            el.innerHTML = grades.map((g) => `
-                <div class="rung" data-grade="${g.name}">
-                    <span class="rung-name">${g.name}</span>
-                    <span class="rung-cost">${g.kroneCost.toLocaleString('fr-FR')} Krônes</span>
-                    <span class="rung-bar"></span>
-                    <p class="rung-perk">${g.perk.split('|')[0].trim()}</p>
-                </div>
-            `).join('');
-        }
-
-        function renderKroneOffers() {
-            const container = document.getElementById('krone-cards');
-            container.innerHTML = '';
-            kroneOffers.forEach((offer) => {
-                const rate = offer.krone / offer.price;
-                const card = document.createElement('button');
-                card.type = 'button';
-                card.className = 'offer';
-                card.innerHTML = `
-                    <span class="offer-k">${offer.krone.toLocaleString('fr-FR')}</span>
-                    <span class="offer-e">${euro(offer.price)}</span>
-                    <span class="offer-r">${rate.toFixed(1)} / EUR</span>
-                `;
-                card.onclick = () => buyKronePack(offer.price, offer.krone);
-                container.appendChild(card);
-            });
         }
 
         function renderAnnouncements() {
             const list = document.getElementById('news-list');
+            if (!list) return;
             list.innerHTML = '';
             const filtered = announcementsData.filter((item) => {
                 const itemScope = item.scope || item.menu || 'synkrone';
@@ -526,10 +511,10 @@
                         <div class="news-meta">
                             <span class="news-badge">${normalizeTypeLabel(item.scope || item.menu || 'synkrone')}</span>
                             ${typeBadges}
-                            <span class="news-date">${item.date}</span>
+                            <span class="news-date">${item.date || ''}</span>
                         </div>
                         <h4 class="news-title">${item.title}</h4>
-                        <p class="news-summary">${item.summary}</p>
+                        <p class="news-summary">${item.summary || ''}</p>
                     </div>
                     <button type="button" class="btn" onclick="openModal(${item.id})">Lire</button>
                 `;
@@ -543,40 +528,6 @@
             }
         }
 
-        function renderGrades() {
-            const list = document.getElementById('grade-list');
-            list.innerHTML = '';
-            const currentGrade = currentViewer?.grade && Object.hasOwn(GRADE_KRONE_COSTS, currentViewer.grade)
-                ? currentViewer.grade : 'Aucun';
-            const currentGradeCost = Number(GRADE_KRONE_COSTS[currentGrade] || 0);
-            const currentKrone = Math.max(0, Math.trunc(Number(currentViewer?.krone || 0)));
-            grades.forEach((grade) => {
-                const upgradeCost = Math.max(0, Number(grade.kroneCost || 0) - currentGradeCost);
-                const alreadyUnlocked = upgradeCost === 0;
-                const canAfford = currentKrone >= upgradeCost;
-                const isDisabled = !currentViewer || alreadyUnlocked || !canAfford;
-                const buttonLabel = !currentViewer
-                    ? 'Connexion requise'
-                    : alreadyUnlocked
-                        ? 'Déjà débloqué'
-                        : canAfford
-                            ? `Obtenir ${grade.name} (${upgradeCost.toLocaleString('fr-FR')} Krônes)`
-                            : `Solde insuffisant (${upgradeCost.toLocaleString('fr-FR')} Krônes)`;
-                const item = document.createElement('article');
-                item.className = 'grade-card';
-                item.setAttribute('data-grade', grade.name);
-                item.innerHTML = `
-                    <div class="grade-top">
-                        <span class="grade-name">${grade.name}</span>
-                        <span class="grade-price">${grade.kroneCost.toLocaleString('fr-FR')} Krônes</span>
-                    </div>
-                    <p class="grade-perk">${grade.perk}</p>
-                    <button type="button" class="btn" onclick="buyGrade('${grade.name}', ${grade.kroneCost})" ${isDisabled ? 'disabled' : ''}>${buttonLabel}</button>
-                `;
-                list.appendChild(item);
-            });
-        }
-
         function onFilterChange() {
             const scopeSelect = document.getElementById('scope-filter');
             const typeSelect = document.getElementById('type-filter');
@@ -585,82 +536,21 @@
             renderAnnouncements();
         }
 
-        function buyKronePack(price, krone) {
-            showToast('Achat Krone', `Pack ${euro(price)} - ${krone.toLocaleString('fr-FR')} Krones`);
-        }
-
-        async function buyGrade(name, kroneCost) {
-            if (!currentViewer) {
-                showToast('Soutenir Synkrone', 'Connectez-vous avec Discord pour acheter un grade.');
-                return;
-            }
-            try {
-                const res = await fetch('/api/grades/purchase', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ grade: name })
-                });
-                let payload = null;
-                try { payload = await res.json(); } catch { payload = null; }
-                if (!res.ok) {
-                    showToast('Soutenir Synkrone', payload?.message || 'Achat impossible pour le moment.');
-                    return;
-                }
-                currentViewer = payload?.user || currentViewer;
-                try {
-                    if (window.parent && window.parent !== window) {
-                        window.parent.postMessage({ type: 'synkrone:user-updated', user: currentViewer }, window.location.origin);
-                    }
-                } catch { /* no-op */ }
-                renderGrades();
-                const spent = Number(payload?.chargedKrone || kroneCost);
-                const remaining = Number(currentViewer?.krone || 0).toLocaleString('fr-FR');
-                showToast('Soutenir Synkrone', `${name} débloqué (-${spent.toLocaleString('fr-FR')} Krônes). Solde restant: ${remaining} Krônes.`);
-            } catch {
-                showToast('Soutenir Synkrone', 'Erreur réseau pendant l\'achat du grade.');
-            }
-        }
-
         function openModal(id) {
             const item = announcementsData.find((news) => news.id === id);
             if (!item) return;
             document.getElementById('modal-title').textContent = item.title;
-            document.getElementById('modal-meta').textContent = `${normalizeTypeLabel(item.scope || item.menu || 'synkrone')} • ${item.date || 'Date inconnue'}`;
+            document.getElementById('modal-meta').textContent = `${normalizeTypeLabel(item.scope || item.menu || 'synkrone')} • ${item.date || ''}`;
             document.getElementById('modal-body').textContent = item.content;
             const modal = document.getElementById('announcement-modal');
             modal.classList.add('open');
             modal.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('modal-open');
         }
 
         function closeModal() {
             const modal = document.getElementById('announcement-modal');
             modal.classList.remove('open');
             modal.setAttribute('aria-hidden', 'true');
-            if (!document.getElementById('grade-info-modal').classList.contains('open')) {
-                document.body.classList.remove('modal-open');
-            }
-        }
-
-        function openGradeInfoModal() {
-            const modal = document.getElementById('grade-info-modal');
-            modal.classList.add('open');
-            modal.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('modal-open');
-        }
-
-        function closeGradeInfoModal() {
-            const modal = document.getElementById('grade-info-modal');
-            modal.classList.remove('open');
-            modal.setAttribute('aria-hidden', 'true');
-            if (!document.getElementById('announcement-modal').classList.contains('open')) {
-                document.body.classList.remove('modal-open');
-            }
-        }
-
-        function closeModalOnOverlay(event) {
-            if (event.target.id === 'announcement-modal') closeModal();
-            if (event.target.id === 'grade-info-modal') closeGradeInfoModal();
         }
 
         function showToast(title, message) {
@@ -669,16 +559,6 @@
             toast.classList.add('visible');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => toast.classList.remove('visible'), 2800);
-        }
-
-        function bindScene() {
-            const hero = document.getElementById('scene-hero');
-            if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            hero.addEventListener('pointermove', (e) => {
-                const r = hero.getBoundingClientRect();
-                hero.style.setProperty('--mx', String((e.clientX - r.left) / r.width));
-                hero.style.setProperty('--my', String((e.clientY - r.top) / r.height));
-            });
         }
 
         function bindReveal() {
@@ -698,32 +578,51 @@
             nodes.forEach((n) => io.observe(n));
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            renderLadder();
-            renderKroneOffers();
-            refreshAnnouncementSelectors();
-            refreshAnnouncementsFromEquipe();
-            renderAnnouncements();
-            await loadViewerProfile();
-            renderGrades();
-            bindScene();
-            bindReveal();
-            const modal = document.getElementById('announcement-modal');
-            if (modal) modal.addEventListener('click', closeModalOnOverlay);
-            const gradeModal = document.getElementById('grade-info-modal');
-            if (gradeModal) gradeModal.addEventListener('click', closeModalOnOverlay);
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape') {
-                    closeModal();
-                    closeGradeInfoModal();
+        async function applyPanelOrigin() {
+            let origin = '/hebergement';
+            try {
+                const res = await fetch('/api/config');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.panelOrigin) origin = data.panelOrigin;
                 }
+            } catch { /* default */ }
+            document.querySelectorAll('#hosting-link, #app-hosting, #hero-panel').forEach((el) => {
+                el.setAttribute('href', origin);
             });
-            window.addEventListener('storage', (event) => {
-                if (event.key === STORAGE_TYPES || event.key === STORAGE_ITEMS) {
-                    refreshAnnouncementSelectors();
-                    refreshAnnouncementsFromEquipe();
-                    renderAnnouncements();
+            const login = document.getElementById('login-link');
+            if (login) login.setAttribute('href', `${String(origin).replace(/\/$/, '')}/login`);
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            announcementsData = loadEquipeAnnouncements().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            refreshAnnouncementSelectors();
+            renderAnnouncements();
+            bindReveal();
+            await applyPanelOrigin();
+            try {
+                const res = await fetch('/api/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    const set = (id, value) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = value;
+                    };
+                    const pct = data?.uptime?.pct;
+                    set('hs-up', Number.isFinite(pct) ? `${String(pct).replace('.', ',')} %` : '—');
+                    const run = data?.hosting?.running || 0;
+                    const total = data?.hosting?.total || 0;
+                    set('hs-run', total ? `${run} / ${total}` : String(run));
+                    set('hs-mc', String(data?.hosting?.minecraft ?? '—'));
+                    set('hs-dc', String(data?.hosting?.discord ?? '—'));
                 }
+            } catch { /* stats later */ }
+            const modal = document.getElementById('announcement-modal');
+            if (modal) modal.addEventListener('click', (event) => {
+                if (event.target.id === 'announcement-modal') closeModal();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeModal();
             });
         });
     </script>

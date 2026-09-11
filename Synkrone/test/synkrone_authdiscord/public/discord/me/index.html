@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plateforme Profils | Synkrone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,15 +14,15 @@
             theme: {
                 extend: {
                     colors: {
-                        base: '#0f1114',
-                        surface: 'rgba(30, 32, 34, 0.78)',
-                        surfaceHover: 'rgba(45, 48, 51, 0.9)',
-                        sysBorder: 'rgba(255, 255, 255, 0.12)',
-                        accentRed: '#ff0013',
-                        accentBlue: '#6d8cff',
-                        accentGold: '#ffd700',
-                        krones: '#4ade80',
-                        textDim: '#a0a0a0'
+                        base: '#EEF0EA',
+                        surface: '#FFFFFF',
+                        surfaceHover: '#E3E6DD',
+                        sysBorder: '#5C6A661F',
+                        accentRed: '#A8462F',
+                        accentBlue: '#3F6B52',
+                        accentGold: '#B8823D',
+                        krones: '#B8823D',
+                        textDim: '#5C6A66'
                     }
                 }
             }
@@ -29,17 +32,17 @@
     <script src="/assets/mosaique.js" defer></script>
     <style>
         :root {
-            --bg: #0f1114;
-            --surface: rgba(30, 32, 34, 0.78);
-            --surface-hover: rgba(45, 48, 51, 0.9);
-            --border: rgba(255, 255, 255, 0.12);
-            --accent: #ff0013;
-            --accent-2: #6d8cff;
-            --accent-gold: #ffd700;
-            --krones: #4ade80;
-            --text: #ffffff;
-            --text-dim: #a0a0a0;
-            --radius: 12px;
+            --bg: #EEF0EA;
+            --surface: #FFFFFF;
+            --surface-hover: #E3E6DD;
+            --border: #5C6A661F;
+            --accent: #3F6B52;
+            --accent-2: #3F6B52;
+            --accent-gold: #B8823D;
+            --krones: #B8823D;
+            --text: #1B211E;
+            --text-dim: #5C6A66;
+            --radius: 6px;
             --transition: all 0.22s ease;
         }
 
@@ -47,29 +50,29 @@
         *::-webkit-scrollbar { width: 6px; height: 6px; }
         *::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text); background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; color: var(--text); background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         #app-layout { display: flex; width: 100%; height: 100%; }
         #main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow-y: auto; }
         
         .page-container { max-width: 1040px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px; padding: 24px; }
-        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); backdrop-filter: blur(8px); padding: 24px; position: relative; overflow: hidden; }
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; position: relative; overflow: hidden; }
         
         .tabs { display: flex; gap: 10px; overflow-x: auto; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 12px; border: 1px solid var(--border); width: fit-content; }
         .tab-btn { background: none; border: none; color: var(--text-dim); padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: var(--transition); white-space: nowrap; }
-        .tab-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .tab-btn.active { background: var(--surface-hover); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .tab-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .tab-btn.active { background: var(--surface-hover); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
         .view-controls { display: flex; gap: 8px; align-items: center; }
         .view-btn { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 14px; }
-        .view-btn.active { background: var(--accent-2); color: #fff; border-color: var(--accent-2); }
+        .view-btn.active { background: var(--accent-2); color: var(--text); border-color: var(--accent-2); }
 
         .time-toggle { display: inline-flex; background: rgba(0,0,0,0.4); border-radius: 8px; padding: 4px; border: 1px solid var(--border); }
         .time-btn { background: none; border: none; color: var(--text-dim); padding: 6px 12px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .time-btn.active { background: var(--surface-hover); color: #fff; }
+        .time-btn.active { background: var(--surface-hover); color: var(--text); }
 
         /* Boutons d'intégration (fins et gris) */
         .btn-slim-gray { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px; }
-        .btn-slim-gray:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-slim-gray:hover { background: rgba(255,255,255,0.1); color: var(--text); }
 
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
         .user-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; gap: 12px; position: relative; }
@@ -77,7 +80,7 @@
         .user-card-header { display: flex; align-items: center; gap: 12px; }
         .user-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
         .user-info { flex: 1; min-width: 0; }
-        .user-name { font-weight: bold; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
+        .user-name { font-weight: bold; font-size: 16px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;}
         .user-stats { font-size: 12px; color: var(--text-dim); display: flex; gap: 10px; margin-top: 4px; }
         
         .user-card.featured { border-color: rgba(255, 215, 0, 0.3); background: linear-gradient(145deg, rgba(30,32,34,0.9), rgba(40,35,15,0.9)); }
@@ -103,7 +106,7 @@
         .hero-profile { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-top: -70px; margin-bottom: 20px; }
         .avatar-wrap { width: 118px; height: 118px; border-radius: 50%; padding: 4px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); position: relative; z-index: 2; transition: all 0.3s; }
         .avatar-wrap img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #0f1114; object-fit: cover; }
-        .profile-name { font-size: 26px; font-weight: 800; color: #fff; transition: color 0.3s; }
+        .profile-name { font-size: 26px; font-weight: 800; color: var(--text); transition: color 0.3s; }
         .profile-subtitle { color: var(--text-dim); font-size: 14px; max-width: 600px; line-height: 1.5; transition: color 0.3s; }
         
         .link-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 10px; }
@@ -117,23 +120,23 @@
         
         /* Contrôles du profil avec empilement vertical */
         .profile-controls { position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
-        .nav-btn-floating { position: absolute; top: 15px; left: 15px; z-index: 10; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .nav-btn-floating { position: absolute; top: 15px; left: 15px; z-index: 10; background: rgba(0,0,0,0.5); }
         
-        .like-main-btn { padding: 8px 15px; border-radius: 20px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; backdrop-filter: blur(5px); }
+        .like-main-btn { padding: 8px 15px; border-radius: 20px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--text); font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .like-main-btn:hover { background: rgba(225, 79, 79, 0.2); border-color: var(--accent); color: var(--accent); }
-        .like-main-btn.liked { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .like-main-btn.liked { background: var(--accent); color: var(--text); border-color: var(--accent); }
 
         .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 13px; font-weight: 600; color: var(--text-dim); }
-        .form-control { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px 14px; border-radius: 8px; font-family: inherit; width: 100%; }
+        .form-control { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: inherit; width: 100%; }
         .form-control:focus { outline: none; border-color: var(--accent-2); }
         
         .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); }
-        .btn-primary { background: var(--accent-2); color: #fff; }
+        .btn-primary { background: var(--accent-2); color: var(--text); }
         .btn-primary:hover { background: #5c7ae6; }
         .btn-success { background: var(--krones); color: #000; }
         .btn-success:hover { background: #3cb868; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
         .btn-outline:hover { background: rgba(255,255,255,0.1); }
 
         .editor-section { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
@@ -146,16 +149,16 @@
         .color-picker::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 50%; }
 
         .rank-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        .rank-base { background: #444; color: #fff; }
+        .rank-base { background: #444; color: var(--text); }
         .rank-soutien { background: #115e59; color: #5eead4; }
         .rank-vip { background: #4c1d95; color: #c4b5fd; }
-        .rank-premium { background: linear-gradient(45deg, #b91c1c, #d97706); color: #fff; }
+        .rank-premium { background: linear-gradient(45deg, #b91c1c, #d97706); color: var(--text); }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; width: 90%; max-width: 400px; transform: scale(0.95); transition: transform 0.2s; text-align: center; }
         .modal-overlay.active .modal-box { transform: scale(1); }
-        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #fff; }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; color: var(--text); }
         .modal-text { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
 
@@ -167,6 +170,7 @@
         }
     </style>
     <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="/assets/app-pages.css">
 </head>
 <body class="mosaic-bg">
 
@@ -290,6 +294,16 @@
             }
         }
 
+        function goKrones() {
+            try {
+                if (window.parent && window.parent !== window && typeof window.parent.navigateToMainSection === 'function') {
+                    window.parent.navigateToMainSection('krones', { updateUrl: true });
+                    return;
+                }
+            } catch { /* fall through */ }
+            window.top.location.href = '/krones';
+        }
+
         function syncUserToParent() {
             if(window.parent && window.parent !== window) {
                 window.parent.postMessage({ type: 'synkrone:user-updated', user: MonProfil }, window.location.origin);
@@ -346,7 +360,7 @@
         window.navigateProfile = function() {
             if(!MonProfil) {
                 showModal("Erreur", "Veuillez vous connecter.", "Fermer", () => {
-                    window.location.href = "/auth/discord";
+                    window.top.location.href = "/hebergement/login";
                 });
             } else {
                 navigate('profile', 'me');
@@ -364,10 +378,15 @@
                     </div>
                     <div id="home-controls-dynamic" style="display: flex; align-items: center; gap: 12px; flex: 1; justify-content: flex-end;"></div>
                     ${MonProfil ? `
-                    <div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <button class="btn-slim-gray" onclick="goKrones()" title="Offres Krônes">Krônes</button>
                         <button class="btn-slim-gray" onclick="navigateProfile()">👤 Mon profil</button>
                     </div>
-                    ` : ''}
+                    ` : `
+                    <div>
+                        <button class="btn-slim-gray" onclick="goKrones()" title="Offres Krônes">Krônes</button>
+                    </div>
+                    `}
                 </div>
                 <div id="home-content"></div>
             `;
@@ -951,3 +970,5 @@
     </script>
 </body>
 </html>
+</html>
+

@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centre de Developpement</title>
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
-    <link rel="stylesheet" href="/assets/mosaique.css">
-    <script src="/assets/mosaique.js" defer></script>
     <style>
         :root {
             --bg-main: #181a1b;
@@ -332,27 +330,29 @@
         }
     </style>
     <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="/assets/bot-tuto.css">
 </head>
-<body class="mosaic-bg">
+<body>
     <div class="page">
         <div class="frame">
+            <div class="create-bar">
+                <div>
+                    <strong>Créer le bot dans le panel</strong>
+                    <p>Le tutoriel ci-dessous reste disponible. Pour héberger une instance Discord, ouvrez le wizard du panel.</p>
+                </div>
+                <a class="btn-panel" id="create-bot-link" href="/hebergement/dashboard/new/discord" target="_top">Créer un bot</a>
+            </div>
             <nav class="top-nav">
-                <button onclick="switchTab('setup')" id="btn-setup" class="tab-btn active">
-                    <span aria-hidden="true">🧭</span>
-                    Setup
-                </button>
-                <button onclick="switchTab('python')" id="btn-python" class="tab-btn">
-                    <img class="tab-icon" src="/assets/images/py.png" alt="Python">
+                <button type="button" onclick="switchTab('setup')" id="btn-setup" class="tab-btn active">Setup</button>
+                <button type="button" onclick="switchTab('python')" id="btn-python" class="tab-btn">
+                    <img class="tab-icon" src="/assets/images/py.png" alt="">
                     Python
                 </button>
-                <button onclick="switchTab('javascript')" id="btn-javascript" class="tab-btn">
-                    <img class="tab-icon" src="/assets/images/js.png" alt="JavaScript">
+                <button type="button" onclick="switchTab('javascript')" id="btn-javascript" class="tab-btn">
+                    <img class="tab-icon" src="/assets/images/js.png" alt="">
                     JavaScript
                 </button>
-                <button onclick="switchTab('best')" id="btn-best" class="tab-btn">
-                    <span aria-hidden="true">✅</span>
-                    Logiciel
-                </button>
+                <button type="button" onclick="switchTab('best')" id="btn-best" class="tab-btn">Logiciel</button>
             </nav>
 
             <main class="content">
@@ -922,6 +922,20 @@ module.exports = {
                 }
             });
         }
+
+        (async function bindPanelCreate() {
+            const link = document.getElementById('create-bot-link');
+            if (!link) return;
+            let origin = '/hebergement';
+            try {
+                const res = await fetch('/api/config');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.panelOrigin) origin = String(data.panelOrigin).replace(/\/$/, '');
+                }
+            } catch { /* default */ }
+            link.setAttribute('href', `${origin}/dashboard/new/discord`);
+        })();
     </script>
 </body>
 </html>
