@@ -59,7 +59,17 @@
         .modal-overlay { position: fixed; inset: 0; z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-box { background: #fff; border: 1px solid #5c6a661f; border-radius: 6px; padding: 24px; width: 90%; max-width: 400px; text-align: center; }
-        .like-btn-mini { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #5c6a661f; background: #fff; color: #5c6a66; }
+        .like-btn-mini, .like-main-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            border: 1px solid #5c6a661f; background: #fff; color: #5c6a66; cursor: pointer;
+            font: inherit; font-weight: 600;
+        }
+        .like-btn-mini { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; padding: 0; border-radius: 50%; z-index: 2; }
+        .like-main-btn { padding: 8px 12px; border-radius: 4px; }
+        .like-btn-mini:hover, .like-main-btn:hover { color: #a8462f; border-color: #a8462f; }
+        .like-heart { width: 16px; height: 16px; display: block; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+        .like-btn-mini .like-heart { width: 15px; height: 15px; }
+        .liked .like-heart { fill: currentColor; }
         .user-list-item .like-btn-mini { position: relative; top: auto; right: auto; }
         .filter-bar { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
     </style>
@@ -127,6 +137,9 @@
         function bannerStyle(user) {
             const url = bannerOf(user);
             return url ? `background-image:url('${esc(url)}')` : '';
+        }
+        function heartIcon() {
+            return '<svg class="like-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
         }
         function safeHref(value) {
             try {
@@ -360,7 +373,7 @@
             const statVal = sortKey ? (user.stats?.[sortKey] || 0) : (user.stats?.visitsTotal || 0);
             const liked = MonProfil && (MonProfil.likedProfiles || []).includes(user.id);
             const like = (MonProfil && user.id !== MonProfil.id)
-                ? `<button type="button" class="like-btn-mini ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${esc(user.id)}')" title="Aimer">+</button>`
+                ? `<button type="button" class="like-btn-mini ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${esc(user.id)}')" title="${liked ? 'Retirer le j’aime' : 'Aimer'}" aria-label="${liked ? 'Retirer le j’aime' : 'Aimer'}" aria-pressed="${liked}">${heartIcon()}</button>`
                 : '';
             const rank = user.rank && user.rank !== 'base'
                 ? `<span class="rank-badge ${Ranks[user.rank]?.class || 'rank-base'}">${esc(Ranks[user.rank]?.name || '')}</span>`
@@ -447,7 +460,7 @@
                             <button type="button" class="btn btn-outline" onclick="bumpMe()">Bump</button>
                         </div>` : ''}
                         ${(!isMe && MonProfil) ? `<div class="profile-controls">
-                            <button type="button" class="like-main-btn ${liked ? 'liked' : ''}" onclick="toggleLike('${esc(user.id)}')">Aimer (${user.stats?.likesTotal || 0})</button>
+                            <button type="button" class="like-main-btn ${liked ? 'liked' : ''}" onclick="toggleLike('${esc(user.id)}')" title="${liked ? 'Retirer le j’aime' : 'Aimer'}" aria-label="${liked ? 'Retirer le j’aime' : 'Aimer'}" aria-pressed="${liked}">${heartIcon()} <span>${user.stats?.likesTotal || 0}</span></button>
                         </div>` : ''}
                         <div class="hero-profile">
                             <div class="avatar-wrap" style="border-color:${esc(theme.border)}">

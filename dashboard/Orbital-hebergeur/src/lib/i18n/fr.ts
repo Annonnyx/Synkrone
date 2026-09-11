@@ -392,7 +392,7 @@ export const fr = {
     botCommands: "Commandes du bot",
     prefixHint: "1 à 10 caractères, au choix — par exemple !, ?, . ou sk!",
     slashHint:
-      "Désactivées, les commandes / sont retirées de Discord au prochain redémarrage. Les commandes préfixe restent disponibles.",
+      "Elles s’enregistrent au démarrage, sur chaque serveur où le bot est déjà présent. Il faut l’avoir invité avec le lien du panneau (scope applications.commands). Les commandes préfixe restent disponibles.",
     saveBotCommands: "Enregistrer préfixe et slash",
     botCommandsSaved: "Préfixe et slash enregistrés — redémarrez le bot pour appliquer",
     slashOn: "Activées",
@@ -430,7 +430,7 @@ export const fr = {
     name: "Nom",
     description: "Description",
     prefix: "Préfixe",
-    slashEnable: "Activer les commandes slash (enregistrées auprès de Discord au démarrage)",
+    slashEnable: "Activer les commandes slash (enregistrées sur tes serveurs au démarrage)",
     enableModuleFirst: "Activez d'abord un module.",
     intentsHint:
       "Les intents non privilégiés suivent vos modules. Les intents privilégiés restent désactivés tant que vous ne les cochez pas — et ils doivent aussi être activés dans le portail développeur Discord.",
@@ -544,11 +544,12 @@ export const fr = {
     appIdPlaceholder: "Identifiant numérique depuis le portail développeur",
     saveId: "Enregistrer l'ID",
     tokenRemoved: "Token supprimé. Le bot ne pourra plus se connecter.",
-    tokenStored: "Token chiffré enregistré. Recréez le conteneur pour l'injecter.",
+    tokenStored: "Token chiffré enregistré. Il sera injecté au prochain démarrage.",
     appIdSaved: "ID d'application enregistré.",
     unknown: "inconnue",
     invite: "Inviter le bot",
-    inviteHint: "Lien généré depuis l'ID d'application contenu dans le token. Discord demandera le serveur et les permissions.",
+    inviteHint:
+      "Lien généré depuis l'ID d'application du token. Il inclut le scope applications.commands — sans lui, le préfixe marche mais les commandes / n’apparaissent pas. Réinvitez le bot avec ce lien si besoin.",
     copyInvite: "Copier le lien",
   },
   sftp: {

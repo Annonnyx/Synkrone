@@ -26,8 +26,15 @@ fi
 export DISCORD_TOKEN="\$TOKEN"
 export BOT_TOKEN="\$TOKEN"
 if [ -f requirements.txt ]; then
-  echo "[synkrone] installing python dependencies"
-  python -m pip install --user --no-cache-dir --disable-pip-version-check --root-user-action=ignore -q -r requirements.txt
+  HASH=$(sha256sum requirements.txt | awk '{print $1}')
+  if [ -f /app/.orbital/reqs.ok ] && [ "$(cat /app/.orbital/reqs.ok)" = "$HASH" ]; then
+    echo "[synkrone] python dependencies already installed"
+  else
+    echo "[synkrone] installing python dependencies"
+    python -m pip install --user --no-cache-dir --disable-pip-version-check --root-user-action=ignore -q -r requirements.txt
+    mkdir -p /app/.orbital
+    echo "$HASH" > /app/.orbital/reqs.ok
+  fi
 fi
 export PATH="/root/.local/bin:\${PATH}"
 echo "[synkrone] starting bot"
@@ -68,11 +75,7 @@ const CUSTOM_MAIN_PY = [
   '    prefix = str(cfg.get("prefix") or os.getenv("BOT_PREFIX") or os.getenv("PREFIX") or "!")',
   "    return [prefix]",
   "",
-  "def slash_enabled():",
-  "    cfg = runtime_config()",
-  '    if "slashCommands" in cfg:',
-  '        return bool(cfg.get("slashCommands"))',
-  '    return os.getenv("ENABLE_SLASH_COMMANDS", "true").lower() in ("1", "true", "yes")',
+  "from synkrone_slash import sync_app_commands",
   "",
   "bot = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)",
   "",
@@ -86,17 +89,12 @@ const CUSTOM_MAIN_PY = [
   "@bot.event",
   "async def on_ready():",
   '    print("[bot] logged in as %s" % bot.user)',
-  "    try:",
-  "        if slash_enabled():",
-  "            synced = await bot.tree.sync()",
-  '            print("[bot] slash commands synced (%s)" % len(synced))',
-  "        else:",
-  "            bot.tree.clear_commands(guild=None)",
-  "            await bot.tree.sync()",
-  '            print("[bot] slash commands disabled")',
-  "    except Exception as err:",
-  '        print("[bot] slash sync failed: %s" % err)',
+  "    await sync_app_commands(bot, runtime_config(), log_prefix=\"[bot]\")",
   '    print("[bot] ready")',
+  "",
+  "@bot.event",
+  "async def on_guild_join(guild):",
+  "    await sync_app_commands(bot, runtime_config(), guild=guild, log_prefix=\"[bot]\")",
   "",
   "async def setup():",
   "    for cog in enabled_files():",
@@ -119,26 +117,9 @@ const CUSTOM_MAIN_PY = [
 
 const SYNKRONE_RUNTIME_PY = [
   "# Managed by Synkrone. Applies prefix and slash settings from the panel.",
-  "import json",
-  "import os",
-  "",
   "from discord.ext import commands",
   "",
-  "",
-  "def _panel_config():",
-  "    try:",
-  '        with open(os.path.join("config", "bot.json"), encoding="utf-8") as handle:',
-  "            data = json.load(handle)",
-  "            return data if isinstance(data, dict) else {}",
-  "    except Exception:",
-  "        return {}",
-  "",
-  "",
-  "def _slash_enabled(cfg):",
-  '    if "slashCommands" in cfg:',
-  '        return bool(cfg.get("slashCommands"))',
-  '    raw = os.getenv("ENABLE_SLASH_COMMANDS", "true")',
-  '    return str(raw).lower() in ("1", "true", "yes")',
+  "from synkrone_slash import read_panel_config, sync_app_commands",
   "",
   "",
   "class SynkroneRuntime(commands.Cog):",
@@ -157,21 +138,16 @@ const SYNKRONE_RUNTIME_PY = [
   "",
   "    @commands.Cog.listener()",
   "    async def on_ready(self):",
-  "        cfg = _panel_config()",
+  "        cfg = read_panel_config()",
   "        self._apply_prefix(cfg)",
   "        if self._slash_done:",
   "            return",
   "        self._slash_done = True",
-  "        try:",
-  "            if _slash_enabled(cfg):",
-  "                synced = await self.bot.tree.sync()",
-  '                print("[synkrone] slash commands synced (%s)" % len(synced))',
-  "            else:",
-  "                self.bot.tree.clear_commands(guild=None)",
-  "                await self.bot.tree.sync()",
-  '                print("[synkrone] slash commands disabled")',
-  "        except Exception as err:",
-  '            print("[synkrone] slash sync failed: %s" % err)',
+  "        await sync_app_commands(self.bot, cfg, log_prefix=\"[synkrone]\")",
+  "",
+  "    @commands.Cog.listener()",
+  "    async def on_guild_join(self, guild):",
+  "        await sync_app_commands(self.bot, guild=guild, log_prefix=\"[synkrone]\")",
   "",
   "",
   "async def setup(bot):",
@@ -293,10 +269,23 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
       ),
     );
     await this.syncPanelbotPrefix(fsm, prefix);
+    await this.writeSlashHelper(fsm);
     if (flavor === "custom") {
       await this.refreshGeneratedMain(fsm);
     } else {
       await fsm.write("cogs/synkrone_runtime.py", SYNKRONE_RUNTIME_PY);
+    }
+  }
+
+  private async writeSlashHelper(fsm: FilesystemManager) {
+    try {
+      const source = await readFile(
+        path.join(synkroneRepoRoot(), "templates/discord/synkrone_slash.py"),
+        "utf8",
+      );
+      await fsm.write("synkrone_slash.py", source);
+    } catch {
+      /* template missing in a partial checkout — generated main still has a fallback import */
     }
   }
 
@@ -343,6 +332,13 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
   }
 
   async create(service: ServiceRecord) {
+    const token = await this.storedToken(service.id);
+    await appendConsole(
+      service.id,
+      token
+        ? "Discord token attached to the container"
+        : "No Discord token yet — add it in the Token tab before starting",
+    );
     return super.create({
       ...service,
       restartPolicy: service.restartPolicy === "always" ? "always" : "no",
@@ -397,7 +393,7 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     if (row?.dockerContainerId) {
       const hasToken = await this.containerHasToken(row.dockerContainerId);
       if (hasToken !== false) return;
-      await appendConsole(serviceId, "Recreating container to inject the Discord token...");
+      await appendConsole(serviceId, "Applying the saved Discord token to a new container...");
       await this.remove(serviceId);
     }
     const record = await loadServiceRecord(serviceId);

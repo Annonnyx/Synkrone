@@ -246,17 +246,22 @@ def _read_json_prefix(path: str) -> Optional[str]:
         pass
     return None
 
-def _slash_enabled() -> bool:
-    if os.path.exists(_PANEL_CFG_PATH):
-        try:
-            with open(_PANEL_CFG_PATH, 'r', encoding='utf-8') as f:
-                flag = json.load(f).get('slashCommands')
-                if flag is not None:
-                    return bool(flag)
-        except Exception:
-            pass
-    raw = os.getenv('ENABLE_SLASH_COMMANDS', 'true')
-    return str(raw).lower() in ('1', 'true', 'yes')
+try:
+    from synkrone_slash import slash_enabled as _slash_enabled, sync_app_commands
+except ImportError:
+    sync_app_commands = None
+
+    def _slash_enabled() -> bool:
+        if os.path.exists(_PANEL_CFG_PATH):
+            try:
+                with open(_PANEL_CFG_PATH, 'r', encoding='utf-8') as f:
+                    flag = json.load(f).get('slashCommands')
+                    if flag is not None:
+                        return bool(flag)
+            except Exception:
+                pass
+        raw = os.getenv('ENABLE_SLASH_COMMANDS', 'true')
+        return str(raw).lower() in ('1', 'true', 'yes')
 
 def _get_global_prefix() -> str:
     """Retourne le préfixe global actif : panneau → BotAdmin → bot_config.json → env"""
@@ -321,20 +326,28 @@ bot.help_command = None  # Désactive l'aide par défaut
 async def on_ready():
     print(f'\033[92m🤖 Connecté en tant que {bot.user.name}\033[0m')
     print('\033[94m' + '─' * 60 + '\033[0m')
-    try:
-        if _slash_enabled():
-            synced = await bot.tree.sync()
-            print(f'\033[92m[✓] {len(synced)} commande(s) slash synchronisée(s)\033[0m')
-        else:
-            bot.tree.clear_commands(guild=None)
-            await bot.tree.sync()
-            print('\033[93m[!] Commandes slash désactivées\033[0m')
-    except Exception as e:
-        print(f'\033[93m[!] Erreur lors de la synchronisation des slash commands : {e}\033[0m')
+    if sync_app_commands:
+        await sync_app_commands(bot, log_prefix="[bot]")
+    else:
+        try:
+            if _slash_enabled():
+                synced = await bot.tree.sync()
+                print(f'\033[92m[✓] {len(synced)} commande(s) slash synchronisée(s)\033[0m')
+            else:
+                bot.tree.clear_commands(guild=None)
+                await bot.tree.sync()
+                print('\033[93m[!] Commandes slash désactivées\033[0m')
+        except Exception as e:
+            print(f'\033[93m[!] Erreur lors de la synchronisation des slash commands : {e}\033[0m')
     if COGS_ERRORS:
         print('\033[93m[!] Erreurs de chargement des cogs :\033[0m')
         for cog, msg in COGS_ERRORS:
             print(f'\033[93m - {cog}: {msg}\033[0m')
+
+@bot.event
+async def on_guild_join(guild):
+    if sync_app_commands:
+        await sync_app_commands(bot, guild=guild, log_prefix="[bot]")
 
 async def main():
     async with bot:

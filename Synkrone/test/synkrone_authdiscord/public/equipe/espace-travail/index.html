@@ -12,12 +12,12 @@
             theme: {
                 extend: {
                     colors: {
-                        base: '#0f1114',
-                        panel: '#2b2d31',
-                        border: 'rgba(255,255,255,0.1)',
-                        accent: '#4e5058',
-                        accentHover: '#6d6f78',
-                        card: '#313338'
+                        base: '#EEF0EA',
+                        panel: '#FFFFFF',
+                        border: '#5C6A661F',
+                        accent: '#3F6B52',
+                        accentHover: '#2E5039',
+                        card: '#E3E6DD'
                     }
                 }
             }
@@ -29,21 +29,12 @@
     <script src="/assets/mosaique.js" defer></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        body { font-family: 'Inter', sans-serif; color: #f8fafc; overflow: hidden; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.2); }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-        
-        .glass-panel { background: rgba(43, 45, 49, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--tw-colors-border); }
+        body { overflow: hidden; }
         .kanban-column { min-height: 200px; transition: background-color 0.2s, outline 0.2s; }
-        .kanban-column.drag-over { background-color: rgba(255, 255, 255, 0.05); outline: 2px dashed rgba(255,255,255,0.4); outline-offset: -2px; }
-        .task-card { cursor: grab; transition: transform 0.2s, box-shadow 0.2s; }
+        .kanban-column.drag-over { outline-offset: -2px; }
+        .task-card { cursor: grab; transition: transform 0.2s; }
         .task-card:active { cursor: grabbing; transform: scale(0.98); }
-        .task-card:hover { border-color: rgba(255,255,255,0.3); }
-        #brainstorm-container { cursor: grab; overflow: hidden; background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
+        #brainstorm-container { cursor: grab; overflow: hidden; background-size: 20px 20px; }
         #brainstorm-container:active { cursor: grabbing; }
         .post-it { cursor: grab; transition: box-shadow 0.2s; }
         .post-it:active { cursor: grabbing; }
@@ -54,8 +45,9 @@
         .writing-vertical { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); }
     </style>
     <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="/assets/equipe.css">
 </head>
-<body class="mosaic-bg h-screen w-screen flex flex-col relative text-sm bg-base">
+<body class="equipe-da mosaic-bg h-screen w-screen flex flex-col relative text-sm bg-base">
     <div id="app-root" class="h-full w-full flex flex-col relative z-0"></div>
     
     <div id="toast-container" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
@@ -263,7 +255,7 @@
 
         function openModalHTML(html) { setIframeFullscreen(true); document.getElementById('global-modals').innerHTML = html; }
         function closeGlobalModal() { setIframeFullscreen(false); document.getElementById('global-modals').innerHTML = ''; }
-        function getUser(id) { return USERS.find(u => u.id === id) || { name: 'Inconnu', avatar: 'https://placehold.co/100x100/333/fff?text=?' }; }
+        function getUser(id) { return USERS.find(u => u.id === id) || { name: 'Inconnu', avatar: 'https://placehold.co/100x100/eef0ea/1b211e?text=?' }; }
 
         function hexToRgba(hex, alpha) {
             let r = 0, g = 0, b = 0;
@@ -276,7 +268,7 @@
         function showToast(title, message, type = 'info') {
             const container = document.getElementById('toast-container');
             const id = 'toast_' + Date.now();
-            let icon = 'fa-info-circle text-gray-300';
+            let icon = 'fa-info-circle';
             let border = 'border-gray-500/30';
             if(type === 'success') { icon = 'fa-check-circle text-green-400'; border = 'border-green-500/30'; }
             if(type === 'error') { icon = 'fa-exclamation-circle text-red-400'; border = 'border-red-500/30'; }
@@ -344,11 +336,11 @@
                     <div class="max-w-6xl mx-auto">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                             <div>
-                                <h1 class="text-3xl font-bold text-white">Espace de Travail</h1>
-                                <p class="text-gray-400 mt-1">Sélectionnez un projet pour commencer</p>
+                                <h1 class="text-3xl font-bold text-white">Espace de travail</h1>
+                                <p class="text-gray-400 mt-1">Choisissez un projet pour ouvrir le tableau.</p>
                             </div>
                             <button onclick="window.openCreateProjectModal()" class="${window.isUserAdmin() ? 'flex' : 'hidden'} bg-accent hover:bg-accentHover text-white px-4 py-2 rounded-lg font-medium transition shadow-lg items-center gap-2 border border-border">
-                                <i class="fa-solid fa-plus"></i> Nouveau Projet
+                                <i class="fa-solid fa-plus"></i> Créer un projet
                             </button>
                         </div>
                         
@@ -382,7 +374,7 @@
                                 </div>
                                 `;
                             }).join('')}
-                            ${sortedProjects.length === 0 ? `<p class="text-gray-500 text-center py-10 italic col-span-3">Aucun projet. Commencez par en créer un.</p>` : ''}
+                            ${sortedProjects.length === 0 ? `<p class="text-gray-500 text-center py-10 col-span-3">Aucun projet pour l’instant. Créez le premier pour commencer.</p>` : ''}
                         </div>
                     </div>
                 </div>
@@ -404,10 +396,10 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                             <div>
                                 <h1 class="text-3xl font-bold text-white">${project.name}</h1>
-                                <p class="text-gray-400 mt-1">Sélectionnez une version de travail</p>
+                                <p class="text-gray-400 mt-1">Choisissez une version de travail.</p>
                             </div>
                             <button onclick="window.openCreateVersionModal()" class="${window.isUserAdmin() ? 'flex' : 'hidden'} bg-accent hover:bg-accentHover text-white px-4 py-2 rounded-lg font-medium transition shadow-lg items-center gap-2 border border-border">
-                                <i class="fa-solid fa-code-branch"></i> Nouvelle Version
+                                <i class="fa-solid fa-code-branch"></i> Créer une version
                             </button>
                         </div>
                         <div class="space-y-4">
@@ -434,7 +426,7 @@
                                     </div>
                                 </div>
                             `).join('')}
-                            ${projectVersions.length === 0 ? `<p class="text-gray-500 text-center py-10 italic">Aucune version créée pour ce projet.</p>` : ''}
+                            ${projectVersions.length === 0 ? `<p class="text-gray-500 text-center py-10">Aucune version pour l’instant. Créez la première pour commencer.</p>` : ''}
                         </div>
                     </div>
                 </div>
@@ -647,8 +639,8 @@
             return `
             <div class="absolute inset-0 fade-in flex flex-col">
                 <div class="absolute top-4 left-4 z-10 flex flex-col gap-2 pointer-events-none">
-                    <button onclick="window.createNote()" class="pointer-events-auto bg-gray-300 hover:bg-gray-200 text-black px-4 py-2 rounded-lg text-sm shadow-lg flex items-center gap-2 w-fit transition border border-border font-medium">
-                        <i class="fa-solid fa-plus"></i> Nouveau Post-it
+                    <button onclick="window.createNote()" class="pointer-events-auto bg-accent hover:bg-accentHover text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 w-fit transition border border-border font-medium">
+                        <i class="fa-solid fa-plus"></i> Créer un post-it
                     </button>
                     <button onclick="window.recenterBrainstorm()" class="pointer-events-auto bg-panel hover:bg-card border border-border text-white px-3 py-1.5 rounded-lg text-sm shadow-lg flex items-center gap-2 w-fit transition">
                         <i class="fa-solid fa-crosshairs"></i> Recentrer (<span id="zoom-level">${Math.round(appState.brainstorm.scale * 100)}</span>%)
@@ -775,7 +767,7 @@
         window.createNote = function() {
             const text = prompt('Texte du post-it :');
             if(text && text.trim()) {
-                const colors = ['#fef08a', '#bbf7d0', '#bfdbfe', '#fbcfe8', '#fed7aa', '#e5e7eb'];
+                const colors = ['#F3E7D3', '#E4ECE4', '#E3E6DD', '#F5E2DC', '#EEF0EA', '#E4ECE4'];
                 const randColor = colors[Math.floor(Math.random() * colors.length)];
                 const container = document.getElementById('brainstorm-container');
                 const rect = container.getBoundingClientRect();
@@ -863,7 +855,7 @@
                     </div>
                     <div class="space-y-6">
                         ${vPolls.map(poll => renderPollCard(poll)).join('')}
-                        ${vPolls.length === 0 ? `<div class="text-center py-10 glass-panel border border-border border-dashed rounded-xl"><p class="text-gray-500">Aucun sondage actif pour cette version.</p></div>` : ''}
+                        ${vPolls.length === 0 ? `<div class="text-center py-10 glass-panel border border-border border-dashed rounded-xl"><p class="text-gray-500">Aucun sondage pour l’instant. Créez le premier pour commencer.</p></div>` : ''}
                     </div>
                 </div>
             </div>`;
@@ -971,7 +963,7 @@
                 <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
                     <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-md shadow-2xl flex flex-col max-h-[90vh]">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-lg text-white">Nouveau Sondage</h3>
+                            <h3 class="font-bold text-lg text-white">Créer un sondage</h3>
                             <button onclick="closeGlobalModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                         <form onsubmit="window.submitPoll(event)" class="flex flex-col gap-4 overflow-y-auto p-1">
@@ -1026,7 +1018,7 @@
                 <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
                     <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-sm shadow-2xl">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-lg text-white">Nouveau Projet</h3>
+                            <h3 class="font-bold text-lg text-white">Créer un projet</h3>
                             <button onclick="closeGlobalModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                         <form onsubmit="window.submitProject(event)">
@@ -1095,7 +1087,7 @@
                 <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[90] fade-in" onclick="if(event.target === this) closeGlobalModal()">
                     <div class="glass-panel bg-panel p-6 rounded-xl border border-border w-full max-w-sm shadow-2xl">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-lg text-white">Nouvelle Version</h3>
+                            <h3 class="font-bold text-lg text-white">Créer une version</h3>
                             <button onclick="closeGlobalModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                         <form onsubmit="window.submitVersion(event)">
@@ -1205,7 +1197,7 @@
 
         window.openColumnModal = function(colId = null) {
             window.hideContextMenu();
-            let title = '', color = '#475569';
+            let title = '', color = '#3F6B52';
             if (colId) {
                 const col = appState.columns.find(c => c.id === colId);
                 if (col) { title = col.title; color = col.color; }
@@ -1240,7 +1232,7 @@
         window.submitColumn = function(e, colId) {
             e.preventDefault();
             const title = document.getElementById('col-name').value.trim();
-            const color = document.getElementById('col-color-hex').value.trim() || '#475569';
+            const color = document.getElementById('col-color-hex').value.trim() || '#3F6B52';
             if (colId) {
                 const col = appState.columns.find(c => c.id === colId);
                 if (col) { col.title = title; col.color = color; }
@@ -1395,7 +1387,7 @@
                 </div>
                 <div id="global-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
                     ${vMessages.map(m => renderMessage(m)).join('')}
-                    ${vMessages.length === 0 ? `<p class="text-gray-500 text-center text-xs mt-4">Commencez la discussion...</p>` : ''}
+                    ${vMessages.length === 0 ? `<p class="text-gray-500 text-center text-xs mt-4">Aucun message pour l’instant.</p>` : ''}
                 </div>
                 <form onsubmit="window.submitGlobalChat(event)" class="p-3 bg-base border-t border-border flex gap-2">
                     <input type="text" id="global-chat-input" autocomplete="off" placeholder="Message..." class="flex-1 bg-card border border-border rounded-lg px-3 py-2 text-white text-sm focus:border-gray-500 outline-none">
@@ -1417,7 +1409,7 @@
                         <span class="text-[11px] font-semibold ${isMe ? 'text-gray-300' : 'text-gray-400'}">${isMe ? 'Vous' : author.name}</span>
                         <span class="text-[9px] text-gray-500">${time}</span>
                     </div>
-                    <div class="px-3 py-2 rounded-xl text-sm ${isMe ? 'bg-accent border border-border text-white rounded-tr-sm' : 'bg-card border border-border text-gray-200 rounded-tl-sm'} shadow-sm">
+                    <div class="px-3 py-2 rounded-xl text-sm ${isMe ? 'bg-accent border border-border text-white is-me-bubble rounded-tr-sm' : 'bg-card border border-border text-gray-200 rounded-tl-sm'} shadow-sm">
                         ${msg.text}
                     </div>
                 </div>
@@ -1471,11 +1463,11 @@
                 // Palette de couleurs pour post-its
                 menu.innerHTML += `
                     <div class="px-4 py-2 flex gap-2 border-t border-border justify-between items-center" onclick="event.stopPropagation()">
-                        <button onclick="window.changeNoteColor('${id}', '#fef08a')" class="w-5 h-5 rounded-full bg-[#fef08a] border border-gray-600 shadow-inner"></button>
-                        <button onclick="window.changeNoteColor('${id}', '#bbf7d0')" class="w-5 h-5 rounded-full bg-[#bbf7d0] border border-gray-600 shadow-inner"></button>
-                        <button onclick="window.changeNoteColor('${id}', '#bfdbfe')" class="w-5 h-5 rounded-full bg-[#bfdbfe] border border-gray-600 shadow-inner"></button>
-                        <button onclick="window.changeNoteColor('${id}', '#fbcfe8')" class="w-5 h-5 rounded-full bg-[#fbcfe8] border border-gray-600 shadow-inner"></button>
-                        <button onclick="window.changeNoteColor('${id}', '#e5e7eb')" class="w-5 h-5 rounded-full bg-[#e5e7eb] border border-gray-600 shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#F3E7D3')" class="w-5 h-5 rounded-full bg-[#F3E7D3] border border-border shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#E4ECE4')" class="w-5 h-5 rounded-full bg-[#E4ECE4] border border-border shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#E3E6DD')" class="w-5 h-5 rounded-full bg-[#E3E6DD] border border-border shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#F5E2DC')" class="w-5 h-5 rounded-full bg-[#F5E2DC] border border-border shadow-inner"></button>
+                        <button onclick="window.changeNoteColor('${id}', '#EEF0EA')" class="w-5 h-5 rounded-full bg-[#EEF0EA] border border-border shadow-inner"></button>
                     </div>
                 `;
                 

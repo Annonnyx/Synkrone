@@ -394,7 +394,7 @@ export const en: Dict = {
     botCommands: "Bot commands",
     prefixHint: "1 to 10 characters, anything you want — for example !, ?, . or sk!",
     slashHint:
-      "When off, slash commands are removed from Discord on the next restart. Prefix commands stay available.",
+      "They are registered on startup, on every server the bot is already in. Invite it with the panel link (applications.commands scope). Prefix commands stay available.",
     saveBotCommands: "Save prefix and slash",
     botCommandsSaved: "Prefix and slash saved — restart the bot to apply",
     slashOn: "On",
@@ -432,7 +432,7 @@ export const en: Dict = {
     name: "Name",
     description: "Description",
     prefix: "Prefix",
-    slashEnable: "Enable slash commands (registered with Discord on boot)",
+    slashEnable: "Enable slash commands (registered on your servers at startup)",
     enableModuleFirst: "Enable a module first.",
     intentsHint:
       "Safe intents follow your modules. Privileged intents stay off unless you check them — and they must also be enabled in the Discord developer portal.",
@@ -545,11 +545,12 @@ export const en: Dict = {
     appIdPlaceholder: "Numeric application id from the developer portal",
     saveId: "Save ID",
     tokenRemoved: "Token removed. The bot will not be able to log in.",
-    tokenStored: "Token stored encrypted. Recreate the container to inject it.",
+    tokenStored: "Token stored encrypted. It is injected the next time the bot starts.",
     appIdSaved: "Application ID saved.",
     unknown: "unknown",
     invite: "Invite the bot",
-    inviteHint: "Link built from the application ID inside the token. Discord will ask for the server and permissions.",
+    inviteHint:
+      "Link built from the application ID inside the token. It includes the applications.commands scope — without it, prefix works but / commands never appear. Re-invite the bot with this link if needed.",
     copyInvite: "Copy link",
   },
   sftp: {

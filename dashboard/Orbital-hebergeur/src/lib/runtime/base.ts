@@ -15,6 +15,7 @@ import type {
   ServiceStatus,
 } from "./types";
 import { crashReasonFromLogs, isConfigFatalLogs } from "./crash";
+import { mergeContainerEnv } from "./env";
 
 export { crashReasonFromLogs } from "./crash";
 
@@ -83,11 +84,11 @@ export abstract class BaseRuntimeProvider implements RuntimeProvider {
     await appendConsole(service.id, `Pulling image ${tpl.image}...`);
     await ContainerManager.pullImage(tpl.image);
 
-    const env = {
-      ...tpl.environment,
-      ...(await this.extraEnv(service)),
-      ...(await serviceEnvironment(service.id)),
-    };
+    const env = mergeContainerEnv(
+      tpl.environment,
+      await serviceEnvironment(service.id),
+      await this.extraEnv(service),
+    );
 
     const spec: ContainerSpec = {
       name,
@@ -238,7 +239,14 @@ export abstract class BaseRuntimeProvider implements RuntimeProvider {
       if (svc && svc.state !== state && svc.state !== "DELETING") {
         // A stop we initiated ends with a non-zero exit (SIGTERM/SIGKILL). That is
         // not a crash — leave the service STOPPED instead of flipping to CRASHED.
-        if (state === "CRASHED" && (svc.state === "STOPPING" || svc.state === "STOPPED")) {
+        if (
+          state === "CRASHED" &&
+          (svc.state === "STOPPING" || svc.state === "STOPPED" || svc.state === "RESTARTING")
+        ) {
+          // docker stop/restart ends with SIGTERM (143) or SIGKILL (137).
+          if (svc.state === "RESTARTING") {
+            return { state: "RESTARTING", dockerStatus: s.Status, exitCode: s.ExitCode };
+          }
           await setServiceState(serviceId, "STOPPED");
           await db.update(containers).set({ status: "STOPPED" }).where(eq(containers.id, row.id));
           return { state: "STOPPED", dockerStatus: s.Status, exitCode: s.ExitCode };

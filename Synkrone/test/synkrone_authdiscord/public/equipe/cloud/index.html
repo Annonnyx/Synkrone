@@ -33,12 +33,12 @@
             theme: {
                 extend: {
                     colors: {
-                        base: '#0f1114',
-                        panel: '#2b2d31',
-                        border: 'rgba(255,255,255,0.1)',
-                        accent: '#4e5058',
-                        accentHover: '#6d6f78',
-                        card: '#313338'
+                        base: '#EEF0EA',
+                        panel: '#FFFFFF',
+                        border: '#5C6A661F',
+                        accent: '#3F6B52',
+                        accentHover: '#2E5039',
+                        card: '#E3E6DD'
                     }
                 }
             }
@@ -68,8 +68,8 @@
             transition: all 0.2s;
         }
         .checkbox-custom:checked {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
+            background-color: #3F6B52;
+            border-color: #3F6B52;
         }
         .checkbox-custom:checked::after {
             content: '';
@@ -101,14 +101,15 @@
             .col-name { flex-grow: 1; min-width: 150px; }
             .hide-mobile { display: none !important; }
         }
-        .drag-over { background-color: rgba(59, 130, 246, 0.2) !important; border: 1px dashed #3b82f6; }
+        .drag-over { background-color: #E4ECE4 !important; border: 1px dashed #3F6B52; }
     </style>
     <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="/assets/equipe.css">
 </head>
-<body class="mosaic-bg h-screen flex flex-col font-sans overflow-hidden text-sm bg-base text-gray-200">
-    <header class="h-14 flex items-center justify-between px-4 border-b border-border bg-panel backdrop-blur" id="cloud-header">
+<body class="equipe-da mosaic-bg h-screen flex flex-col overflow-hidden text-sm bg-base">
+    <header class="h-14 flex items-center justify-between px-4 border-b border-border bg-panel" id="cloud-header">
         <div class="flex items-center space-x-2">
-            <span class="font-bold text-gray-200 tracking-wider text-xs uppercase hidden sm:inline"></span>
+            <span class="font-bold text-gray-200 text-xs hidden sm:inline"></span>
         </div>
         <div class="flex items-center space-x-2 sm:space-x-3 overflow-x-auto py-1">
             <button onclick="toggleFullscreen()" class="px-2.5 py-1.5 rounded bg-card hover:bg-accent text-gray-300 border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Plein écran">
@@ -129,21 +130,21 @@
             </button>
             
             <div id="batchActionsContainer" class="hidden items-center gap-2">
-                <button onclick="batchDownload()" class="px-2.5 py-1.5 rounded bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white border border-indigo-600/50 transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Télécharger la sélection">
+                <button onclick="batchDownload()" class="px-2.5 py-1.5 rounded bg-indigo-600/20 text-indigo-400 hover:bg-accent hover:text-white border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Télécharger la sélection">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 </button>
-                <button onclick="batchMoveModal()" class="px-2.5 py-1.5 rounded bg-amber-600/20 text-amber-400 hover:bg-amber-600 hover:text-white border border-amber-600/50 transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Déplacer la sélection">
+                <button onclick="batchMoveModal()" class="px-2.5 py-1.5 rounded bg-amber-600/20 text-amber-400 hover:bg-amber-600 hover:text-white border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Déplacer la sélection">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                 </button>
-                <button onclick="batchDelete()" class="px-2.5 py-1.5 rounded bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-600/50 transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Supprimer la sélection">
+                <button onclick="batchDelete()" class="px-2.5 py-1.5 rounded bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" title="Supprimer la sélection">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
             </div>
             
-            <button onclick="triggerAction('addFolder')" class="px-2.5 py-1.5 rounded bg-card hover:bg-accent text-gray-300 border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" id="btn-add-folder" title="Nouveau dossier">
+            <button onclick="triggerAction('addFolder')" class="px-2.5 py-1.5 rounded bg-card hover:bg-accent text-gray-300 border border-border transition flex items-center justify-center gap-1 text-xs shrink-0 h-8 w-8 sm:w-auto sm:px-2.5" id="btn-add-folder" title="Créer un dossier">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             </button>
-            <button onclick="triggerAction('addFile')" class="px-2.5 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white shadow transition flex items-center justify-center gap-1 text-xs shrink-0 border border-blue-700 h-8 w-8 sm:w-auto sm:px-2.5" id="btn-add-file" title="Nouveau fichier">
+            <button onclick="triggerAction('addFile')" class="px-2.5 py-1.5 rounded bg-accent hover:bg-accentHover text-white transition flex items-center justify-center gap-1 text-xs shrink-0 border border-border h-8 w-8 sm:w-auto sm:px-2.5" id="btn-add-file" title="Créer un fichier">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             </button>
         </div>
@@ -163,7 +164,7 @@
         </div>
     </div>
     <main class="flex-1 overflow-auto relative" id="mainContainer">
-        <div class="grid-list sticky top-0 bg-panel border-b border-border py-2 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider z-10">
+        <div class="grid-list sticky top-0 bg-panel border-b border-border py-2 px-2 text-xs font-semibold text-gray-400 z-10">
             <div class="flex justify-center">
                 <input type="checkbox" id="selectAll" class="checkbox-custom" onclick="toggleSelectAll(this.checked)">
             </div>
@@ -178,8 +179,8 @@
     
     <!-- Context Menu -->
     <div id="contextMenu" class="hidden absolute bg-card border border-border rounded-lg shadow-2xl py-1 z-50 w-48 text-gray-200 text-sm max-h-[80vh] overflow-y-auto">
-        <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('addFolder')">Ajouter Dossier</button>
-        <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('addFile')">Ajouter Fichier</button>
+        <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('addFolder')">Créer un dossier</button>
+        <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('addFile')">Créer un fichier</button>
         <div class="h-px bg-border my-1"></div>
         <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('selectAll')">Sélectionner tout</button>
         <div id="itemSpecificActions" class="hidden">
@@ -189,7 +190,7 @@
             <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('download')">Télécharger</button>
             <div id="adminMenuDivider" class="h-px bg-border my-1"></div>
             <button class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition" onclick="triggerContextMenuAction('duplicate')">Dupliquer</button>
-            <button id="adminPermissionsBtn" class="w-full text-left px-4 py-2 hover:bg-purple-600 hover:text-white transition text-purple-300 font-semibold" onclick="triggerContextMenuAction('permissions')">Admin : Droits d'accès</button>
+            <button id="adminPermissionsBtn" class="w-full text-left px-4 py-2 hover:bg-accent hover:text-white transition text-purple-300 font-semibold" onclick="triggerContextMenuAction('permissions')">Droits d’accès</button>
             <div class="h-px bg-border my-1"></div>
             <button class="w-full text-left px-4 py-2 hover:bg-red-600 hover:text-white transition text-red-400" onclick="triggerContextMenuAction('delete')">Supprimer</button>
         </div>
@@ -215,7 +216,7 @@
             <input type="text" id="inputModalField" class="w-full bg-base border border-border rounded p-2 text-white mb-4 focus:outline-none focus:border-gray-500" placeholder="Entrez le nom...">
             <div class="flex justify-end gap-2">
                 <button onclick="closeModal('inputModal')" class="px-4 py-2 rounded bg-panel hover:bg-accent text-white transition border border-border">Annuler</button>
-                <button id="inputModalSubmit" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition">Valider</button>
+                <button id="inputModalSubmit" class="px-4 py-2 rounded bg-accent hover:bg-accentHover text-white transition">Valider</button>
             </div>
         </div>
     </div>
@@ -240,7 +241,7 @@
                 <span id="editorInfoText" class="text-xs text-gray-400"></span>
                 <div class="flex gap-2">
                     <button onclick="closeModal('editorModal')" class="px-4 py-2 rounded bg-base hover:bg-accent text-white transition border border-border">Fermer</button>
-                    <button id="editorModalSave" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition hidden">Enregistrer</button>
+                    <button id="editorModalSave" class="px-4 py-2 rounded bg-accent hover:bg-accentHover text-white transition hidden">Enregistrer</button>
                 </div>
             </div>
         </div>
@@ -272,7 +273,7 @@
             </div>
             <div class="flex justify-end gap-2 shrink-0">
                 <button onclick="closeModal('permissionsModal')" class="px-4 py-2 rounded bg-panel hover:bg-accent border border-border text-white transition">Fermer</button>
-                <button onclick="savePermissions()" class="px-4 py-2 rounded bg-purple-600 hover:bg-purple-500 text-white transition">Enregistrer</button>
+                <button onclick="savePermissions()" class="px-4 py-2 rounded bg-accent hover:bg-accentHover text-white transition">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -344,7 +345,7 @@
             <div class="max-h-60 overflow-auto bg-base border border-border rounded p-2 mb-4" id="moveFolderList"></div>
             <div class="flex justify-end gap-2">
                 <button onclick="closeModal('moveModal')" class="px-4 py-2 rounded bg-panel hover:bg-accent border border-border text-white transition">Annuler</button>
-                <button id="moveModalSubmit" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition">Déplacer</button>
+                <button id="moveModalSubmit" class="px-4 py-2 rounded bg-accent hover:bg-accentHover text-white transition">Déplacer</button>
             </div>
         </div>
     </div>

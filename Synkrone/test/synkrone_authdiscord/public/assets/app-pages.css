@@ -560,7 +560,7 @@ h1, h2, h3 {
 .rank-vip { background: #f3e7d3 !important; color: #b8823d !important; }
 .rank-premium { background: #f5e2dc !important; color: #a8462f !important; }
 
-.like-btn-mini,
+.like-btn-mini.liked,
 .like-main-btn.liked {
     color: #a8462f !important;
     border-color: #a8462f !important;
