@@ -95,6 +95,63 @@ function overlayPath(applicationId, guildId) {
     return path.join(OVERLAY_ROOT, String(applicationId), `${guildId}.json`);
 }
 
+function serveurPathFromQuery(query) {
+    const q = new URLSearchParams();
+    const src = query || {};
+    for (const key of ['t', 'guild', 'application']) {
+        const value = String(src[key] || '').trim();
+        if (value) q.set(key, value);
+    }
+    const qs = q.toString();
+    return qs ? `/serveur?${qs}` : '/serveur';
+}
+
+function rememberServeurLink(req, claims) {
+    if (!req.session || !claims) return;
+    req.session.serveurLink = {
+        guildId: claims.guildId,
+        userId: claims.userId,
+        applicationId: claims.applicationId
+    };
+}
+
+function sessionServeurLink(req, discordId) {
+    const link = req.session?.serveurLink;
+    if (!link) return null;
+    if (discordId && String(link.userId) !== String(discordId)) return null;
+    if (!link.guildId || !link.applicationId) return null;
+    return link;
+}
+
+async function listHostedGuilds(discordId, email) {
+    const query = new URLSearchParams();
+    if (discordId) query.set('discordUserId', discordId);
+    if (email) query.set('email', String(email).trim().toLowerCase());
+    if (!query.toString()) return [];
+    try {
+        const data = await panelAdmin(`/discord?${query.toString()}`);
+        const guilds = [];
+        const seen = new Set();
+        for (const svc of data.services || []) {
+            for (const g of svc.guilds || []) {
+                const key = `${g.id}:${svc.applicationId || svc.id}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                guilds.push({
+                    id: g.id,
+                    name: g.name,
+                    bot: svc.name,
+                    applicationId: svc.applicationId,
+                    href: svc.applicationId ? `/serveur?guild=${g.id}&application=${svc.applicationId}` : '/serveur'
+                });
+            }
+        }
+        return guilds;
+    } catch {
+        return [];
+    }
+}
+
 function welcomeRel(guildId) {
     return `cogs/ADMIN/configuration/joinleave/bienvenue/data/${guildId}/config.json`;
 }
@@ -238,25 +295,40 @@ function mountServeur(app) {
     app.get('/api/serveur', async (req, res) => {
         const user = sessionUser(req);
         const discordId = discordUserId(user);
+        const rawToken = String(req.query.t || '').trim();
+        const claims = rawToken ? verifyToken(rawToken) : null;
+        if (claims) rememberServeurLink(req, claims);
+        const returnTo = serveurPathFromQuery(req.query);
         if (!discordId) {
             return res.status(401).json({
                 ok: false,
                 discordOnly: true,
-                loginUrl: `/login?returnTo=${encodeURIComponent(`/serveur${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`)}`
+                loginUrl: `/login?returnTo=${encodeURIComponent(returnTo)}`
             });
         }
-        const claims = verifyToken(req.query.t);
-        const guildId = String(claims?.guildId || req.query.guild || '').trim();
-        const applicationId = String(claims?.applicationId || req.query.application || '').trim();
+        if (rawToken && !claims) {
+            return res.status(403).json({
+                ok: false,
+                expired: true,
+                error: 'Lien expiré. Relance /config sur Discord, puis Configurer sur le site.'
+            });
+        }
+        const stored = sessionServeurLink(req, discordId);
+        const guildId = String(claims?.guildId || req.query.guild || stored?.guildId || '').trim();
+        const applicationId = String(claims?.applicationId || req.query.application || stored?.applicationId || '').trim();
         if (claims && claims.userId !== discordId) {
             return res.status(403).json({ ok: false, error: 'Ce lien Discord appartient à un autre compte.' });
         }
         if (!guildId || !applicationId) {
+            const guilds = await listHostedGuilds(discordId, user.email);
             return res.json({
                 ok: true,
                 needLink: true,
                 user: { id: discordId, username: user.username },
-                hint: 'Ouvre /config sur le serveur Discord, puis Configurer sur le site.'
+                guilds,
+                hint: guilds.length
+                    ? 'Choisis un serveur, ou ouvre /config sur Discord pour un lien direct.'
+                    : 'Ouvre /config sur le serveur Discord, puis Configurer sur le site.'
             });
         }
         const official = officialByApp(applicationId);
@@ -313,16 +385,19 @@ function mountServeur(app) {
         const user = sessionUser(req);
         const discordId = discordUserId(user);
         if (!discordId) return res.status(401).json({ ok: false, discordOnly: true });
-        const claims = verifyToken(req.body?.t || req.query.t);
-        const guildId = String(claims?.guildId || req.body?.guildId || '').trim();
-        const applicationId = String(claims?.applicationId || req.body?.applicationId || '').trim();
+        const rawToken = String(req.body?.t || req.query.t || '').trim();
+        const claims = rawToken ? verifyToken(rawToken) : null;
+        if (claims) rememberServeurLink(req, claims);
+        const stored = sessionServeurLink(req, discordId);
+        const guildId = String(claims?.guildId || req.body?.guildId || stored?.guildId || '').trim();
+        const applicationId = String(claims?.applicationId || req.body?.applicationId || stored?.applicationId || '').trim();
         if (!guildId || !applicationId) {
             return res.status(400).json({ ok: false, error: 'Serveur ou application manquant.' });
         }
         if (claims && claims.userId !== discordId) {
             return res.status(403).json({ ok: false, error: 'Ce lien Discord appartient à un autre compte.' });
         }
-        const allowed = await assertConfigurer(discordId, guildId, applicationId, claims);
+        const allowed = await assertConfigurer(discordId, guildId, applicationId, claims || stored);
         if (!allowed) {
             return res.status(403).json({ ok: false, error: 'Lien expiré ou permission insuffisante. Relance /config.' });
         }
@@ -355,5 +430,6 @@ module.exports = {
     mountServeur,
     verifyToken,
     discordUserId,
+    serveurPathFromQuery,
     OFFICIAL_BOTS
 };

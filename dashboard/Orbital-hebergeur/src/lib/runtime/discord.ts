@@ -329,7 +329,7 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     let needsCopy = true;
     try {
       const raw = await fsm.read(CONFIG_COG_FILE);
-      needsCopy = !hasConfigHybridCommand(raw) || !raw.includes("siteOrigin");
+      needsCopy = !hasConfigHybridCommand(raw) || !raw.includes("siteOrigin") || !raw.includes("24 * 60 * 60");
     } catch {
       needsCopy = true;
     }

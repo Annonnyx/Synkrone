@@ -64,7 +64,7 @@
             } else if (data.linkedPanel === false && data.user && data.user.discordId) {
                 servicesLabel = '<li>Compte Discord du site non lié au panel. Ouvre Hébergement et connecte-toi (ou lie Discord dans Compte) avec le même Discord que celui du bot.</li>';
             }
-            const guilds = (data.guilds || []).map((g) => `<li><a href="${esc(g.href)}">${esc(g.name)}</a> · ${esc(g.bot)}</li>`).join('') || '<li>Passe par /config sur Discord pour ouvrir un serveur.</li>';
+            const guilds = (data.guilds || []).map((g) => `<li><a href="${esc(g.href)}" target="_top">${esc(g.name)}</a> · ${esc(g.bot)}</li>`).join('') || '<li>Passe par /config sur Discord pour ouvrir un serveur.</li>';
             root.innerHTML = `
                 <article class="compte-card">
                     <h2>${esc(data.user.username)}</h2>

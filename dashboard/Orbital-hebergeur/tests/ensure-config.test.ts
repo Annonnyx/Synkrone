@@ -26,6 +26,7 @@ test("catalog maps /config to the template hub cog", () => {
 test("template config.py exposes the hybrid /config command", () => {
   assert.equal(hasConfigHybridCommand(TEMPLATE), true);
   assert.equal(hasConfigHybridCommand("async def config_cmd"), false);
+  assert.match(TEMPLATE, /24 \* 60 \* 60/);
 });
 
 test("enabled_cogs always includes the config hub module", () => {

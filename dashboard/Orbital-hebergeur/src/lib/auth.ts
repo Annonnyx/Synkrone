@@ -8,7 +8,7 @@ import { SFTPManager } from "@/lib/sftp/manager";
 
 export const SESSION_COOKIE = "synkrone_session";
 const LEGACY_SESSION_COOKIE = "orbital_session";
-const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30;
+const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 21;
 
 export type SessionUser = {
   id: string;

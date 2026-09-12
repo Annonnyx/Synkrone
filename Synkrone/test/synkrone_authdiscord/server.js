@@ -23,7 +23,6 @@ const DEFAULT_SUPPORT_GUILD_ID = '1368235294192570520';
 const DEFAULT_TICKET_CATEGORY_ID = '1465825775231176717';
 const DEFAULT_SUPPORT_ROLE_ID = '1465825778771034236';
 const BOT_OWNER_CACHE_TTL_MS = 5 * 60 * 1000;
-const SESSION_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
 
 const USERS_DB_PATH = path.join(__dirname, 'data', 'users.json');
 const ME_UPLOADS_DIR = path.join(__dirname, 'data', 'uploads', 'me');
@@ -70,11 +69,16 @@ try {
 
 const { readPlatform, writePlatform } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'platform'));
 const { panelAdmin, pm2Logs, listTickets } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'admin-ops'));
+const {
+    COOKIE_NAME,
+    createFileSessionStore,
+    sessionCookieOptions
+} = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'session-store'));
 
 function safeReturnTo(value) {
     const raw = String(value || '').trim();
     if (!raw.startsWith('/') || raw.startsWith('//') || raw.includes('\\') || raw.includes('://')) return '';
-    if (raw.length > 256) return '';
+    if (raw.length > 1024) return '';
     if (/^\/(auth|logout|api)(\/|$)/i.test(raw)) return '';
     return raw;
 }
@@ -540,9 +544,13 @@ function mountPublic(app, options = {}) {
     }
     if (!skipSession) {
         app.use(session({
+            name: COOKIE_NAME,
             secret: process.env.SESSION_SECRET || 'synkrone_secret',
-            resave: false, saveUninitialized: false, rolling: true,
-            cookie: { maxAge: SESSION_MAX_AGE_MS, httpOnly: true, sameSite: 'lax' }
+            resave: false,
+            saveUninitialized: false,
+            rolling: false,
+            store: createFileSessionStore(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'data', 'sessions')),
+            cookie: sessionCookieOptions(process.env.NODE_ENV === 'production')
         }));
     }
 
@@ -668,7 +676,11 @@ app.get('/auth/discord/callback', async (req, res) => {
             grade: persistedUser?.grade || 'Aucun', krone: Number.isFinite(Number(persistedUser?.krone)) ? Number(persistedUser.krone) : 0,
             isGuest: false, isTeamOwner: Boolean(persistedUser?.isTeamOwner)
         };
-        res.redirect(consumeReturnTo(req));
+        const dest = consumeReturnTo(req);
+        req.session.save((err) => {
+            if (err) return res.redirect('/login');
+            res.redirect(dest);
+        });
     } catch (err) { 
         res.redirect(safeReturnTo(req.session?.returnTo) || '/login'); 
     }
@@ -718,7 +730,11 @@ app.get('/auth/github/callback', async (req, res) => {
             isGuest: false,
             isTeamOwner: persistedUser.isTeamOwner
         };
-        res.redirect(consumeReturnTo(req));
+        const dest = consumeReturnTo(req);
+        req.session.save((err) => {
+            if (err) return res.redirect('/login');
+            res.redirect(dest);
+        });
     } catch (err) {
         res.redirect(safeReturnTo(req.session?.returnTo) || '/login');
     }
@@ -770,7 +786,11 @@ app.get('/auth/google/callback', async (req, res) => {
             isGuest: false,
             isTeamOwner: persistedUser.isTeamOwner
         };
-        res.redirect(consumeReturnTo(req));
+        const dest = consumeReturnTo(req);
+        req.session.save((err) => {
+            if (err) return res.redirect('/login');
+            res.redirect(dest);
+        });
     } catch (err) {
         res.redirect(safeReturnTo(req.session?.returnTo) || '/login');
     }
@@ -779,7 +799,11 @@ app.get('/auth/google/callback', async (req, res) => {
 app.get('/auth/guest', (req, res) => {
     rememberReturnTo(req);
     req.session.user = { id: 'guest', username: 'Visiteur', isGuest: true };
-    res.redirect(consumeReturnTo(req));
+    const dest = consumeReturnTo(req);
+    req.session.save((err) => {
+        if (err) return res.redirect('/');
+        res.redirect(dest);
+    });
 });
 
 app.get('/api/me', async (req, res) => {

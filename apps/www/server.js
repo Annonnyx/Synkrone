@@ -33,6 +33,11 @@ const { mountStatus } = require('./lib/status');
 const { mountServeur } = require('./lib/serveur');
 const { mountCompte } = require('./lib/compte');
 const {
+    COOKIE_NAME,
+    createFileSessionStore,
+    sessionCookieOptions
+} = require('./lib/session-store');
+const {
     PANEL_PREFIX,
     panelPublicOrigin,
     mountPanelProxy,
@@ -48,7 +53,6 @@ const LISTEN_HOST = String(process.env.SYNKRONE_LISTEN_HOST || '127.0.0.1').trim
 const IS_PROD = process.env.NODE_ENV === 'production';
 const INTERNAL_TOOLS = process.env.SYNKRONE_INTERNAL === '1' || !IS_PROD;
 const HUB_ENABLED = process.env.SYNKRONE_HUB === '0' ? false : true;
-const SESSION_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
 
 function lanUrls(port) {
     const urls = [];
@@ -86,16 +90,13 @@ app.set('trust proxy', 1);
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
 app.use(session({
+    name: COOKIE_NAME,
     secret: process.env.SESSION_SECRET || 'synkrone_secret',
     resave: false,
     saveUninitialized: false,
-    rolling: true,
-    cookie: {
-        maxAge: SESSION_MAX_AGE_MS,
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: IS_PROD
-    }
+    rolling: false,
+    store: createFileSessionStore(path.join(WWW_DIR, 'data', 'sessions')),
+    cookie: sessionCookieOptions(IS_PROD)
 }));
 
 if (HUB_ENABLED) {

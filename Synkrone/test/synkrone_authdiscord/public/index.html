@@ -139,7 +139,8 @@
             return value.toString();
         }
         function siteLoginUrl(returnTo) {
-            const dest = encodeURIComponent(returnTo || window.location.pathname || '/');
+            const fallback = `${window.location.pathname || '/'}${window.location.search || ''}`;
+            const dest = encodeURIComponent(returnTo || fallback);
             return `/login?returnTo=${dest}`;
         }
         function kronesBadgeHtml() {
@@ -189,7 +190,7 @@
             }
         }
         function loginButtonsHtml() {
-            return `<a class="btn-login" href="${siteLoginUrl(window.location.pathname)}" target="_top">Se connecter</a>`;
+            return `<a class="btn-login" href="${siteLoginUrl()}" target="_top">Se connecter</a>`;
         }
         function themeToggleHtml() {
             const theme = window.synkroneTheme ? synkroneTheme.read() : 'light';
@@ -528,15 +529,32 @@
             return { mainSection: 'accueil', subTab: null, canonical: '/accueil' };
         }
 
-        function syncBrowserPath(nextPath, replaceHistory = false) {
+        const QUERY_LEAF_SECTIONS = new Set(['login', 'serveur']);
+
+        function leafSearch(mainSection, explicit) {
+            if (!QUERY_LEAF_SECTIONS.has(mainSection)) return '';
+            if (typeof explicit === 'string') return explicit;
+            return window.location.search || '';
+        }
+
+        function withSearch(path, search) {
+            if (!path) return path;
+            if (!search) return path;
+            return search.startsWith('?') ? `${path}${search}` : `${path}?${search}`;
+        }
+
+        function syncBrowserPath(nextPath, replaceHistory = false, search = '') {
             const targetPath = normalizePath(nextPath);
+            const nextSearch = search || '';
             const currentPath = normalizePath(window.location.pathname);
-            if (targetPath === currentPath) return;
+            const currentSearch = window.location.search || '';
+            if (targetPath === currentPath && nextSearch === currentSearch) return;
+            const href = `${targetPath}${nextSearch}`;
             if (replaceHistory) {
-                window.history.replaceState({}, '', targetPath);
+                window.history.replaceState({}, '', href);
                 return;
             }
-            window.history.pushState({}, '', targetPath);
+            window.history.pushState({}, '', href);
         }
 
         function setFrameSrc(path) {
@@ -606,7 +624,7 @@
         }
 
         async function navigateToMainSection(mainSection, options = {}) {
-            const { subTab = null, updateUrl = true, replaceHistory = false, botsTab = null, modpackTab = null, cloudPath = null, profileTab = null } = options;
+            const { subTab = null, updateUrl = true, replaceHistory = false, botsTab = null, modpackTab = null, cloudPath = null, profileTab = null, search = undefined } = options;
             const section = APP_STRUCTURE[mainSection];
             if (!section) return;
             if (mainSection === 'admin' && !canAccessAdmin()) {
@@ -629,12 +647,13 @@
                 if (mainSection === 'me' && profileTab) {
                     leafPath = `${section.page}?profile=${encodeURIComponent(profileTab.replace(/^\//, ''))}`;
                 }
-                setFrameSrc(leafPath);
+                const query = leafSearch(mainSection, search);
+                setFrameSrc(withSearch(leafPath, query));
                 if (updateUrl) {
                     const leafRoute = (mainSection === 'me' && profileTab)
                         ? profileTab
                         : (section.route || section.page);
-                    syncBrowserPath(leafRoute, replaceHistory);
+                    syncBrowserPath(leafRoute, replaceHistory, QUERY_LEAF_SECTIONS.has(mainSection) ? query : '');
                 }
                 return;
             }
@@ -827,6 +846,7 @@
                     modpackTab: route.modpackTab || null,
                     cloudPath: route.cloudPath || null,
                     profileTab: route.profileTab || null,
+                    search: window.location.search || '',
                     updateUrl: true,
                     replaceHistory: normalizePath(window.location.pathname) !== normalizePath(route.canonical)
                 });
@@ -840,6 +860,7 @@
                     modpackTab: route.modpackTab || null,
                     cloudPath: route.cloudPath || null,
                     profileTab: route.profileTab || null,
+                    search: window.location.search || '',
                     updateUrl: true,
                     replaceHistory: normalizePath(window.location.pathname) !== normalizePath(route.canonical)
                 });
@@ -853,6 +874,7 @@
                     modpackTab: popRoute.modpackTab || null,
                     cloudPath: popRoute.cloudPath || null,
                     profileTab: popRoute.profileTab || null,
+                    search: window.location.search || '',
                     updateUrl: false
                 });
             });

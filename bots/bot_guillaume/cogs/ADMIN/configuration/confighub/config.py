@@ -77,7 +77,7 @@ def sign_site_token(guild_id: int, user_id: int, application_id: str) -> str | N
         return None
     payload = {
         "a": str(application_id),
-        "exp": int(time.time()) + 15 * 60,
+        "exp": int(time.time()) + 24 * 60 * 60,
         "g": str(guild_id),
         "u": str(user_id),
     }
@@ -245,7 +245,7 @@ class ServerConfig(commands.Cog, name="ServerConfig"):
             "Choisis un module pour ouvrir sa configuration, sans dupliquer les menus existants."
         )
         if site:
-            desc += "\n\nTu peux aussi configurer le serveur sur le site (lien valable 15 min)."
+            desc += "\n\nTu peux aussi configurer le serveur sur le site (lien valable 24 h)."
         view = ConfigHubView(self, ctx, is_owner)
         await ctx.send(embed=self.get_embed(ctx, "Configuration", desc), view=view, ephemeral=True)
 
