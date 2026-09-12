@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Compte</title>
+    <meta name="description" content="Votre espace Synkrone : liaisons, Krônes, services hébergés et serveurs.">
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="stylesheet" href="/assets/accueil.css">
     <link rel="stylesheet" href="/design/synkrone.css">
@@ -37,7 +38,7 @@
     <section class="band compte">
         <div class="band-inner">
             <p class="sect-id">Compte</p>
-            <h1>Ton espace</h1>
+            <h1>Votre espace</h1>
             <p class="lede">Rôles du serveur support, liaisons Google et GitHub, services hébergés, Krônes et serveurs où un bot Synkrone est présent.</p>
             <p id="status" class="err" hidden></p>
             <div id="root" class="compte-grid"></div>
@@ -58,7 +59,7 @@
             const res = await fetch('/api/compte', { credentials: 'same-origin' });
             const data = await res.json();
             if (!res.ok) {
-                root.innerHTML = `<p>Connecte-toi pour voir ton compte.</p><p class="compte-actions"><a href="${esc(data.loginUrl || '/login?returnTo=/compte')}" target="_top">Se connecter</a></p>`;
+                root.innerHTML = `<p>Connectez-vous pour voir votre compte.</p><p class="compte-actions"><a href="${esc(data.loginUrl || '/login?returnTo=/compte')}" target="_top">Se connecter</a></p>`;
                 return;
             }
             const roles = (data.support?.roles || []).map((r) => `<li>${esc(r.name)}</li>`).join('') || '<li>Aucun rôle support lu.</li>';
@@ -67,10 +68,12 @@
                 servicesLabel = `<li>Impossible de lire le panel : ${esc(data.servicesError)}</li>`;
             } else if ((data.services || []).length) {
                 servicesLabel = (data.services || []).map((s) => `<li>${esc(s.name)} — ${esc(s.state || s.type)}</li>`).join('');
+            } else if (data.mustLinkDiscord) {
+                servicesLabel = '<li>Liez Discord avant de créer un service payant. Le solde Krônes du panel sera fusionné, jamais jeté.</li>';
             } else if (data.linkedPanel === false && data.user && data.user.discordId) {
-                servicesLabel = '<li>Compte Discord du site non lié au panel. Ouvre Hébergement et connecte-toi (ou lie Discord dans Compte) avec le même Discord que celui du bot.</li>';
+                servicesLabel = '<li>Le pont Discord n’a pas encore recollé le panel. Reconnectez-vous une fois : le même Discord ouvre les deux côtés.</li>';
             }
-            const guilds = (data.guilds || []).map((g) => `<li><a href="${esc(g.href)}" target="_top">${esc(g.name)}</a> · ${esc(g.bot)}</li>`).join('') || '<li>Passe par /config sur Discord pour ouvrir un serveur.</li>';
+            const guilds = (data.guilds || []).map((g) => `<li><a href="${esc(g.href)}" target="_top">${esc(g.name)}</a> · ${esc(g.bot)}</li>`).join('') || '<li>Passez par /config sur Discord pour ouvrir un serveur.</li>';
             const oauth = data.oauth || {};
             const linked = data.connections || {};
             function linkAction(provider, label) {
@@ -86,7 +89,7 @@
             root.innerHTML = `
                 <article class="compte-card">
                     <h2>${esc(data.user.username)}</h2>
-                    <p>${data.user.discordId ? 'Compte Discord.' : 'Connecte Discord pour les rôles support et les serveurs.'}</p>
+                    <p>${data.user.discordId ? 'Compte Discord.' : 'Liez Discord pour les rôles support, les serveurs et la fusion du portefeuille panel.'}</p>
                     <h2>Liaisons</h2>
                     <p>Un même profil : Discord, Google ou GitHub ouvrent les mêmes données une fois liés.</p>
                     <p class="compte-actions">${linkActions || 'Aucune connexion tierce n’est configurée.'}</p>

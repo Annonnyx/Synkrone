@@ -11,12 +11,22 @@ const registerCloudRoutes = require('./routes/cloudRoutes');
 const registerMeRoutes = require('./routes/meRoutes');
 const registerPublicbotRoutes = require('./routes/publicbotRoutes');
 const registerBumpRoutes = require('./routes/bumpRoutes');
+const registerAnnouncementRoutes = require('./routes/announcementRoutes');
+const { renderShell } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'leaf-pages'));
+const {
+    requestPanelSession,
+    rememberIdentity,
+    issueSiteSession,
+    requireInternalAuth,
+    panelCookieOptions
+} = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'identity-bridge'));
+const { mountTemoignages, addOptInQuote } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'temoignages'));
 
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
 const DEFAULT_PORT = 3668;
-const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/me-media', '/design', '/api', '/hebergement'];
+const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/me-media', '/design', '/api', '/hebergement', '/robots.txt', '/sitemap.xml'];
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
 const CONTACT_COOLDOWN_MS = 10 * 60 * 1000;
 const DEFAULT_SUPPORT_GUILD_ID = '1368235294192570520';
@@ -68,7 +78,7 @@ try {
 }
 
 const { readPlatform, writePlatform } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'platform'));
-const { panelAdmin, pm2Logs, listTickets } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'admin-ops'));
+const { panelAdmin, panelOrigin, pm2Logs, listTickets } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'admin-ops'));
 const {
     COOKIE_NAME,
     createFileSessionStore,
@@ -527,6 +537,48 @@ async function upsertUserFromOAuth(provider, profile, attachToId) {
     return db.users[id];
 }
 
+function isProdCookie() {
+    return process.env.NODE_ENV === 'production';
+}
+
+async function attachPanelFromSite(res, persisted, provider, profile) {
+    try {
+        const panel = await requestPanelSession({
+            provider,
+            profile: {
+                id: String(profile.id || persisted.id),
+                name: persisted.username,
+                login: profile.username || persisted.username,
+                email: persisted.email || profile.email || '',
+                avatarUrl: persisted.avatar
+            }
+        });
+        if (panel?.token) {
+            res.cookie('synkrone_session', panel.token, panelCookieOptions(isProdCookie()));
+            await rememberIdentity({
+                siteUserId: persisted.id,
+                panelUserId: panel.userId,
+                discordId: provider === 'discord' ? String(profile.id || persisted.id) : (panel.discordId || ''),
+                email: persisted.email || profile.email || ''
+            });
+            if (provider === 'discord' && panel.userId && kronesApi?.migrateWallet) {
+                await kronesApi.migrateWallet(`panel:${panel.userId}`, String(profile.id || persisted.id)).catch(() => undefined);
+            }
+        }
+    } catch {
+        /* panel optional */
+    }
+}
+
+async function sendShell(res, pathname) {
+    const html = await renderShell({
+        shellPath: path.join(__dirname, 'public', 'index.html'),
+        publicDir: path.join(__dirname, 'public'),
+        pathname
+    });
+    res.type('html').send(html);
+}
+
 async function syncSessionUserWithDb(sessionUser, options = {}) {
     const { markLogin = false } = options;
     if (!sessionUser || sessionUser.isGuest) return sessionUser;
@@ -766,8 +818,9 @@ app.get('/auth/discord/callback', async (req, res) => {
         if (!persistedUser) return res.redirect('/');
         req.session.user = sessionFromPersisted(persistedUser);
         const dest = consumeReturnTo(req);
-        req.session.save((err) => {
+        req.session.save(async (err) => {
             if (err) return res.redirect('/login');
+            await attachPanelFromSite(res, persistedUser, 'discord', discordUser);
             res.redirect(dest);
         });
     } catch (err) {
@@ -811,8 +864,14 @@ app.get('/auth/github/callback', async (req, res) => {
         if (!persistedUser) return res.redirect('/');
         req.session.user = sessionFromPersisted(persistedUser);
         const dest = consumeReturnTo(req);
-        req.session.save((err) => {
+        req.session.save(async (err) => {
             if (err) return res.redirect('/login');
+            await attachPanelFromSite(res, persistedUser, 'github', {
+                id: gh.id,
+                username: gh.login || gh.name,
+                email: '',
+                avatar: gh.avatar_url
+            });
             res.redirect(dest);
         });
     } catch (err) {
@@ -859,8 +918,14 @@ app.get('/auth/google/callback', async (req, res) => {
         if (!persistedUser) return res.redirect('/');
         req.session.user = sessionFromPersisted(persistedUser);
         const dest = consumeReturnTo(req);
-        req.session.save((err) => {
+        req.session.save(async (err) => {
             if (err) return res.redirect('/login');
+            await attachPanelFromSite(res, persistedUser, 'google', {
+                id: g.sub,
+                username: g.name || g.email,
+                email: g.email,
+                avatar: g.picture
+            });
             res.redirect(dest);
         });
     } catch (err) {
@@ -878,6 +943,88 @@ app.get('/auth/guest', (req, res) => {
     });
 });
 
+app.post('/api/internal/session-bridge', async (req, res) => {
+    if (!requireInternalAuth(req)) return res.status(401).json({ error: 'Unauthorized' });
+    const provider = String(req.body?.provider || '');
+    const profile = req.body?.profile || {};
+    if (!profile.id) return res.status(400).json({ error: 'missing_profile' });
+    try {
+        let persisted = null;
+        if (provider === 'discord') {
+            persisted = await upsertUserFromDiscordAuth({
+                id: String(profile.id),
+                username: profile.login || profile.name,
+                global_name: profile.name,
+                avatar: null
+            }, false, null);
+            if (persisted && profile.avatarUrl) persisted.avatar = String(profile.avatarUrl);
+        } else if (provider === 'github' || provider === 'google') {
+            persisted = await upsertUserFromOAuth(provider, {
+                id: profile.id,
+                username: profile.login || profile.name,
+                avatar: profile.avatarUrl,
+                email: profile.email
+            }, null);
+        } else {
+            return res.status(400).json({ error: 'unknown_provider' });
+        }
+        if (!persisted) return res.status(400).json({ error: 'user_failed' });
+        const sid = await issueSiteSession(sessionFromPersisted(persisted));
+        await rememberIdentity({
+            siteUserId: persisted.id,
+            discordId: provider === 'discord' ? String(profile.id) : '',
+            email: persisted.email || profile.email || ''
+        });
+        return res.json({ ok: true, sid, siteUserId: persisted.id });
+    } catch (err) {
+        if (err.code === 'PROVIDER_TAKEN') return res.status(409).json({ error: 'PROVIDER_TAKEN' });
+        return res.status(500).json({ error: 'bridge_failed' });
+    }
+});
+
+app.post('/api/auth/sync-panel', async (req, res) => {
+    try {
+        const meRes = await fetch(`${panelOrigin()}/api/auth/me`, {
+            headers: { cookie: String(req.headers.cookie || ''), accept: 'application/json' }
+        });
+        const data = await meRes.json().catch(() => ({}));
+        const panelUser = data.user;
+        if (!panelUser) return res.status(401).json({ ok: false, error: 'Panel non connecté.' });
+        const discordId = String(panelUser.discordId || '').trim();
+        let persisted = null;
+        if (discordId) {
+            persisted = await upsertUserFromDiscordAuth({
+                id: discordId,
+                username: panelUser.name,
+                global_name: panelUser.name,
+                avatar: null
+            }, false, attachTargetId(req));
+        } else {
+            persisted = await upsertUserFromOAuth('google', {
+                id: `panel-${panelUser.id}`,
+                username: panelUser.name,
+                email: panelUser.email,
+                avatar: panelUser.avatarUrl
+            }, attachTargetId(req));
+        }
+        if (!persisted) return res.status(400).json({ ok: false, error: 'Compte site introuvable.' });
+        if (discordId && kronesApi?.migrateWallet) {
+            await kronesApi.migrateWallet(`panel:${panelUser.id}`, discordId).catch(() => undefined);
+        }
+        req.session.user = sessionFromPersisted(persisted);
+        await rememberIdentity({
+            siteUserId: persisted.id,
+            panelUserId: panelUser.id,
+            discordId,
+            email: panelUser.email || persisted.email || ''
+        });
+        return res.json({ ok: true, user: req.session.user });
+    } catch (err) {
+        if (err.code === 'PROVIDER_TAKEN') return res.status(409).json({ ok: false, error: 'PROVIDER_TAKEN' });
+        return res.status(502).json({ ok: false, error: 'Pont panel indisponible.' });
+    }
+});
+
 app.get('/api/me', async (req, res) => {
     if (!req.session.user) return res.json({ authenticated: false, ...oauthStatus() });
     await resolveAdminAccessForSessionUser(req.session.user);
@@ -890,7 +1037,15 @@ app.get('/api/me', async (req, res) => {
     const fullUser = db.users[syncedUser.id];
     if (fullUser) await overlayWalletOnUser(fullUser);
     await overlayWalletOnUser(syncedUser);
-    return res.json({ authenticated: true, ...oauthStatus(), user: fullUser || syncedUser });
+    const out = fullUser || syncedUser;
+    const discordId = /^\d{15,22}$/.test(String(out.id || ''))
+        ? String(out.id)
+        : String(out.providers?.discord || '');
+    return res.json({
+        authenticated: true,
+        ...oauthStatus(),
+        user: { ...out, discordId: discordId || null }
+    });
 });
 
 app.post('/api/me/profile', async (req, res) => {
@@ -991,6 +1146,7 @@ app.get('/api/profiles', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     const dest = safeReturnTo(req.query.returnTo) || '/';
+    res.clearCookie('synkrone_session', { path: '/' });
     req.session.destroy(() => res.redirect(dest));
 });
 
@@ -999,6 +1155,8 @@ registerCloudRoutes(app, { readCloudDb, writeCloudDb, isManualStaffRole });
 registerMeRoutes(app, { readUsersDb, writeUsersDb, isManualStaffRole, krones: kronesApi });
 registerPublicbotRoutes(app, { readUsersDb, writeUsersDb, isManualStaffRole, krones: kronesApi });
 registerBumpRoutes(app, { readUsersDb, writeUsersDb, isManualStaffRole });
+registerAnnouncementRoutes(app, { resolveAdminAccessForSessionUser });
+mountTemoignages(app, { resolveAdminAccessForSessionUser });
 
 // --- ESPACE DE TRAVAIL (WORKSPACE) ---
 app.get('/api/workspace', async (req, res) => {
@@ -1184,7 +1342,14 @@ app.post('/api/contact-ticket', async (req, res) => {
         }, { headers: { Authorization: `Bot ${token}` } });
         
         contactCooldownByUser.set(String(sessionUser.id), Date.now());
-        return res.json({ ok: true, message: 'Demande envoy e.' });
+        if (req.body?.publishQuote) {
+            await addOptInQuote({
+                authorId: sessionUser.id,
+                displayName: safeUsername,
+                quote: rawMessage
+            }).catch(() => undefined);
+        }
+        return res.json({ ok: true, message: 'Demande envoyée.' });
     } catch (error) { return res.status(502).json({ ok: false, message: 'Erreur lors de la cr ation du ticket.' }); }
 });
 
@@ -1221,7 +1386,7 @@ app.get('/api/roulette/stats', async (req, res) => {
 
 app.post('/api/roulette/spin', async (req, res) => {
     const sessionUser = req.session?.user;
-    if (!sessionUser || sessionUser.isGuest) return res.status(401).json({ ok: false, message: 'Connecte-toi pour jouer   la roulette.' });
+    if (!sessionUser || sessionUser.isGuest) return res.status(401).json({ ok: false, message: 'Connectez-vous pour jouer à la roulette.' });
     
     const db = await readRouletteDb();
     if (!ROULETTE_DEV_MODE) {
@@ -1465,12 +1630,21 @@ app.get(/^\/admin\/(utilisateur|annonce|pm2|plateforme|services|tickets)\/index\
     res.sendFile(path.join(__dirname, 'public', 'admin', String(req.params[0]).toLowerCase(), 'index.html'));
 });
 
-app.get(['/faq', '/faq/', '/krones', '/krones/', '/cgv', '/cgv/', '/stats', '/stats/', '/login', '/login/', '/compte', '/compte/', '/serveur', '/serveur/'], (_req, res) => {
-    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get('/robots.txt', (_req, res) => {
+    res.type('text/plain');
+    res.sendFile(path.join(__dirname, 'public', 'robots.txt'));
+});
+app.get('/sitemap.xml', (_req, res) => {
+    res.type('application/xml');
+    res.sendFile(path.join(__dirname, 'public', 'sitemap.xml'));
+});
+
+app.get(['/faq', '/faq/', '/krones', '/krones/', '/cgv', '/cgv/', '/stats', '/stats/', '/login', '/login/', '/compte', '/compte/', '/serveur', '/serveur/'], (req, res) => {
+    return sendShell(res, req.path);
 });
 
 // -- ROUTES SHELL --
-const SHELL_ROUTES = new Set(['/', '/accueil', '/login', '/discord', '/discord/bots', '/discord/publicbot', '/discord/dashbot', '/discord/commandes', '/discord/me', '/discord/bump', '/minecraft', '/minecraft/serveur', '/minecraft/modpack', '/admin', '/admin/utilisateur', '/admin/annonce', '/admin/pm2', '/admin/plateforme', '/admin/services', '/admin/tickets', '/equipe', '/equipe/espace-travail', '/equipe/cloud', '/cgu', '/cgv', '/contact', '/faq', '/krones', '/stats', '/compte', '/serveur', '/parametre.html']);
+const SHELL_ROUTES = new Set(['/', '/accueil', '/login', '/discord', '/discord/bots', '/discord/publicbot', '/discord/dashbot', '/discord/commandes', '/discord/me', '/discord/bump', '/minecraft', '/minecraft/serveur', '/minecraft/modpack', '/admin', '/admin/utilisateur', '/admin/annonce', '/admin/pm2', '/admin/plateforme', '/admin/services', '/admin/tickets', '/equipe', '/equipe/espace-travail', '/equipe/cloud', '/cgu', '/cgv', '/contact', '/faq', '/krones', '/stats', '/compte', '/serveur']);
 const SHELL_PREFIXES = ['/discord/bots/', '/minecraft/modpack/', '/equipe/espace-travail/', '/equipe/cloud/'];
 
 app.get(/^\/(.*)$/i, async (req, res, next) => {
@@ -1491,13 +1665,13 @@ app.get(/^\/(.*)$/i, async (req, res, next) => {
         const hasAccess = await resolveAdminAccessForSessionUser(req.session.user);
         if (!hasAccess) return res.redirect('/accueil');
     }
-    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    return sendShell(res, normalizedPath);
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get(/^(.*)$/, (req, res, next) => {
     if (isReservedPublicPath(req.path)) return next();
-    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    return sendShell(res, req.path);
 });
 }
 

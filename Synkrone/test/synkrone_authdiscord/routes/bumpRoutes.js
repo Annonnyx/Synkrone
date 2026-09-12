@@ -22,6 +22,48 @@ async function writeBumpDb(db) {
 module.exports = function registerBumpRoutes(app, deps) {
     const DISCORD_API_BASE = 'https://discord.com/api/v10';
 
+    app.get('/api/discord/bump/public', async (req, res) => {
+        const db = await readBumpDb();
+        const botToken = process.env.DISCORD_BOT_TOKEN;
+        const entries = Object.entries(db.servers || {}).filter(([, data]) => data && data.visibilityLevel !== 'hidden');
+        const servers = [];
+        for (const [id, data] of entries) {
+            let name = `Serveur ${id.slice(-4)}`;
+            let icon = '/assets/images/logo.jpg';
+            if (botToken) {
+                try {
+                    const guildRes = await axios.get(`${DISCORD_API_BASE}/guilds/${id}?with_counts=true`, {
+                        headers: { Authorization: `Bot ${botToken}` }
+                    });
+                    const guild = guildRes.data;
+                    name = guild.name || name;
+                    if (guild.icon) icon = `https://cdn.discordapp.com/icons/${id}/${guild.icon}.png`;
+                    servers.push({
+                        id,
+                        name,
+                        icon,
+                        featuredUntil: data.featuredUntil || null,
+                        visibilityLevel: data.visibilityLevel || 'public',
+                        members: guild.approximate_member_count || 0
+                    });
+                    continue;
+                } catch {
+                    /* keep fallback */
+                }
+            }
+            servers.push({
+                id,
+                name,
+                icon,
+                featuredUntil: data.featuredUntil || null,
+                visibilityLevel: data.visibilityLevel || 'public',
+                members: 0
+            });
+        }
+        servers.sort((a, b) => Number(b.featuredUntil || 0) - Number(a.featuredUntil || 0));
+        res.json({ ok: true, servers });
+    });
+
     // 1. Récupération des serveurs de l'utilisateur
     app.get('/api/discord/bump/servers', async (req, res) => {
         const user = req.session?.user;

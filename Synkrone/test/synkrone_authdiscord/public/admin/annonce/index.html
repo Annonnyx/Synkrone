@@ -52,14 +52,22 @@
                 <textarea id="annonce-content" maxlength="2000" placeholder="Contenu complet affiché dans le modal"></textarea>
             </div>
 
+            <div class="field">
+                <label class="label"><input type="checkbox" id="annonce-published" checked> Publier tout de suite</label>
+            </div>
             <div class="btn-row">
-                <button class="sk-btn-primary" type="button" onclick="createAnnouncement()">Publier l'annonce</button>
+                <button class="sk-btn-primary" type="button" onclick="createAnnouncement()">Enregistrer</button>
             </div>
         </section>
 
         <section class="admin-card">
-            <h2>Annonces publiées</h2>
+            <h2>Annonces</h2>
             <div id="annonce-list" class="list"></div>
+        </section>
+        <section class="admin-card">
+            <h2>Avis opt-in</h2>
+            <p class="admin-lead">Extraits proposés depuis Contact. Publiez seulement ce qui a été accepté.</p>
+            <div id="avis-list" class="list"></div>
         </section>
     </main>
 
@@ -83,13 +91,18 @@
     </div>
 
     <script>
-        const STORAGE_TYPES = 'synkroneAnnouncementTypes';
-        const STORAGE_ITEMS = 'synkroneAnnouncements';
         const ALLOWED_SCOPES = ['synkrone', 'bots', 'bump', 'me', 'dashbot', 'serveur', 'modpack'];
         const DEFAULT_TYPES = ['maj', 'nerf', 'event', 'boutique'];
 
         let toastTimer;
         let selectedTypesForAnnouncement = [];
+        let typeCache = [...DEFAULT_TYPES];
+        let itemCache = [];
+        let editingId = null;
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        }
 
         function normalizeType(value) {
             return value
@@ -100,31 +113,27 @@
         }
 
         function loadTypes() {
-            try {
-                const raw = localStorage.getItem(STORAGE_TYPES);
-                const parsed = raw ? JSON.parse(raw) : DEFAULT_TYPES;
-                return Array.isArray(parsed) && parsed.length ? parsed : [...DEFAULT_TYPES];
-            } catch {
-                return [...DEFAULT_TYPES];
-            }
+            return typeCache.length ? typeCache : [...DEFAULT_TYPES];
         }
 
-        function saveTypes(types) {
-            localStorage.setItem(STORAGE_TYPES, JSON.stringify(types));
+        async function saveTypes(types) {
+            typeCache = types;
+            await fetch('/api/announcement-types', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ types })
+            });
         }
 
         function loadAnnouncements() {
-            try {
-                const raw = localStorage.getItem(STORAGE_ITEMS);
-                const parsed = raw ? JSON.parse(raw) : [];
-                return Array.isArray(parsed) ? parsed : [];
-            } catch {
-                return [];
-            }
+            return itemCache;
         }
 
-        function saveAnnouncements(items) {
-            localStorage.setItem(STORAGE_ITEMS, JSON.stringify(items));
+        async function refreshAnnouncements() {
+            const res = await fetch('/api/announcements?admin=1');
+            const data = await res.json();
+            typeCache = Array.isArray(data.types) && data.types.length ? data.types : [...DEFAULT_TYPES];
+            itemCache = Array.isArray(data.items) ? data.items : [];
         }
 
         function formatLabel(value) {
@@ -197,7 +206,7 @@
             const typeSelect = document.getElementById('annonce-type');
             const value = typeSelect ? typeSelect.value : '';
             if (!value) {
-                showToast('Choisis un type à ajouter.');
+                showToast('Choisissez un type à ajouter.');
                 return;
             }
             if (selectedTypesForAnnouncement.includes(value)) {
@@ -251,10 +260,12 @@
                             ${typeBadges}
                             <span class="muted">${item.dateLabel}</span>
                         </div>
-                        <h4 class="item-title">${item.title}</h4>
-                        <p class="muted">${item.summary}</p>
+                        <h4 class="item-title">${escapeHtml(item.title)}</h4>
+                        <p class="muted">${escapeHtml(item.summary)}</p>
+                        <p class="muted">${item.published === false ? 'Brouillon' : 'Publiée'}</p>
                     </div>
-                    <div>
+                    <div class="btn-row">
+                        <button class="sk-btn" type="button" onclick="editAnnouncement(${item.id})">Modifier</button>
                         <button class="sk-btn danger" type="button" onclick="deleteAnnouncement(${item.id})">Supprimer</button>
                     </div>
                 `;
@@ -275,10 +286,11 @@
                 return;
             }
             types.push(value);
-            saveTypes(types);
-            input.value = '';
-            renderTypeList();
-            showToast('Type ajouté.');
+            saveTypes(types).then(() => {
+                input.value = '';
+                renderTypeList();
+                showToast('Type ajouté.');
+            });
         }
 
         function removeType(type) {
@@ -287,49 +299,97 @@
                 showToast('Il faut conserver au moins un type.');
                 return;
             }
-            saveTypes(types);
-            renderTypeList();
-            showToast('Type supprimé.');
+            saveTypes(types).then(() => {
+                renderTypeList();
+                showToast('Type supprimé.');
+            });
         }
 
-        function createAnnouncement() {
+        function editAnnouncement(id) {
+            const item = itemCache.find((entry) => Number(entry.id) === Number(id));
+            if (!item) return;
+            editingId = item.id;
+            document.getElementById('annonce-title').value = item.title || '';
+            document.getElementById('annonce-scope').value = item.scope || 'synkrone';
+            document.getElementById('annonce-summary').value = item.summary || '';
+            document.getElementById('annonce-content').value = item.content || '';
+            document.getElementById('annonce-published').checked = item.published !== false;
+            selectedTypesForAnnouncement = Array.isArray(item.types) ? [...item.types] : [item.type].filter(Boolean);
+            renderSelectedAnnouncementTypes();
+            showToast('Annonce chargée pour modification.');
+        }
+
+        async function createAnnouncement() {
             const title = (document.getElementById('annonce-title').value || '').trim();
             const scope = document.getElementById('annonce-scope').value;
             const fallbackType = document.getElementById('annonce-type').value;
             const summary = (document.getElementById('annonce-summary').value || '').trim();
             const content = (document.getElementById('annonce-content').value || '').trim();
+            const published = document.getElementById('annonce-published').checked;
             const types = [...selectedTypesForAnnouncement];
             if (!types.length && fallbackType) types.push(fallbackType);
             if (!title || !summary || !content || !types.length) {
-                showToast('Complète le titre, les étiquettes, le résumé et le contenu.');
+                showToast('Complétez le titre, les étiquettes, le résumé et le contenu.');
                 return;
             }
-            const now = new Date();
-            const item = {
-                id: Date.now(),
-                scope,
-                menu: scope,
-                types,
-                type: types[0],
-                category: types[0],
-                categoryLabel: types[0],
-                date: now.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
-                dateLabel: now.toLocaleString('fr-FR'),
-                title,
-                summary,
-                content,
-                createdAt: now.getTime()
-            };
-            const items = loadAnnouncements();
-            items.push(item);
-            saveAnnouncements(items);
+            const item = { scope, types, title, summary, content, published };
+            const res = editingId
+                ? await fetch(`/api/announcements/${editingId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(item)
+                })
+                : await fetch('/api/announcements', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(item)
+                });
+            if (!res.ok) {
+                showToast('Enregistrement impossible.');
+                return;
+            }
+            editingId = null;
+            await refreshAnnouncements();
             document.getElementById('annonce-title').value = '';
             document.getElementById('annonce-summary').value = '';
             document.getElementById('annonce-content').value = '';
+            document.getElementById('annonce-published').checked = true;
             selectedTypesForAnnouncement = [];
             renderSelectedAnnouncementTypes();
             renderAnnouncementsList();
-            showToast('Annonce publiée.');
+            showToast('Annonce enregistrée.');
+        }
+
+        async function refreshAvis() {
+            const list = document.getElementById('avis-list');
+            if (!list) return;
+            const res = await fetch('/api/temoignages?admin=1');
+            const data = await res.json().catch(() => ({ items: [] }));
+            const items = Array.isArray(data.items) ? data.items : [];
+            if (!items.length) {
+                list.innerHTML = '<div class="empty">Aucun avis en attente.</div>';
+                return;
+            }
+            list.innerHTML = items.map((item) => `
+                <article class="item">
+                    <div>
+                        <h4 class="item-title">${escapeHtml(item.displayName)}</h4>
+                        <p class="muted">${escapeHtml(item.quote)}</p>
+                        <p class="muted">${item.published ? 'Publié' : 'En attente'}</p>
+                    </div>
+                    <div class="btn-row">
+                        <button class="sk-btn" type="button" onclick="toggleAvis(${item.id}, ${item.published ? 'false' : 'true'})">${item.published ? 'Retirer' : 'Publier'}</button>
+                    </div>
+                </article>`).join('');
+        }
+
+        async function toggleAvis(id, published) {
+            await fetch(`/api/temoignages/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ published })
+            });
+            await refreshAvis();
         }
 
         function openTypesModal() {
@@ -350,17 +410,19 @@
             if (event.target.id === 'types-modal') closeTypesModal();
         }
 
-        function deleteAnnouncement(id) {
-            const items = loadAnnouncements().filter((item) => item.id !== id);
-            saveAnnouncements(items);
+        async function deleteAnnouncement(id) {
+            await fetch(`/api/announcements/${id}`, { method: 'DELETE' });
+            await refreshAnnouncements();
             renderAnnouncementsList();
             showToast('Annonce supprimée.');
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            await refreshAnnouncements();
             renderScopeSelect();
             renderTypeList();
             renderAnnouncementsList();
+            await refreshAvis();
             const typesModal = document.getElementById('types-modal');
             if (typesModal) typesModal.addEventListener('click', closeTypesModalOnOverlay);
         });

@@ -97,7 +97,8 @@ function sellerRecord() {
         iban: env('SYNKRONE_SELLER_IBAN'),
         bic: env('SYNKRONE_SELLER_BIC'),
         mediatorName: env('SYNKRONE_MEDIATOR_NAME'),
-        mediatorUrl: env('SYNKRONE_MEDIATOR_URL')
+        mediatorUrl: env('SYNKRONE_MEDIATOR_URL'),
+        mediatorAddress: env('SYNKRONE_MEDIATOR_ADDRESS')
     };
 }
 
@@ -182,48 +183,32 @@ function publicSeller(seller) {
         rcs: seller.rcs || null,
         hasIban: Boolean(seller.iban),
         mediatorName: seller.mediatorName || null,
-        mediatorUrl: seller.mediatorUrl || null
+        mediatorUrl: seller.mediatorUrl || null,
+        mediatorAddress: seller.mediatorAddress || null,
+        mediatorReady: Boolean(seller.mediatorName && (seller.mediatorUrl || seller.mediatorAddress))
     };
 }
 
 function paymentMethods(seller) {
-    return [
+    const methods = [
         {
             id: 'sepa',
             label: 'Virement SEPA',
             available: Boolean(seller.iban),
             hint: seller.iban
                 ? 'Crédit après réception du virement (référence = n° de facture).'
-                : 'IBAN à renseigner (SYNKRONE_SELLER_IBAN) pour activer le virement.'
-        },
-        {
-            id: 'paypal',
-            label: 'PayPal',
-            available: false,
-            soon: true,
-            hint: 'Prestataire à brancher. La commande et la facture sont déjà prêtes.'
-        },
-        {
-            id: 'apple_pay',
-            label: 'Apple Pay',
-            available: false,
-            soon: true,
-            hint: 'Prestataire à brancher. Même flux de commande.'
-        },
-        {
-            id: 'card',
-            label: 'Carte bancaire',
-            available: false,
-            soon: true,
-            hint: 'Prestataire à brancher.'
-        },
-        {
-            id: 'demo',
-            label: 'Paiement de test',
-            available: simulateAllowed(),
-            hint: 'Aucun prélèvement. Valide le parcours commande → facture → crédit du portefeuille.'
+                : 'IBAN vendeur non renseigné : le virement n’est pas ouvert.'
         }
     ];
+    if (simulateAllowed()) {
+        methods.push({
+            id: 'demo',
+            label: 'Paiement de test',
+            available: true,
+            hint: 'Aucun prélèvement. Valide le parcours commande → facture → crédit du portefeuille.'
+        });
+    }
+    return methods.filter((method) => method.available);
 }
 
 function billingPublicDto(account) {

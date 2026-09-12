@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Configuration</title>
+    <meta name="description" content="Configurer un serveur où un bot officiel Synkrone est présent.">
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -550,7 +551,7 @@
             const res = await fetch(`/api/serveur?${queryForApi()}`, { credentials: 'same-origin' });
             const data = await res.json();
             if (res.status === 401 || data.discordOnly) {
-                lede.textContent = 'Connecte-toi avec Discord pour modifier ce serveur.';
+                lede.textContent = 'Connectez-vous avec Discord pour modifier ce serveur.';
                 stage.innerHTML = `<div class="sk-actions">
                     <a class="sk-btn sk-btn-discord" href="${esc(data.loginUrl || '/login?returnTo=/serveur')}" target="_top">Continuer avec Discord</a>
                     <a class="sk-btn" href="/accueil" target="_top">Retour</a>
@@ -568,11 +569,11 @@
             if (data.needLink) {
                 const guilds = data.guilds || [];
                 lede.textContent = guilds.length
-                    ? 'Choisis le serveur à configurer, ou passe par /config sur Discord.'
+                    ? 'Choisissez le serveur à configurer, ou passez par /config sur Discord.'
                     : 'Il faut un lien depuis Discord (/config → Configurer sur le site), ou un bot hébergé déjà présent sur un serveur.';
                 const list = guilds.length
                     ? `<ul class="srv-guilds">${guilds.map((g) => `<li><a href="${esc(g.href)}" target="_top">${esc(g.name)}<span>${esc(g.bot)}</span></a></li>`).join('')}</ul>`
-                    : `<p class="note">${esc(data.hint || 'Ouvre /config dans Discord.')}</p>`;
+                    : `<p class="note">${esc(data.hint || 'Ouvrez /config dans Discord.')}</p>`;
                 stage.innerHTML = `${list}<div class="sk-actions">
                     <a class="sk-btn" href="/compte" target="_top">Compte</a>
                     <a class="sk-btn" href="/accueil" target="_top">Retour</a>

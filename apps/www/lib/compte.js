@@ -1,7 +1,8 @@
 'use strict';
 
 const { panelAdmin } = require('./admin-ops');
-const { peekWallet, spendFromLedger } = require('./krones');
+const { peekWallet, spendFromLedger, migrateWallet } = require('./krones');
+const { identityFor } = require('./identity-bridge');
 const { discordUserId, OFFICIAL_BOTS } = require('./serveur');
 
 const DISCORD_API = 'https://discord.com/api/v10';
@@ -74,7 +75,11 @@ function mountCompte(app) {
         if (discordId) providers.discord = discordId;
         const prefixed = String(user.id || '').match(/^(github|google):(.+)$/);
         if (prefixed && !providers[prefixed[1]]) providers[prefixed[1]] = prefixed[2];
-        const wallet = await peekWallet(user.id).catch(() => null);
+        const mapped = await identityFor('site', user.id).catch(() => null);
+        if (discordId && mapped?.panelUserId) {
+            await migrateWallet(`panel:${mapped.panelUserId}`, discordId).catch(() => undefined);
+        }
+        const wallet = await peekWallet(discordId || user.id).catch(() => null);
         const spend = spendFromLedger(wallet?.ledger || []);
         let services = [];
         let linkedPanel = false;
@@ -143,6 +148,7 @@ function mountCompte(app) {
                 flavor: svc.flavor
             })),
             linkedPanel,
+            mustLinkDiscord: !discordId,
             servicesError,
             guilds,
             officialBots: OFFICIAL_BOTS.map((b) => ({ slug: b.slug, name: b.name, applicationId: b.applicationId })),

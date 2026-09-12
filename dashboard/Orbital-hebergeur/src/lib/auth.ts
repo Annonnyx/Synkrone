@@ -18,15 +18,26 @@ export type SessionUser = {
   avatarUrl: string | null;
 };
 
-export async function createSession(userId: string): Promise<string> {
+export async function issueSessionToken(
+  userId: string,
+  meta?: { ip?: string | null; userAgent?: string | null },
+): Promise<string> {
   const token = randomToken(32);
-  const hdrs = await headers();
   await db.insert(sessions).values({
     userId,
     tokenHash: sha256(token),
-    ip: hdrs.get("x-forwarded-for") ?? null,
-    userAgent: hdrs.get("user-agent") ?? null,
+    ip: meta?.ip ?? null,
+    userAgent: meta?.userAgent ?? null,
     expiresAt: new Date(Date.now() + SESSION_TTL_MS),
+  });
+  return token;
+}
+
+export async function createSession(userId: string): Promise<string> {
+  const hdrs = await headers();
+  const token = await issueSessionToken(userId, {
+    ip: hdrs.get("x-forwarded-for"),
+    userAgent: hdrs.get("user-agent"),
   });
   const store = await cookies();
   store.set(SESSION_COOKIE, token, {

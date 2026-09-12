@@ -4,7 +4,8 @@
     <script src="/assets/theme-boot.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synkrone Bots | Annuaire</title>
+    <title>Synkrone — Catalogue</title>
+    <meta name="description" content="Catalogue public des bots communautaires Synkrone.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -612,7 +613,7 @@
         }
 
         window.promptHighlight = function(botId) {
-            showModal("Mise en avant", "Mettre ce bot en vedette pour <b>50 Krones</b> ? Il aura un design unique et remontera en haut de l'explorateur.", "Acheter", async () => {
+            showModal("Mise en avant", "Mettre ce bot en vedette pour <b>50 Krônes</b> ? Il aura un design unique et remontera en haut de l'explorateur.", "Acheter", async () => {
                 try {
                     const res = await fetch('/api/discord/publicbot/feature', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },

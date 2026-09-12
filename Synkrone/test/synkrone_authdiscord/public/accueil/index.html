@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Accueil</title>
+    <meta name="description" content="Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.">
     <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,10 +32,10 @@
         </div>
         <div class="hero-copy">
             <h1>Synkrone</h1>
-            <p class="lede">Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et modpacks. Un compte, un panel, un solde Krônes.</p>
+            <p class="lede">Hébergement de bots Discord, serveurs Minecraft et sites — le panel pour créer et piloter. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et modpacks. Un panel, un solde Krônes.</p>
             <div class="cta">
                 <a class="btn btn-red" id="hero-panel" href="/hebergement" target="_top">Ouvrir le panel</a>
-                <a class="btn" href="/hub" target="_top">Hub</a>
+                <a class="btn" href="/discord/bots" onclick="goSection(event, 'discord')">Voir les bots</a>
             </div>
             <a class="scroll-hint" href="#hebergement">Voir l'hébergement</a>
         </div>
@@ -51,7 +52,7 @@
             </div>
             <div class="prose reveal">
                 <p>Le panel est l’atelier : vous y créez un bot Discord, un serveur Minecraft ou un site, puis vous le pilotez (console, fichiers, domaine, arrêt, relance).</p>
-                <p>Chaque service est une machine à part. Le même compte ouvre le site public et l’hébergement. Ici, rien n’est débité en carte : le temps machine se paie en Krônes, la monnaie du portefeuille.</p>
+                <p>Une connexion ouvre le site (Krônes, Bump, Me) et le panel (créer un service) quand Discord est le même des deux côtés. Ici, rien n’est débité en carte : le temps machine se paie en Krônes.</p>
             </div>
             <div class="plates cols-2 reveal">
                 <a class="plate" id="hosting-link" href="/hebergement" target="_top">
@@ -75,21 +76,26 @@
             <div class="band-head reveal">
                 <p class="sect-id">02 — Statut</p>
                 <div>
-                    <h2>La plateforme, mesurée.</h2>
-                    <p>Voir d’un coup d’œil si Synkrone tourne : uptime, machines Minecraft / Discord / web, bots et listings.</p>
+                    <h2>La plateforme tourne.</h2>
+                    <p>Mesures réelles : uptime, machines, listings et comptes — seulement ce qui existe.</p>
                 </div>
             </div>
+            <p class="muted reveal" id="home-stats-error" hidden>Statut indisponible.</p>
             <div class="stat-strip reveal" id="home-stats">
                 <div class="stat-chip"><strong id="hs-up">—</strong><span>Uptime 7 j</span></div>
                 <div class="stat-chip"><strong id="hs-run">—</strong><span>Services en cours</span></div>
-                <div class="stat-chip"><strong id="hs-mc">—</strong><span>Minecraft</span></div>
-                <div class="stat-chip"><strong id="hs-dc">—</strong><span>Discord</span></div>
+                <div class="stat-chip" id="chip-mc" hidden><strong id="hs-mc">—</strong><span>Minecraft</span></div>
+                <div class="stat-chip" id="chip-dc" hidden><strong id="hs-dc">—</strong><span>Discord</span></div>
+                <div class="stat-chip" id="chip-web" hidden><strong id="hs-web">—</strong><span>Web</span></div>
+                <div class="stat-chip" id="chip-cat" hidden><strong id="hs-cat">—</strong><span>Catalogue</span></div>
+                <div class="stat-chip" id="chip-bump" hidden><strong id="hs-bump">—</strong><span>Bump</span></div>
+                <div class="stat-chip" id="chip-acc" hidden><strong id="hs-acc">—</strong><span>Comptes</span></div>
             </div>
             <div class="plates cols-2 reveal" style="margin-top:16px">
                 <a class="plate" href="/stats" onclick="goSection(event, 'stats')">
-                    <div class="plate-meta"><span>Live</span><span>Stats</span></div>
-                    <h3>Voir les stats</h3>
-                    <p>Uptime global, barres sur 7 jours, totaux d’hébergement, catalogue, Bump, comptes.</p>
+                    <div class="plate-meta"><span>Live</span><span>Statut</span></div>
+                    <h3>Le détail mesuré</h3>
+                    <p>Uptime sur 7 jours, barres quotidiennes, totaux d’hébergement, catalogue, Bump, comptes.</p>
                     <span class="go">Ouvrir le statut</span>
                 </a>
                 <a class="plate" href="/hebergement" target="_top">
@@ -102,43 +108,13 @@
         </div>
     </section>
 
-    <section class="band" id="compte">
-        <div class="band-inner">
-            <div class="band-head reveal">
-                <p class="sect-id">03 — Compte</p>
-                <div>
-                    <h2>Se connecter</h2>
-                    <p>Un compte pour tout Synkrone : Discord, Google ou GitHub, puis le même solde Krônes partout.</p>
-                </div>
-            </div>
-            <div class="prose reveal">
-                <p>Le bouton Se connecter (en haut à droite) ouvre Discord, Google ou GitHub et te ramène sur la page en cours. L’e-mail reste pour le panel d’hébergement.</p>
-                <p>Ce compte débloque Krônes, Bump, Me et les packs. Le panel Hébergement a sa propre connexion. Pour un ticket support, Discord et le serveur Synkrone sont requis.</p>
-            </div>
-            <div class="plates cols-2 reveal">
-                <a class="plate" id="login-link" href="/login?returnTo=/accueil" target="_top">
-                    <div class="plate-meta"><span>Compte</span><span>Login</span></div>
-                    <h3>Se connecter</h3>
-                    <p>Discord, Google, GitHub ou e-mail. Un compte ouvre panel, Krônes, Bump et Me.</p>
-                    <span class="go">Ouvrir la connexion</span>
-                </a>
-                <a class="plate" href="/faq" onclick="goSection(event, 'faq')">
-                    <div class="plate-meta"><span>Aide</span><span>FAQ</span></div>
-                    <h3>Questions fréquentes</h3>
-                    <p>Compte, Krônes, panel, bots, Cantale, tickets. Les réponses courtes avant le support.</p>
-                    <span class="go">Lire la FAQ</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
     <section class="band" id="bots">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">04 — Bots</p>
+                <p class="sect-id">03 — Bots</p>
                 <div>
                     <h2>Cinq bots officiels.</h2>
-                    <p>Des bots pour tous vos serveurs, selon le besoin : fun, modération, jeu, argent, XP. Fiche pour les commandes, bouton pour l’ajouter tout de suite.</p>
+                    <p>Des bots pour tous vos serveurs, selon le besoin : fun, modération, jeu, argent, XP. Fiche pour les commandes, bouton pour l’ajouter tout de suite. Pour héberger votre propre bot, ouvrez le panel.</p>
                 </div>
             </div>
             <div class="bot-cards reveal">
@@ -204,16 +180,17 @@
     <section class="band" id="minecraft">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">05 — Minecraft</p>
+                <p class="sect-id">04 — Minecraft</p>
                 <div>
                     <h2>Cantale et trois modpacks.</h2>
-                    <p>Un serveur Java 1.21 à trois vies, plus trois modpacks prêts à télécharger — pour jouer tout de suite, pas pour chercher une IP pendant une heure.</p>
+                    <p>Un serveur Java 1.21 à trois vies, plus trois modpacks prêts à télécharger — pour jouer tout de suite, pas pour chercher une IP pendant une heure. Pour créer votre propre serveur, c’est le panel.</p>
                 </div>
             </div>
             <div class="play-grid reveal">
                 <a class="world" href="/minecraft/serveur" onclick="goSection(event, 'minecraft')">
                     <h3>Cantale</h3>
-                    <p>play.cantale.world — Java 1.21, factions, Cantox. Le site cantale.world est prévisualisé sur la page Minecraft.</p>
+                    <p>play.cantale.world — Java 1.21, factions, Cantox. Copiez l’adresse, ou rejoignez le Discord Cantale.</p>
+                    <p class="project-meta" id="cantale-ip-home">play.cantale.world</p>
                 </a>
                 <div class="packs">
                     <div class="pack-row">
@@ -244,6 +221,10 @@
                         </div>
                     </div>
                 </div>
+                <div class="pack-actions" style="margin-top:12px">
+                    <button type="button" class="btn" id="copy-cantale-ip">Copier l’IP</button>
+                    <a class="btn" href="https://discord.gg/eDTfYWtuYp" target="_blank" rel="noopener noreferrer">Discord Cantale</a>
+                </div>
             </div>
         </div>
     </section>
@@ -251,7 +232,7 @@
     <section class="band" id="bump">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">06 — Bump</p>
+                <p class="sect-id">05 — Bump</p>
                 <div>
                     <h2>Bump</h2>
                     <p>Faire connaître votre serveur Discord : listing public, bump, mise en avant — le même principe qu’un Disboard, dans Synkrone.</p>
@@ -289,13 +270,15 @@
                     <span class="go">Voir les bots</span>
                 </a>
             </div>
+            <div class="plates cols-2 reveal" id="home-bump-list" style="margin-top:16px"></div>
+            <p class="muted reveal" id="home-bump-empty" hidden>Aucun serveur listé pour l’instant.</p>
         </div>
     </section>
 
     <section class="band" id="decouverte">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">07 — Communauté</p>
+                <p class="sect-id">06 — Communauté</p>
                 <div>
                     <h2>Me et catalogue.</h2>
                     <p>Un profil public pour se retrouver, et un catalogue de bots communautaires à parcourir avant d’en héberger un.</p>
@@ -315,33 +298,24 @@
                     <span class="go">Voir le catalogue</span>
                 </a>
             </div>
+            <div class="plates cols-2 reveal" id="home-me-list" style="margin-top:16px"></div>
         </div>
     </section>
 
     <section class="band" id="apps">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">08 — Applications</p>
+                <p class="sect-id">07 — Outils</p>
                 <div>
-                    <h2>Tout Synkrone.</h2>
-                    <p>Un lien par application, y compris FAQ et Contact.</p>
+                    <h2>Hors de la barre.</h2>
+                    <p>Dashbot, packs de commandes, catalogue et Krônes — le reste est déjà dans la navigation.</p>
                 </div>
             </div>
             <div class="apps-grid reveal" id="apps-grid">
-                <a class="plate" id="app-hosting" href="/hebergement" target="_top"><h3>Hébergement</h3><p>Panel</p></a>
-                <a class="plate" href="/login?returnTo=/accueil" target="_top"><h3>Se connecter</h3><p>Compte</p></a>
-                <a class="plate" href="/discord/bots" onclick="goSection(event, 'discord')"><h3>Bots</h3><p>Fiches</p></a>
                 <a class="plate" href="/discord/dashbot" onclick="goSection(event, 'discord', { subTab: 'dashbot' })"><h3>Dashbot</h3><p>Invitations</p></a>
                 <a class="plate" href="/discord/commandes" onclick="goSection(event, 'discord', { subTab: 'commandes' })"><h3>Commandes</h3><p>Packs</p></a>
-                <a class="plate" href="/minecraft" onclick="goSection(event, 'minecraft')"><h3>Minecraft</h3><p>Serveur</p></a>
+                <a class="plate" href="/discord/publicbot" onclick="goSection(event, 'discord', { subTab: 'publicbot' })"><h3>Catalogue</h3><p>Bots communautaires</p></a>
                 <a class="plate" href="/krones" onclick="goSection(event, 'krones')"><h3>Krônes</h3><p>Portefeuille</p></a>
-                <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')"><h3>Bump</h3><p>Listing</p></a>
-                <a class="plate" href="/discord/me" onclick="goSection(event, 'me')"><h3>Me</h3><p>Profil</p></a>
-                <a class="plate" href="/stats" onclick="goSection(event, 'stats')"><h3>Stats</h3><p>Uptime</p></a>
-                <a class="plate" href="/faq" onclick="goSection(event, 'faq')"><h3>FAQ</h3><p>Questions</p></a>
-                <a class="plate" href="/contact" onclick="goSection(event, 'contact')"><h3>Contact</h3><p>Tickets</p></a>
-                <a class="plate hub-plate" href="/hub" target="_top"><h3>Hub</h3><p>Outils internes</p></a>
-                <a class="plate" href="/vux/" target="_top"><h3>Vux</h3><p>Client</p></a>
             </div>
         </div>
     </section>
@@ -349,7 +323,7 @@
     <section class="band" id="journal">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">09 — Journal</p>
+                <p class="sect-id">08 — Journal</p>
                 <div>
                     <h2>Ce qui change.</h2>
                     <p>Annonces publiées depuis Admin.</p>
@@ -369,14 +343,41 @@
         </div>
     </section>
 
+    <section class="band" id="avis" hidden>
+        <div class="band-inner">
+            <div class="band-head reveal">
+                <p class="sect-id">Extraits</p>
+                <div>
+                    <h2>Ce que des utilisateurs ont accepté de publier.</h2>
+                    <p>Uniquement des extraits opt-in, validés par l’équipe. Pas de citation inventée.</p>
+                </div>
+            </div>
+            <div class="plates cols-2 reveal" id="home-avis-list"></div>
+        </div>
+    </section>
+
     <section class="band" id="aide">
         <div class="band-inner">
             <div class="band-head reveal">
-                <p class="sect-id">10 — Aide</p>
+                <p class="sect-id">09 — Aide</p>
                 <div>
                     <h2>FAQ et contact.</h2>
-                    <p>Les réponses d’abord, un ticket ensuite. Les CGU encadrent l’usage de la plateforme, des bots et des modpacks.</p>
+                    <p>Les réponses d’abord, un ticket ensuite. Le bouton Se connecter (en haut) ouvre le compte unique.</p>
                 </div>
+            </div>
+            <div class="plates cols-2 reveal" style="margin-bottom:16px">
+                <a class="plate" id="login-link" href="/login?returnTo=/accueil" target="_top">
+                    <div class="plate-meta"><span>Compte</span><span>Login</span></div>
+                    <h3>Se connecter</h3>
+                    <p>Discord, Google, GitHub ou e-mail. Même porte pour Krônes et le panel.</p>
+                    <span class="go">Ouvrir la connexion</span>
+                </a>
+                <a class="plate" href="/hebergement" target="_top">
+                    <div class="plate-meta"><span>Panel</span><span>Hébergement</span></div>
+                    <h3>Créer un service</h3>
+                    <p>Bot, Minecraft ou site — après la même connexion.</p>
+                    <span class="go">Ouvrir le panel</span>
+                </a>
             </div>
             <div class="plates cols-2 reveal">
                 <a class="plate" href="/faq" onclick="goSection(event, 'faq')">
@@ -390,6 +391,12 @@
                     <h3>Contacter l’équipe</h3>
                     <p>Ticket Discord si vous êtes connecté et présent sur le serveur Synkrone.</p>
                     <span class="go">Ouvrir Contact</span>
+                </a>
+                <a class="plate" id="home-discord" href="https://discord.gg/p768u2Pgp3" target="_blank" rel="noopener noreferrer">
+                    <div class="plate-meta"><span>Discord</span><span>Support</span></div>
+                    <h3>Rejoindre Synkrone</h3>
+                    <p>Serveur officiel : tickets, annonces, communauté.</p>
+                    <span class="go">Ouvrir Discord</span>
                 </a>
             </div>
         </div>
@@ -418,19 +425,24 @@
         function goSection(event, section, options = {}) {
             if (event) event.preventDefault();
             try {
+                if (typeof window.navigateToMainSection === 'function') {
+                    window.navigateToMainSection(section, { updateUrl: true, ...options });
+                    return;
+                }
                 if (window.parent && window.parent !== window && typeof window.parent.navigateToMainSection === 'function') {
                     window.parent.navigateToMainSection(section, { updateUrl: true, ...options });
                     return;
                 }
             } catch { /* fall through */ }
             const href = event && event.currentTarget && event.currentTarget.getAttribute('href');
-            if (href) window.top.location.href = href;
+            if (href) window.location.href = href;
         }
 
         const STORAGE_TYPES = 'synkroneAnnouncementTypes';
         const STORAGE_ITEMS = 'synkroneAnnouncements';
         const ALLOWED_SCOPES = new Set(['synkrone', 'bots', 'bump', 'me', 'dashbot', 'serveur', 'modpack']);
         let announcementsData = [];
+        let supportInvite = 'https://discord.gg/p768u2Pgp3';
         let currentScopeFilter = 'all';
         let currentTypeFilter = 'all';
         let toastTimer;
@@ -452,11 +464,20 @@
             }
         }
 
-        function loadEquipeAnnouncements() {
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        }
+
+        async function loadEquipeAnnouncements() {
             try {
-                const raw = localStorage.getItem(STORAGE_ITEMS);
-                const parsed = raw ? JSON.parse(raw) : [];
-                if (!Array.isArray(parsed)) return [];
+                const res = await fetch('/api/announcements');
+                if (!res.ok) return [];
+                const data = await res.json();
+                if (Array.isArray(data.types) && data.types.length) {
+                    try { localStorage.removeItem(STORAGE_TYPES); } catch { /* ignore */ }
+                    window.__annonceTypes = data.types;
+                }
+                const parsed = Array.isArray(data.items) ? data.items : [];
                 return parsed
                     .filter((item) => item && (item.scope || item.menu) && (item.type || (Array.isArray(item.types) && item.types.length)) && item.title)
                     .map((item) => ({
@@ -464,9 +485,7 @@
                         types: (Array.isArray(item.types) && item.types.length ? item.types : [item.type])
                             .map((type) => String(type || '').trim().toLowerCase())
                             .filter(Boolean),
-                        scope: item.scope || item.menu || 'synkrone',
-                        category: item.type,
-                        categoryLabel: normalizeTypeLabel(item.categoryLabel || item.type)
+                        scope: item.scope || item.menu || 'synkrone'
                     }))
                     .map((item) => ({ ...item, type: item.types[0] || item.type }));
             } catch {
@@ -477,7 +496,9 @@
         function refreshAnnouncementSelectors() {
             const scopeSelect = document.getElementById('scope-filter');
             const typeSelect = document.getElementById('type-filter');
-            const types = loadConfiguredTypes();
+                const types = (Array.isArray(window.__annonceTypes) && window.__annonceTypes.length)
+                    ? window.__annonceTypes
+                    : loadConfiguredTypes();
             if (scopeSelect) {
                 scopeSelect.innerHTML = '<option value="all">Tous</option>';
                 Array.from(ALLOWED_SCOPES).forEach((scope) => {
@@ -512,27 +533,27 @@
             });
             filtered.forEach((item) => {
                 const itemTypes = Array.isArray(item.types) && item.types.length ? item.types : [item.type].filter(Boolean);
-                const typeBadges = itemTypes.map((type) => `<span class="news-badge">${normalizeTypeLabel(type)}</span>`).join('');
+                const typeBadges = itemTypes.map((type) => `<span class="news-badge">${escapeHtml(normalizeTypeLabel(type))}</span>`).join('');
                 const article = document.createElement('article');
                 article.className = 'news-item';
                 article.innerHTML = `
                     <div>
                         <div class="news-meta">
-                            <span class="news-badge">${normalizeTypeLabel(item.scope || item.menu || 'synkrone')}</span>
+                            <span class="news-badge">${escapeHtml(normalizeTypeLabel(item.scope || item.menu || 'synkrone'))}</span>
                             ${typeBadges}
-                            <span class="news-date">${item.date || ''}</span>
+                            <span class="news-date">${escapeHtml(item.date || '')}</span>
                         </div>
-                        <h4 class="news-title">${item.title}</h4>
-                        <p class="news-summary">${item.summary || ''}</p>
+                        <h4 class="news-title">${escapeHtml(item.title)}</h4>
+                        <p class="news-summary">${escapeHtml(item.summary || '')}</p>
                     </div>
-                    <button type="button" class="btn" onclick="openModal(${item.id})">Lire</button>
+                    <button type="button" class="btn" onclick="openModal(${Number(item.id)})">Lire</button>
                 `;
                 list.appendChild(article);
             });
             if (filtered.length === 0) {
                 const empty = document.createElement('p');
                 empty.className = 'muted';
-                empty.textContent = 'Le journal est vide.';
+                empty.innerHTML = `Aucune annonce publiée. <a href="${escapeHtml(supportInvite)}" target="_blank" rel="noopener noreferrer">Discord Synkrone</a>`;
                 list.appendChild(empty);
             }
         }
@@ -604,28 +625,133 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            announcementsData = loadEquipeAnnouncements().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            announcementsData = (await loadEquipeAnnouncements()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
             refreshAnnouncementSelectors();
             renderAnnouncements();
             bindReveal();
+            const copyIp = document.getElementById('copy-cantale-ip');
+            if (copyIp) {
+                copyIp.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText('play.cantale.world');
+                        copyIp.textContent = 'IP copiée';
+                    } catch {
+                        copyIp.textContent = 'play.cantale.world';
+                    }
+                });
+            }
             await applyPanelOrigin();
             try {
-                const res = await fetch('/api/status');
-                if (res.ok) {
-                    const data = await res.json();
-                    const set = (id, value) => {
-                        const el = document.getElementById(id);
-                        if (el) el.textContent = value;
-                    };
-                    const pct = data?.uptime?.pct;
-                    set('hs-up', Number.isFinite(pct) ? `${String(pct).replace('.', ',')} %` : '—');
-                    const run = data?.hosting?.running || 0;
-                    const total = data?.hosting?.total || 0;
-                    set('hs-run', total ? `${run} / ${total}` : String(run));
-                    set('hs-mc', String(data?.hosting?.minecraft ?? '—'));
-                    set('hs-dc', String(data?.hosting?.discord ?? '—'));
+                const cfg = await fetch('/api/config');
+                if (cfg.ok) {
+                    const conf = await cfg.json();
+                    if (conf.supportInvite) supportInvite = conf.supportInvite;
+                    const disc = document.getElementById('home-discord');
+                    if (disc && conf.supportInvite) disc.setAttribute('href', conf.supportInvite);
                 }
-            } catch { /* stats later */ }
+            } catch { /* invite default */ }
+            try {
+                const res = await fetch('/api/status');
+                const err = document.getElementById('home-stats-error');
+                if (!res.ok) throw new Error('status');
+                const data = await res.json();
+                if (err) err.hidden = true;
+                const set = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = value;
+                };
+                const showChip = (chipId, on) => {
+                    const el = document.getElementById(chipId);
+                    if (el) el.hidden = !on;
+                };
+                const pct = data?.uptime?.pct;
+                set('hs-up', Number.isFinite(pct) ? `${String(pct).replace('.', ',')} %` : '—');
+                const run = data?.hosting?.running || 0;
+                const total = data?.hosting?.total || 0;
+                set('hs-run', total ? `${run} / ${total}` : String(run));
+                const mc = Number(data?.hosting?.minecraft || 0);
+                const dc = Number(data?.hosting?.discord || 0);
+                const web = Number(data?.hosting?.web || 0);
+                const cat = Number(data?.platform?.catalog || 0);
+                const bump = Number(data?.platform?.bump || 0);
+                const acc = Number(data?.platform?.accounts || 0);
+                set('hs-mc', String(mc));
+                set('hs-dc', String(dc));
+                set('hs-web', String(web));
+                set('hs-cat', String(cat));
+                set('hs-bump', String(bump));
+                set('hs-acc', String(acc));
+                showChip('chip-mc', mc > 0);
+                showChip('chip-dc', dc > 0);
+                showChip('chip-web', web > 0);
+                showChip('chip-cat', cat > 0);
+                showChip('chip-bump', bump > 0);
+                showChip('chip-acc', acc > 0);
+                const catPlate = document.querySelector('#decouverte .plate p');
+                if (cat > 0) {
+                    const catalogP = document.querySelector('#decouverte a[href="/discord/publicbot"] p');
+                    if (catalogP) catalogP.textContent = `${cat} bot${cat > 1 ? 's' : ''} au catalogue, Dashbot, packs de commandes.`;
+                }
+            } catch {
+                const err = document.getElementById('home-stats-error');
+                if (err) err.hidden = false;
+            }
+            try {
+                const bumpRes = await fetch('/api/discord/bump/public');
+                const list = document.getElementById('home-bump-list');
+                const empty = document.getElementById('home-bump-empty');
+                if (bumpRes.ok && list) {
+                    const payload = await bumpRes.json();
+                    const servers = (payload.servers || []).slice(0, 3);
+                    if (!servers.length) {
+                        if (empty) empty.hidden = false;
+                    } else {
+                        if (empty) empty.hidden = true;
+                        list.innerHTML = servers.map((srv) => `
+                            <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')">
+                                <div class="plate-meta"><span>Bump</span><span>${escapeHtml(srv.visibilityLevel || 'public')}</span></div>
+                                <h3>${escapeHtml(srv.name)}</h3>
+                                <p>${srv.members ? `${srv.members} membres` : 'Serveur listé.'}</p>
+                                <span class="go">Voir Bump</span>
+                            </a>`).join('');
+                    }
+                }
+            } catch { /* listing later */ }
+            try {
+                const meRes = await fetch('/api/profiles');
+                const box = document.getElementById('home-me-list');
+                if (meRes.ok && box) {
+                    const payload = await meRes.json();
+                    const profiles = (payload.profiles || []).slice(0, 6);
+                    box.innerHTML = profiles.map((p) => {
+                        const href = p.customUrl ? `/${encodeURIComponent(p.customUrl)}` : '/discord/me';
+                        return `<a class="plate" href="${href}" target="_top">
+                            <div class="plate-meta"><span>Me</span><span>Profil</span></div>
+                            <h3>${escapeHtml(p.name || p.username)}</h3>
+                            <p>${escapeHtml(p.subtitle || 'Profil public')}</p>
+                            <span class="go">Ouvrir</span>
+                        </a>`;
+                    }).join('');
+                }
+            } catch { /* profiles later */ }
+            try {
+                const avisRes = await fetch('/api/temoignages');
+                const band = document.getElementById('avis');
+                const box = document.getElementById('home-avis-list');
+                if (avisRes.ok && band && box) {
+                    const payload = await avisRes.json();
+                    const quotes = (payload.items || []).filter((item) => item.published && item.quote);
+                    if (quotes.length) {
+                        band.hidden = false;
+                        box.innerHTML = quotes.map((item) => `
+                            <article class="plate">
+                                <div class="plate-meta"><span>Avis</span><span>Opt-in</span></div>
+                                <h3>${escapeHtml(item.displayName)}</h3>
+                                <p>${escapeHtml(item.quote)}</p>
+                            </article>`).join('');
+                    }
+                }
+            } catch { /* aucun avis */ }
             const modal = document.getElementById('announcement-modal');
             if (modal) modal.addEventListener('click', (event) => {
                 if (event.target.id === 'announcement-modal') closeModal();

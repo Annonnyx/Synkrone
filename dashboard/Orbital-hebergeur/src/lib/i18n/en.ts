@@ -80,8 +80,9 @@ export const en: Dict = {
     title1: "Synkrone",
     title2: "hosting",
     subtitle: "Host Discord bots, Minecraft servers and web apps.",
-    openPanel: "Sign in",
-    createAccount: "Create an account",
+    openPanel: "Sign in to the panel",
+    createAccount: "Create a hosting account",
+    siteAccount: "Site account (Krônes, Bump, Me)",
     runtimeDiscordTitle: "Discord bots",
     runtimeDiscordBody:
       "Official Synkrone bots or a custom bot built from real Python cogs.",

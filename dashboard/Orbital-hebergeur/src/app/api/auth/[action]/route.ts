@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { discordIdForUser } from "@/lib/oauth/accounts";
 import { body, fail, ok, rateLimit, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import {
@@ -77,7 +78,8 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ action: st
         .from(users)
         .where(eq(users.id, user.id))
         .limit(1);
-      return ok({ user: { ...user, hasPassword: Boolean(row?.passwordHash) } });
+      const discordId = await discordIdForUser(user.id);
+      return ok({ user: { ...user, hasPassword: Boolean(row?.passwordHash), discordId } });
     }
     return fail("Unknown auth action", 404);
   });

@@ -18,8 +18,6 @@ const PUBLIC_DATA = path.join(
 );
 const GAP_MS = 3 * 60 * 1000;
 const KEEP_DAYS = 14;
-const OFFICIAL_BOTS = 5;
-
 function dayKey(ms) {
     return new Date(ms).toISOString().slice(0, 10);
 }
@@ -207,11 +205,20 @@ async function collect() {
             running: hosting.running || 0
         },
         platform: {
-            officialBots: OFFICIAL_BOTS,
             catalog,
             bump,
             accounts
-        }
+        },
+        product: {
+            officialBotsLabel: 'Cinq bots officiels'
+        },
+        incidents: window.bars
+            .filter((bar) => (Number(bar.down) || 0) > GAP_MS)
+            .map((bar) => ({
+                date: bar.date,
+                downMs: Number(bar.down) || 0,
+                downMin: Math.round((Number(bar.down) || 0) / 60000)
+            }))
     };
 }
 

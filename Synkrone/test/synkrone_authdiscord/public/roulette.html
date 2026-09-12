@@ -4,39 +4,23 @@
     <script src="/assets/theme-boot.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roulette Synkrone</title>
+    <title>Synkrone — Roulette</title>
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
-        <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        slate: {
-                            50: '#f4f5f7', 100: '#e8eaed', 200: '#c5cad1', 300: '#9aa3ae',
-                            400: '#9aa3ae', 500: '#6b7380', 600: '#3d4450', 700: '#2a3139',
-                            800: '#22272e', 900: '#171a1e', 950: '#0f1114'
-                        }
-                    },
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/design/synkrone.css">
     <link rel="stylesheet" href="/assets/mosaique.css">
     <script src="/assets/mosaique.js" defer></script>
     <style>
         :root {
             --bg-main: transparent;
-            --surface: rgba(0, 0, 0, 0.15); /* Très transparent */
-            --surface-hover: rgba(255, 255, 255, 0.05); /* Léger voile au survol */
-            --sysBorder: rgba(255, 255, 255, 0.08); /* Bordure très discrète */
-            --accentBlue: #6d8cff;
-            --accentGold: #ffd700;
-            --krones: #4ade80;
-            --text-main: #ffffff;
-            --textDim: #a0a0a0;
-            --radius: 12px;
+            --surface: var(--sk-surface);
+            --surface-hover: var(--sk-surface-hover);
+            --sysBorder: var(--sk-border);
+            --accentBlue: var(--sk-accent);
+            --accentGold: var(--sk-gold);
+            --krones: var(--sk-gold);
+            --text-main: var(--sk-text);
+            --textDim: var(--sk-text-muted);
+            --radius: var(--sk-radius-lg);
         }
         
         * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--sysBorder) transparent; }
@@ -46,7 +30,7 @@
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--sk-font);
             background: var(--bg-main);
             color: var(--text-main);
             min-height: 100vh;
@@ -262,6 +246,64 @@
             z-index: 9999; 
         }
         .toast.show { transform: translateY(0); opacity: 1; }
+
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .flex-1 { flex: 1; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .gap-4 { gap: 16px; }
+        .gap-8 { gap: 32px; }
+        .p-4 { padding: 16px; }
+        .p-5 { padding: 20px; }
+        .p-6 { padding: 24px; }
+        .px-4 { padding-left: 16px; padding-right: 16px; }
+        .py-3 { padding-top: 12px; padding-bottom: 12px; }
+        .mt-1 { margin-top: 4px; }
+        .mt-2 { margin-top: 8px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-5 { margin-bottom: 20px; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .min-h-0 { min-height: 0; }
+        .min-w-0 { min-width: 0; }
+        .max-w-xl { max-width: 36rem; }
+        .relative { position: relative; }
+        .hidden { display: none; }
+        .grid { display: grid; }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .text-center { text-align: center; }
+        .text-xs { font-size: 12px; }
+        .text-sm { font-size: 14px; }
+        .text-lg { font-size: 18px; }
+        .text-xl { font-size: 20px; }
+        .font-bold { font-weight: 700; }
+        .font-medium { font-weight: 500; }
+        .uppercase { text-transform: uppercase; }
+        .tracking-wide { letter-spacing: 0.04em; }
+        .tracking-wider { letter-spacing: 0.08em; }
+        .text-white { color: var(--sk-text); }
+        .text-textDim { color: var(--sk-text-muted); }
+        .cursor-pointer { cursor: pointer; }
+        .overflow-y-auto { overflow-y: auto; }
+        .shrink-0 { flex-shrink: 0; }
+        .rounded-lg { border-radius: var(--sk-radius-lg); }
+        .border { border: 1px solid var(--sk-border); }
+        @media (min-width: 768px) {
+            .md\:flex-row { flex-direction: row; }
+            .md\:w-auto { width: auto; }
+            .md\:justify-between { justify-content: space-between; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:flex-row { flex-direction: row; }
+            .lg\:w-\[320px\] { width: 320px; }
+        }
     </style>
     <link rel="stylesheet" href="/design/synkrone.css">
 </head>
@@ -598,7 +640,7 @@
                 } else {
                     if (!config.authenticated) {
                         statusContainer.style.display = 'block';
-                        statusText.textContent = 'Connecte-toi avec Discord pour jouer.';
+                        statusText.textContent = 'Connectez-vous avec Discord pour jouer.';
                         statusText.style.color = 'var(--textDim)';
                     } else {
                         if (config.canSpin) {

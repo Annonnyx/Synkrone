@@ -177,7 +177,8 @@
                 },
                 body: JSON.stringify({
                     theme,
-                    message
+                    message,
+                    publishQuote: Boolean(form.publishQuote?.checked)
                 })
             });
 

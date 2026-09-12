@@ -30,6 +30,7 @@ const { mountKrones } = require('./lib/krones');
 const { mountDashbot } = require('./lib/dashbot');
 const { mountCommands } = require('./lib/commands');
 const { mountStatus } = require('./lib/status');
+const { billingPublicDto } = require('./lib/billing');
 const { mountServeur } = require('./lib/serveur');
 const { mountCompte } = require('./lib/compte');
 const {
@@ -124,11 +125,21 @@ app.use('/logo', express.static(path.join(WWW_DIR, 'logo')));
 app.use('/design', express.static(path.join(WWW_DIR, 'design')));
 
 app.get('/api/config', (_req, res) => {
+    const billing = billingPublicDto(null);
     res.json({
         panelOrigin: panelPublicOrigin(PORT),
         internal: INTERNAL_TOOLS,
         hub: HUB_ENABLED,
-        supportInvite: process.env.DISCORD_SUPPORT_INVITE_URL || 'https://discord.gg/p768u2Pgp3'
+        supportInvite: process.env.DISCORD_SUPPORT_INVITE_URL || 'https://discord.gg/p768u2Pgp3',
+        sellerReady: billing.sellerReady,
+        seller: billing.seller,
+        methods: billing.methods,
+        mediatorReady: Boolean(billing.seller?.mediatorReady),
+        mediator: {
+            name: billing.seller?.mediatorName || '',
+            url: billing.seller?.mediatorUrl || '',
+            address: billing.seller?.mediatorAddress || ''
+        }
     });
 });
 

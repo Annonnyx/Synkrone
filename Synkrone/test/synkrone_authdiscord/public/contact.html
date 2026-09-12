@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Contact</title>
+    <meta name="description" content="Ticket Discord pour un bug, un paiement ou la modération. Compte lié et présence sur le serveur Synkrone requis.">
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="stylesheet" href="/assets/accueil.css">
     <script src="/assets/contact.js" defer></script>
@@ -272,6 +273,10 @@
                             <label for="message">Votre message</label>
                             <textarea id="message" name="message" maxlength="1800" placeholder="Décrivez votre demande, les étapes, et ce que vous attendez." required></textarea>
                         </div>
+                        <label class="field" style="display:flex;align-items:flex-start;gap:8px">
+                            <input type="checkbox" id="publish-quote" name="publishQuote" value="1" style="width:auto;margin-top:4px">
+                            <span>J’accepte qu’un extrait de ce message soit publié sur l’accueil (après validation de l’équipe).</span>
+                        </label>
                         <button id="contact-submit" class="submit" type="submit">Envoyer au support</button>
                         <p id="contact-status" class="status" aria-live="polite"></p>
                     </form>
@@ -283,12 +288,16 @@
         function goPage(event, section) {
             if (event) event.preventDefault();
             try {
-                if (window.parent && typeof window.parent.navigateToMainSection === 'function') {
+                if (typeof window.navigateToMainSection === 'function') {
+                    window.navigateToMainSection(section, { updateUrl: true });
+                    return;
+                }
+                if (window.parent && window.parent !== window && typeof window.parent.navigateToMainSection === 'function') {
                     window.parent.navigateToMainSection(section, { updateUrl: true });
                     return;
                 }
             } catch { /* fall through */ }
-            window.top.location.href = '/' + section;
+            window.location.href = '/' + section;
         }
     </script>
 </body>

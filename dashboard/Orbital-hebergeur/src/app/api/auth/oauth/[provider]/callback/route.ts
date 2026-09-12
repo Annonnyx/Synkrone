@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { audit } from "@/lib/audit";
 import { createSession, getCurrentUser } from "@/lib/auth";
+import { publicSiteOriginFromEnv } from "@/lib/discord/site-link-env";
 import { completeOAuthLogin } from "@/lib/oauth/accounts";
 import {
   exchangeAuthorizationCode,
@@ -17,6 +18,38 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type Ctx = { params: Promise<{ provider: string }> };
+
+async function bridgeSiteSession(
+  provider: string,
+  profile: { id: string; name?: string; login?: string | null; email?: string | null; avatarUrl?: string | null },
+) {
+  const origin = publicSiteOriginFromEnv() || "http://127.0.0.1:3668";
+  const key = String(process.env.PLATFORM_SECRET_KEY || "").trim();
+  if (key.length < 16) return;
+  try {
+    const res = await fetch(`${origin}/api/internal/session-bridge`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${key}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ provider, profile }),
+    });
+    if (!res.ok) return;
+    const data = (await res.json()) as { sid?: string };
+    if (!data.sid) return;
+    const store = await cookies();
+    store.set("synkrone.sid", data.sid, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 21 * 24 * 60 * 60,
+    });
+  } catch {
+    /* site unreachable — panel session still stands */
+  }
+}
 
 function redirectWith(origin: string, path: string, params: Record<string, string>) {
   const url = panelUrl(origin, path);
@@ -73,6 +106,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
       currentUserId: current?.id,
     });
     if (!current) await createSession(result.userId);
+    await bridgeSiteSession(provider, profile);
     await audit({
       userId: result.userId,
       action: intent === "link" ? `oauth.link.${provider}` : `oauth.login.${provider}`,

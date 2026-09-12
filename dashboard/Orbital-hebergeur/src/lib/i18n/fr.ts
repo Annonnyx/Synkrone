@@ -78,8 +78,9 @@ export const fr = {
     title1: "Synkrone",
     title2: "hébergement",
     subtitle: "Hébergement de bots Discord, serveurs Minecraft et applications web.",
-    openPanel: "Se connecter",
-    createAccount: "Créer un compte",
+    openPanel: "Se connecter au panel",
+    createAccount: "Créer un compte hébergement",
+    siteAccount: "Compte site (Krônes, Bump, Me)",
     runtimeDiscordTitle: "Bots Discord",
     runtimeDiscordBody:
       "Bots officiels Synkrone ou bot custom à partir des vrais cogs Python.",

@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone.app</title>
+    <meta name="description" content="Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.">
+    <meta property="og:title" content="Synkrone.app">
+    <meta property="og:description" content="Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://synkrone.app/">
+    <meta property="og:image" content="https://synkrone.app/logo/Synk_2B9348.png">
+    <meta property="og:locale" content="fr_FR">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Synkrone.app">
+    <meta name="twitter:description" content="Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.">
+    <link rel="canonical" href="https://synkrone.app/">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            { "@type": "WebSite", "name": "Synkrone", "url": "https://synkrone.app/" },
+            { "@type": "Organization", "name": "Synkrone", "url": "https://synkrone.app/" }
+        ]
+    }
+    </script>
+    <!--LEAF_HEAD-->
     <script>
         (function () {
             var t = 'light';
@@ -48,7 +69,7 @@
                     <div class="nav-tabs" id="menu-tabs">
                         <button type="button" class="nav-tab active" data-target="accueil">Accueil</button>
                         <a class="nav-tab nav-tab-external" id="nav-hosting" href="/hebergement" target="_top">Hébergement</a>
-                        <button type="button" class="nav-tab" data-target="stats">Stats</button>
+                        <button type="button" class="nav-tab" data-target="stats">Statut</button>
                         <button type="button" class="nav-tab" data-target="discord">Bots</button>
                         <button type="button" class="nav-tab" data-target="minecraft">Minecraft</button>
                         <button type="button" class="nav-tab" data-target="bump">Bump</button>
@@ -61,12 +82,7 @@
         </div>
         <main>
             <div id="section-menu-container"></div>
-            <iframe
-                id="content-frame"
-                class="content-frame"
-                title="Contenu de la section"
-                src="about:blank"
-            ></iframe>
+            <div id="content-root" class="content-frame" data-leaf=""></div><!--LEAF_BODY-->
         </main>
         <footer>
             <div class="footer-brand">
@@ -78,9 +94,9 @@
                 <a href="/cgv" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('cgv', { updateUrl: true });">CGV</a>
                 <a href="/faq" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('faq', { updateUrl: true });">FAQ</a>
                 <a href="/contact" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('contact', { updateUrl: true });">Contact</a>
-                <a href="/hub" class="footer-link">Hub</a>
-                <a href="/vux/" class="footer-link">Vux</a>
+                <a href="https://discord.gg/p768u2Pgp3" class="footer-link" id="footer-discord" target="_blank" rel="noopener noreferrer">Discord</a>
             </div>
+            <p class="footer-legal" id="footer-legal">Identité du vendeur affichée à la commande dès qu’elle est renseignée.</p>
         </footer>
     </div>
     
@@ -91,7 +107,8 @@
             oauth: { discord: false, github: false, google: false },
             panelOrigin: '/hebergement',
             internal: false,
-            hub: true,
+            hub: false,
+            supportInvite: 'https://discord.gg/p768u2Pgp3',
             krones: null
         };
         const SUPPORT_GRADE_ORDER = {
@@ -204,19 +221,11 @@
         function setSiteTheme(theme) {
             if (!window.synkroneTheme) return;
             synkroneTheme.set(theme);
-            document.querySelectorAll('iframe').forEach((frame) => synkroneTheme.applyToFrame(frame));
             renderUI();
         }
-        function bindFrameTheme() {
-            const frame = document.getElementById('content-frame');
-            if (!frame || frame.dataset.themeBound) return;
-            frame.dataset.themeBound = '1';
-            frame.addEventListener('load', () => {
-                if (window.synkroneTheme) synkroneTheme.applyToFrame(frame);
-            });
-        }
+        function bindFrameTheme() {}
         function publicToolsHtml() {
-            if (store.hub === false) return '';
+            if (!store.internal) return '';
             return `<nav class="sk-app-nav" aria-label="Hub">
                 <a href="/hub">Hub</a>
             </nav>`;
@@ -244,8 +253,20 @@
                         if (data.panelOrigin) store.panelOrigin = data.panelOrigin;
                         store.internal = Boolean(data.internal);
                         if (data.hub !== undefined) store.hub = Boolean(data.hub);
+                        store.supportInvite = data.supportInvite || store.supportInvite;
                         const hosting = menuContainer.querySelector('#nav-hosting');
                         if (hosting && data.panelOrigin) hosting.setAttribute('href', data.panelOrigin);
+                        const footerDiscord = document.getElementById('footer-discord');
+                        if (footerDiscord && store.supportInvite) footerDiscord.setAttribute('href', store.supportInvite);
+                        const legal = document.getElementById('footer-legal');
+                        if (legal) {
+                            if (data.sellerReady && data.seller) {
+                                const bits = [data.seller.name, data.seller.address, data.seller.siret && `SIRET ${data.seller.siret}`].filter(Boolean);
+                                legal.textContent = bits.join(' · ');
+                            } else {
+                                legal.textContent = 'Identité du vendeur affichée à la commande dès qu’elle est renseignée.';
+                            }
+                        }
                     }
                 } catch { /* default localhost */ }
             } catch (e) {
@@ -430,6 +451,88 @@
             }
         };
 
+        const SITE_ORIGIN = 'https://synkrone.app';
+        const PAGE_TITLES = {
+            accueil: 'Synkrone — Accueil',
+            discord: 'Synkrone — Bots',
+            bump: 'Synkrone — Bump',
+            me: 'Synkrone — Me',
+            minecraft: 'Synkrone — Minecraft',
+            login: 'Connexion — Synkrone',
+            admin: 'Synkrone — Admin',
+            equipe: 'Synkrone — Équipe',
+            cgu: 'Synkrone — CGU',
+            cgv: 'Synkrone — CGV',
+            contact: 'Synkrone — Contact',
+            faq: 'Synkrone — FAQ',
+            krones: 'Synkrone — Krônes',
+            stats: 'Synkrone — Statut',
+            compte: 'Synkrone — Compte',
+            serveur: 'Synkrone — Serveur'
+        };
+        const PAGE_DESCRIPTIONS = {
+            accueil: 'Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.',
+            discord: 'Cinq bots officiels Synkrone : Vax, Arceus, Asuna, Kayaba et Yui. Fiches, préfixes et invitations.',
+            bump: 'Listing public des serveurs Discord de la communauté Synkrone.',
+            me: 'Profils publics Me : se retrouver, visites, likes, mise en avant.',
+            minecraft: 'Cantale, serveur Java 1.21 à trois vies, et trois modpacks à télécharger.',
+            login: 'Une seule connexion Synkrone : Discord, Google, GitHub ou e-mail pour le site et le panel.',
+            cgu: 'Conditions générales d’utilisation de Synkrone : compte, Krônes, rangs, données et modération.',
+            cgv: 'Conditions générales de vente des packs de Krônes : prix TTC, délivrance, rétractation et médiation.',
+            contact: 'Ticket Discord pour un bug, un paiement ou la modération. Compte lié et présence sur le serveur Synkrone requis.',
+            faq: 'Réponses courtes : compte, panel, Krônes, bots officiels, Bump, Cantale et support.',
+            krones: 'Portefeuille Krônes : packs, rangs, hébergement et journal des mouvements.',
+            stats: 'Uptime mesuré sur 7 jours, machines du panel, catalogue, Bump et comptes — sans chiffre inventé.',
+            compte: 'Votre espace Synkrone : liaisons, Krônes, services hébergés et serveurs.',
+            serveur: 'Configurer un serveur où un bot officiel Synkrone est présent.'
+        };
+        const BOT_DESCRIPTIONS = {
+            vax: 'Vax — bot de modération Synkrone : warns, mutes, bans, tickets et journaux.',
+            arceus: 'Arceus — bot Pokémon Synkrone : capture, combats et collection.',
+            asuna: 'Asuna — bot de jeux Synkrone : mini-jeux, économie ludique et XP.',
+            kayaba: 'Kayaba — bot de combat Synkrone : PvP cadré et progression.',
+            yui: 'Yui — bot d’architecture Synkrone : salons, rôles et organisation.',
+            bot: 'Créer et héberger votre propre bot Discord sur le panel Synkrone.'
+        };
+        const BOT_TITLES = {
+            vax: 'Synkrone — Vax',
+            arceus: 'Synkrone — Arceus',
+            asuna: 'Synkrone — Asuna',
+            kayaba: 'Synkrone — Kayaba',
+            yui: 'Synkrone — Yui',
+            bot: 'Synkrone — Créer un bot'
+        };
+
+        function applyPageSeo(mainSection, options = {}) {
+            let title = PAGE_TITLES[mainSection] || 'Synkrone.app';
+            if (mainSection === 'discord' && options.botsTab && BOT_TITLES[options.botsTab]) {
+                title = BOT_TITLES[options.botsTab];
+            } else if (mainSection === 'minecraft' && options.subTab === 'modpack') {
+                title = 'Synkrone — Modpacks';
+            }
+            document.title = title;
+            let description = PAGE_DESCRIPTIONS[mainSection] || PAGE_DESCRIPTIONS.accueil;
+            if (mainSection === 'discord' && options.botsTab && BOT_DESCRIPTIONS[options.botsTab]) {
+                description = BOT_DESCRIPTIONS[options.botsTab];
+            }
+            const path = normalizePath(window.location.pathname);
+            const url = SITE_ORIGIN + (path === '/' ? '/' : path);
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            const twTitle = document.querySelector('meta[name="twitter:title"]');
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            const canonical = document.querySelector('link[rel="canonical"]');
+            const desc = document.querySelector('meta[name="description"]');
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            const twDesc = document.querySelector('meta[name="twitter:description"]');
+            if (ogTitle) ogTitle.setAttribute('content', title);
+            if (twTitle) twTitle.setAttribute('content', title);
+            if (ogUrl) ogUrl.setAttribute('content', url);
+            if (canonical) canonical.setAttribute('href', url);
+            if (desc) desc.setAttribute('content', description);
+            if (ogDesc) ogDesc.setAttribute('content', description);
+            if (twDesc) twDesc.setAttribute('content', description);
+        }
+
         function normalizePath(pathname) {
             if (!pathname) return '/';
             if (pathname.length > 1 && pathname.endsWith('/')) {
@@ -557,10 +660,64 @@
             window.history.pushState({}, '', href);
         }
 
-        function setFrameSrc(path) {
-            const frame = document.getElementById('content-frame');
-            if (!frame || !path) return;
-            frame.src = path;
+        function applyLeafHead(html) {
+            document.querySelectorAll('[data-leaf-asset]').forEach((el) => el.remove());
+            const wrap = document.createElement('div');
+            wrap.innerHTML = html || '';
+            [...wrap.querySelectorAll('link,style')].forEach((el) => {
+                el.setAttribute('data-leaf-asset', '1');
+                document.head.appendChild(el);
+            });
+        }
+
+        function replayLeafScripts(root) {
+            const scripts = [...root.querySelectorAll('script')];
+            const pending = [];
+            const orig = EventTarget.prototype.addEventListener;
+            EventTarget.prototype.addEventListener = function (type, fn, opts) {
+                if ((type === 'DOMContentLoaded' || type === 'load') && this === document) {
+                    pending.push(fn);
+                    return;
+                }
+                return orig.call(this, type, fn, opts);
+            };
+            for (const old of scripts) {
+                const src = old.getAttribute('src') || '';
+                if (src.includes('theme-boot.js')) {
+                    old.remove();
+                    continue;
+                }
+                const copy = document.createElement('script');
+                for (const attr of old.attributes) copy.setAttribute(attr.name, attr.value);
+                copy.textContent = old.textContent;
+                old.replaceWith(copy);
+            }
+            EventTarget.prototype.addEventListener = orig;
+            pending.forEach((fn) => {
+                try { fn.call(document); } catch (err) { console.error(err); }
+            });
+        }
+
+        async function loadLeaf(path) {
+            const root = document.getElementById('content-root');
+            if (!root || !path) return;
+            if (root.dataset.leaf === path && root.childNodes.length) return;
+            const res = await fetch(path, { credentials: 'same-origin', cache: 'no-store' });
+            if (!res.ok) {
+                root.innerHTML = '<p style="padding:24px">Page indisponible.</p>';
+                root.dataset.leaf = '';
+                return;
+            }
+            const html = await res.text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const links = [...doc.head.querySelectorAll('link[rel="stylesheet"]')]
+                .filter((el) => !/fonts\.googleapis|fonts\.gstatic/.test(el.href || ''))
+                .map((el) => el.outerHTML);
+            const styles = [...doc.head.querySelectorAll('style')].map((el) => el.outerHTML);
+            applyLeafHead(`${links.join('')}${styles.join('')}`);
+            root.innerHTML = doc.body.innerHTML;
+            root.dataset.leaf = path;
+            replayLeafScripts(root);
         }
 
         function setActiveMainTab(mainSection) {
@@ -581,27 +738,27 @@
 
         async function loadSectionMenu(mainSection) {
             const sectionMenuContainer = document.getElementById('section-menu-container');
-            const frame = document.getElementById('content-frame');
+            const root = document.getElementById('content-root');
             const section = APP_STRUCTURE[mainSection];
-            if (!sectionMenuContainer || !frame || !section) return;
+            if (!sectionMenuContainer || !root || !section) return;
             if (!section.menu) {
                 sectionMenuContainer.innerHTML = '';
-                frame.classList.remove('with-section-menu');
+                root.classList.remove('with-section-menu');
                 return;
             }
             try {
                 const res = await fetch(`${section.menu}?v=2`, { cache: 'no-store' });
                 if (!res.ok) {
                     sectionMenuContainer.innerHTML = '';
-                    frame.classList.remove('with-section-menu');
+                    root.classList.remove('with-section-menu');
                     return;
                 }
                 sectionMenuContainer.innerHTML = await res.text();
-                frame.classList.add('with-section-menu');
+                root.classList.add('with-section-menu');
             } catch (e) {
                 console.error("Erreur lors du chargement du menu de section", e);
                 sectionMenuContainer.innerHTML = '';
-                frame.classList.remove('with-section-menu');
+                root.classList.remove('with-section-menu');
             }
         }
 
@@ -616,7 +773,7 @@
                     if (!pagePath) return;
                     e.preventDefault();
                     setActiveSubTab(subTarget);
-                    setFrameSrc(pagePath);
+                    loadLeaf(pagePath);
                     const targetRoute = section.routes?.[subTarget] || section.route;
                     syncBrowserPath(targetRoute);
                 };
@@ -648,13 +805,14 @@
                     leafPath = `${section.page}?profile=${encodeURIComponent(profileTab.replace(/^\//, ''))}`;
                 }
                 const query = leafSearch(mainSection, search);
-                setFrameSrc(withSearch(leafPath, query));
+                await loadLeaf(withSearch(leafPath, query));
                 if (updateUrl) {
                     const leafRoute = (mainSection === 'me' && profileTab)
                         ? profileTab
                         : (section.route || section.page);
                     syncBrowserPath(leafRoute, replaceHistory, QUERY_LEAF_SECTIONS.has(mainSection) ? query : '');
                 }
+                applyPageSeo(mainSection, { botsTab, subTab, modpackTab });
                 return;
             }
             bindSectionMenuEvents(mainSection);
@@ -672,7 +830,7 @@
                 framePath = `${framePath}?cloudPath=${encodeURIComponent(cloudPath)}`;
             }
 
-            setFrameSrc(framePath);
+            await loadLeaf(framePath);
             
             if (updateUrl) {
                 const sectionRoutes = section.routes || {};
@@ -688,6 +846,7 @@
                 }
                 syncBrowserPath(targetRoute, replaceHistory);
             }
+            applyPageSeo(mainSection, { botsTab, subTab: resolvedSubTab, modpackTab });
         }
 
         function bindNavToggle() {

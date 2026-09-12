@@ -5,7 +5,7 @@ const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
-test('shell forwards login and serveur query strings into the iframe', () => {
+test('shell forwards login and serveur query strings into the leaf', () => {
     const source = readFileSync(
         path.join(__dirname, '..', '..', '..', 'Synkrone', 'test', 'synkrone_authdiscord', 'public', 'index.html'),
         'utf8'

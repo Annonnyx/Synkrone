@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Statut</title>
+    <meta name="description" content="Uptime mesuré sur 7 jours, machines du panel, catalogue, Bump et comptes — sans chiffre inventé.">
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="stylesheet" href="/assets/accueil.css">
     <link rel="stylesheet" href="/assets/stats-page.css">
@@ -92,8 +93,8 @@
             </div>
             <div class="st-grid">
                 <div class="st-tile">
-                    <strong id="st-bots">5</strong>
-                    <span>Bots officiels</span>
+                    <strong>5</strong>
+                    <span>Cinq bots officiels</span>
                 </div>
                 <div class="st-tile">
                     <strong id="st-cat">—</strong>
@@ -108,6 +109,19 @@
                     <span>Comptes</span>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="band">
+        <div class="band-inner">
+            <div class="band-head">
+                <p class="sect-id">04 · Coupures</p>
+                <div>
+                    <h2>Relevées sur 7 jours.</h2>
+                    <p>Trous de plus de 3 minutes dans la mesure d’uptime. Pas de SLA annoncé.</p>
+                </div>
+            </div>
+            <ul class="legal" id="st-incidents" style="color:var(--hall-mute);max-width:68ch;padding-left:1.2rem;"></ul>
         </div>
     </section>
 
@@ -138,10 +152,20 @@
             document.getElementById('st-dc').textContent = fmt(data?.hosting?.discord);
             document.getElementById('st-web').textContent = fmt(data?.hosting?.web);
             document.getElementById('st-host').textContent = fmt(total);
-            document.getElementById('st-bots').textContent = fmt(data?.platform?.officialBots || 5);
             document.getElementById('st-cat').textContent = fmt(data?.platform?.catalog);
             document.getElementById('st-bump').textContent = fmt(data?.platform?.bump);
             document.getElementById('st-acc').textContent = fmt(data?.platform?.accounts);
+            const list = document.getElementById('st-incidents');
+            if (list) {
+                if (!data?.live && !Array.isArray(data?.incidents)) {
+                    list.innerHTML = '<li>Statut indisponible.</li>';
+                } else {
+                    const incidents = Array.isArray(data?.incidents) ? data.incidents : [];
+                    list.innerHTML = incidents.length
+                        ? incidents.map((row) => `<li>${row.date} — ${row.downMin} min relevées</li>`).join('')
+                        : '<li>Aucune coupure mesurée sur 7 jours.</li>';
+                }
+            }
         }
 
         (async function init() {

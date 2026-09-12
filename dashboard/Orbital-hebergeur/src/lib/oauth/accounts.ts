@@ -15,6 +15,41 @@ export function oauthPlaceholderEmail(provider: OAuthProvider, providerUserId: s
   return placeholderEmail(provider, providerUserId);
 }
 
+export async function discordIdForUser(userId: string): Promise<string | null> {
+  const row = await getOAuthAccount(userId, "discord");
+  return row?.providerAccountId ?? null;
+}
+
+export async function ensurePanelIdentity(input: {
+  provider: OAuthProvider;
+  profile: {
+    id: string;
+    name?: string;
+    login?: string | null;
+    email?: string | null;
+    avatarUrl?: string | null;
+    emailVerified?: boolean;
+  };
+}): Promise<{ userId: string; created: boolean; discordId: string | null }> {
+  const profile: OAuthProfile = {
+    id: String(input.profile.id),
+    name: String(input.profile.name || input.profile.login || input.provider),
+    login: input.profile.login || input.profile.name || null,
+    email: input.profile.email || null,
+    emailVerified: Boolean(input.profile.emailVerified),
+    avatarUrl: input.profile.avatarUrl || null,
+  };
+  const result = await completeOAuthLogin({
+    provider: input.provider,
+    profile,
+    tokens: { accessToken: "" },
+    intent: "login",
+  });
+  const discordId =
+    input.provider === "discord" ? profile.id : await discordIdForUser(result.userId);
+  return { ...result, discordId };
+}
+
 export async function userIdForDiscordAccount(discordUserId: string): Promise<string | null> {
   const id = String(discordUserId || "").trim();
   if (!/^\d{15,22}$/.test(id)) return null;
@@ -137,7 +172,7 @@ async function upsertOAuthAccount(
     providerLogin: profile.login,
     email: profile.email,
     avatarUrl: profile.avatarUrl,
-    accessTokenEnc: encryptSecret(tokens.accessToken),
+    accessTokenEnc: tokens.accessToken ? encryptSecret(tokens.accessToken) : existing?.accessTokenEnc ?? null,
     refreshTokenEnc: tokens.refreshToken ? encryptSecret(tokens.refreshToken) : existing?.refreshTokenEnc ?? null,
     expiresAt: expiresAtFrom(tokens),
     scope: tokens.scope ?? existing?.scope ?? null,

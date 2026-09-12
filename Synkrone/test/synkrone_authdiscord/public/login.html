@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion — Synkrone</title>
+    <title>Synkrone — Connexion</title>
+    <meta name="description" content="Une seule connexion Synkrone : Discord, Google, GitHub ou e-mail pour le site et le panel.">
     <script src="/assets/theme-boot.js"></script>
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,10 +13,21 @@
     <link rel="stylesheet" href="/design/synkrone.css">
     <style>
         .login-list { display: grid; gap: .75rem; }
-        .login-list a { width: 100%; }
+        .login-list a, .login-list button { width: 100%; }
         .login-page-bar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-        .login-note { margin-top: 1.5rem; font-size: .9rem; color: var(--sk-text-muted); }
+        .login-note { margin-top: 1.25rem; font-size: .9rem; color: var(--sk-text-muted); }
         .login-note a { color: var(--mousse); }
+        .login-form { display: grid; gap: 10px; margin-top: 8px; }
+        .login-form label { font-size: 12px; color: var(--sk-text-muted); }
+        .login-form input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--sk-border);
+            background: var(--sk-bg);
+            color: inherit;
+        }
+        .login-error { color: #8f2d2d; font-size: .9rem; min-height: 1.2em; }
+        .login-divider { margin: 18px 0 8px; font-size: 12px; color: var(--sk-text-faint); }
     </style>
 </head>
 <body>
@@ -24,9 +36,21 @@
             <div class="login-page-bar" id="theme-bar"></div>
             <p class="sk-kicker">Compte</p>
             <h1>Se connecter</h1>
-            <p class="lede">Tu restes sur le site. Le panel d’hébergement a sa propre page de connexion.</p>
+            <p class="lede" id="login-lede">Une porte : Discord, Google, GitHub ou e-mail. Le même Discord ouvre le site (Krônes, Bump, Me) et le panel (créer un service).</p>
             <div class="login-list" id="providers"></div>
-            <p class="login-note">Pour créer un bot, un serveur ou un site : <a href="/hebergement/login" target="_top">ouvrir le panel</a>.</p>
+            <p class="login-divider" id="panel-divider" hidden>Ou avec un e-mail (hébergement)</p>
+            <form class="login-form" id="panel-form" hidden>
+                <label for="panel-email">E-mail</label>
+                <input id="panel-email" type="email" autocomplete="username" required>
+                <label for="panel-password">Mot de passe</label>
+                <input id="panel-password" type="password" autocomplete="current-password" required>
+                <label for="panel-name" id="panel-name-label" hidden>Nom</label>
+                <input id="panel-name" type="text" hidden autocomplete="nickname">
+                <p class="login-error" id="panel-error"></p>
+                <button type="submit" class="sk-btn" id="panel-submit">Se connecter au panel</button>
+                <button type="button" class="sk-btn" id="panel-toggle">Créer un compte hébergement</button>
+            </form>
+            <p class="login-note">Lecture seule, sans Krônes, Bump ni tickets : <a href="/auth/guest" target="_top">continuer sans compte</a>.</p>
         </article>
     </main>
     <script>
@@ -51,17 +75,14 @@
                 });
             }
         })();
+        const params = new URLSearchParams(window.location.search);
+        const intent = params.get('intent') || '';
+        const oauthError = params.get('oauth_error') || '';
+        let mode = params.get('mode') === 'register' ? 'register' : 'login';
         function readReturnTo() {
-            const local = new URLSearchParams(window.location.search).get('returnTo');
+            const local = params.get('returnTo');
             if (local && local.startsWith('/')) return local;
-            try {
-                if (window.top && window.top !== window) {
-                    const fromTop = new URLSearchParams(window.top.location.search).get('returnTo');
-                    if (fromTop && fromTop.startsWith('/')) return fromTop;
-                }
-            } catch {
-                /* iframe opaque */
-            }
+            if (intent === 'panel') return '/hebergement';
             return '/';
         }
         function isDiscordAccount(user) {
@@ -73,13 +94,64 @@
         function href(provider) {
             return `/auth/${provider}?returnTo=${encodeURIComponent(returnTo)}`;
         }
+        function setMode(next) {
+            mode = next;
+            const name = document.getElementById('panel-name');
+            const nameLabel = document.getElementById('panel-name-label');
+            const submit = document.getElementById('panel-submit');
+            const toggle = document.getElementById('panel-toggle');
+            const showName = mode === 'register';
+            name.hidden = !showName;
+            nameLabel.hidden = !showName;
+            name.required = showName;
+            submit.textContent = showName ? 'Créer le compte hébergement' : 'Se connecter au panel';
+            toggle.textContent = showName ? 'J’ai déjà un e-mail' : 'Créer un compte hébergement';
+        }
+        document.getElementById('panel-toggle').addEventListener('click', () => {
+            setMode(mode === 'login' ? 'register' : 'login');
+        });
+        document.getElementById('panel-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const errorEl = document.getElementById('panel-error');
+            errorEl.textContent = '';
+            const email = document.getElementById('panel-email').value.trim();
+            const password = document.getElementById('panel-password').value;
+            const name = document.getElementById('panel-name').value.trim();
+            const payload = mode === 'register' ? { email, password, name } : { email, password };
+            try {
+                const res = await fetch(`/hebergement/api/auth/${mode}`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    errorEl.textContent = data.error || data.message || 'Connexion panel impossible.';
+                    return;
+                }
+                await fetch('/api/auth/sync-panel', { method: 'POST', credentials: 'same-origin' });
+                window.location.href = returnTo.startsWith('/') ? returnTo : '/hebergement';
+            } catch {
+                errorEl.textContent = 'Panel injoignable.';
+            }
+        });
+        setMode(mode);
+        if (oauthError) {
+            const map = {
+                linked_other: 'Ce Discord, Google ou GitHub est déjà lié à un autre compte.',
+                PROVIDER_TAKEN: 'Ce compte est déjà lié à un autre profil Synkrone.',
+                denied: 'Connexion annulée.'
+            };
+            document.getElementById('panel-error').textContent = map[oauthError] || 'Connexion refusée.';
+        }
         (async () => {
             try {
                 const res = await fetch('/api/me', { credentials: 'same-origin' });
                 const data = await res.json();
                 const user = data.user;
-                if (data.authenticated && (!needsDiscord || isDiscordAccount(user)) && window.top) {
-                    window.top.location.href = returnTo.startsWith('/') ? returnTo : '/';
+                if (data.authenticated && (!needsDiscord || isDiscordAccount(user))) {
+                    window.location.href = returnTo.startsWith('/') ? returnTo : '/';
                     return;
                 }
                 const p = data.providers || {};
@@ -91,9 +163,12 @@
                 if (needsDiscord && data.authenticated && !isDiscordAccount(user)) {
                     items.unshift('<p class="note">Cette page demande un compte Discord.</p>');
                 }
-                box.innerHTML = items.join('') || '<p>Aucune connexion n’est configurée pour le moment.</p>';
+                box.innerHTML = items.join('') || '<p>Aucune connexion sociale n’est configurée pour le moment.</p>';
+                document.getElementById('panel-form').hidden = false;
+                document.getElementById('panel-divider').hidden = false;
             } catch {
                 document.getElementById('providers').innerHTML = '<p>Connexion indisponible.</p>';
+                document.getElementById('panel-form').hidden = false;
             }
         })();
     </script>

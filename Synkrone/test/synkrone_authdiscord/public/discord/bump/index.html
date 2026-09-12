@@ -4,7 +4,8 @@
     <script src="/assets/theme-boot.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synkrone | Plateforme Serveurs & Bots</title>
+    <title>Synkrone — Bump</title>
+    <meta name="description" content="Listing public des serveurs Discord de la communauté Synkrone.">
     <!-- Ajout de FontAwesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -923,19 +924,20 @@
                 const d = await r.json(); 
                 store.user = d.authenticated ? d.user : null; 
                 
-                const srv = await fetch("/api/discord/bump/servers"); 
+                let srv = await fetch("/api/discord/bump/servers");
+                if (!srv.ok) srv = await fetch("/api/discord/bump/public");
                 if(srv.ok) { 
                     const sd = await srv.json(); 
                     AllServers = (sd.servers || []).map(x=>({
                         id: x.id, 
                         name: x.name, 
                         desc: "Serveur synchronisé avec l'infrastructure Synkrone.", 
-                        icon: x.icon ? ("https://cdn.discordapp.com/icons/" + x.id + "/" + x.icon + ".png") : "/assets/images/logo.jpg", 
+                        icon: x.icon && String(x.icon).startsWith('http') ? x.icon : (x.icon ? ("https://cdn.discordapp.com/icons/" + x.id + "/" + x.icon + ".png") : "/assets/images/logo.jpg"), 
                         banner: "", 
-                        stats: {views:0, likes:0, members: 0, online: 0}, 
-                        userRole: x.role, 
+                        stats: {views:0, likes:0, members: x.members || 0, online: 0}, 
+                        userRole: x.role || 'visitor', 
                         hasSynkrone: false, 
-                        isFeatured: false, 
+                        isFeatured: Boolean(x.featuredUntil && x.featuredUntil > Date.now()), 
                         unlockedFeatures: [], 
                         disabledFeatures: [],
                         customTheme: {active: false}, 

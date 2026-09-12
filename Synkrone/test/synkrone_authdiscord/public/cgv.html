@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Conditions générales de vente</title>
+    <meta name="description" content="Conditions générales de vente des packs de Krônes : prix TTC, délivrance, rétractation et médiation.">
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="stylesheet" href="/assets/accueil.css">
     <style>
@@ -49,7 +50,7 @@
             <p>Les Krônes sont un crédit d’usage exclusivement interne à Synkrone (hébergement, rangs, boutique de la plateforme). Ce n’est pas une monnaie ayant cours légal, ni un instrument financier, ni de la monnaie électronique remboursable. Ils ne peuvent pas être échangés contre des euros, cédés hors de la plateforme, ni retirés.</p>
 
             <h2>3. Compte</h2>
-            <p>L’achat exige un compte Synkrone (connexion via le panel). Le crédit est rattaché à ce compte. Un mineur de moins de 18 ans ne commande qu’avec l’autorisation de la personne qui exerce l’autorité parentale.</p>
+            <p>L’achat exige un compte Synkrone (connexion sur le site, puis checkout Krônes). Le crédit est rattaché à ce compte. Un mineur de moins de 18 ans ne commande qu’avec l’autorisation de la personne qui exerce l’autorité parentale.</p>
 
             <h2>4. Prix et TVA</h2>
             <p>Les prix des packs sont indiqués en euros TTC, TVA française 20 % (taux en vigueur, sauf mention contraire). Le détail hors taxes / TVA / TTC figure avant validation. Une commande crée une facture numérotée (SK-AAAA-n). Les rangs (Kronium à Kronix) s’achètent ensuite en Krônes, pas en euros.</p>
@@ -58,7 +59,7 @@
             <ul>
                 <li>Vous choisissez un pack, prenez connaissance du prix TTC, puis cochez les consentements.</li>
                 <li>La commande est enregistrée avant le paiement. Aucun Krône n’est versé tant que le paiement n’est pas confirmé.</li>
-                <li>Moyens prévus : virement SEPA (dès IBAN publié), puis PayPal, Apple Pay et carte via un prestataire de paiement. Ces prestataires se branchent sur la même commande et la même facture.</li>
+                <li>Les moyens réellement ouverts sont ceux affichés à la commande (source unique avec le checkout). Aucun autre n’est promis ici.</li>
                 <li>En virement, le libellé doit reprendre le numéro de facture. Le crédit a lieu après réception des fonds.</li>
             </ul>
 
@@ -76,7 +77,7 @@
             <p>La commande enregistre l’identifiant de compte, le pack, les montants, les consentements, la date et, pour la facturation et la lutte contre la fraude, l’adresse IP. Les factures sont conservées conformément aux obligations comptables. Les droits d’accès, de rectification et d’effacement s’exercent via le support, dans les limites légales de conservation des pièces.</p>
 
             <h2>10. Médiation et droit applicable</h2>
-            <p>Droit français. En cas de litige, vous pouvez d’abord saisir le support. Un consommateur peut recourir au médiateur de la consommation désigné par le vendeur (nom et adresse publiés dès désignation) et à la plateforme européenne de règlement en ligne des litiges. Les tribunaux français sont compétents, sous réserve des règles impératives de protection du consommateur.</p>
+            <p id="cgv-mediator">Droit français. En cas de litige, vous pouvez d’abord saisir le support. Un consommateur peut recourir au médiateur de la consommation désigné par le vendeur (nom et adresse publiés dès désignation) et à la plateforme européenne de règlement en ligne des litiges. Les tribunaux français sont compétents, sous réserve des règles impératives de protection du consommateur.</p>
 
             <div class="legal-nav">
                 <a class="btn" href="/cgu" onclick="goPage(event, 'cgu')">CGU</a>
@@ -95,8 +96,21 @@
                     return;
                 }
             } catch { /* fall through */ }
-            window.top.location.href = '/' + section;
+            window.location.href = '/' + section;
         }
+        (async function fillMediator() {
+            try {
+                const res = await fetch('/api/config');
+                if (!res.ok) return;
+                const data = await res.json();
+                const el = document.getElementById('cgv-mediator');
+                if (!el) return;
+                if (data.mediatorReady && data.mediator) {
+                    const bits = [data.mediator.name, data.mediator.address, data.mediator.url].filter(Boolean);
+                    el.textContent = `Droit français. En cas de litige, saisissez d’abord le support. Médiateur : ${bits.join(' · ')}. La plateforme européenne de règlement en ligne des litiges reste disponible. Les tribunaux français sont compétents, sous réserve des règles impératives de protection du consommateur.`;
+                }
+            } catch { /* phrase d’attente */ }
+        })();
     </script>
 </body>
 </html>

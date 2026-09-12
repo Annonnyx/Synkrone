@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — FAQ</title>
+    <meta name="description" content="Réponses courtes : compte, panel, Krônes, bots officiels, Bump, Cantale et support.">
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="stylesheet" href="/assets/accueil.css">
     <style>
@@ -62,7 +63,8 @@
                 </details>
                 <details class="faq-item">
                     <summary>Comment créer un compte ?</summary>
-                    <p>Cliquez sur « Se connecter » dans le header. La page du panel propose Discord, Google ou GitHub, ou un compte e-mail. Une fois connecté, le même solde Krônes sert au site et à l’hébergement si Discord est lié.</p>
+                    <p>Deux connexions existent aujourd’hui. Sur le site, le bouton « Se connecter » (en haut à droite) ouvre Discord, Google ou GitHub : ce compte sert à Krônes, Bump, Me et les packs.</p>
+                    <p>Pour créer un bot, un serveur ou un site, ouvrez le panel d’hébergement : il a sa propre page de connexion (e-mail, ou les mêmes réseaux). Le solde Krônes se retrouve des deux côtés si Discord est lié.</p>
                 </details>
                 <details class="faq-item">
                     <summary>Où gérer un bot, un serveur Minecraft ou un site ?</summary>
@@ -79,7 +81,7 @@
                 </details>
                 <details class="faq-item">
                     <summary>Comment payer un pack de Krônes ?</summary>
-                    <p>Connectez-vous, choisissez un pack, acceptez les CGV et renoncez au droit de rétractation (contenu numérique immédiat). Une facture est créée. Le portefeuille n’est crédité qu’après paiement confirmé. PayPal, Apple Pay et la carte seront branchés sur cette étape. En local, un paiement de test valide le parcours. Un virement SEPA s’active dès qu’un IBAN vendeur est renseigné.</p>
+                    <p id="faq-pay">Connectez-vous, choisissez un pack, acceptez les CGV et renoncez au droit de rétractation (contenu numérique immédiat). Une facture est créée. Le portefeuille n’est crédité qu’après paiement confirmé. Les moyens ouverts sont ceux affichés à la commande.</p>
                 </details>
                 <details class="faq-item">
                     <summary>Quels sont les bots officiels ?</summary>
@@ -94,7 +96,7 @@
                 </details>
                 <details class="faq-item">
                     <summary>C’est quoi Bump ?</summary>
-                    <p>Un listing de serveurs Discord, comme Disboard. Tout le monde peut parcourir la liste. Pour y ajouter le sien : se connecter, inviter au moins un bot officiel (Vax, Arceus, Asuna, Kayaba ou Yui), être admin ou propriétaire, puis ouvrir Mes serveurs dans Bump pour publier, bumper et mettre en avant.</p>
+                    <p>Un listing de serveurs Discord, comme Disboard. Tout le monde peut parcourir la liste. Pour y ajouter le vôtre : connectez-vous, invitez au moins un bot officiel (Vax, Arceus, Asuna, Kayaba ou Yui), soyez admin ou propriétaire, puis ouvrez Mes serveurs dans Bump pour publier, bumper et mettre en avant.</p>
                 </details>
                 <details class="faq-item">
                     <summary>Comment jouer sur Cantale ?</summary>
@@ -127,8 +129,22 @@
                     return;
                 }
             } catch { /* fall through */ }
-            window.top.location.href = '/' + section;
+            window.location.href = '/' + section;
         }
+        (async function loadPayMethods() {
+            try {
+                const res = await fetch('/api/config');
+                if (!res.ok) return;
+                const data = await res.json();
+                const methods = (data.methods || []).filter((method) => method.available);
+                const el = document.getElementById('faq-pay');
+                if (!el) return;
+                const labels = methods.map((method) => method.label).join(', ');
+                el.textContent = labels
+                    ? `Connectez-vous, choisissez un pack, acceptez les CGV et renoncez au droit de rétractation (contenu numérique immédiat). Une facture est créée. Le portefeuille n’est crédité qu’après paiement confirmé. Moyens ouverts : ${labels}.`
+                    : 'Connectez-vous, choisissez un pack, acceptez les CGV et renoncez au droit de rétractation. Aucun moyen de paiement n’est ouvert pour le moment : la commande reste bloquée tant qu’une méthode n’est pas branchée.';
+            } catch { /* keep fallback */ }
+        })();
     </script>
 </body>
 </html>

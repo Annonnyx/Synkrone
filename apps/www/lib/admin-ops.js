@@ -161,6 +161,7 @@ async function listTickets() {
 
 module.exports = {
     panelAdmin,
+    panelOrigin,
     pm2Logs,
     listTickets,
     readPanelEnvValue

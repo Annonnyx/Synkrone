@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Krônes</title>
+    <meta name="description" content="Portefeuille Krônes : packs, rangs, hébergement et journal des mouvements.">
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="stylesheet" href="/assets/accueil.css">
     <link rel="stylesheet" href="/design/synkrone.css">
@@ -31,7 +32,7 @@
                 <p class="sect-id">01 · Packs</p>
                 <div>
                     <h2>Recharger.</h2>
-                    <p>Prix TTC, TVA 20 %. Le portefeuille n’est crédité qu’après paiement confirmé. PayPal et Apple Pay se brancheront sur le même parcours.</p>
+                    <p>Prix TTC, TVA 20 %. Le portefeuille n’est crédité qu’après paiement confirmé. Seuls les moyens ouverts apparaissent à la commande.</p>
                 </div>
             </div>
             <div id="pack-row" class="offer-row"></div>
@@ -43,7 +44,7 @@
             <div class="band-head">
                 <p class="sect-id">02 · Rangs</p>
                 <div>
-                    <h2>Abonnements.</h2>
+                    <h2>Rangs.</h2>
                     <p>Achat unique, pas de prélèvement. Vous payez en Krônes (solde) ou directement en euros TTC — sans passer par un pack. Pour monter de rang, seule la différence est due.</p>
                 </div>
             </div>
@@ -128,6 +129,7 @@
         <div class="kr-dialog-inner">
             <h2 id="kr-checkout-title">Commande</h2>
             <p class="lede" id="kr-checkout-lede"></p>
+            <p class="muted" id="kr-seller"></p>
             <table class="kr-breakdown" id="kr-breakdown"></table>
             <div id="kr-checkout-form">
                 <div class="kr-legal">
@@ -495,8 +497,10 @@
             document.getElementById('kr-checkout-form').hidden = true;
             document.getElementById('kr-checkout-pay').hidden = false;
             document.getElementById('kr-checkout-lede').textContent = `Commande ${order.invoiceNumber} — ${STATUS_LABEL[order.status] || order.status}`;
-            document.getElementById('kr-pay-hint').textContent = 'Choisissez un moyen. PayPal, Apple Pay et la carte seront branchés sur cette étape, sans changer la facture.';
-            const methods = catalog.billing?.methods || [];
+            const methods = (catalog.billing?.methods || []).filter((method) => method.available);
+            document.getElementById('kr-pay-hint').textContent = methods.length
+                ? 'Choisissez un moyen ouvert. La facture ne change pas.'
+                : 'Aucun moyen de paiement n’est ouvert pour le moment.';
             const root = document.getElementById('kr-pay-methods');
             root.innerHTML = methods.map((method) => {
                 const disabled = !method.available ? 'disabled' : '';
@@ -625,6 +629,19 @@
             renderCompare();
             renderGrades();
             renderMcQuote();
+            const sellerEl = document.getElementById('kr-seller');
+            if (sellerEl) {
+                const seller = catalog.billing?.seller || {};
+                if (catalog.billing?.sellerReady) {
+                    const bits = [seller.name, seller.legalForm, seller.address, seller.siret && `SIRET ${seller.siret}`, seller.email].filter(Boolean);
+                    if (seller.mediatorReady) {
+                        bits.push(['Médiateur', seller.mediatorName, seller.mediatorAddress, seller.mediatorUrl].filter(Boolean).join(' '));
+                    }
+                    sellerEl.textContent = bits.join(' · ');
+                } else {
+                    sellerEl.textContent = 'Identité du vendeur affichée à la commande dès qu’elle est renseignée.';
+                }
+            }
         }
 
         async function loadOrders() {

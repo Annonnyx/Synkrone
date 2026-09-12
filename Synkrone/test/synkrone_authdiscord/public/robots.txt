@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /equipe
+Disallow: /hub
+Disallow: /ui
+Disallow: /sharing
+
+Sitemap: https://synkrone.app/sitemap.xml
