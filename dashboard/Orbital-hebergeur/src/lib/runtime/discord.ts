@@ -3,7 +3,7 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { discordBots } from "@/db/schema";
-import { decryptSecret, encryptSecret, opensWithPreferredKey } from "@/lib/crypto";
+import { decryptSecret, rewrapSecret } from "@/lib/crypto";
 import type { ServiceType } from "@/lib/paths";
 import { COMMAND_COGS, cogForCommand, flavorFromModules, officialBot } from "@/lib/discord/catalog";
 import {
@@ -468,11 +468,14 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     )[0];
     const fromEnc = decryptSecret(bot?.tokenEnc);
     if (fromEnc) {
-      if (bot?.id && bot.tokenEnc && !opensWithPreferredKey(bot.tokenEnc)) {
-        await db
-          .update(discordBots)
-          .set({ tokenEnc: encryptSecret(fromEnc) })
-          .where(eq(discordBots.id, bot.id));
+      if (bot?.id && bot.tokenEnc) {
+        const wrapped = rewrapSecret(bot.tokenEnc);
+        if (wrapped && wrapped !== bot.tokenEnc) {
+          await db
+            .update(discordBots)
+            .set({ tokenEnc: wrapped })
+            .where(eq(discordBots.id, bot.id));
+        }
       }
       return fromEnc;
     }

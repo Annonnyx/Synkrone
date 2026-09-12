@@ -17,7 +17,7 @@ import {
 import { body, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
-import { decryptSecret, isLockedSecret } from "@/lib/crypto";
+import { decryptSecret, isLockedSecret, rewrapSecret } from "@/lib/crypto";
 import { publicSftpEndpoint } from "@/lib/sftp/manager";
 import { applicationIdFromToken } from "@/lib/discord/token";
 import { withRequiredConfigCommand } from "@/lib/discord/ensure-config";
@@ -44,6 +44,13 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     const detail: Record<string, unknown> = { service: svc, container: container ?? null };
     if (svc.type === "discord") {
       const [bot] = await db.select().from(discordBots).where(eq(discordBots.serviceId, id));
+      if (bot?.tokenEnc) {
+        const wrapped = rewrapSecret(bot.tokenEnc);
+        if (wrapped && wrapped !== bot.tokenEnc) {
+          await db.update(discordBots).set({ tokenEnc: wrapped }).where(eq(discordBots.id, bot.id));
+          bot.tokenEnc = wrapped;
+        }
+      }
       if (bot && !bot.applicationId && bot.tokenEnc) {
         const fromToken = applicationIdFromToken(decryptSecret(bot.tokenEnc) ?? "");
         if (fromToken) {

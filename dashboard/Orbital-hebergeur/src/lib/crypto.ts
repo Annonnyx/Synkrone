@@ -6,30 +6,111 @@ import {
   scryptSync,
   timingSafeEqual,
 } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 
 /**
  * Secrets (Discord tokens, DB passwords, env values) are encrypted at rest with
- * AES-256-GCM. The master key comes from PLATFORM_SECRET_KEY. A derived key is
- * used so that the raw env value never becomes the cipher key directly.
+ * AES-256-GCM. The master key is only PLATFORM_SECRET_KEY — never DATABASE_URL
+ * (rotating the DB password used to lock every stored token).
  *
  * Env is read via `process.env[name]` so Next.js cannot inline the value at
- * build time (which would decrypt with a different key than the one used to
- * encrypt). An empty PLATFORM_SECRET_KEY is treated as unset so DATABASE_URL
- * or the development fallback can still open older rows.
+ * build time. An empty PLATFORM_SECRET_KEY is treated as unset. We also read
+ * the panel `.env` on disk, because Next will not overlay the file when the
+ * parent process already exported an empty PLATFORM_SECRET_KEY.
  */
 function envMaterial(name: string): string {
-  return String(process.env[name] ?? "").trim();
+  const env = process.env;
+  return String(env[name] ?? "").trim();
 }
 
-function preferredSecretMaterial(): string {
-  return envMaterial("PLATFORM_SECRET_KEY") || envMaterial("DATABASE_URL") || "insecure-development-key";
+export function parseDotenvKeys(text: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const line of String(text ?? "").split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq <= 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (key && value) out[key] = value;
+  }
+  return out;
+}
+
+function dotenvFiles(): string[] {
+  const names = [".env", path.join("dashboard", "Orbital-hebergeur", ".env")];
+  const files: string[] = [];
+  let dir = process.cwd();
+  for (let i = 0; i < 8; i++) {
+    for (const name of names) files.push(path.join(dir, name));
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return files;
+}
+
+function ignoreDotenvFiles(): boolean {
+  return envMaterial("SYNKRONE_CRYPTO_IGNORE_DOTENV") === "1";
+}
+
+function fileSecretMaterials(): string[] {
+  if (ignoreDotenvFiles()) return [];
+  const values: string[] = [];
+  const seen = new Set<string>();
+  for (const file of dotenvFiles()) {
+    try {
+      if (!existsSync(file)) continue;
+      const parsed = parseDotenvKeys(readFileSync(file, "utf8"));
+      for (const key of ["PLATFORM_SECRET_KEY", "DATABASE_URL"] as const) {
+        const value = String(parsed[key] ?? "").trim();
+        if (!value || seen.has(value)) continue;
+        seen.add(value);
+        values.push(value);
+      }
+    } catch {
+      /* unreadable .env */
+    }
+  }
+  return values;
+}
+
+function filePlatformKey(): string {
+  if (ignoreDotenvFiles()) return "";
+  for (const file of dotenvFiles()) {
+    try {
+      if (!existsSync(file)) continue;
+      const value = String(parseDotenvKeys(readFileSync(file, "utf8")).PLATFORM_SECRET_KEY ?? "").trim();
+      if (value) return value;
+    } catch {
+      /* unreadable .env */
+    }
+  }
+  return "";
+}
+
+/** Key used to encrypt new secrets. DATABASE_URL is never a write key. */
+export function preferredSecretMaterial(): string {
+  return envMaterial("PLATFORM_SECRET_KEY") || filePlatformKey() || "insecure-development-key";
+}
+
+function hasConfiguredPlatformKey(): boolean {
+  return Boolean(envMaterial("PLATFORM_SECRET_KEY") || filePlatformKey());
 }
 
 function secretMaterials(): string[] {
   const ordered = [
     preferredSecretMaterial(),
     envMaterial("PLATFORM_SECRET_KEY"),
-    String(process.env["PLATFORM_SECRET_KEY"] ?? ""),
+    filePlatformKey(),
+    ...fileSecretMaterials(),
     envMaterial("DATABASE_URL"),
     String(process.env["DATABASE_URL"] ?? ""),
     "insecure-development-key",
@@ -65,6 +146,11 @@ function decryptWithMaterial(payload: string, raw: string): string | null {
 }
 
 export function encryptSecret(plain: string): string {
+  if (process.env.NODE_ENV === "production" && !hasConfiguredPlatformKey()) {
+    throw new Error(
+      "PLATFORM_SECRET_KEY is missing. Refusing to encrypt secrets with a fallback key.",
+    );
+  }
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", keyFromMaterial(preferredSecretMaterial()), iv);
   const enc = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
@@ -95,6 +181,16 @@ export function opensWithPreferredKey(payload: string | null | undefined): boole
   const text = String(payload).trim();
   if (!text) return false;
   return decryptWithMaterial(text, preferredSecretMaterial()) !== null;
+}
+
+/** Re-encrypt with today's key when an older fallback still opens the blob. */
+export function rewrapSecret(payload: string | null | undefined): string | null {
+  const text = payload == null ? "" : String(payload).trim();
+  if (!text) return null;
+  const plain = decryptSecret(text);
+  if (plain == null) return null;
+  if (opensWithPreferredKey(text)) return text;
+  return encryptSecret(plain);
 }
 
 export function hashPassword(password: string): string {

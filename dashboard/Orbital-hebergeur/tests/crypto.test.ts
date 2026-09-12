@@ -7,6 +7,9 @@ import {
   verifyPassword,
   fingerprint,
   slugify,
+  parseDotenvKeys,
+  rewrapSecret,
+  opensWithPreferredKey,
 } from "../src/lib/crypto";
 import { sha512Crypt } from "../src/lib/sha512crypt";
 import { sftpUserConfLine } from "../src/lib/sftp/format";
@@ -26,7 +29,9 @@ test("tampered ciphertext does not decrypt", () => {
 test("empty PLATFORM_SECRET_KEY is not used as the cipher key", () => {
   const prevKey = process.env.PLATFORM_SECRET_KEY;
   const prevUrl = process.env.DATABASE_URL;
+  const prevIgnore = process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV;
   try {
+    process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV = "1";
     process.env.PLATFORM_SECRET_KEY = "";
     process.env.DATABASE_URL = "postgres://fallback";
     const enc = encryptSecret("tok");
@@ -37,13 +42,17 @@ test("empty PLATFORM_SECRET_KEY is not used as the cipher key", () => {
     else process.env.PLATFORM_SECRET_KEY = prevKey;
     if (prevUrl === undefined) delete process.env.DATABASE_URL;
     else process.env.DATABASE_URL = prevUrl;
+    if (prevIgnore === undefined) delete process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV;
+    else process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV = prevIgnore;
   }
 });
 
 test("decrypt still opens secrets encrypted with the development fallback", () => {
   const prevKey = process.env.PLATFORM_SECRET_KEY;
   const prevUrl = process.env.DATABASE_URL;
+  const prevIgnore = process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV;
   try {
+    process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV = "1";
     delete process.env.PLATFORM_SECRET_KEY;
     delete process.env.DATABASE_URL;
     const enc = encryptSecret("legacy");
@@ -54,6 +63,55 @@ test("decrypt still opens secrets encrypted with the development fallback", () =
     else process.env.PLATFORM_SECRET_KEY = prevKey;
     if (prevUrl === undefined) delete process.env.DATABASE_URL;
     else process.env.DATABASE_URL = prevUrl;
+    if (prevIgnore === undefined) delete process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV;
+    else process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV = prevIgnore;
+  }
+});
+
+test("DATABASE_URL is never the write key, so rotating it cannot lock tokens", () => {
+  const prevKey = process.env.PLATFORM_SECRET_KEY;
+  const prevUrl = process.env.DATABASE_URL;
+  const prevIgnore = process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV;
+  try {
+    process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV = "1";
+    process.env.PLATFORM_SECRET_KEY = "stable-platform-key";
+    process.env.DATABASE_URL = "postgres://old";
+    const enc = encryptSecret("tok");
+    process.env.DATABASE_URL = "postgres://new-password";
+    assert.equal(decryptSecret(enc), "tok");
+  } finally {
+    if (prevKey === undefined) delete process.env.PLATFORM_SECRET_KEY;
+    else process.env.PLATFORM_SECRET_KEY = prevKey;
+    if (prevUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = prevUrl;
+    if (prevIgnore === undefined) delete process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV;
+    else process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV = prevIgnore;
+  }
+});
+
+test("rewrapSecret upgrades a blob opened with a fallback key", () => {
+  const prevKey = process.env.PLATFORM_SECRET_KEY;
+  const prevUrl = process.env.DATABASE_URL;
+  const prevIgnore = process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV;
+  try {
+    process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV = "1";
+    delete process.env.PLATFORM_SECRET_KEY;
+    delete process.env.DATABASE_URL;
+    const legacy = encryptSecret("tok");
+    process.env.PLATFORM_SECRET_KEY = "today-key";
+    assert.equal(opensWithPreferredKey(legacy), false);
+    const wrapped = rewrapSecret(legacy);
+    assert.ok(wrapped);
+    assert.notEqual(wrapped, legacy);
+    assert.equal(opensWithPreferredKey(wrapped), true);
+    assert.equal(decryptSecret(wrapped), "tok");
+  } finally {
+    if (prevKey === undefined) delete process.env.PLATFORM_SECRET_KEY;
+    else process.env.PLATFORM_SECRET_KEY = prevKey;
+    if (prevUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = prevUrl;
+    if (prevIgnore === undefined) delete process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV;
+    else process.env.SYNKRONE_CRYPTO_IGNORE_DOTENV = prevIgnore;
   }
 });
 
@@ -67,6 +125,16 @@ test("passwords use salted scrypt", () => {
 test("fingerprints are stable and non reversible", () => {
   assert.equal(fingerprint("abc"), fingerprint("abc"));
   assert.equal(fingerprint("abc").length, 12);
+});
+
+test("parseDotenvKeys reads PLATFORM_SECRET_KEY without comments", () => {
+  const parsed = parseDotenvKeys(`
+# PLATFORM_SECRET_KEY=ignored
+PLATFORM_SECRET_KEY="abc def"
+DATABASE_URL=postgres://x
+`);
+  assert.equal(parsed.PLATFORM_SECRET_KEY, "abc def");
+  assert.equal(parsed.DATABASE_URL, "postgres://x");
 });
 
 test("slugify produces container safe names", () => {

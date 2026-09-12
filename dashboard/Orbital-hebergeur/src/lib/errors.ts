@@ -98,6 +98,23 @@ const RULES: Rule[] = [
     },
   },
   {
+    match: /PLATFORM_SECRET_KEY is missing|Refusing to encrypt secrets/i,
+    fr: {
+      title: "Clé serveur manquante",
+      explanation:
+        "Le panel refuse d'enregistrer des secrets sans PLATFORM_SECRET_KEY. Sans cette clé, les tokens Discord redeviendraient illisibles.",
+      action:
+        "Ajoutez PLATFORM_SECRET_KEY dans dashboard/Orbital-hebergeur/.env (et ne la changez plus), puis redémarrez le panel.",
+    },
+    en: {
+      title: "Server key missing",
+      explanation:
+        "The panel refuses to store secrets without PLATFORM_SECRET_KEY. Without it, Discord tokens would become unreadable later.",
+      action:
+        "Set PLATFORM_SECRET_KEY in dashboard/Orbital-hebergeur/.env (and do not rotate it), then restart the panel.",
+    },
+  },
+  {
     match: /stored but cannot be decrypted|could not be encrypted with the current server key/i,
     fr: {
       title: "Token Discord illisible",

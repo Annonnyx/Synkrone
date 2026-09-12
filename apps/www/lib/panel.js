@@ -218,6 +218,11 @@ function spawnPanel({ publicPort }) {
         return null;
     }
     const origin = panelPublicOrigin(publicPort);
+    const inherited = { ...process.env };
+    // An empty PLATFORM_SECRET_KEY inherited from the site blocks Next from
+    // loading dashboard/.env (dotenv does not override existing keys). Tokens
+    // then get encrypted with a fallback and become unreadable later.
+    delete inherited.PLATFORM_SECRET_KEY;
     const child = spawn(process.execPath, [
         nextBin(),
         production ? 'start' : 'dev',
@@ -229,10 +234,7 @@ function spawnPanel({ publicPort }) {
         cwd: PANEL_DIR,
         stdio: ['ignore', 'inherit', 'inherit'],
         env: {
-            ...process.env,
-            // Panel .env must win: an empty PLATFORM_SECRET_KEY inherited from
-            // the site process would otherwise block Next from loading the file
-            // and make stored Discord tokens undecryptable.
+            ...inherited,
             ...loadPanelEnvFile(),
             PORT: String(PANEL_PORT),
             SYNKRONE_PANEL_ORIGIN: origin
