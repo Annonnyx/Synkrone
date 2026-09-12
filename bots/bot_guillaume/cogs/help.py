@@ -252,9 +252,9 @@ class HelpCog(commands.Cog):
         app_info = await self.bot.application_info()
         owner_mention = app_info.owner.mention if app_info.owner else "Inconnu"
 
-        total_members = guild.member_count
-        bots_count = sum(1 for member in guild.members if member.bot)
-        humans_count = total_members - bots_count
+        total_members = int((guild.member_count if guild else 0) or (len(guild.members) if guild else 0) or 0)
+        bots_count = sum(1 for member in guild.members if member.bot) if guild else 0
+        humans_count = max(0, total_members - bots_count)
         bot_texte = "bot" if bots_count <= 1 else "bots"
         
         # Récupération des vraies stats depuis la DB

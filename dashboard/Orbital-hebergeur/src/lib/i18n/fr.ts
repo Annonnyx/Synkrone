@@ -394,6 +394,7 @@ export const fr = {
     dbProvisioned: "Base provisionnée",
     actionOk: "Action terminée",
     officialReadOnly: "Bot officiel : le code Python est déployé tel quel. Les modules ne se pickent pas à l'unité.",
+    configLocked: "/config est toujours actif et ne peut pas être désactivé.",
     guild: "Serveur",
     guildIdFallback: "ID du serveur",
     guildCount: "Serveurs",
@@ -454,6 +455,7 @@ export const fr = {
     prefix: "Préfixe",
     slashEnable: "Activer les commandes slash (enregistrées sur tes serveurs au démarrage)",
     enableModuleFirst: "Activez d'abord un module.",
+    configAlways: "La commande /config est toujours incluse : hub serveur et lien vers le site.",
     intentsHint:
       "Les intents non privilégiés suivent vos modules. Les intents privilégiés restent désactivés tant que vous ne les cochez pas — et ils doivent aussi être activés dans le portail développeur Discord.",
     privilegedBadge: "privilégié",

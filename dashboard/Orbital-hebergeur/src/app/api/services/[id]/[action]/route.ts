@@ -33,6 +33,7 @@ import { parseProperties, serializeProperties } from "@/lib/runtime/minecraft";
 import { normalizeProperties } from "@/lib/minecraft/properties";
 import { applicationIdFromToken, isDiscordToken } from "@/lib/discord/token";
 import { normalizeBotPrefix } from "@/lib/discord/prefix";
+import { withRequiredConfigCommand } from "@/lib/discord/ensure-config";
 import { backupsDir, type ServiceType } from "@/lib/paths";
 import { createJob, dispatch } from "@/lib/jobs/queue";
 import {
@@ -609,17 +610,19 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           };
         }
 
-        const commands = (bot.commands ?? []).map((c) => {
-          const update = payload.commands?.find((p) => p.name === c.name);
-          return update
-            ? {
-                ...c,
-                enabled: update.enabled,
-                cooldown: update.cooldown ?? c.cooldown,
-                response: update.response ?? c.response,
-              }
-            : c;
-        });
+        const commands = withRequiredConfigCommand(
+          (bot.commands ?? []).map((c) => {
+            const update = payload.commands?.find((p) => p.name === c.name);
+            return update
+              ? {
+                  ...c,
+                  enabled: update.enabled,
+                  cooldown: update.cooldown ?? c.cooldown,
+                  response: update.response ?? c.response,
+                }
+              : c;
+          }),
+        );
         const modules = payload.modules ?? bot.modules;
         if (payload.applicationId !== undefined && !/^\d{0,25}$/.test(payload.applicationId.trim()))
           return fail("The application ID is the numeric snowflake of your Discord application");

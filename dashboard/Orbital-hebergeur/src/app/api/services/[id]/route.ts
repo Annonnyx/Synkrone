@@ -20,6 +20,7 @@ import { requireUser } from "@/lib/auth";
 import { decryptSecret, isLockedSecret } from "@/lib/crypto";
 import { publicSftpEndpoint } from "@/lib/sftp/manager";
 import { applicationIdFromToken } from "@/lib/discord/token";
+import { withRequiredConfigCommand } from "@/lib/discord/ensure-config";
 import { authorizeService } from "@/lib/runtime";
 import { dnsRecordsFor, domainHints } from "@/lib/domains/public";
 import { createJob, dispatch } from "@/lib/jobs/queue";
@@ -54,6 +55,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
       detail.discord = bot
         ? {
             ...bot,
+            commands: withRequiredConfigCommand(bot.commands ?? []),
             tokenEnc: undefined,
             hasToken: Boolean(plain),
             tokenUnreadable: isLockedSecret(bot.tokenEnc),

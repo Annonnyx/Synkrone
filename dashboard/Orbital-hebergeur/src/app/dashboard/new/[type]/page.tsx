@@ -15,6 +15,7 @@ import { PROPERTY_BY_KEY, defaultProperties } from "@/lib/minecraft/properties";
 import { mergeIntentsForModules, suggestedPrivilegedIntents } from "@/lib/discord/intents";
 import { IntentPicker } from "@/components/discord-intents";
 import { COMMAND_COGS, customCategories } from "@/lib/discord/catalog";
+import { CONFIG_COMMAND } from "@/lib/discord/ensure-config";
 import { hostingCost } from "@/lib/krones/pricing";
 import { activeDiscounts, type PromoDiscount } from "@/lib/krones/discounts";
 import { withPanelBase } from "@/lib/panel-base";
@@ -132,7 +133,7 @@ export default function CreateServicePage() {
   const [botSource, setBotSource] = useState<"catalog" | "ticket">("catalog");
   const [supportInvite, setSupportInvite] = useState("https://discord.gg/p768u2Pgp3");
   const [modules, setModules] = useState<string[]>(["moderation", "public"]);
-  const [commands, setCommands] = useState<string[]>(["ban", "kick", "ping"]);
+  const [commands, setCommands] = useState<string[]>(["ban", "kick", "ping", CONFIG_COMMAND]);
   const [intents, setIntents] = useState<string[]>(() => mergeIntentsForModules([], ["moderation", "public"]));
   const [cmdQuery, setCmdQuery] = useState("");
 
@@ -277,7 +278,7 @@ export default function CreateServicePage() {
           slashCommands: slash,
           flavor: "custom",
           modules,
-          commands,
+          commands: Array.from(new Set([...commands, CONFIG_COMMAND])),
           intents,
         };
       if (type === "minecraft")
@@ -377,17 +378,23 @@ export default function CreateServicePage() {
     items: string[],
     selected: string[],
     setSelected: (v: string[]) => void,
+    locked: string[] = [],
   ) => (
     <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
       {items.map((m) => (
         <button
           key={m}
           type="button"
-          onClick={() => toggle(selected, setSelected, m)}
+          disabled={locked.includes(m)}
+          onClick={() => {
+            if (locked.includes(m)) return;
+            toggle(selected, setSelected, m);
+          }}
           className="btn justify-start text-left"
           style={{
-            borderColor: selected.includes(m) ? "var(--accent)" : "var(--line)",
-            color: selected.includes(m) ? "var(--text)" : "var(--muted)",
+            borderColor: selected.includes(m) || locked.includes(m) ? "var(--accent)" : "var(--line)",
+            color: selected.includes(m) || locked.includes(m) ? "var(--text)" : "var(--muted)",
+            opacity: locked.includes(m) ? 0.85 : 1,
           }}
         >
           {m}
@@ -543,8 +550,10 @@ export default function CreateServicePage() {
                   <div className="label mb-2">{cat.name}</div>
                   {checkboxGrid(
                     visible.map((c) => c.name),
-                    commands,
-                    setCommands,
+                    Array.from(new Set([...commands, CONFIG_COMMAND])),
+                    (names) =>
+                      setCommands(Array.from(new Set([...names.filter((n) => n !== CONFIG_COMMAND), CONFIG_COMMAND]))),
+                    [CONFIG_COMMAND],
                   )}
                 </div>
               );
@@ -552,6 +561,7 @@ export default function CreateServicePage() {
             {modules.length === 0 && (
               <p className="text-sm text-[var(--muted)]">{t("create.enableModuleFirst")}</p>
             )}
+            <p className="text-sm text-[var(--muted)]">{t("create.configAlways")}</p>
           </div>
         );
       }

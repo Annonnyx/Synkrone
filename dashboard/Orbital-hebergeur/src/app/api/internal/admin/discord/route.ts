@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { discordBots, oauthAccounts, services } from "@/db/schema";
+import { discordBots, services, users } from "@/db/schema";
 import { route } from "@/lib/api";
 import { decryptSecret } from "@/lib/crypto";
 import { requireInternalAdmin } from "@/lib/internal-admin";
 import { FilesystemManager } from "@/lib/filesystem/manager";
 import { RUNTIME_STATS_PATH, readJsonFile } from "@/lib/discord/guild-files";
+import { userIdForDiscordAccount } from "@/lib/oauth/accounts";
 import type { ServiceType } from "@/lib/paths";
 
 export const runtime = "nodejs";
@@ -52,6 +53,7 @@ export async function GET(req: NextRequest) {
     const serviceId = String(req.nextUrl.searchParams.get("serviceId") || "").trim();
     const guildId = String(req.nextUrl.searchParams.get("guildId") || "").trim();
     const memberId = String(req.nextUrl.searchParams.get("memberId") || "").trim();
+    const email = String(req.nextUrl.searchParams.get("email") || "").trim().toLowerCase();
 
     async function serviceByApp(appId: string) {
       const [bot] = await db.select().from(discordBots).where(eq(discordBots.applicationId, appId)).limit(1);
@@ -90,14 +92,14 @@ export async function GET(req: NextRequest) {
       return found || { found: false };
     }
 
-    if (discordUserId) {
-      const [account] = await db
-        .select()
-        .from(oauthAccounts)
-        .where(and(eq(oauthAccounts.provider, "discord"), eq(oauthAccounts.providerAccountId, discordUserId)))
-        .limit(1);
-      if (!account) return { linked: false, services: [] };
-      const rows = await db.select().from(services).where(eq(services.ownerId, account.userId));
+    if (discordUserId || email) {
+      let ownerId = discordUserId ? await userIdForDiscordAccount(discordUserId) : null;
+      if (!ownerId && email) {
+        const [byEmail] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+        ownerId = byEmail?.id ?? null;
+      }
+      if (!ownerId) return { linked: false, services: [] };
+      const rows = await db.select().from(services).where(eq(services.ownerId, ownerId));
       const out = [];
       for (const svc of rows) {
         if (svc.type !== "discord") {

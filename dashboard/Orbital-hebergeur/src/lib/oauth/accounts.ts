@@ -11,6 +11,27 @@ function placeholderEmail(provider: OAuthProvider, providerUserId: string): stri
   return `${provider}-${providerUserId}@oauth.synkrone.local`;
 }
 
+export function oauthPlaceholderEmail(provider: OAuthProvider, providerUserId: string): string {
+  return placeholderEmail(provider, providerUserId);
+}
+
+export async function userIdForDiscordAccount(discordUserId: string): Promise<string | null> {
+  const id = String(discordUserId || "").trim();
+  if (!/^\d{15,22}$/.test(id)) return null;
+  const [account] = await db
+    .select({ userId: oauthAccounts.userId })
+    .from(oauthAccounts)
+    .where(and(eq(oauthAccounts.provider, "discord"), eq(oauthAccounts.providerAccountId, id)))
+    .limit(1);
+  if (account) return account.userId;
+  const [user] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, placeholderEmail("discord", id)))
+    .limit(1);
+  return user?.id ?? null;
+}
+
 function expiresAtFrom(tokens: OAuthTokens): Date | null {
   if (!tokens.expiresIn || tokens.expiresIn <= 0) return null;
   return new Date(Date.now() + tokens.expiresIn * 1000);

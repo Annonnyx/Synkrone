@@ -897,6 +897,7 @@ function DiscordCommands({
       {official && (
         <p className="mb-3 text-sm leading-relaxed text-[var(--muted)]">{t("service.officialReadOnly")}</p>
       )}
+      <p className="mb-3 text-sm leading-relaxed text-[var(--muted)]">{t("service.configLocked")}</p>
       <input
         className="input mb-3"
         value={query}
@@ -908,8 +909,8 @@ function DiscordCommands({
           <label key={c.name} className="flex items-center gap-3 border-b border-[var(--line)] py-1.5">
             <input
               type="checkbox"
-              checked={c.enabled}
-              disabled={official}
+              checked={c.enabled || c.name === "config"}
+              disabled={official || c.name === "config"}
               onChange={(e) => onToggle(c.name, e.target.checked)}
             />
             <span className="font-mono">{c.name}</span>

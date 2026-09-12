@@ -33,6 +33,7 @@ import { assertGithubRepoAccess } from "@/lib/oauth/github";
 import { debitWallet, hostingCost } from "@/lib/krones/store";
 import { assertCreationAllowed, clampResources, type ServiceKind } from "@/lib/services/limits";
 import { DISCORD_COMMANDS } from "@/lib/discord/catalog";
+import { withRequiredConfigCommand } from "@/lib/discord/ensure-config";
 
 export type CreateServiceInput = {
   type: ServiceType;
@@ -175,19 +176,21 @@ export async function createService(userId: string, input: CreateServiceInput) {
     if (!d) throw new HttpError(400, "Discord configuration is required");
     const modules = (d.modules ?? []).filter((id) => id in DISCORD_COMMANDS);
     const selected = new Set(d.commands ?? []);
-    const commands = Object.entries(DISCORD_COMMANDS)
-      .filter(([moduleId]) => modules.includes(moduleId))
-      .flatMap(([moduleId, list]) =>
-        list.map((c) => ({
-          name: c.name,
-          module: moduleId,
-          enabled: selected.size === 0 ? true : selected.has(c.name),
-          description: c.description,
-          permission: c.permission,
-          cooldown: 3,
-          logging: false,
-        })),
-      );
+    const commands = withRequiredConfigCommand(
+      Object.entries(DISCORD_COMMANDS)
+        .filter(([moduleId]) => modules.includes(moduleId))
+        .flatMap(([moduleId, list]) =>
+          list.map((c) => ({
+            name: c.name,
+            module: moduleId,
+            enabled: selected.size === 0 ? true : selected.has(c.name),
+            description: c.description,
+            permission: c.permission,
+            cooldown: 3,
+            logging: false,
+          })),
+        ),
+    );
     const token = d.token?.trim() || undefined;
     await db.insert(discordBots).values({
       serviceId: svc.id,

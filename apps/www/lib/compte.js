@@ -51,17 +51,24 @@ function mountCompte(app) {
             });
         }
         const discordId = discordUserId(user);
+        const email = String(user.email || '').trim().toLowerCase();
         const wallet = await peekWallet(user.id).catch(() => null);
         const spend = spendFromLedger(wallet?.ledger || []);
         let services = [];
         let linkedPanel = false;
-        if (discordId) {
+        let servicesError = null;
+        const query = new URLSearchParams();
+        if (discordId) query.set('discordUserId', discordId);
+        if (email) query.set('email', email);
+        if (discordId || email) {
             try {
-                const data = await panelAdmin(`/discord?discordUserId=${encodeURIComponent(discordId)}`);
+                const data = await panelAdmin(`/discord?${query.toString()}`);
                 linkedPanel = Boolean(data.linked);
                 services = Array.isArray(data.services) ? data.services : [];
-            } catch {
+            } catch (err) {
                 services = [];
+                servicesError = err instanceof Error ? err.message : 'Panel injoignable.';
+                console.warn('[compte] services panel:', servicesError);
             }
         }
         const guilds = [];
@@ -107,6 +114,7 @@ function mountCompte(app) {
                 flavor: svc.flavor
             })),
             linkedPanel,
+            servicesError,
             guilds,
             officialBots: OFFICIAL_BOTS.map((b) => ({ slug: b.slug, name: b.name, applicationId: b.applicationId })),
             panelUrl: '/hebergement'

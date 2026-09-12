@@ -56,7 +56,14 @@
                 return;
             }
             const roles = (data.support?.roles || []).map((r) => `<li>${esc(r.name)}</li>`).join('') || '<li>Aucun rôle support lu.</li>';
-            const services = (data.services || []).map((s) => `<li>${esc(s.name)} — ${esc(s.state || s.type)}</li>`).join('') || '<li>Aucun service lié au panel.</li>';
+            let servicesLabel = '<li>Aucun service lié au panel.</li>';
+            if (data.servicesError) {
+                servicesLabel = `<li>Impossible de lire le panel : ${esc(data.servicesError)}</li>`;
+            } else if ((data.services || []).length) {
+                servicesLabel = (data.services || []).map((s) => `<li>${esc(s.name)} — ${esc(s.state || s.type)}</li>`).join('');
+            } else if (data.linkedPanel === false && data.user && data.user.discordId) {
+                servicesLabel = '<li>Compte Discord du site non lié au panel. Ouvre Hébergement et connecte-toi (ou lie Discord dans Compte) avec le même Discord que celui du bot.</li>';
+            }
             const guilds = (data.guilds || []).map((g) => `<li><a href="${esc(g.href)}">${esc(g.name)}</a> · ${esc(g.bot)}</li>`).join('') || '<li>Passe par /config sur Discord pour ouvrir un serveur.</li>';
             root.innerHTML = `
                 <article class="compte-card">
@@ -75,7 +82,7 @@
                 </article>
                 <article class="compte-card">
                     <h2>Services</h2>
-                    <ul>${services}</ul>
+                    <ul>${servicesLabel}</ul>
                     <p class="compte-actions"><a href="${esc(data.panelUrl)}" target="_top">Hébergement</a></p>
                 </article>
                 <article class="compte-card">

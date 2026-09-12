@@ -14,13 +14,39 @@ if (fs.existsSync(PANEL_ENV)) {
     dotenv.config({ path: PANEL_ENV, override: false });
 }
 
+function readPanelEnvValue(name) {
+    try {
+        if (!fs.existsSync(PANEL_ENV)) return '';
+        for (const line of fs.readFileSync(PANEL_ENV, 'utf8').split(/\r?\n/)) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('#')) continue;
+            const eq = trimmed.indexOf('=');
+            if (eq <= 0) continue;
+            const key = trimmed.slice(0, eq).trim();
+            if (key !== name) continue;
+            let value = trimmed.slice(eq + 1).trim();
+            if (
+                (value.startsWith('"') && value.endsWith('"'))
+                || (value.startsWith("'") && value.endsWith("'"))
+            ) {
+                value = value.slice(1, -1);
+            }
+            return value;
+        }
+    } catch {
+        return '';
+    }
+    return '';
+}
+
 function panelOrigin() {
-    const port = Number(process.env.SYNKRONE_PANEL_PORT || 3000);
+    const port = Number(process.env.SYNKRONE_PANEL_PORT || readPanelEnvValue('SYNKRONE_PANEL_PORT') || 3000);
     return `http://127.0.0.1:${port}/hebergement`;
 }
 
 function adminToken() {
-    return String(process.env.PLATFORM_SECRET_KEY || '').trim();
+    // Same key as the Next child: panel .env wins over an empty site PLATFORM_SECRET_KEY.
+    return readPanelEnvValue('PLATFORM_SECRET_KEY') || String(process.env.PLATFORM_SECRET_KEY || '').trim();
 }
 
 async function panelAdmin(pathname, init = {}) {

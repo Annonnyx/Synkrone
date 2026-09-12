@@ -396,6 +396,7 @@ export const en: Dict = {
     dbProvisioned: "Database provisioned",
     actionOk: "Action completed",
     officialReadOnly: "Official bot: the Python tree is deployed as-is. Modules are not picked one by one.",
+    configLocked: "/config is always on and cannot be turned off.",
     guild: "Server",
     guildIdFallback: "Server ID",
     guildCount: "Servers",
@@ -456,6 +457,7 @@ export const en: Dict = {
     prefix: "Prefix",
     slashEnable: "Enable slash commands (registered on your servers at startup)",
     enableModuleFirst: "Enable a module first.",
+    configAlways: "/config is always included: server hub and link to the site.",
     intentsHint:
       "Safe intents follow your modules. Privileged intents stay off unless you check them — and they must also be enabled in the Discord developer portal.",
     privilegedBadge: "privileged",

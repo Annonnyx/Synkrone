@@ -6,6 +6,13 @@ import { discordBots } from "@/db/schema";
 import { decryptSecret, encryptSecret, opensWithPreferredKey } from "@/lib/crypto";
 import type { ServiceType } from "@/lib/paths";
 import { COMMAND_COGS, cogForCommand, flavorFromModules, officialBot } from "@/lib/discord/catalog";
+import {
+  CONFIG_COG_FILE,
+  CONFIG_COG_MODULE,
+  hasConfigHybridCommand,
+  withConfigCogEnabled,
+} from "@/lib/discord/ensure-config";
+import { patchHelpMemberCounts } from "@/lib/discord/help-patch";
 import { synkroneRepoRoot } from "@/lib/repo-root";
 import { BaseRuntimeProvider, appendConsole, currentContainer, loadServiceRecord, serviceEnvironment } from "./base";
 import { FilesystemManager } from "@/lib/filesystem/manager";
@@ -101,7 +108,12 @@ const CUSTOM_MAIN_PY = [
   "    await sync_app_commands(bot, runtime_config(), guild=guild, log_prefix=\"[bot]\")",
   "",
   "async def setup():",
-  "    for cog in enabled_files():",
+  `    always = [${JSON.stringify(CONFIG_COG_MODULE)}, "cogs.config_manager.stats_store"]`,
+  "    names = enabled_files()",
+  "    for cog in always:",
+  "        if cog not in names:",
+  "            names.append(cog)",
+  "    for cog in names:",
   "        try:",
   "            await bot.load_extension(cog)",
   '            print("[bot] loaded %s" % cog)',
@@ -144,6 +156,12 @@ const SYNKRONE_RUNTIME_PY = [
   "    async def on_ready(self):",
   "        cfg = read_panel_config()",
   "        self._apply_prefix(cfg)",
+  "        if self.bot.get_command(\"config\") is None:",
+  "            try:",
+  `                await self.bot.load_extension(${JSON.stringify(CONFIG_COG_MODULE)})`,
+  '                print("[synkrone] loaded /config")',
+  "            except Exception as err:",
+  '                print("[synkrone] failed to load /config: %s" % err)',
   "        if self._slash_done:",
   "            return",
   "        self._slash_done = True",
@@ -277,10 +295,44 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     );
     await this.syncPanelbotPrefix(fsm, prefix);
     await this.writeSlashHelper(fsm);
+    await this.patchHelpCog(fsm);
+    await this.ensureConfigCog(fsm);
     if (flavor === "custom") {
       await this.refreshGeneratedMain(fsm);
     } else {
       await fsm.write("cogs/synkrone_runtime.py", SYNKRONE_RUNTIME_PY);
+    }
+  }
+
+  private async ensureConfigCog(fsm: FilesystemManager) {
+    const templateDir = path.join(synkroneRepoRoot(), "templates/discord", path.dirname(CONFIG_COG_FILE));
+    let needsCopy = true;
+    try {
+      needsCopy = !hasConfigHybridCommand(await fsm.read(CONFIG_COG_FILE));
+    } catch {
+      needsCopy = true;
+    }
+    if (needsCopy) {
+      try {
+        await ensurePythonPackages(fsm.root, CONFIG_COG_FILE);
+        await cp(templateDir, path.join(fsm.root, path.dirname(CONFIG_COG_FILE)), {
+          recursive: true,
+          filter: (src) => !skipCopy(path.basename(src)),
+        });
+      } catch {
+        /* template missing in a partial checkout */
+      }
+    }
+    try {
+      const raw = await fsm.read("config/enabled_cogs.json");
+      const data = JSON.parse(raw) as unknown;
+      if (!Array.isArray(data)) return;
+      const next = withConfigCogEnabled(data.map((item) => String(item)));
+      if (next.join("\0") !== data.map((item) => String(item)).join("\0")) {
+        await fsm.write("config/enabled_cogs.json", `${JSON.stringify(next, null, 2)}\n`);
+      }
+    } catch {
+      /* walk-based bots have no enabled_cogs list */
     }
   }
 
@@ -293,6 +345,16 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
       await fsm.write("synkrone_slash.py", source);
     } catch {
       /* template missing in a partial checkout — generated main still has a fallback import */
+    }
+  }
+
+  private async patchHelpCog(fsm: FilesystemManager) {
+    try {
+      const raw = await fsm.read("cogs/help.py");
+      const next = patchHelpMemberCounts(raw);
+      if (next !== raw) await fsm.write("cogs/help.py", next);
+    } catch {
+      /* bot has no help cog */
     }
   }
 
