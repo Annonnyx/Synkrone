@@ -256,7 +256,7 @@
                     Depuis Bump → Mes serveurs, vous gérez la fiche et relancez la visibilité.
                 </li>
             </ol>
-            <div class="plates cols-2 reveal">
+            <div class="plates reveal">
                 <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')">
                     <div class="plate-meta"><span>Bump</span><span>Listing</span></div>
                     <h3>Voir les serveurs</h3>
@@ -269,8 +269,14 @@
                     <p>Vax, Arceus, Asuna, Kayaba, Yui — fiches et préfixes.</p>
                     <span class="go">Voir les bots</span>
                 </a>
+                <a class="plate" href="/login?returnTo=/discord/bump" target="_top">
+                    <div class="plate-meta"><span>Compte</span><span>Publier</span></div>
+                    <h3>Publier le vôtre</h3>
+                    <p>Connectez-vous, invitez un bot officiel, puis ouvrez Mes serveurs.</p>
+                    <span class="go">Se connecter pour publier</span>
+                </a>
             </div>
-            <div class="plates cols-2 reveal" id="home-bump-list" style="margin-top:16px"></div>
+            <div class="plates reveal" id="home-bump-list" hidden style="margin-top:16px"></div>
             <p class="muted reveal" id="home-bump-empty" hidden>Aucun serveur listé pour l’instant.</p>
         </div>
     </section>
@@ -704,16 +710,44 @@
                     const payload = await bumpRes.json();
                     const servers = (payload.servers || []).slice(0, 3);
                     if (!servers.length) {
+                        list.hidden = true;
+                        list.innerHTML = '';
                         if (empty) empty.hidden = false;
                     } else {
                         if (empty) empty.hidden = true;
-                        list.innerHTML = servers.map((srv) => `
+                        const cards = servers.map((srv) => `
                             <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')">
                                 <div class="plate-meta"><span>Bump</span><span>${escapeHtml(srv.visibilityLevel || 'public')}</span></div>
                                 <h3>${escapeHtml(srv.name)}</h3>
                                 <p>${srv.members ? `${srv.members} membres` : 'Serveur listé.'}</p>
                                 <span class="go">Voir Bump</span>
-                            </a>`).join('');
+                            </a>`);
+                        if (cards.length === 1) {
+                            cards.push(`
+                            <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')">
+                                <div class="plate-meta"><span>Bump</span><span>Listing</span></div>
+                                <h3>Tout le listing</h3>
+                                <p>Les autres serveurs publiés, le classement et les mises en avant.</p>
+                                <span class="go">Ouvrir Bump</span>
+                            </a>`);
+                            cards.push(`
+                            <a class="plate" href="/krones" onclick="goSection(event, 'krones')">
+                                <div class="plate-meta"><span>₭</span><span>Krônes</span></div>
+                                <h3>Mise en avant</h3>
+                                <p>Une fois publié, vous pouvez remonter dans la liste avec des Krônes.</p>
+                                <span class="go">Portefeuille</span>
+                            </a>`);
+                        } else if (cards.length === 2) {
+                            cards.push(`
+                            <a class="plate" href="/discord/bump" onclick="goSection(event, 'bump')">
+                                <div class="plate-meta"><span>Bump</span><span>Listing</span></div>
+                                <h3>Tout le listing</h3>
+                                <p>Classement, mises en avant, et les autres serveurs publiés.</p>
+                                <span class="go">Ouvrir Bump</span>
+                            </a>`);
+                        }
+                        list.innerHTML = cards.join('');
+                        list.hidden = false;
                     }
                 }
             } catch { /* listing later */ }
