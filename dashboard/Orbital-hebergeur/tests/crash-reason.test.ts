@@ -22,6 +22,18 @@ test("falls back to the exit code", () => {
   assert.equal(crashReasonFromLogs("", 1), "exit code 1");
 });
 
+test("surfaces ModuleNotFoundError instead of a bare exit code", () => {
+  const logs = [
+    "[synkrone] python dependencies already installed",
+    "[synkrone] starting bot",
+    "Traceback (most recent call last):",
+    'File "/app/main.py", line 11, in <module>',
+    "import discord",
+    "ModuleNotFoundError: No module named 'discord'",
+  ].join("\n");
+  assert.equal(crashReasonFromLogs(logs, 1), "ModuleNotFoundError: No module named 'discord'");
+});
+
 test("disallowed intents are a config fatal even without [fatal]", () => {
   assert.equal(isConfigFatalLogs("Error: Used disallowed intents"), true);
   assert.equal(isConfigFatalLogs("[bot] loaded 26 commands"), false);

@@ -33,18 +33,22 @@ if [ -z "\$TOKEN" ]; then
 fi
 export DISCORD_TOKEN="\$TOKEN"
 export BOT_TOKEN="\$TOKEN"
+# Packages live on the service volume. pip --user wrote to /root/.local (lost
+# on every container recreate) while reqs.ok stayed on /app, so boot skipped
+# install and crashed with ModuleNotFoundError: discord.
+export PYTHONPATH="/app/.orbital/py:\${PYTHONPATH:-}"
+export PATH="/app/.orbital/py/bin:/root/.local/bin:\${PATH}"
 if [ -f requirements.txt ]; then
   HASH=$(sha256sum requirements.txt | awk '{print $1}')
-  if [ -f /app/.orbital/reqs.ok ] && [ "$(cat /app/.orbital/reqs.ok)" = "$HASH" ]; then
+  mkdir -p /app/.orbital/py
+  if [ -f /app/.orbital/reqs.ok ] && [ "$(cat /app/.orbital/reqs.ok)" = "v2:$HASH" ] && python -c "import discord" >/dev/null 2>&1; then
     echo "[synkrone] python dependencies already installed"
   else
     echo "[synkrone] installing python dependencies"
-    python -m pip install --user --no-cache-dir --disable-pip-version-check --root-user-action=ignore -q -r requirements.txt
-    mkdir -p /app/.orbital
-    echo "$HASH" > /app/.orbital/reqs.ok
+    python -m pip install --target /app/.orbital/py --no-cache-dir --disable-pip-version-check --root-user-action=ignore -q -r requirements.txt
+    echo "v2:$HASH" > /app/.orbital/reqs.ok
   fi
 fi
-export PATH="/root/.local/bin:\${PATH}"
 echo "[synkrone] starting bot"
 exec python -u main.py
 `;

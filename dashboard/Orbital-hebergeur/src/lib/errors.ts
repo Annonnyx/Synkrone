@@ -132,6 +132,21 @@ const RULES: Rule[] = [
     },
   },
   {
+    match: /No module named ['"]discord['"]|ModuleNotFoundError: No module named ['"]discord['"]/i,
+    fr: {
+      title: "Dépendances Python absentes",
+      explanation:
+        "Le conteneur a été recréé sans discord.py : le cache d’installation était sur le volume, les paquets dans le conteneur.",
+      action: "Redémarrez le service après la mise à jour du panel : les dépendances s’installent sur le volume.",
+    },
+    en: {
+      title: "Python dependencies missing",
+      explanation:
+        "The container was recreated without discord.py: the install cache lived on the volume, the packages in the container.",
+      action: "Restart the service after the panel update: dependencies now install on the volume.",
+    },
+  },
+  {
     match: /BOT_TOKEN is not set/i,
     fr: {
       title: "Token Discord manquant",

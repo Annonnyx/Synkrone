@@ -16,6 +16,12 @@ test("missing discord token suggests the Token tab", () => {
   assert.match(hit.action ?? "", /Token/);
 });
 
+test("missing discord.py after recreate is explained", () => {
+  const hit = explainError("ModuleNotFoundError: No module named 'discord'", "fr");
+  assert.equal(hit.title, "Dépendances Python absentes");
+  assert.match(hit.action ?? "", /Redémarrez/);
+});
+
 test("undecryptable stored token asks to paste again without resetting Discord", () => {
   const hit = explainError("BOT_TOKEN is stored but cannot be decrypted", "fr");
   assert.equal(hit.title, "Token Discord illisible");

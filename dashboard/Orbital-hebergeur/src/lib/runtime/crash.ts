@@ -26,5 +26,9 @@ export function crashReasonFromLogs(
     return match?.[1] || fatal;
   }
   if (engineError) return engineError;
+  const missing = [...lines]
+    .reverse()
+    .find((line) => /ModuleNotFoundError|No module named/i.test(line));
+  if (missing) return missing;
   return `exit code ${exitCode}`;
 }
