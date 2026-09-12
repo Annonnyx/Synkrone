@@ -17,14 +17,17 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Moon,
   Plus,
   Server,
   Shield,
+  Sun,
 } from "lucide-react";
 import { api, STATE_COLORS } from "@/lib/client";
 import { explainError } from "@/lib/errors";
 import { useEngineStatus } from "@/lib/engine-status";
 import { useI18n, useT, LOCALES, type Locale } from "@/lib/i18n";
+import { useTheme, type Theme } from "@/lib/theme";
 import { useCreationFlags } from "@/lib/use-creation-flags";
 import { firstCreateHref } from "@/lib/services/creation-flags";
 
@@ -94,6 +97,40 @@ export function LanguageSelector() {
           }}
         >
           {l}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const t = useT();
+  const options: { id: Theme; label: string; Icon: typeof Sun }[] = [
+    { id: "light", label: t("theme.light"), Icon: Sun },
+    { id: "dark", label: t("theme.dark"), Icon: Moon },
+  ];
+  return (
+    <div
+      className="flex items-center gap-1 rounded-lg border border-[var(--line)] bg-[var(--panel-2)] p-0.5"
+      role="group"
+      aria-label={t("theme.label")}
+    >
+      {options.map(({ id, label, Icon }) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => setTheme(id)}
+          aria-pressed={theme === id}
+          title={label}
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-semibold tracking-wide transition"
+          style={{
+            background: theme === id ? "var(--accent)" : "transparent",
+            color: theme === id ? "#fff" : "var(--muted)",
+          }}
+        >
+          <Icon size={13} strokeWidth={1.5} />
+          {label}
         </button>
       ))}
     </div>
@@ -302,10 +339,11 @@ export function Sidebar({
         <KronesPill />
         <LowBalanceBanner />
         <EngineStatusPill />
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0 truncate text-xs text-[var(--muted)]" title={user.email}>
-            {user.email}
-          </div>
+        <div className="min-w-0 truncate text-xs text-[var(--muted)]" title={user.email}>
+          {user.email}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <ThemeToggle />
           <LanguageSelector />
         </div>
         <button
@@ -372,7 +410,7 @@ export function EngineBanner() {
       style={{
         borderColor: "rgba(168, 70, 47, 0.45)",
         background: "rgba(168, 70, 47, 0.14)",
-        color: "#e8a090",
+        color: "var(--danger)",
       }}
       role="alert"
     >
@@ -426,7 +464,7 @@ export function ErrorText({ error }: { error: string | null }) {
       style={{
         borderColor: "rgba(168, 70, 47, 0.45)",
         background: "rgba(168, 70, 47, 0.14)",
-        color: "#e8a090",
+        color: "var(--danger)",
       }}
       role="alert"
     >

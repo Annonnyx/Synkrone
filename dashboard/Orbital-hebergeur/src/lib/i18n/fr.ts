@@ -271,6 +271,11 @@ export const fr = {
     fr: "Français",
     en: "English",
   },
+  theme: {
+    label: "Thème",
+    light: "Clair",
+    dark: "Sombre",
+  },
   service: {
     start: "Démarrer",
     stop: "Arrêter",

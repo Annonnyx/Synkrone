@@ -4,8 +4,8 @@ html,
 body.admin-body {
     margin: 0;
     min-height: 100%;
-    background: var(--pierre, #eef0ea);
-    color: var(--basalte, #1b211e);
+    background: var(--sk-bg, #eef0ea);
+    color: var(--sk-text, #1b211e);
 }
 
 .admin-page {
@@ -32,7 +32,7 @@ body.admin-body {
     font-size: 1.7rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
 }
 
 .admin-lead,
@@ -40,7 +40,7 @@ body.admin-body {
 .subtitle {
     margin: 0;
     max-width: 62ch;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     font-size: 14px;
 }
 
@@ -59,8 +59,8 @@ body.admin-body {
 .admin-stat {
     min-width: 0;
     padding: 12px 14px;
-    background: var(--blanc, #fff);
-    border: 1px solid var(--ardoise-15, #5c6a661f);
+    background: var(--sk-surface, #fff);
+    border: 1px solid var(--sk-border, #5c6a661f);
     border-radius: var(--sk-radius-lg, 6px);
 }
 
@@ -68,7 +68,7 @@ body.admin-body {
     margin: 0 0 4px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .admin-stat-value {
@@ -87,8 +87,8 @@ body.admin-body {
 .admin-card,
 .admin-page .panel {
     padding: 14px;
-    background: var(--blanc, #fff);
-    border: 1px solid var(--ardoise-15, #5c6a661f);
+    background: var(--sk-surface, #fff);
+    border: 1px solid var(--sk-border, #5c6a661f);
     border-radius: var(--sk-radius-lg, 6px);
 }
 
@@ -132,8 +132,8 @@ body.admin-body {
 .sk-btn.is-active,
 .sk-btn.ghost.is-active {
     border-color: var(--mousse, #3f6b52);
-    background: var(--mousse-clair, #e4ece4);
-    color: var(--basalte, #1b211e);
+    background: var(--sk-accent-soft, #e4ece4);
+    color: var(--sk-text, #1b211e);
 }
 
 .admin-toolbar input,
@@ -159,7 +159,7 @@ body.admin-body {
 .admin-page table td {
     text-align: left;
     padding: 10px 8px;
-    border-bottom: 1px solid var(--ardoise-15, #5c6a661f);
+    border-bottom: 1px solid var(--sk-border, #5c6a661f);
     vertical-align: middle;
 }
 
@@ -167,11 +167,11 @@ body.admin-body {
 .admin-page table th {
     font-size: 12px;
     font-weight: 600;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .admin-table tbody tr:hover {
-    background: var(--pierre-2, #e3e6dd);
+    background: var(--sk-surface-2, #e3e6dd);
 }
 
 .admin-member {
@@ -189,7 +189,7 @@ body.admin-body {
 .admin-meta {
     margin: 2px 0 0;
     font-size: 11px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .admin-avatar {
@@ -202,7 +202,7 @@ body.admin-body {
     height: 34px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid var(--ardoise-30, #5c6a6640);
+    border: 1px solid var(--sk-border-strong, #5c6a6640);
 }
 
 .admin-dot {
@@ -213,18 +213,18 @@ body.admin-body {
     height: 10px;
     border-radius: 50%;
     border: 2px solid var(--blanc, #fff);
-    background: var(--ardoise, #5c6a66);
+    background: var(--sk-text-muted, #5c6a66);
 }
 
 .admin-dot.is-online { background: var(--mousse, #3f6b52); }
-.admin-dot.is-offline { background: var(--ardoise, #5c6a66); }
+.admin-dot.is-offline { background: var(--sk-text-muted, #5c6a66); }
 .admin-dot.is-warn { background: var(--ambre, #b8823d); }
 .admin-dot.is-danger { background: var(--brique, #a8462f); }
 
 .admin-id {
     font-family: var(--sk-mono, "IBM Plex Mono", ui-monospace, monospace);
     font-size: 11px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     word-break: break-all;
 }
 
@@ -243,16 +243,16 @@ body.admin-body {
 
 .sk-badge.is-staff,
 .badge-chip.badge-equipe {
-    background: var(--mousse-clair, #e4ece4);
+    background: var(--sk-accent-soft, #e4ece4);
     border-color: transparent;
     color: var(--mousse-fonce, #2e5039);
 }
 
 .sk-badge.is-grade,
 .badge-chip.badge-krobi {
-    background: var(--pierre-2, #e3e6dd);
+    background: var(--sk-surface-2, #e3e6dd);
     border-color: transparent;
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
 }
 
 .sk-badge.is-amber {
@@ -263,16 +263,16 @@ body.admin-body {
 
 .sk-badge.is-online,
 .badge-chip.badge-online {
-    background: var(--mousse-clair, #e4ece4);
+    background: var(--sk-accent-soft, #e4ece4);
     border-color: transparent;
     color: var(--mousse-fonce, #2e5039);
 }
 
 .sk-badge.is-offline,
 .badge-chip.badge-offline {
-    background: var(--pierre-2, #e3e6dd);
+    background: var(--sk-surface-2, #e3e6dd);
     border-color: transparent;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .admin-actions {
@@ -287,9 +287,9 @@ body.admin-body {
 #noUsersState {
     margin: 8px 0 0;
     padding: 16px;
-    border: 1px dashed var(--ardoise-30, #5c6a6640);
+    border: 1px dashed var(--sk-border-strong, #5c6a6640);
     border-radius: var(--sk-radius-lg, 6px);
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     font-size: 13px;
 }
 
@@ -297,7 +297,7 @@ body.admin-body {
     min-height: 1.2em;
     margin: 0 0 10px;
     font-size: 13px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .grid-2 {
@@ -324,13 +324,13 @@ body.admin-body {
     padding: 8px 8px;
     text-align: left;
     vertical-align: middle;
-    border-bottom: 1px solid var(--ardoise-15, #5c6a661f);
+    border-bottom: 1px solid var(--sk-border, #5c6a661f);
 }
 
 .admin-limits thead th {
     font-size: 12px;
     font-weight: 600;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .admin-limits thead th span {
@@ -345,12 +345,12 @@ body.admin-body {
     font-family: var(--sk-serif, "Zilla Slab", Georgia, serif);
     font-size: 15px;
     font-weight: 700;
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
 }
 
 .admin-limits tbody tr:first-child th,
 .admin-limits tbody tr:first-child td {
-    background: var(--pierre, #eef0ea);
+    background: var(--sk-bg, #eef0ea);
 }
 
 .admin-limits input {
@@ -361,12 +361,12 @@ body.admin-body {
 
 .admin-limits tbody tr:hover td,
 .admin-limits tbody tr:hover th {
-    background: var(--pierre-2, #e3e6dd);
+    background: var(--sk-surface-2, #e3e6dd);
 }
 
 .admin-limits tbody tr:first-child:hover th,
 .admin-limits tbody tr:first-child:hover td {
-    background: var(--pierre-2, #e3e6dd);
+    background: var(--sk-surface-2, #e3e6dd);
 }
 
 .admin-check,
@@ -376,14 +376,14 @@ label.admin-check {
     gap: 8px;
     margin: 0 0 12px;
     font-weight: 500;
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
 }
 
 button.ghost,
 .btn.ghost,
 .sk-btn.ghost {
     background: transparent;
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
 }
 
 button.danger,
@@ -409,7 +409,7 @@ button.danger:hover,
     padding: 12px;
     background: var(--basalte, #1b211e);
     color: var(--pierre, #eef0ea);
-    border: 1px solid var(--ardoise-30, #5c6a6640);
+    border: 1px solid var(--sk-border-strong, #5c6a6640);
     border-radius: var(--sk-radius, 4px);
     font-family: var(--sk-mono, "IBM Plex Mono", ui-monospace, monospace);
     font-size: 12px;
@@ -438,8 +438,8 @@ button.danger:hover,
     max-height: min(92vh, 840px);
     overflow: auto;
     padding: 16px;
-    background: var(--blanc, #fff);
-    border: 1px solid var(--ardoise-15, #5c6a661f);
+    background: var(--sk-surface, #fff);
+    border: 1px solid var(--sk-border, #5c6a661f);
     border-radius: var(--sk-radius-lg, 6px);
     box-shadow: var(--sk-shadow, 0 2px 12px rgba(27, 33, 30, 0.08));
 }
@@ -460,7 +460,7 @@ button.danger:hover,
     height: 56px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid var(--ardoise-30, #5c6a6640);
+    border: 1px solid var(--sk-border-strong, #5c6a6640);
 }
 
 .admin-presence {
@@ -472,14 +472,14 @@ button.danger:hover,
 
 .admin-presence article {
     padding: 8px 10px;
-    background: var(--pierre, #eef0ea);
+    background: var(--sk-bg, #eef0ea);
     border-radius: var(--sk-radius, 4px);
 }
 
 .admin-presence p {
     margin: 0;
     font-size: 12px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .admin-presence strong {
@@ -487,7 +487,7 @@ button.danger:hover,
     margin-top: 4px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
 }
 
 .admin-modal-fields {
@@ -511,7 +511,7 @@ button.danger:hover,
     gap: 8px;
     margin-top: 16px;
     padding-top: 12px;
-    border-top: 1px solid var(--ardoise-15, #5c6a661f);
+    border-top: 1px solid var(--sk-border, #5c6a661f);
 }
 
 .admin-toast,
@@ -522,11 +522,11 @@ button.danger:hover,
     z-index: 60;
     max-width: min(28rem, calc(100vw - 32px));
     padding: 10px 14px;
-    background: var(--blanc, #fff);
-    border: 1px solid var(--ardoise-30, #5c6a6640);
+    background: var(--sk-surface, #fff);
+    border: 1px solid var(--sk-border-strong, #5c6a6640);
     border-radius: var(--sk-radius-lg, 6px);
     box-shadow: var(--sk-shadow, 0 2px 12px rgba(27, 33, 30, 0.08));
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
     font-size: 13px;
     opacity: 0;
     transform: translateY(10px);
@@ -547,7 +547,7 @@ button.danger:hover,
 
 .admin-toast.is-ok {
     border-color: var(--mousse, #3f6b52);
-    background: var(--mousse-clair, #e4ece4);
+    background: var(--sk-accent-soft, #e4ece4);
 }
 
 /* Annonce */
@@ -570,7 +570,7 @@ button.danger:hover,
 .label {
     font-size: 12px;
     font-weight: 600;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     text-transform: none;
     letter-spacing: 0;
 }
@@ -585,7 +585,7 @@ button.danger:hover,
 .config-count,
 .muted {
     font-size: 12px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .type-list,
@@ -602,7 +602,7 @@ button.danger:hover,
     align-items: center;
     gap: 6px;
     padding: 4px 8px;
-    background: var(--mousse-clair, #e4ece4);
+    background: var(--sk-accent-soft, #e4ece4);
     border: 1px solid transparent;
     border-radius: 999px;
     color: var(--mousse-fonce, #2e5039);
@@ -628,8 +628,8 @@ button.danger:hover,
     gap: 10px;
     align-items: start;
     padding: 12px;
-    background: var(--pierre, #eef0ea);
-    border: 1px solid var(--ardoise-15, #5c6a661f);
+    background: var(--sk-bg, #eef0ea);
+    border: 1px solid var(--sk-border, #5c6a661f);
     border-radius: var(--sk-radius, 4px);
 }
 
@@ -680,8 +680,8 @@ button.danger:hover,
     justify-content: space-between;
     gap: 12px;
     padding: 14px;
-    background: var(--pierre, #eef0ea);
-    border: 1px solid var(--ardoise-15, #5c6a661f);
+    background: var(--sk-bg, #eef0ea);
+    border: 1px solid var(--sk-border, #5c6a661f);
     border-radius: var(--sk-radius-lg, 6px);
 }
 
@@ -705,7 +705,7 @@ button.danger:hover,
 
 .admin-process-metrics div {
     padding: 8px;
-    background: var(--blanc, #fff);
+    background: var(--sk-surface, #fff);
     border-radius: var(--sk-radius, 4px);
     text-align: center;
 }
@@ -714,7 +714,7 @@ button.danger:hover,
     display: block;
     margin-bottom: 2px;
     font-size: 11px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .admin-process-metrics b {
@@ -767,9 +767,9 @@ button.danger:hover,
         grid-template-columns: 1fr 1fr;
         gap: 8px;
         padding: 10px;
-        border: 1px solid var(--ardoise-15, #5c6a661f);
+        border: 1px solid var(--sk-border, #5c6a661f);
         border-radius: var(--sk-radius-lg, 6px);
-        background: var(--blanc, #fff);
+        background: var(--sk-surface, #fff);
     }
 
     .admin-table tbody td {

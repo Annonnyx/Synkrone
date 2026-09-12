@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
-import { ErrorText, LanguageSelector, Logo } from "@/components/panel";
+import { ErrorText, LanguageSelector, Logo, ThemeToggle } from "@/components/panel";
 import { OAuthButtons, oauthErrorMessage } from "@/components/oauth-buttons";
 import type { ProviderStatus } from "@/lib/oauth/types";
 
@@ -59,7 +59,10 @@ function LoginForm() {
             <Logo size={26} />
             <div className="font-serif text-xl font-bold leading-none tracking-tight">Synkrone</div>
           </div>
-          <LanguageSelector />
+          <div className="flex flex-col items-end gap-2">
+            <ThemeToggle />
+            <LanguageSelector />
+          </div>
         </div>
         <h1 className="page-title mt-6 text-3xl">
           {mode === "login" ? t("login.signInTitle") : t("login.registerTitle")}

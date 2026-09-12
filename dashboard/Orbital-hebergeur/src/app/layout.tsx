@@ -3,6 +3,8 @@ import { IBM_Plex_Mono, IBM_Plex_Sans, Zilla_Slab } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
+import { ThemeProvider } from "@/lib/theme";
+import { getTheme } from "@/lib/theme-server";
 import { ToastProvider } from "@/components/toast";
 import { withPanelBase } from "@/lib/panel-base";
 
@@ -35,12 +37,20 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
+  const theme = await getTheme();
   return (
-    <html lang={locale} className={`${sans.variable} ${serif.variable} ${mono.variable}`}>
+    <html
+      lang={locale}
+      data-theme={theme}
+      style={{ colorScheme: theme }}
+      className={`${sans.variable} ${serif.variable} ${mono.variable}`}
+    >
       <body className="min-h-screen antialiased">
-        <I18nProvider initialLocale={locale}>
-          <ToastProvider>{children}</ToastProvider>
-        </I18nProvider>
+        <ThemeProvider initialTheme={theme}>
+          <I18nProvider initialLocale={locale}>
+            <ToastProvider>{children}</ToastProvider>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

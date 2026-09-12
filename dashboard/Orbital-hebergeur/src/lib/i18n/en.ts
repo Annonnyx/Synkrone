@@ -273,6 +273,11 @@ export const en: Dict = {
     fr: "Français",
     en: "English",
   },
+  theme: {
+    label: "Theme",
+    light: "Light",
+    dark: "Dark",
+  },
   service: {
     start: "Start",
     stop: "Stop",

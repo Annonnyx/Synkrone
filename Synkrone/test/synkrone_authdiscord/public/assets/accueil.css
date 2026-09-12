@@ -26,6 +26,7 @@
     --hall-red: var(--mousse);
     --hall-red-soft: var(--mousse-clair);
     --hall-gold: var(--ambre);
+    --hall-elev-2: var(--hall-elev-2);
     --serif: "Zilla Slab", Georgia, serif;
     --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
     --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -42,6 +43,24 @@
 html {
     color-scheme: light;
     background: var(--hall-bg);
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --hall-bg: #1b211e;
+    --hall-elev: #232b27;
+    --hall-elev-2: #2a332e;
+    --hall-ink: #eef0ea;
+    --hall-mute: #8fa096;
+    --hall-faint: #6d7c76;
+    --hall-line: #333e38;
+    --hall-line-strong: #3d4a44;
+    --hall-red-soft: rgba(63, 107, 82, 0.35);
+}
+
+html[data-theme="dark"] .hero-mosaic,
+html[data-theme="dark"] .hero-logo {
+    mix-blend-mode: screen;
 }
 
 html,
@@ -91,8 +110,8 @@ a {
     top: 12px;
     z-index: 40;
     padding: 8px 12px;
-    background: var(--basalte);
-    color: var(--pierre);
+    background: var(--hall-ink);
+    color: var(--hall-bg);
     font-size: 12px;
     font-weight: 600;
     text-decoration: none;
@@ -178,7 +197,7 @@ a {
     font-weight: 700;
     letter-spacing: -0.01em;
     line-height: 1.05;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .hero h1 .line {
@@ -237,8 +256,8 @@ a {
 }
 
 .btn:hover {
-    border-color: var(--basalte);
-    color: var(--basalte);
+    border-color: var(--hall-ink);
+    color: var(--hall-ink);
     background: transparent;
 }
 
@@ -471,7 +490,7 @@ a {
     font-weight: 700;
     letter-spacing: -0.01em;
     line-height: 1.15;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .band-head p {
@@ -509,7 +528,7 @@ a {
 
 .how li {
     padding: 16px 18px;
-    background: var(--blanc);
+    background: var(--hall-elev);
     border: 1px solid var(--hall-line);
     border-radius: 6px;
     color: var(--hall-mute);
@@ -520,7 +539,7 @@ a {
 .how strong {
     display: block;
     margin-bottom: 4px;
-    color: var(--basalte);
+    color: var(--hall-ink);
     font-weight: 600;
 }
 
@@ -572,7 +591,7 @@ a {
 }
 
 .plate:hover {
-    background: var(--pierre-2);
+    background: var(--hall-elev-2);
 }
 
 .plate-meta {
@@ -590,7 +609,7 @@ a {
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.01em;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .plate p {
@@ -634,7 +653,7 @@ a {
 }
 
 .u:hover {
-    background: var(--pierre-2);
+    background: var(--hall-elev-2);
 }
 
 .u-id {
@@ -656,7 +675,7 @@ a {
     font-size: 16px;
     font-weight: 600;
     letter-spacing: -0.02em;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .u-role {
@@ -671,7 +690,7 @@ a {
     color: var(--hall-ink);
     padding: 4px 8px;
     border: 1px solid var(--hall-line);
-    background: var(--pierre-2);
+    background: var(--hall-elev-2);
 }
 
 .u-add,
@@ -684,7 +703,7 @@ a {
 }
 
 .u-open {
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .u:hover .u-open {
@@ -698,7 +717,7 @@ a {
     flex-wrap: wrap;
     padding: 14px 18px;
     border-top: 1px solid var(--hall-line);
-    background: var(--pierre-2);
+    background: var(--hall-elev-2);
     font-size: 13px;
     color: var(--hall-mute);
 }
@@ -733,7 +752,7 @@ a {
             rgba(92, 106, 102, 0.1) 0 1px,
             transparent 1px 28px
         ),
-        var(--pierre-2);
+        var(--hall-elev-2);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -759,7 +778,7 @@ a {
     font-size: 42px;
     font-weight: 700;
     letter-spacing: -0.01em;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .world p {
@@ -791,7 +810,7 @@ a {
     font-size: 16px;
     font-weight: 600;
     letter-spacing: -0.02em;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .pack-row p {
@@ -821,14 +840,14 @@ a {
     flex-wrap: wrap;
     padding: 18px 20px;
     border: 1px solid var(--hall-line);
-    background: var(--blanc);
+    background: var(--hall-elev);
 }
 
 .vux-row strong {
     display: block;
     font-size: 16px;
     letter-spacing: -0.02em;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .vux-row span {
@@ -978,7 +997,7 @@ a {
 .grade-name {
     font-size: 15px;
     font-weight: 600;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .grade-price {
@@ -1056,7 +1075,7 @@ a {
 }
 
 .filter-select option {
-    background: var(--blanc);
+    background: var(--hall-elev);
 }
 
 .news-list {
@@ -1107,7 +1126,7 @@ a {
     margin: 0 0 4px;
     font-size: 16px;
     font-weight: 600;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .news-summary {
@@ -1142,10 +1161,10 @@ a {
     right: 16px;
     bottom: 16px;
     max-width: 340px;
-    background: var(--blanc);
+    background: var(--hall-elev);
     border: 1px solid var(--ardoise-15);
     border-left: 3px solid var(--mousse);
-    color: var(--basalte);
+    color: var(--hall-ink);
     padding: 10px 12px;
     font-size: 12px;
     transform: translateY(18px);
@@ -1177,7 +1196,7 @@ a {
 
 .modal-content {
     width: min(760px, 100%);
-    background: var(--blanc);
+    background: var(--hall-elev);
     border: 1px solid var(--ardoise-15);
     border-radius: 6px;
     padding: 18px;
@@ -1209,7 +1228,7 @@ a {
     font-size: 22px;
     font-weight: 500;
     letter-spacing: -0.03em;
-    color: var(--basalte);
+    color: var(--hall-ink);
 }
 
 .modal-meta {
@@ -1246,8 +1265,8 @@ a {
 }
 
 .comparison-table th {
-    background: var(--pierre-2);
-    color: var(--basalte);
+    background: var(--hall-elev-2);
+    color: var(--hall-ink);
     white-space: nowrap;
 }
 
@@ -1457,7 +1476,7 @@ body.home-mosaic {
     letter-spacing: -0.01em;
     line-height: 1.1;
     text-transform: none;
-    color: var(--basalte);
+    color: var(--hall-ink);
     text-align: left;
 }
 

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --pierre: #eef0ea;
   --pierre-2: #e3e6dd;
   --basalte: #1b211e;
@@ -13,24 +13,24 @@
   --brique: #a8462f;
   --brique-clair: #f5e2dc;
   --ardoise: #5c6a66;
-  --sk-bg: #1b211e;
-  --sk-bg-elevated: #1f2622;
-  --sk-surface: #232b27;
-  --sk-surface-2: #2a332e;
-  --sk-surface-hover: #333e38;
-  --sk-border: #333e38;
-  --sk-border-strong: #3d4a44;
-  --sk-text: #eef0ea;
-  --sk-text-muted: #8fa096;
-  --sk-text-faint: #6d7c76;
+  --sk-bg: #eef0ea;
+  --sk-bg-elevated: #e3e6dd;
+  --sk-surface: #ffffff;
+  --sk-surface-2: #e3e6dd;
+  --sk-surface-hover: #d8dcd3;
+  --sk-border: #5c6a661f;
+  --sk-border-strong: #5c6a6640;
+  --sk-text: #1b211e;
+  --sk-text-muted: #5c6a66;
+  --sk-text-faint: #7a8884;
   --sk-accent: #3f6b52;
   --sk-accent-hover: #2e5039;
-  --sk-accent-soft: rgba(63, 107, 82, 0.35);
-  --sk-accent-ring: rgba(63, 107, 82, 0.7);
-  --sk-success: #9ad1af;
-  --sk-warning: #e3b675;
-  --sk-danger: #c56a55;
-  --sk-info: #8fa096;
+  --sk-accent-soft: #e4ece4;
+  --sk-accent-ring: #3f6b5280;
+  --sk-success: #3f6b52;
+  --sk-warning: #b8823d;
+  --sk-danger: #a8462f;
+  --sk-info: #5c6a66;
   --sk-discord: #5865f2;
   --sk-gold: #b8823d;
   --sk-radius: 4px;
@@ -56,6 +56,26 @@
   --ring: var(--sk-accent-ring);
 }
 
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --sk-bg: #1b211e;
+  --sk-bg-elevated: #1f2622;
+  --sk-surface: #232b27;
+  --sk-surface-2: #2a332e;
+  --sk-surface-hover: #333e38;
+  --sk-border: #333e38;
+  --sk-border-strong: #3d4a44;
+  --sk-text: #eef0ea;
+  --sk-text-muted: #8fa096;
+  --sk-text-faint: #6d7c76;
+  --sk-accent-soft: rgba(63, 107, 82, 0.35);
+  --sk-accent-ring: rgba(63, 107, 82, 0.7);
+  --sk-success: #9ad1af;
+  --sk-warning: #e3b675;
+  --sk-danger: #c56a55;
+  --sk-info: #8fa096;
+}
+
 html,
 body {
   background: var(--bg);
@@ -72,6 +92,10 @@ body {
   background-size: 92px 92px;
   background-repeat: repeat;
   transform: rotate(45deg);
+  opacity: 0.08;
+  mix-blend-mode: multiply;
+}
+html[data-theme="dark"] .logo-mosaic {
   opacity: 0.1;
   mix-blend-mode: screen;
 }
@@ -101,9 +125,12 @@ h3,
 }
 
 .login-panel {
-  background: rgba(35, 43, 39, 0.7);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(18px) saturate(1.15);
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
+}
+html[data-theme="dark"] .login-panel {
+  background: rgba(35, 43, 39, 0.7);
 }
 
 .panel-hover {
@@ -163,7 +190,7 @@ h3,
 }
 .btn-danger {
   border-color: var(--brique);
-  color: #e8a090;
+  color: var(--danger);
   background: transparent;
 }
 .btn-danger:hover:not(:disabled) {
@@ -242,12 +269,12 @@ h3,
   border-radius: 999px;
   background: currentColor;
 }
-.badge-success { color: #9ad1af; background: rgba(63, 107, 82, 0.35); }
-.badge-warning { color: #e3b675; background: rgba(184, 130, 61, 0.3); }
-.badge-danger  { color: #e8a090; background: rgba(168, 70, 47, 0.28); }
+.badge-success { color: var(--success); background: var(--sk-accent-soft); }
+.badge-warning { color: var(--warning); background: rgba(184, 130, 61, 0.22); }
+.badge-danger  { color: var(--danger); background: rgba(168, 70, 47, 0.18); }
 .badge-info    { color: var(--muted); background: var(--panel-2); }
-.badge-accent  { color: #9ad1af; background: var(--sk-accent-soft); }
-.badge-gold    { color: #e3b675; background: rgba(184, 130, 61, 0.28); }
+.badge-accent  { color: var(--success); background: var(--sk-accent-soft); }
+.badge-gold    { color: var(--gold); background: rgba(184, 130, 61, 0.22); }
 
 @keyframes pulse-dot {
   0%, 100% { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
@@ -298,6 +325,7 @@ h3,
 
 .console {
   background: #161c19;
+  color: #eef0ea;
   border: 1px solid var(--line);
   border-radius: var(--sk-radius-lg);
   font-family: var(--font-mono), "IBM Plex Mono", ui-monospace, Menlo, monospace;

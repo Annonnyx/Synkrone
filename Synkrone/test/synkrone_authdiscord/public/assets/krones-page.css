@@ -38,7 +38,7 @@
 }
 
 .kr-balance span {
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     font-size: 14px;
 }
 
@@ -46,18 +46,18 @@
     margin: 10px 0 0;
     max-width: 58ch;
     font-size: 13px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .status-line {
     min-height: 1.4em;
     margin: 8px 0 0;
     font-size: 13px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .offer-row .offer-e {
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
 }
 
 .offer-row .offer-r {
@@ -67,8 +67,8 @@
 .compare-wrap {
     overflow-x: auto;
     margin-top: 8px;
-    border: 1px solid var(--ardoise-15, #5c6a661f);
-    background: var(--blanc, #fff);
+    border: 1px solid var(--sk-border, #5c6a661f);
+    background: var(--sk-surface, #fff);
 }
 
 .compare {
@@ -81,7 +81,7 @@
 .compare th,
 .compare td {
     padding: 11px 12px;
-    border-bottom: 1px solid var(--ardoise-15, #5c6a661f);
+    border-bottom: 1px solid var(--sk-border, #5c6a661f);
     text-align: center;
     vertical-align: middle;
 }
@@ -90,13 +90,13 @@
     font-family: var(--sk-serif, "Zilla Slab", Georgia, serif);
     font-size: 15px;
     font-weight: 600;
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
 }
 
 .compare tbody th {
     text-align: left;
     font-weight: 500;
-    color: var(--basalte, #1b211e);
+    color: var(--sk-text, #1b211e);
     width: 22%;
 }
 
@@ -117,7 +117,7 @@
 .compare td:first-child {
     position: sticky;
     left: 0;
-    background: var(--blanc, #fff);
+    background: var(--sk-surface, #fff);
     text-align: left;
     z-index: 1;
 }
@@ -144,7 +144,7 @@
     flex-direction: column;
     padding: 16px;
     border: 1px solid var(--hall-line, #5c6a661f);
-    background: var(--blanc, #fff);
+    background: var(--sk-surface, #fff);
     min-height: 100%;
 }
 
@@ -157,7 +157,7 @@
     margin: 0 0 6px;
     font-family: var(--sk-mono, "IBM Plex Mono", monospace);
     font-size: 11px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .grade-card .grade-perk {
@@ -170,7 +170,7 @@
     padding-left: 1.1rem;
     font-size: 12px;
     line-height: 1.45;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .grade-card .grade-perk li {
@@ -191,7 +191,7 @@
     display: inline-block;
     margin-top: 2px;
     font-size: 11px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     font-weight: 500;
 }
 
@@ -218,7 +218,7 @@
     align-items: center;
     gap: 8px;
     margin-top: 22px;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     font-size: 13px;
 }
 
@@ -237,11 +237,11 @@
 .ledger td {
     text-align: left;
     padding: 10px 8px;
-    border-bottom: 1px solid var(--ardoise-15, #5c6a661f);
+    border-bottom: 1px solid var(--sk-border, #5c6a661f);
 }
 
 .ledger th {
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     font-weight: 600;
     font-size: 11px;
 }
@@ -266,7 +266,7 @@
     align-items: center;
     padding: 14px 16px;
     border: 1px solid var(--hall-line, #5c6a661f);
-    background: var(--blanc, #fff);
+    background: var(--sk-surface, #fff);
     font-size: 13px;
 }
 
@@ -276,16 +276,16 @@
 }
 
 .order-card .muted {
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
     font-size: 12px;
 }
 
 .kr-dialog {
     width: min(520px, calc(100% - 32px));
     padding: 0;
-    border: 1px solid var(--ardoise-30, #5c6a6640);
-    background: var(--pierre, #eef0ea);
-    color: var(--basalte, #1b211e);
+    border: 1px solid var(--sk-border-strong, #5c6a6640);
+    background: var(--sk-bg, #eef0ea);
+    color: var(--sk-text, #1b211e);
 }
 
 .kr-dialog::backdrop {
@@ -315,7 +315,7 @@
 
 .kr-breakdown td {
     padding: 6px 0;
-    border-bottom: 1px solid var(--ardoise-15, #5c6a661f);
+    border-bottom: 1px solid var(--sk-border, #5c6a661f);
 }
 
 .kr-breakdown td:last-child {
@@ -341,7 +341,7 @@
     align-items: start;
     font-size: 13px;
     line-height: 1.45;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .kr-legal input {
@@ -369,14 +369,14 @@
 .kr-pay-methods .soon {
     font-size: 11px;
     font-weight: 500;
-    color: var(--ardoise, #5c6a66);
+    color: var(--sk-text-muted, #5c6a66);
 }
 
 .transfer-box {
     margin: 12px 0;
     padding: 12px 14px;
-    border: 1px solid var(--ardoise-15, #5c6a661f);
-    background: var(--blanc, #fff);
+    border: 1px solid var(--sk-border, #5c6a661f);
+    background: var(--sk-surface, #fff);
     font-size: 13px;
 }
 

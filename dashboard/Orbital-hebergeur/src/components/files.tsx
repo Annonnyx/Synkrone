@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
+import { useTheme } from "@/lib/theme";
 import { withPanelBase } from "@/lib/panel-base";
 import { usePoll } from "@/lib/use-poll";
 import { ErrorText } from "@/components/panel";
@@ -31,6 +32,7 @@ type Entry = {
 
 export function FileManager({ serviceId }: { serviceId: string }) {
   const t = useT();
+  const { theme } = useTheme();
   const toast = useToast();
   const [cwd, setCwd] = useState("/");
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -226,7 +228,7 @@ export function FileManager({ serviceId }: { serviceId: string }) {
             ) : (
               <MonacoEditor
                 height="460px"
-                theme="vs-dark"
+                theme={theme === "dark" ? "vs-dark" : "vs"}
                 language={language}
                 value={content}
                 onChange={(v) => setContent(v ?? "")}

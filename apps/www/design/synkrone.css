@@ -109,6 +109,26 @@
     --hall-gold: var(--sk-gold);
 }
 
+html[data-theme="dark"] {
+    --sk-bg: #1b211e;
+    --sk-bg-elevated: #1f2622;
+    --sk-surface: #232b27;
+    --sk-surface-2: #2a332e;
+    --sk-surface-hover: #333e38;
+    --sk-border: #333e38;
+    --sk-border-strong: #3d4a44;
+    --sk-text: #eef0ea;
+    --sk-text-muted: #8fa096;
+    --sk-text-faint: #6d7c76;
+    --sk-accent-soft: rgba(63, 107, 82, 0.35);
+    --sk-accent-ring: rgba(63, 107, 82, 0.7);
+    --sk-success: #9ad1af;
+    --sk-warning: #e3b675;
+    --sk-danger: #c56a55;
+    --sk-info: #8fa096;
+    --sk-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
 *,
 *::before,
 *::after {
@@ -118,6 +138,10 @@
 html {
     color-scheme: light;
     background: var(--sk-bg);
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
 }
 
 body {
@@ -153,7 +177,7 @@ a:not([class]) {
 }
 
 a:not([class]):hover {
-    color: var(--mousse-fonce);
+    color: var(--sk-accent);
 }
 
 :focus-visible {
@@ -272,10 +296,10 @@ button.primary:hover {
     gap: 10px;
     min-height: 36px;
     padding: 0 12px 0 10px;
-    background: var(--blanc);
-    border: 1px solid var(--ardoise-30);
+    background: var(--sk-surface);
+    border: 1px solid var(--sk-border-strong);
     border-radius: var(--sk-radius);
-    color: var(--basalte);
+    color: var(--sk-text);
     cursor: pointer;
     font-family: inherit;
 }
@@ -488,8 +512,8 @@ table.sk-table {
     height: auto;
     padding: 12px 20px;
     column-gap: 16px;
-    background: var(--pierre);
-    border-bottom: 1px solid var(--ardoise-15);
+    background: var(--sk-bg);
+    border-bottom: 1px solid var(--sk-border);
     z-index: 30;
     flex-shrink: 0;
     position: relative;
@@ -615,9 +639,9 @@ header#app-header,
 
 .badge-krone {
     gap: 6px;
-    background: var(--blanc);
-    border: 1px solid var(--ardoise-30);
-    color: var(--basalte);
+    background: var(--sk-surface);
+    border: 1px solid var(--sk-border-strong);
+    color: var(--sk-text);
     padding: 0 12px;
     min-height: 36px;
     font-size: 13px;
@@ -644,6 +668,51 @@ header#app-header,
 
 .btn-symbol.logout { color: var(--sk-danger); }
 .btn-symbol.logout:hover { background: var(--brique-clair); color: var(--brique); }
+html[data-theme="dark"] .btn-symbol.logout:hover {
+    background: rgba(168, 70, 47, 0.2);
+    color: var(--sk-danger);
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--sk-border);
+    border-radius: var(--sk-radius);
+    background: var(--sk-surface-2);
+}
+.theme-opt {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--sk-text-muted);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.theme-opt svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+.theme-opt[aria-pressed="true"] {
+    background: var(--sk-accent);
+    color: #fff;
+}
+.theme-opt:hover:not([aria-pressed="true"]) {
+    color: var(--sk-text);
+}
+@media (max-width: 720px) {
+    .theme-opt span { display: none; }
+}
 
 .btn-roulette {
     display: inline-flex;

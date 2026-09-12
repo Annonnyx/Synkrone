@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getDict } from "@/lib/i18n-server";
-import { LanguageSelector } from "@/components/panel";
+import { LanguageSelector, ThemeToggle } from "@/components/panel";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,8 @@ export default async function Home() {
   return (
     <main className="relative z-10 flex min-h-screen flex-col justify-center px-6">
       <div className="logo-mosaic" aria-hidden="true" />
-      <div className="absolute right-6 top-6">
+      <div className="absolute right-6 top-6 flex flex-col items-end gap-2">
+        <ThemeToggle />
         <LanguageSelector />
       </div>
       <div className="mx-auto w-full max-w-xl">

@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone.app</title>
+    <script>
+        (function () {
+            var t = 'light';
+            try {
+                var m = document.cookie.match(/(?:^|; )synkrone_theme=(light|dark)(?:;|$)/);
+                if (m) t = m[1];
+                else {
+                    var s = localStorage.getItem('synkrone_theme');
+                    if (s === 'dark' || s === 'light') t = s;
+                }
+            } catch (e) {}
+            document.documentElement.setAttribute('data-theme', t);
+            document.documentElement.style.colorScheme = t;
+        })();
+    </script>
+    <script src="/assets/theme-boot.js"></script>
     <link rel="icon" type="image/jpeg" href="assets/images/logo.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +27,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"></noscript>
     <link rel="stylesheet" href="/design/synkrone.css">
     <style>
-        html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; background: #eef0ea; color: #1b211e; }
+        html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; background: var(--sk-bg); color: var(--sk-text); }
         .header-login-row {
     display: flex;
     flex-wrap: wrap;
@@ -174,6 +190,29 @@
         }
         function loginButtonsHtml() {
             return `<a class="btn-login" href="${siteLoginUrl(window.location.pathname)}" target="_top">Se connecter</a>`;
+        }
+        function themeToggleHtml() {
+            const theme = window.synkroneTheme ? synkroneTheme.read() : 'light';
+            const sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 3v1.5M12 19.5V21M4.5 12H3M21 12h-1.5M6.2 6.2l1.1 1.1M16.7 16.7l1.1 1.1M6.2 17.8l1.1-1.1M16.7 7.3l1.1-1.1"></path></svg>';
+            const moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15.5A8.5 8.5 0 1 1 8.5 4 7 7 0 0 0 20 15.5z"></path></svg>';
+            return `<div class="theme-toggle" role="group" aria-label="Thème">
+                <button type="button" class="theme-opt" data-theme-set="light" title="Clair" aria-pressed="${theme === 'light'}" onclick="setSiteTheme('light')">${sun}<span>Clair</span></button>
+                <button type="button" class="theme-opt" data-theme-set="dark" title="Sombre" aria-pressed="${theme === 'dark'}" onclick="setSiteTheme('dark')">${moon}<span>Sombre</span></button>
+            </div>`;
+        }
+        function setSiteTheme(theme) {
+            if (!window.synkroneTheme) return;
+            synkroneTheme.set(theme);
+            document.querySelectorAll('iframe').forEach((frame) => synkroneTheme.applyToFrame(frame));
+            renderUI();
+        }
+        function bindFrameTheme() {
+            const frame = document.getElementById('content-frame');
+            if (!frame || frame.dataset.themeBound) return;
+            frame.dataset.themeBound = '1';
+            frame.addEventListener('load', () => {
+                if (window.synkroneTheme) synkroneTheme.applyToFrame(frame);
+            });
         }
         function publicToolsHtml() {
             if (store.hub === false) return '';
@@ -677,6 +716,7 @@
                     <div class="header-bottom">
                         <div class="header-user">
                             <div class="krones-center-section">${kronesBadgeHtml()}</div>
+                            ${themeToggleHtml()}
                             ${loginButtonsHtml()}
                         </div>
                     </div>
@@ -713,6 +753,7 @@
                             <div class="krones-center-section">${kronesBadgeHtml()}</div>
                             
                             <div class="header-actions">
+                                ${themeToggleHtml()}
                                 <button class="btn-symbol logout" title="Déconnexion" onclick="logout()">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -746,6 +787,7 @@
         // --- DÉMARRAGE ---
         (async function init() {
             bindNavToggle();
+            bindFrameTheme();
             renderUI();
             initMainNavigation();
 
