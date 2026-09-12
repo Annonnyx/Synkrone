@@ -3,12 +3,15 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const express = require('express');
 const { panelAdmin, readPanelEnvValue } = require('./admin-ops');
 const custom = require('./bot-custom');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const OVERLAY_ROOT = path.join(__dirname, '..', 'data', 'serveur-config');
+const MEDIA_DIR = path.join(__dirname, '..', 'data', 'uploads', 'serveur');
 const DISCORD_API = 'https://discord.com/api/v10';
+const LOGO_MAX_BYTES = 2 * 1024 * 1024;
 
 const OFFICIAL_BOTS = [
     { slug: 'vax', name: 'Vax', applicationId: '1367891720871874560', dir: 'bots/synkrone/py/Vax', tokenEnv: 'BOT_TOKEN_VAX' },
@@ -84,6 +87,72 @@ function tokenForOfficial(bot) {
 
 function overlayPath(applicationId, guildId) {
     return path.join(OVERLAY_ROOT, String(applicationId), `${guildId}.json`);
+}
+
+function safeDiscordId(id) {
+    const digits = String(id || '').replace(/\D/g, '');
+    return /^\d{15,22}$/.test(digits) ? digits : '';
+}
+
+function imageExtFromBuffer(buf) {
+    if (!buf || buf.length < 12) return null;
+    if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'jpg';
+    if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'png';
+    if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46) return 'gif';
+    if (buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46
+        && buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) return 'webp';
+    return null;
+}
+
+function parseImageDataUrl(raw, maxBytes = LOGO_MAX_BYTES) {
+    const match = String(raw || '').match(/^data:(image\/(?:jpeg|png|webp|gif));base64,([A-Za-z0-9+/=\s]+)$/i);
+    if (!match) return { error: 'Choisissez une image JPEG, PNG, WebP ou GIF.' };
+    let buf;
+    try {
+        buf = Buffer.from(match[2].replace(/\s+/g, ''), 'base64');
+    } catch {
+        return { error: 'Image illisible.' };
+    }
+    if (!buf.length) return { error: 'Image vide.' };
+    if (buf.length > maxBytes) return { error: 'Image trop lourde (2 Mo max).' };
+    const ext = imageExtFromBuffer(buf);
+    if (!ext) return { error: 'Le fichier n’est pas une image valide.' };
+    return { buf, ext };
+}
+
+function logoFilename(applicationId, guildId, ext, now = Date.now()) {
+    const app = safeDiscordId(applicationId);
+    const guild = safeDiscordId(guildId);
+    if (!app || !guild) return '';
+    return `${app}-${guild}-${Number(now)}.${ext}`;
+}
+
+function requestOrigin(req) {
+    const env = String(process.env.PUBLIC_ORIGIN || '').trim().replace(/\/$/, '');
+    if (env) return env;
+    const host = String(req?.get?.('host') || req?.headers?.host || '').trim();
+    if (!host) return '';
+    const forwarded = String(req?.get?.('x-forwarded-proto') || '').split(',')[0].trim();
+    const proto = forwarded || (req?.secure ? 'https' : 'http');
+    return `${proto}://${host}`;
+}
+
+function logoPublicUrl(req, filename) {
+    const rel = `/serveur-media/${filename}`;
+    const origin = requestOrigin(req);
+    return origin ? `${origin}${rel}` : rel;
+}
+
+async function pruneLogos(prefix, keep = 4) {
+    let names = [];
+    try {
+        names = await fs.readdir(MEDIA_DIR);
+    } catch {
+        return;
+    }
+    const matched = names.filter((name) => name.startsWith(prefix)).sort();
+    const extra = matched.slice(0, Math.max(0, matched.length - keep));
+    await Promise.all(extra.map((name) => fs.unlink(path.join(MEDIA_DIR, name)).catch(() => undefined)));
 }
 
 function defaultPath(applicationId) {
@@ -349,7 +418,32 @@ function sessionUser(req) {
     return user;
 }
 
+async function resolveServeurWrite(req) {
+    const user = sessionUser(req);
+    const discordId = discordUserId(user);
+    if (!discordId) return { error: { status: 401, body: { ok: false, discordOnly: true } } };
+    const rawToken = String(req.body?.t || req.query.t || '').trim();
+    const claims = rawToken ? verifyToken(rawToken) : null;
+    if (claims) rememberServeurLink(req, claims);
+    const stored = sessionServeurLink(req, discordId);
+    const guildId = String(claims?.guildId || req.body?.guildId || stored?.guildId || '').trim();
+    const applicationId = String(claims?.applicationId || req.body?.applicationId || stored?.applicationId || '').trim();
+    if (!guildId || !applicationId) {
+        return { error: { status: 400, body: { ok: false, error: 'Serveur ou application manquant.' } } };
+    }
+    if (claims && claims.userId !== discordId) {
+        return { error: { status: 403, body: { ok: false, error: 'Ce lien Discord appartient à un autre compte.' } } };
+    }
+    const allowed = await assertConfigurer(discordId, guildId, applicationId);
+    if (!allowed) {
+        return { error: { status: 403, body: { ok: false, error: 'Il faut être propriétaire ou administrateur de ce serveur Discord.' } } };
+    }
+    return { discordId, guildId, applicationId };
+}
+
 function mountServeur(app) {
+    void fs.mkdir(MEDIA_DIR, { recursive: true }).catch(() => undefined);
+    app.use('/serveur-media', express.static(MEDIA_DIR, { fallthrough: true, maxAge: '7d', etag: true }));
     app.get('/api/serveur', async (req, res) => {
         try {
             return await getServeur(req, res);
@@ -476,25 +570,9 @@ async function getServeur(req, res) {
 
 function mountServeurWrites(app) {
     app.post('/api/serveur', async (req, res) => {
-        const user = sessionUser(req);
-        const discordId = discordUserId(user);
-        if (!discordId) return res.status(401).json({ ok: false, discordOnly: true });
-        const rawToken = String(req.body?.t || req.query.t || '').trim();
-        const claims = rawToken ? verifyToken(rawToken) : null;
-        if (claims) rememberServeurLink(req, claims);
-        const stored = sessionServeurLink(req, discordId);
-        const guildId = String(claims?.guildId || req.body?.guildId || stored?.guildId || '').trim();
-        const applicationId = String(claims?.applicationId || req.body?.applicationId || stored?.applicationId || '').trim();
-        if (!guildId || !applicationId) {
-            return res.status(400).json({ ok: false, error: 'Serveur ou application manquant.' });
-        }
-        if (claims && claims.userId !== discordId) {
-            return res.status(403).json({ ok: false, error: 'Ce lien Discord appartient à un autre compte.' });
-        }
-        const allowed = await assertConfigurer(discordId, guildId, applicationId);
-        if (!allowed) {
-            return res.status(403).json({ ok: false, error: 'Il faut être propriétaire ou administrateur de ce serveur Discord.' });
-        }
+        const access = await resolveServeurWrite(req);
+        if (access.error) return res.status(access.error.status).json(access.error.body);
+        const { guildId, applicationId } = access;
         const defaults = await loadDefault(applicationId);
         const existing = await loadServer(applicationId, guildId);
         const body = req.body || {};
@@ -511,6 +589,27 @@ function mountServeurWrites(app) {
             }
         }
         return res.json({ ok: true, config: next, resolved, locked: custom.lockedFields(defaults.allow) });
+    });
+
+    app.post('/api/serveur/logo', async (req, res) => {
+        const access = await resolveServeurWrite(req);
+        if (access.error) return res.status(access.error.status).json(access.error.body);
+        const { guildId, applicationId } = access;
+        const defaults = await loadDefault(applicationId);
+        if (custom.lockedFields(defaults.allow)['identity.logo']) {
+            return res.status(403).json({ ok: false, error: 'Le logo est verrouillé par la config défaut.' });
+        }
+        const parsed = parseImageDataUrl(req.body?.image);
+        if (parsed.error) {
+            const status = parsed.error.includes('trop lourde') ? 413 : 400;
+            return res.status(status).json({ ok: false, error: parsed.error });
+        }
+        const filename = logoFilename(applicationId, guildId, parsed.ext);
+        if (!filename) return res.status(400).json({ ok: false, error: 'Serveur ou application manquant.' });
+        await fs.mkdir(MEDIA_DIR, { recursive: true });
+        await fs.writeFile(path.join(MEDIA_DIR, filename), parsed.buf);
+        await pruneLogos(`${safeDiscordId(applicationId)}-${safeDiscordId(guildId)}-`);
+        return res.json({ ok: true, url: logoPublicUrl(req, filename) });
     });
 
     app.post('/api/serveur/defaults', async (req, res) => {
@@ -541,5 +640,9 @@ module.exports = {
     discordUserId,
     serveurPathFromQuery,
     isGuildAdminFromSnapshot,
+    imageExtFromBuffer,
+    parseImageDataUrl,
+    logoFilename,
+    logoPublicUrl,
     OFFICIAL_BOTS
 };

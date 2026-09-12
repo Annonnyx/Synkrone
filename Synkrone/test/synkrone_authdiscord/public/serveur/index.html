@@ -58,6 +58,40 @@
         .srv-toggle { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sk-border); }
         .srv-toggle:last-child { border-bottom: 0; }
         .srv-json { min-height: 10rem; font-family: var(--sk-mono); font-size: 12px; }
+        .srv-media { display: grid; gap: 8px; }
+        .srv-drop {
+            display: grid;
+            place-items: center;
+            gap: 6px;
+            min-height: 7.5rem;
+            padding: 14px;
+            border: 1px dashed var(--sk-border-strong);
+            background: var(--sk-surface-2);
+            cursor: pointer;
+            text-align: center;
+        }
+        .srv-drop:hover,
+        .srv-drop:focus-visible { border-color: var(--mousse); outline: none; }
+        .srv-drop.is-over {
+            border-color: var(--mousse);
+            background: color-mix(in srgb, var(--mousse) 12%, var(--sk-surface-2));
+        }
+        .srv-field[data-locked="true"] .srv-drop { cursor: not-allowed; }
+        .srv-drop img {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            border: 1px solid var(--sk-border);
+        }
+        .srv-drop p { margin: 0; font-weight: 600; }
+        .srv-drop .hint { font-size: .85rem; font-weight: 400; color: var(--sk-text-muted); }
+        .srv-preview .thumb {
+            float: right;
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            margin: 0 0 8px 12px;
+        }
     </style>
 </head>
 <body>
@@ -254,11 +288,128 @@
                 'ibm-plex-mono': 'IBM Plex Mono, monospace',
                 'fraunces': 'Fraunces, serif'
             };
+            const logo = val('embed-logo');
             preview.innerHTML = `<div class="bar" style="background:${esc(color)}"></div>
+                ${logo ? `<img class="thumb" src="${esc(logo)}" alt="">` : ''}
                 <h3>${esc(titleText)}</h3>
                 <p>${esc(desc)}</p>
                 <p class="foot">${esc(foot)}</p>`;
             preview.style.fontFamily = fontMap[font] || fontMap['ibm-plex-sans'];
+        }
+
+        function setLogoPreview(url) {
+            const img = document.getElementById('logo-preview');
+            if (!img) return;
+            if (url) {
+                img.src = url;
+                img.hidden = false;
+            } else {
+                img.removeAttribute('src');
+                img.hidden = true;
+            }
+        }
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function logoField(logo, locked) {
+            return `<div class="srv-field srv-media" data-locked="${locked ? 'true' : 'false'}">
+                <span>Logo / thumbnail${lockedBadge(locked)}</span>
+                <div class="srv-drop" id="logo-drop" ${locked ? '' : 'tabindex="0" role="button"'}>
+                    <input type="file" id="logo-file" accept="image/jpeg,image/png,image/webp,image/gif" ${locked ? 'disabled' : ''} hidden>
+                    <img id="logo-preview" alt="" ${logo ? `src="${esc(logo)}"` : 'hidden'}>
+                    <p>Glissez une image ou cliquez pour choisir</p>
+                    <p class="hint">PNG, JPEG, WebP ou GIF · 2 Mo max</p>
+                </div>
+                <input id="embed-logo" class="sk-input" value="${esc(logo)}" placeholder="Ou une URL https://…" ${locked ? 'disabled' : ''}>
+                <p class="srv-note" id="logo-status"></p>
+            </div>`;
+        }
+
+        function bindLogoPicker(data, locked) {
+            const drop = document.getElementById('logo-drop');
+            const input = document.getElementById('logo-file');
+            const field = document.getElementById('embed-logo');
+            const status = document.getElementById('logo-status');
+            if (!drop || !input || !field) return;
+            field.addEventListener('input', () => {
+                setLogoPreview(field.value.trim());
+                paint();
+            });
+            if (locked) return;
+            let busy = false;
+            const take = async (file) => {
+                if (!file || busy) return;
+                if (!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)) {
+                    status.textContent = 'JPEG, PNG, WebP ou GIF uniquement.';
+                    return;
+                }
+                if (file.size > 2 * 1024 * 1024) {
+                    status.textContent = 'Image trop lourde (2 Mo max).';
+                    return;
+                }
+                busy = true;
+                status.textContent = 'Envoi…';
+                const dataUrl = await readFileAsDataUrl(file).catch(() => null);
+                if (!dataUrl) {
+                    busy = false;
+                    status.textContent = 'Lecture impossible.';
+                    return;
+                }
+                setLogoPreview(dataUrl);
+                try {
+                    const res = await fetch('/api/serveur/logo', {
+                        method: 'POST',
+                        headers: { 'content-type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            t: params.get('t') || '',
+                            guildId: data.guildId,
+                            applicationId: data.applicationId,
+                            image: dataUrl
+                        })
+                    });
+                    const out = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(out.error || out.message || 'Envoi impossible.');
+                    field.value = out.url;
+                    setLogoPreview(out.url);
+                    status.textContent = 'Image prête — enregistrez pour l’appliquer.';
+                    paint();
+                } catch (err) {
+                    status.textContent = err.message || 'Envoi impossible.';
+                    setLogoPreview(field.value.trim());
+                } finally {
+                    busy = false;
+                    input.value = '';
+                }
+            };
+            drop.addEventListener('click', (ev) => {
+                if (ev.target === input) return;
+                input.click();
+            });
+            drop.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    input.click();
+                }
+            });
+            input.addEventListener('change', () => take(input.files?.[0]));
+            drop.addEventListener('dragenter', (ev) => { ev.preventDefault(); drop.classList.add('is-over'); });
+            drop.addEventListener('dragover', (ev) => { ev.preventDefault(); drop.classList.add('is-over'); });
+            drop.addEventListener('dragleave', (ev) => {
+                if (!drop.contains(ev.relatedTarget)) drop.classList.remove('is-over');
+            });
+            drop.addEventListener('drop', (ev) => {
+                ev.preventDefault();
+                drop.classList.remove('is-over');
+                take(ev.dataTransfer?.files?.[0]);
+            });
         }
 
         let state = { tab: 'visuel' };
@@ -401,7 +552,7 @@
                                 ${field('color-info', 'Info', colorRow('color-info', c.identity.colors.info || data.resolved.identity.colors.info, cat.colorPresets, L('identity.colors.info')), L('identity.colors.info'))}
                             </div>
                             ${field('embed-footer', 'Pied des embeds', `<input id="embed-footer" class="sk-input" value="${esc(c.identity.footerText)}" ${L('identity.footerText') ? 'disabled' : ''}>`, L('identity.footerText'))}
-                            ${field('embed-logo', 'Logo / thumbnail', `<input id="embed-logo" class="sk-input" value="${esc(c.identity.logo)}" placeholder="URL" ${L('identity.logo') ? 'disabled' : ''}>`, L('identity.logo'))}
+                            ${logoField(c.identity.logo, L('identity.logo'))}
                             ${field('embed-font', 'Police des visuels', `<select id="embed-font" ${L('identity.font') ? 'disabled' : ''}>${(cat.fonts || []).map((f) => `<option value="${esc(f.id)}" ${c.identity.font === f.id ? 'selected' : ''}>${esc(f.label)}</option>`).join('')}</select>`, L('identity.font'))}
                             <input type="hidden" id="embed-theme" value="${esc(c.identity.theme)}">
                             <input type="hidden" id="embed-footer-icon" value="${esc(c.identity.footerIcon)}">
@@ -474,6 +625,7 @@
                     </aside>
                 </div>`;
             ['embed-color', 'color-success', 'color-error', 'color-warning', 'color-info', 'def-color'].forEach(bindColor);
+            bindLogoPicker(data, L('identity.logo'));
             document.getElementById('form').addEventListener('input', paint);
             paint();
             document.getElementById('tabs').addEventListener('click', (ev) => {

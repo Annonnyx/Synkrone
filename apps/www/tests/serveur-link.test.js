@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const test = require('node:test');
-const { verifyToken, serveurPathFromQuery, isGuildAdminFromSnapshot } = require('../lib/serveur');
+const { verifyToken, serveurPathFromQuery, isGuildAdminFromSnapshot, imageExtFromBuffer, parseImageDataUrl, logoFilename, logoPublicUrl } = require('../lib/serveur');
 
 function sign(payload, secret) {
     const raw = Buffer.from(JSON.stringify(payload), 'utf8');
@@ -77,4 +77,34 @@ test('guild owner and administrator can configure a server', () => {
         memberRoleIds: [],
         roles: [{ id: 'r-admin', permissions: String(0x8) }]
     }), false);
+});
+
+test('imageExtFromBuffer reads magic bytes', () => {
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+    assert.equal(imageExtFromBuffer(png), 'png');
+    assert.equal(imageExtFromBuffer(Buffer.from('nope')), null);
+});
+
+test('parseImageDataUrl accepts a PNG data URL and rejects junk', () => {
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+    const parsed = parseImageDataUrl(`data:image/png;base64,${png.toString('base64')}`);
+    assert.equal(parsed.ext, 'png');
+    assert.ok(parsed.buf.equals(png));
+    assert.match(parseImageDataUrl('not-an-image').error, /JPEG/);
+});
+
+test('logoFilename and public URL stay predictable', () => {
+    assert.equal(
+        logoFilename('1367891720871874560', '222222222222222222', 'png', 1700000000000),
+        '1367891720871874560-222222222222222222-1700000000000.png'
+    );
+    assert.equal(logoFilename('nope', '222222222222222222', 'png', 1), '');
+    const prev = process.env.PUBLIC_ORIGIN;
+    process.env.PUBLIC_ORIGIN = 'https://synkrone.app';
+    try {
+        assert.equal(logoPublicUrl({}, 'a-b-1.png'), 'https://synkrone.app/serveur-media/a-b-1.png');
+    } finally {
+        if (prev === undefined) delete process.env.PUBLIC_ORIGIN;
+        else process.env.PUBLIC_ORIGIN = prev;
+    }
 });

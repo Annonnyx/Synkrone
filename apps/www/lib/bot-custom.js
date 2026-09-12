@@ -322,7 +322,7 @@ function normalizeServer(raw) {
             warning: hexOrEmpty(colors.warning),
             info: hexOrEmpty(colors.info)
         },
-        logo: asText(identity.logo || legacyEmbed.thumbnail, 400),
+        logo: asText(identity.logo || legacyEmbed.thumbnail, 500),
         footerText: asText(identity.footerText || legacyEmbed.footer, 200),
         footerIcon: asText(identity.footerIcon, 400),
         font: fontIds.has(String(identity.font || '')) ? String(identity.font) : '',

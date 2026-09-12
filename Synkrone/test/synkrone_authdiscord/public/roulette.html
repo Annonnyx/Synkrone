@@ -223,9 +223,106 @@
             gap: 12px;
             padding: 12px 16px;
             border-bottom: 1px solid var(--sysBorder);
+            min-width: 0;
         }
         .ranking-row:last-child { border-bottom: none; }
         .ranking-row.current-user { background: rgba(109, 140, 255, 0.1); border-left: 3px solid var(--accentBlue); }
+        .ranking-row img,
+        .history-card img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid var(--sysBorder);
+        }
+        .history-card img { width: 40px; height: 40px; }
+        .rank-spins {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--textDim);
+            border: 1px solid var(--sysBorder);
+            padding: 4px 8px;
+            flex-shrink: 0;
+        }
+        .rank-kr {
+            color: var(--accentGold);
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .roulette-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            padding: 14px 56px 14px 16px;
+        }
+        .roulette-head-title { min-width: 9.5rem; flex: 0 0 auto; }
+        .roulette-kicker {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--textDim);
+            white-space: nowrap;
+        }
+        .roulette-count {
+            margin: 4px 0 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accentBlue);
+            white-space: nowrap;
+        }
+        .roulette-podium {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            flex: 1 1 16rem;
+            min-width: 0;
+        }
+        .roulette-podium[hidden] { display: none !important; }
+        .podium-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            max-width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--sysBorder);
+            border-radius: 10px;
+            background: color-mix(in srgb, var(--surface) 86%, transparent);
+        }
+        .podium-chip img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--sysBorder);
+            flex-shrink: 0;
+        }
+        .podium-chip .rank { font-size: 12px; font-weight: 800; flex-shrink: 0; }
+        .podium-chip .rank-1 { color: #c9a227; }
+        .podium-chip .rank-2 { color: var(--textDim); }
+        .podium-chip .rank-3 { color: #8c6226; }
+        .podium-chip .name {
+            max-width: 7.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .podium-chip .kr {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accentGold);
+            flex-shrink: 0;
+        }
+        .roulette-head .btn { width: auto; flex-shrink: 0; }
         
         .pagination-btn {
             width: 32px; height: 32px;
@@ -294,7 +391,19 @@
         .overflow-y-auto { overflow-y: auto; }
         .shrink-0 { flex-shrink: 0; }
         .rounded-lg { border-radius: var(--sk-radius-lg); }
+        .rounded-full { border-radius: 50%; }
+        .object-cover { object-fit: cover; }
         .border { border: 1px solid var(--sk-border); }
+        .w-6 { width: 24px; } .h-6 { height: 24px; }
+        .w-8 { width: 32px; } .h-8 { height: 32px; }
+        .w-10 { width: 40px; } .h-10 { height: 40px; }
+        .max-h-\[85vh\] { max-height: 85vh; }
+        .min-h-\[420px\] { min-height: 420px; }
+        .max-w-\[340px\] { max-width: 340px; }
+        .whitespace-nowrap { white-space: nowrap; }
+        .font-semibold { font-weight: 600; }
+        .font-black { font-weight: 800; }
+        .text-base { font-size: 16px; }
         @media (min-width: 768px) {
             .md\:flex-row { flex-direction: row; }
             .md\:w-auto { width: auto; }
@@ -305,31 +414,21 @@
             .lg\:w-\[320px\] { width: 320px; }
         }
     </style>
-    <link rel="stylesheet" href="/design/synkrone.css">
 </head>
 <body class="p-4 mosaic-bg">
     
     <div class="shell h-full">
         
         <!-- Header -->
-        <header class="panel-glass p-4 flex flex-col md:flex-row gap-4 justify-between items-center relative">
-            <div class="w-full flex flex-col md:flex-row md:justify-between items-center gap-4">
-                <div class="flex items-center justify-between w-full md:w-auto">
-                    <div class="flex flex-col">
-                        <span class="text-xs font-bold text-textDim tracking-wider">CLASSEMENT ROULETTE</span>
-                        <span class="text-sm font-bold" style="color: var(--accentBlue);"><span id="statUsersMobile">0</span> JOUEURS</span>
-                    </div>
-                </div>
-                
-                <div class="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
-                    <div id="topPlayerContainer" class="hidden flex-wrap items-center justify-center md:justify-start gap-2">
-                        <!-- Top 3 injecté par JS -->
-                    </div>
-                    <button id="openRankingBtn" class="btn btn-outline w-full md:w-auto text-xs">
-                        Voir le classement complet
-                    </button>
-                </div>
+        <header class="panel-glass roulette-head">
+            <div class="roulette-head-title">
+                <p class="roulette-kicker">Classement roulette</p>
+                <p class="roulette-count"><span id="statUsersMobile">0</span> <span id="statUsersLabel">joueurs</span></p>
             </div>
+            <div id="topPlayerContainer" class="roulette-podium" hidden></div>
+            <button id="openRankingBtn" class="btn btn-outline text-xs">
+                Voir le classement complet
+            </button>
         </header>
 
         <!-- Layout PC principal -->
@@ -539,6 +638,10 @@
         function formatNumber(value) {
             return Number(value || 0).toLocaleString('fr-FR');
         }
+
+        function esc(value) {
+            return String(value ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        }
         
         function formatRelativeDate(timestamp) {
             const date = new Date(Number(timestamp));
@@ -739,13 +842,13 @@
             
             rankingList.innerHTML = filtered.slice(start, start + pageSize).map((player) => `
                 <div class="ranking-row ${player.id === currentUserId ? 'current-user' : ''}">
-                    <strong class="text-textDim text-base font-black w-8 text-center shrink-0">#${player.position}</strong>
+                    <strong class="text-textDim text-base font-black shrink-0">#${player.position}</strong>
                     <div class="flex items-center gap-3 min-w-0 flex-1">
-                        <img src="${player.avatar || '/assets/images/logo.jpg'}" class="w-8 h-8 rounded-full border border-[var(--sysBorder)] object-cover shrink-0" onerror="this.src='/assets/images/logo.jpg';">
-                        <span class="truncate font-semibold text-sm text-white">${player.username || 'Utilisateur'}</span>
+                        <img src="${player.avatar || '/assets/images/logo.jpg'}" alt="" onerror="this.src='/assets/images/logo.jpg';">
+                        <span class="truncate font-semibold text-sm">${player.username || 'Utilisateur'}</span>
                     </div>
-                    <span class="text-[11px] font-medium text-textDim bg-[rgba(0,0,0,0.3)] px-2.5 py-1 rounded-md shrink-0 border border-[var(--sysBorder)]">${player.spinsCount} spins</span>
-                    <strong class="text-[var(--accentGold)] font-bold text-sm whitespace-nowrap shrink-0">${formatNumber(player.totalKrones)} Kr</strong>
+                    <span class="rank-spins">${player.spinsCount} spins</span>
+                    <strong class="rank-kr">${formatNumber(player.totalKrones)} Kr</strong>
                 </div>
             `).join('') || '<p class="text-sm text-textDim text-center p-6">Aucun joueur trouvé.</p>';
             
@@ -783,26 +886,25 @@
                 statToday.textContent = `${formatNumber(stats.todayGenerated || 0)} Kr`;
                 
                 if (statUsersMobile) {
-                    statUsersMobile.textContent = formatNumber(stats.uniqueUsers || 0);
+                    const users = rankingData.length || Number(stats.uniqueUsers || 0);
+                    statUsersMobile.textContent = formatNumber(users);
+                    const label = document.getElementById('statUsersLabel');
+                    if (label) label.textContent = users === 1 ? 'joueur' : 'joueurs';
                 }
 
-                const topPlayers = Array.isArray(stats.monthlyPlayers) ? stats.monthlyPlayers.slice(0, 3) : [];
+                const topPlayers = rankingData.slice(0, 3);
                 if (topPlayers.length) {
-                    topPlayerContainer.classList.remove('hidden');
-                    topPlayerContainer.classList.add('flex');
-                    
-                    const podiumColors = ['text-[#ffd700]', 'text-[#e2e8f0]', 'text-[#d97706]'];
-                    
-                    topPlayerContainer.innerHTML = topPlayers.map((player, index) => {
-                        const color = podiumColors[index] || 'text-textDim';
-                        return `
-                            <div class="flex items-center gap-2 bg-[rgba(0,0,0,0.3)] border border-[var(--sysBorder)] rounded-xl py-1.5 px-3 shadow-sm">
-                                <strong class="${color} text-xs font-black">#${index + 1}</strong>
-                                <img src="${player.avatar || '/assets/images/logo.jpg'}" class="w-6 h-6 rounded-full object-cover border border-[var(--sysBorder)]" onerror="this.src='/assets/images/logo.jpg';">
-                                <span class="truncate max-w-[70px] text-xs font-bold text-white">${player.username}</span>
-                                <span class="text-[10px] font-bold text-[var(--accentGold)] bg-[rgba(0,0,0,0.4)] px-1.5 py-0.5 rounded border border-[var(--sysBorder)]">${formatNumber(player.totalKrones)}</span>
-                            </div>`;
-                    }).join('');
+                    topPlayerContainer.hidden = false;
+                    topPlayerContainer.innerHTML = topPlayers.map((player, index) => `
+                            <div class="podium-chip">
+                                <strong class="rank rank-${index + 1}">#${index + 1}</strong>
+                                <img src="${esc(player.avatar || '/assets/images/logo.jpg')}" alt="" onerror="this.src='/assets/images/logo.jpg';">
+                                <span class="name">${esc(player.username || 'Utilisateur')}</span>
+                                <span class="kr">${formatNumber(player.totalKrones)} Kr</span>
+                            </div>`).join('');
+                } else {
+                    topPlayerContainer.hidden = true;
+                    topPlayerContainer.innerHTML = '';
                 }
                 
                 renderHistory();

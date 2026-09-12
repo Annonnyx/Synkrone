@@ -26,7 +26,7 @@ const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
 const DEFAULT_PORT = 3668;
-const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/me-media', '/design', '/api', '/hebergement', '/robots.txt', '/sitemap.xml'];
+const RESERVED_PATH_PREFIXES = ['/hub', '/ui', '/sharing', '/vux', '/uploads', '/me-media', '/serveur-media', '/design', '/api', '/hebergement', '/robots.txt', '/sitemap.xml'];
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
 const CONTACT_COOLDOWN_MS = 10 * 60 * 1000;
 const DEFAULT_SUPPORT_GUILD_ID = '1368235294192570520';

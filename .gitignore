@@ -12,3 +12,5 @@ apps/www/data/uptime.json
 apps/www/data/sessions/
 Synkrone/test/synkrone_authdiscord/data/uploads/me/*
 !Synkrone/test/synkrone_authdiscord/data/uploads/me/.gitkeep
+apps/www/data/uploads/serveur/*
+!apps/www/data/uploads/serveur/.gitkeep
