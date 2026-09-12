@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Check, Copy, Download, Eraser, Search, WrapText } from "lucide-react";
 import { api } from "@/lib/client";
+import { withPanelBase } from "@/lib/panel-base";
 import { notify } from "@/lib/notify";
 import { useT } from "@/lib/i18n";
 import { formatConsoleClock } from "@/lib/console/docker-log";

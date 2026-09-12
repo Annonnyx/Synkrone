@@ -1,6 +1,6 @@
 /** Docker `timestamps=true` prefix: 2026-09-12T13:27:42.123456789Z message */
 const DOCKER_TS =
-  /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?)(Z|[+-]\d{2}:\d{2})\s+(.*)$/s;
+  /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?)(Z|[+-]\d{2}:\d{2})\s+([\s\S]*)$/;
 
 export function stripDockerTimestamp(line: string): { at?: string; message: string } {
   const text = String(line ?? "");
