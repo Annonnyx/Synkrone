@@ -18,7 +18,7 @@ import { BaseRuntimeProvider, appendConsole, currentContainer, loadServiceRecord
 import { FilesystemManager } from "@/lib/filesystem/manager";
 import { ContainerManager } from "@/lib/docker/adapter";
 import { DISALLOWED_INTENTS_FATAL } from "@/lib/discord/intents";
-import { discordSiteLinkEnv } from "@/lib/discord/site-link-env";
+import { discordSiteLinkEnv, containerNeedsSiteLinkEnv, publicSiteOriginFromEnv } from "@/lib/discord/site-link-env";
 import { DISCORD_TEMPLATE, intentsBitfield, resolveGatewayIntents } from "./templates";
 import type { RuntimeTemplate, ServiceRecord } from "./types";
 
@@ -277,6 +277,8 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     const flavor = bot?.flavor ?? "custom";
     const prefix = bot?.prefix ?? "!";
     const intents = resolveGatewayIntents(bot?.intents, bot?.modules ?? []);
+    const siteOrigin = publicSiteOriginFromEnv();
+    const siteLink = discordSiteLinkEnv();
     await fsm.write(".orbital/boot.sh", BOOT_SH);
     await fsm.write(
       "config/bot.json",
@@ -289,11 +291,24 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
           intents,
           intentsBitfield: intentsBitfield(intents),
           modules: bot?.modules ?? [],
+          ...(siteOrigin ? { siteOrigin } : {}),
         },
         null,
         2,
       ),
     );
+    if (!siteLink.PUBLIC_SITE_ORIGIN) {
+      await appendConsole(
+        service.id,
+        "Site link disabled: set PUBLIC_ORIGIN=https://synkrone.app (or SYNKRONE_PANEL_ORIGIN) on the panel, then recreate the container.",
+      );
+    }
+    if (!siteLink.BOT_CONFIG_SECRET) {
+      await appendConsole(
+        service.id,
+        "Site link disabled: PLATFORM_SECRET_KEY or SESSION_SECRET is missing on the panel.",
+      );
+    }
     await this.syncPanelbotPrefix(fsm, prefix);
     await this.writeSlashHelper(fsm);
     await this.patchHelpCog(fsm);
@@ -309,7 +324,8 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     const templateDir = path.join(synkroneRepoRoot(), "templates/discord", path.dirname(CONFIG_COG_FILE));
     let needsCopy = true;
     try {
-      needsCopy = !hasConfigHybridCommand(await fsm.read(CONFIG_COG_FILE));
+      const raw = await fsm.read(CONFIG_COG_FILE);
+      needsCopy = !hasConfigHybridCommand(raw) || !raw.includes("siteOrigin");
     } catch {
       needsCopy = true;
     }
@@ -422,7 +438,7 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     const record = await loadServiceRecord(serviceId);
     if (!record) throw new Error("Service not found");
     await this.writePlatformRuntime(record);
-    await this.ensureTokenInjected(serviceId);
+    await this.ensurePlatformEnvInjected(serviceId);
     await super.start(serviceId);
   }
 
@@ -431,6 +447,9 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     if (!token) {
       const row = await currentContainer(serviceId);
       if (row?.dockerContainerId && (await this.containerHasToken(row.dockerContainerId)) === true) {
+        const record = await loadServiceRecord(serviceId);
+        if (record) await this.writePlatformRuntime(record);
+        await this.ensurePlatformEnvInjected(serviceId);
         await super.restart(serviceId);
         return;
       }
@@ -439,7 +458,7 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     const record = await loadServiceRecord(serviceId);
     if (!record) throw new Error("Service not found");
     await this.writePlatformRuntime(record);
-    await this.ensureTokenInjected(serviceId);
+    await this.ensurePlatformEnvInjected(serviceId);
     await super.restart(serviceId);
   }
 
@@ -472,23 +491,34 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     throw new Error("BOT_TOKEN is not set");
   }
 
-  private async containerHasToken(containerId: string): Promise<boolean | null> {
+  private async containerEnvList(containerId: string): Promise<string[] | null> {
     try {
       const inspect = await ContainerManager.inspect(containerId);
       const env = inspect.Config?.Env;
-      if (!Array.isArray(env)) return null;
-      return env.some((entry) => /^(BOT_TOKEN|DISCORD_TOKEN)=.+$/.test(entry));
+      return Array.isArray(env) ? env : null;
     } catch {
       return null;
     }
   }
 
-  private async ensureTokenInjected(serviceId: string) {
+  private async containerHasToken(containerId: string): Promise<boolean | null> {
+    const env = await this.containerEnvList(containerId);
+    if (!env) return null;
+    return env.some((entry) => /^(BOT_TOKEN|DISCORD_TOKEN)=.+$/.test(entry));
+  }
+
+  private async ensurePlatformEnvInjected(serviceId: string) {
+    const expected = discordSiteLinkEnv();
     const row = await currentContainer(serviceId);
     if (row?.dockerContainerId) {
-      const hasToken = await this.containerHasToken(row.dockerContainerId);
-      if (hasToken === true) return;
-      await appendConsole(serviceId, "Applying the saved Discord token to a new container...");
+      const env = await this.containerEnvList(row.dockerContainerId);
+      const hasToken = env != null && (await this.containerHasToken(row.dockerContainerId)) === true;
+      const tokenOk = hasToken || !(await this.storedToken(serviceId));
+      if (tokenOk && !containerNeedsSiteLinkEnv(env, expected)) return;
+      await appendConsole(
+        serviceId,
+        "Recreating the container to apply token and site-link settings...",
+      );
       await this.remove(serviceId);
     }
     const record = await loadServiceRecord(serviceId);

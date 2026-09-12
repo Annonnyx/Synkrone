@@ -26,3 +26,20 @@ export function discordSiteLinkEnv(env: NodeJS.Dict<string> = process.env): Reco
     ...(secret ? { BOT_CONFIG_SECRET: secret, SESSION_SECRET: secret } : {}),
   };
 }
+
+export function envListHasValue(envList: string[] | null | undefined, key: string): boolean {
+  if (!Array.isArray(envList) || !key) return false;
+  const prefix = `${key}=`;
+  return envList.some((entry) => entry.startsWith(prefix) && entry.length > prefix.length);
+}
+
+/** True when the running container is missing origin or HMAC secret the panel can inject. */
+export function containerNeedsSiteLinkEnv(
+  envList: string[] | null | undefined,
+  expected: Record<string, string>,
+): boolean {
+  if (expected.PUBLIC_SITE_ORIGIN && !envListHasValue(envList, "PUBLIC_SITE_ORIGIN")) return true;
+  if (expected.BOT_CONFIG_SECRET && !envListHasValue(envList, "BOT_CONFIG_SECRET") && !envListHasValue(envList, "SESSION_SECRET"))
+    return true;
+  return false;
+}

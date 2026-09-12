@@ -37,17 +37,29 @@ HUB_MODULES = [
 ]
 
 
-def _site_origin() -> str:
-    raw = (
-        os.getenv("PUBLIC_SITE_ORIGIN")
-        or os.getenv("PUBLIC_ORIGIN")
-        or os.getenv("ORBITAL_PUBLIC_ORIGIN")
-        or ""
-    )
-    origin = str(raw).strip().rstrip("/")
+def _normalize_origin(raw: str) -> str:
+    origin = str(raw or "").strip().rstrip("/")
     if origin.endswith("/hebergement"):
         origin = origin[: -len("/hebergement")]
     return origin
+
+
+def _site_origin() -> str:
+    origin = _normalize_origin(
+        os.getenv("PUBLIC_SITE_ORIGIN")
+        or os.getenv("PUBLIC_ORIGIN")
+        or os.getenv("ORBITAL_PUBLIC_ORIGIN")
+        or os.getenv("SYNKRONE_PANEL_ORIGIN")
+        or ""
+    )
+    if origin:
+        return origin
+    try:
+        with open("config/bot.json", encoding="utf-8") as fh:
+            data = json.load(fh)
+        return _normalize_origin(str(data.get("siteOrigin") or ""))
+    except Exception:
+        return ""
 
 
 def _config_secret() -> str:
