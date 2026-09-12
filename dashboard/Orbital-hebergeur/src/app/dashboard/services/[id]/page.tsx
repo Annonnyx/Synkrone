@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { Play, RefreshCw, RotateCcw, Square, Trash2, Zap } from "lucide-react";
 import { api, fmtBytesMb, fmtUptime } from "@/lib/client";
+import { cpuPercentOfQuota } from "@/lib/runtime/cpu";
 import { useT } from "@/lib/i18n";
 import { usePoll } from "@/lib/use-poll";
 import { Bar, ErrorText, SecretBanner, Skeleton, StateBadge, TypeIcon } from "@/components/panel";
@@ -288,12 +289,12 @@ function ServiceDetail() {
                   <span>{t("service.cpu")}</span>
                   <span>
                     {t("service.coresOf", {
-                      used: (stats?.cpuPercent ?? 0).toFixed(1),
+                      used: cpuPercentOfQuota(stats?.cpuPercent ?? 0, svc.cpuLimit).toFixed(1),
                       cores: (svc.cpuLimit / 1000).toFixed(1),
                     })}
                   </span>
                 </div>
-                <Bar value={stats?.cpuPercent ?? 0} max={100} />
+                <Bar value={cpuPercentOfQuota(stats?.cpuPercent ?? 0, svc.cpuLimit)} max={100} />
               </div>
               <div>
                 <div className="flex justify-between">

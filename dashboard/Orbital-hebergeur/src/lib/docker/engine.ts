@@ -429,8 +429,19 @@ export const docker = {
 
   inspect: (id: string) => json<ContainerInspect>({ path: `/containers/${id}/json` }),
 
-  statsOnce: (id: string) =>
-    json<DockerStats>({ path: `/containers/${id}/stats?stream=false`, timeoutMs: 15_000 }),
+  async statsOnce(id: string): Promise<DockerStats> {
+    const first = await json<DockerStats>({
+      path: `/containers/${id}/stats?stream=false`,
+      timeoutMs: 15_000,
+    });
+    if (cpuSampleReady(first)) return first;
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    const second = await json<DockerStats>({
+      path: `/containers/${id}/stats?stream=false`,
+      timeoutMs: 15_000,
+    });
+    return mergeCpuSamples(first, second);
+  },
 
   async logs(id: string, tail = 200): Promise<string> {
     const res = await request({
@@ -536,6 +547,29 @@ export const docker = {
   },
 };
 
+export function cpuSampleReady(stats: DockerStats): boolean {
+  const preSys = stats.precpu_stats?.system_cpu_usage ?? 0;
+  if (preSys <= 0) return false;
+  const cpuDelta =
+    (stats.cpu_stats?.cpu_usage?.total_usage ?? 0) -
+    (stats.precpu_stats?.cpu_usage?.total_usage ?? 0);
+  const systemDelta = (stats.cpu_stats?.system_cpu_usage ?? 0) - preSys;
+  return cpuDelta > 0 && systemDelta > 0;
+}
+
+/** Podman often answers stream=false with an empty precpu block. Reuse the previous sample. */
+export function mergeCpuSamples(previous: DockerStats, next: DockerStats): DockerStats {
+  if (cpuSampleReady(next)) return next;
+  return {
+    ...next,
+    precpu_stats: {
+      cpu_usage: { total_usage: previous.cpu_stats?.cpu_usage?.total_usage ?? 0 },
+      system_cpu_usage: previous.cpu_stats?.system_cpu_usage ?? 0,
+    },
+  };
+}
+
+/** Docker's formula: 100 = one core fully used. */
 export function computeCpuPercent(stats: DockerStats): number {
   const cpuDelta =
     (stats.cpu_stats?.cpu_usage?.total_usage ?? 0) -
@@ -547,3 +581,4 @@ export function computeCpuPercent(stats: DockerStats): number {
     stats.cpu_stats?.online_cpus ?? stats.cpu_stats?.cpu_usage?.percpu_usage?.length ?? 1;
   return (cpuDelta / systemDelta) * cpus * 100;
 }
+
