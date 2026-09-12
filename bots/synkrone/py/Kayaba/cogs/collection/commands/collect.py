@@ -831,7 +831,7 @@ class Collect(commands.Cog):
 
         return embed, attachments
 
-    @commands.command(name="collect")
+    @commands.hybrid_command(name="collect")
     async def collect(self, ctx: commands.Context):
         # Vérifier le cooldown personnalisé avant d'exécuter
         if not DEVMOD:

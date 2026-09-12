@@ -623,7 +623,7 @@ class AntiScamCog(commands.Cog, name="AntiScam"):
             custom_log("error", f"Échec de l'écriture de la quarantaine pour {member.id} : {e}")
 
     @perm_command(level=3)
-    @commands.command(name="antiscam", description="Ouvrir le panneau de contrôle de l'Anti-Scam")
+    @commands.hybrid_command(name="antiscam", description="Ouvrir le panneau de contrôle de l'Anti-Scam")
     async def antiscam_menu(self, ctx: commands.Context):
         """Interface d'administration Anti-Scam."""
         if not ctx.guild:

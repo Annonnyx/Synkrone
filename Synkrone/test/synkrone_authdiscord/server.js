@@ -363,7 +363,15 @@ function normalizeStoredUser(user, userId) {
         featuredUntil: Number(user?.featuredUntil) || 0,
         autoRenewFeatured: Boolean(user?.autoRenewFeatured),
         likedProfiles: Array.isArray(user?.likedProfiles) ? user.likedProfiles : [],
-        stats: typeof user?.stats === 'object' ? user.stats : { visitsTotal: 0, visitsMonth: 0, likesTotal: 0, likesMonth: 0 }
+        stats: typeof user?.stats === 'object' ? user.stats : { visitsTotal: 0, visitsMonth: 0, likesTotal: 0, likesMonth: 0 },
+        providers: (() => {
+            const providers = user?.providers && typeof user.providers === 'object' ? { ...user.providers } : {};
+            if (/^\d{15,22}$/.test(safeId) && !providers.discord) providers.discord = safeId;
+            const prefixed = safeId.match(/^(discord|github|google):(.+)$/);
+            if (prefixed && !providers[prefixed[1]]) providers[prefixed[1]] = prefixed[2];
+            return providers;
+        })(),
+        email: String(user?.email || '').trim().toLowerCase()
     };
 }
 
@@ -380,37 +388,143 @@ function toAdminUserDto(user) {
     };
 }
 
-async function upsertUserFromDiscordAuth(discordUser, isTeamOwner) {
+function providersOf(user) {
+    return user?.providers && typeof user.providers === 'object' ? { ...user.providers } : {};
+}
+
+function findUserByProvider(db, provider, providerId) {
+    const id = String(providerId || '').trim();
+    if (!id) return null;
+    return Object.values(db.users || {}).find((u) => {
+        if (!u) return false;
+        if (provider === 'discord' && String(u.id) === id) return true;
+        if (String(u.id) === `${provider}:${id}`) return true;
+        return String(providersOf(u)[provider] || '') === id;
+    }) || null;
+}
+
+function attachTargetId(req) {
+    const user = req.session?.user;
+    if (!user || user.isGuest) return null;
+    const id = String(user.id || '').trim();
+    return id && id !== 'guest' ? id : null;
+}
+
+function sessionFromPersisted(persisted) {
+    return {
+        id: persisted.id,
+        username: persisted.username,
+        avatar: persisted.avatar,
+        role: persisted.role,
+        grade: persisted.grade,
+        krone: persisted.krone,
+        isGuest: false,
+        isTeamOwner: Boolean(persisted.isTeamOwner),
+        providers: providersOf(persisted),
+        email: String(persisted.email || '')
+    };
+}
+
+function providerTakenError() {
+    const err = new Error('Ce compte est déjà lié à un autre profil Synkrone.');
+    err.code = 'PROVIDER_TAKEN';
+    return err;
+}
+
+async function migrateUserId(db, fromId, toId) {
+    if (!fromId || !toId || fromId === toId) return;
+    const fromUser = db.users[fromId];
+    if (!fromUser) return;
+    const dest = db.users[toId] || {};
+    db.users[toId] = normalizeStoredUser({
+        ...fromUser,
+        ...dest,
+        id: toId,
+        providers: { ...providersOf(fromUser), ...providersOf(dest) },
+        krone: Math.max(Number(fromUser.krone) || 0, Number(dest.krone) || 0)
+    }, toId);
+    delete db.users[fromId];
+    if (kronesApi?.migrateWallet) {
+        await kronesApi.migrateWallet(fromId, toId).catch(() => undefined);
+    }
+}
+
+async function upsertUserFromDiscordAuth(discordUser, isTeamOwner, attachToId) {
     const db = await readUsersDb();
-    const userId = String(discordUser?.id || '').trim();
-    if (!userId) return null;
-    const existing = normalizeStoredUser(db.users[userId], userId);
+    const discordId = String(discordUser?.id || '').trim();
+    if (!discordId) return null;
+    const byDiscord = findUserByProvider(db, 'discord', discordId);
+    if (attachToId && db.users[attachToId] && byDiscord && String(byDiscord.id) !== String(attachToId)) {
+        throw providerTakenError();
+    }
+    let existing = (attachToId && db.users[attachToId]) || byDiscord || db.users[discordId] || null;
+    if (existing && String(existing.id) !== discordId) {
+        await migrateUserId(db, existing.id, discordId);
+        existing = db.users[discordId];
+    }
     const now = Date.now();
-    
     const keepBanner = Boolean(existing?.bannerCustom) || isCustomBanner(existing?.banner);
     const discordBanner = discordUser.banner
-        ? `https://cdn.discordapp.com/banners/${userId}/${discordUser.banner}.png?size=512`
+        ? `https://cdn.discordapp.com/banners/${discordId}/${discordUser.banner}.png?size=512`
         : '';
     const bannerUrl = keepBanner
         ? existing.banner
         : (discordBanner || existing?.banner || '');
-        
     const nextUser = {
         ...(existing || {}),
-        id: userId, username: String(discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${userId.slice(-4)}`),
-        name: String(existing?.name || discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${userId.slice(-4)}`),
-        avatar: discordUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${discordUser.avatar}.png` : String(existing?.avatar || '/assets/images/logo.jpg'),
+        id: discordId,
+        username: String(discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${discordId.slice(-4)}`),
+        name: String(existing?.name || discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${discordId.slice(-4)}`),
+        avatar: discordUser?.avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${discordUser.avatar}.png` : String(existing?.avatar || '/assets/images/logo.jpg'),
         banner: bannerUrl,
         bannerCustom: keepBanner,
         role: isTeamOwner === true ? 'Admin' : (existing ? existing.role : 'Krobi'),
         grade: ALLOWED_USER_GRADES.has(String(existing?.grade || '')) ? String(existing.grade) : 'Aucun',
         krone: Number.isFinite(Number(existing?.krone)) ? Math.max(0, Math.trunc(Number(existing.krone))) : 0,
         isTeamOwner: isTeamOwner === null ? Boolean(existing?.isTeamOwner) : Boolean(isTeamOwner),
-        isGuest: false, createdAt: Number(existing?.createdAt) || now, updatedAt: now, lastSeenAt: now, lastLoginAt: now
+        isGuest: false,
+        providers: { ...providersOf(existing), discord: discordId },
+        createdAt: Number(existing?.createdAt) || now,
+        updatedAt: now,
+        lastSeenAt: now,
+        lastLoginAt: now
     };
-    db.users[userId] = nextUser;
+    db.users[discordId] = normalizeStoredUser(nextUser, discordId);
     await writeUsersDb(db);
-    return nextUser;
+    return db.users[discordId];
+}
+
+async function upsertUserFromOAuth(provider, profile, attachToId) {
+    const providerId = String(profile.id || '').trim();
+    if (!providerId) return null;
+    const db = await readUsersDb();
+    const byProvider = findUserByProvider(db, provider, providerId);
+    if (attachToId && db.users[attachToId] && byProvider && String(byProvider.id) !== String(attachToId)) {
+        throw providerTakenError();
+    }
+    const existing = (attachToId && db.users[attachToId]) || byProvider || null;
+    const now = Date.now();
+    const id = existing?.id || `${provider}:${providerId}`;
+    const nextUser = {
+        ...(existing || {}),
+        id,
+        username: String(existing?.username || profile.username || `Utilisateur ${providerId.slice(-4)}`),
+        avatar: String(existing?.avatar || profile.avatar || '/assets/images/logo.jpg'),
+        email: String(profile.email || existing?.email || '').trim().toLowerCase(),
+        role: existing?.role || 'Krobi',
+        grade: ALLOWED_USER_GRADES.has(String(existing?.grade || '')) ? String(existing.grade) : 'Aucun',
+        krone: Number.isFinite(Number(existing?.krone)) ? Math.max(0, Math.trunc(Number(existing.krone))) : 0,
+        isTeamOwner: Boolean(existing?.isTeamOwner),
+        isGuest: false,
+        providers: { ...providersOf(existing), [provider]: providerId },
+        createdAt: Number(existing?.createdAt) || now,
+        updatedAt: now,
+        lastSeenAt: now,
+        lastLoginAt: now
+    };
+    db.users[id] = normalizeStoredUser(nextUser, id);
+    await writeUsersDb(db);
+    return db.users[id];
 }
 
 async function syncSessionUserWithDb(sessionUser, options = {}) {
@@ -422,26 +536,37 @@ async function syncSessionUserWithDb(sessionUser, options = {}) {
     const existing = normalizeStoredUser(db.users[userId], userId);
     const now = Date.now();
     
-    const nextUser = {
+    const providers = providersOf(existing);
+    if (/^\d{15,22}$/.test(userId)) providers.discord = userId;
+    const nextUser = normalizeStoredUser({
         ...(existing || {}),
-        id: userId, username: String(sessionUser.username || existing?.username || `Utilisateur ${userId.slice(-4)}`),
+        id: userId,
+        username: String(sessionUser.username || existing?.username || `Utilisateur ${userId.slice(-4)}`),
         avatar: String(sessionUser.avatar || existing?.avatar || '/assets/images/logo.jpg'),
         role: String(existing?.role || sessionUser.role || 'Krobi'),
         grade: ALLOWED_USER_GRADES.has(String(existing?.grade || sessionUser.grade || '')) ? String(existing?.grade || sessionUser.grade) : 'Aucun',
         krone: Number.isFinite(Number(existing?.krone)) ? Math.max(0, Math.trunc(Number(existing.krone))) : Number.isFinite(Number(sessionUser.krone)) ? Math.max(0, Math.trunc(Number(sessionUser.krone))) : 0,
         isTeamOwner: Boolean(sessionUser.isTeamOwner || existing?.isTeamOwner),
-        isGuest: false, createdAt: Number(existing?.createdAt) || now, updatedAt: now, lastSeenAt: now, lastLoginAt: markLogin ? now : Number(existing?.lastLoginAt || now)
-    };
+        isGuest: false,
+        providers,
+        email: String(existing?.email || sessionUser.email || ''),
+        createdAt: Number(existing?.createdAt) || now,
+        updatedAt: now,
+        lastSeenAt: now,
+        lastLoginAt: markLogin ? now : Number(existing?.lastLoginAt || now)
+    }, userId);
     await overlayWalletOnUser(nextUser);
     db.users[userId] = nextUser;
     await writeUsersDb(db);
-    
+
     sessionUser.username = nextUser.username;
     sessionUser.avatar = nextUser.avatar;
     sessionUser.role = nextUser.role;
     sessionUser.grade = nextUser.grade;
     sessionUser.krone = nextUser.krone;
     sessionUser.isTeamOwner = nextUser.isTeamOwner;
+    sessionUser.providers = nextUser.providers;
+    sessionUser.email = nextUser.email;
     return sessionUser;
 }
 
@@ -483,39 +608,9 @@ function googleRedirectUri(req) {
     return String(process.env.GOOGLE_REDIRECT_URI || '').trim() || `${publicSiteOrigin(req)}/auth/google/callback`;
 }
 
-async function upsertUserFromOAuth(provider, profile) {
-    const providerId = String(profile.id || '').trim();
-    if (!providerId) return null;
-    const userId = `${provider}:${providerId}`;
-    const db = await readUsersDb();
-    const existing = Object.values(db.users || {}).find((u) => {
-        const providers = u?.providers && typeof u.providers === 'object' ? u.providers : {};
-        return String(u?.id) === userId || String(providers[provider] || '') === providerId;
-    });
-    const now = Date.now();
-    const id = existing?.id || userId;
-    const nextUser = {
-        ...(existing || {}),
-        id,
-        username: String(profile.username || existing?.username || `Utilisateur ${providerId.slice(-4)}`),
-        avatar: String(profile.avatar || existing?.avatar || '/assets/images/logo.jpg'),
-        role: existing?.role || 'Krobi',
-        grade: ALLOWED_USER_GRADES.has(String(existing?.grade || '')) ? String(existing.grade) : 'Aucun',
-        krone: Number.isFinite(Number(existing?.krone)) ? Math.max(0, Math.trunc(Number(existing.krone))) : 0,
-        isTeamOwner: Boolean(existing?.isTeamOwner),
-        isGuest: false,
-        providers: {
-            ...((existing && existing.providers) || {}),
-            [provider]: providerId
-        },
-        createdAt: Number(existing?.createdAt) || now,
-        updatedAt: now,
-        lastSeenAt: now,
-        lastLoginAt: now
-    };
-    db.users[id] = normalizeStoredUser(nextUser, id);
-    await writeUsersDb(db);
-    return db.users[id];
+function oauthFailRedirect(req, err) {
+    if (err?.code === 'PROVIDER_TAKEN') return '/compte?linkError=taken';
+    return safeReturnTo(req.session?.returnTo) || '/login';
 }
 
 function oauthStatus() {
@@ -667,22 +762,16 @@ app.get('/auth/discord/callback', async (req, res) => {
         const userResponse = await axios.get('https://discord.com/api/users/@me', { headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` } });
         const discordUser = userResponse.data;
         const isTeamOwner = await isBotOwnerUserId(discordUser.id);
-        const persistedUser = await upsertUserFromDiscordAuth(discordUser, isTeamOwner);
-        
-        req.session.user = {
-            id: discordUser.id, username: persistedUser?.username || discordUser.global_name || discordUser.username,
-            avatar: persistedUser?.avatar || (discordUser.avatar ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png` : '/assets/images/logo.jpg'),
-            role: persistedUser?.role || (isTeamOwner === true ? 'Admin' : 'Krobi'),
-            grade: persistedUser?.grade || 'Aucun', krone: Number.isFinite(Number(persistedUser?.krone)) ? Number(persistedUser.krone) : 0,
-            isGuest: false, isTeamOwner: Boolean(persistedUser?.isTeamOwner)
-        };
+        const persistedUser = await upsertUserFromDiscordAuth(discordUser, isTeamOwner, attachTargetId(req));
+        if (!persistedUser) return res.redirect('/');
+        req.session.user = sessionFromPersisted(persistedUser);
         const dest = consumeReturnTo(req);
         req.session.save((err) => {
             if (err) return res.redirect('/login');
             res.redirect(dest);
         });
-    } catch (err) { 
-        res.redirect(safeReturnTo(req.session?.returnTo) || '/login'); 
+    } catch (err) {
+        res.redirect(oauthFailRedirect(req, err));
     }
 });
 
@@ -718,25 +807,16 @@ app.get('/auth/github/callback', async (req, res) => {
             id: gh.id,
             username: gh.login || gh.name,
             avatar: gh.avatar_url
-        });
+        }, attachTargetId(req));
         if (!persistedUser) return res.redirect('/');
-        req.session.user = {
-            id: persistedUser.id,
-            username: persistedUser.username,
-            avatar: persistedUser.avatar,
-            role: persistedUser.role,
-            grade: persistedUser.grade,
-            krone: persistedUser.krone,
-            isGuest: false,
-            isTeamOwner: persistedUser.isTeamOwner
-        };
+        req.session.user = sessionFromPersisted(persistedUser);
         const dest = consumeReturnTo(req);
         req.session.save((err) => {
             if (err) return res.redirect('/login');
             res.redirect(dest);
         });
     } catch (err) {
-        res.redirect(safeReturnTo(req.session?.returnTo) || '/login');
+        res.redirect(oauthFailRedirect(req, err));
     }
 });
 
@@ -773,26 +853,18 @@ app.get('/auth/google/callback', async (req, res) => {
         const persistedUser = await upsertUserFromOAuth('google', {
             id: g.sub,
             username: g.name || g.email,
-            avatar: g.picture
-        });
+            avatar: g.picture,
+            email: g.email
+        }, attachTargetId(req));
         if (!persistedUser) return res.redirect('/');
-        req.session.user = {
-            id: persistedUser.id,
-            username: persistedUser.username,
-            avatar: persistedUser.avatar,
-            role: persistedUser.role,
-            grade: persistedUser.grade,
-            krone: persistedUser.krone,
-            isGuest: false,
-            isTeamOwner: persistedUser.isTeamOwner
-        };
+        req.session.user = sessionFromPersisted(persistedUser);
         const dest = consumeReturnTo(req);
         req.session.save((err) => {
             if (err) return res.redirect('/login');
             res.redirect(dest);
         });
     } catch (err) {
-        res.redirect(safeReturnTo(req.session?.returnTo) || '/login');
+        res.redirect(oauthFailRedirect(req, err));
     }
 });
 

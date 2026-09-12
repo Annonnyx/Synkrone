@@ -209,7 +209,7 @@ class AdminInfoCommand(commands.Cog):
         debug_log("Cog AdminInfo initialisé avec succès.", "SUCCESS")
 
     @perm_command(level=3) # Niveau 3 Vax pour les commandes staff standard[cite: 6]
-    @commands.command(name="admininfo", description="Affiche l'équipe d'administration et les bots du serveur.")
+    @commands.hybrid_command(name="admininfo", description="Affiche l'équipe d'administration et les bots du serveur.")
     @discord.app_commands.guild_only()
     async def admininfo(self, ctx: commands.Context):
         debug_log(f"Commande /admininfo exécutée par {ctx.author} ({ctx.author.id})", "INFO")

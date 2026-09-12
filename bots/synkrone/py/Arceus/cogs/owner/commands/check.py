@@ -187,7 +187,7 @@ class OwnerCheck(commands.Cog):
             return "⚫"
 
     # --- Commande Principale ---
-    @commands.command(
+    @commands.hybrid_command(
         name="check", 
         help="[Owner] Inspecte un ID pour obtenir des informations détaillées (Serveur ou Utilisateur)."
     )

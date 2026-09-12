@@ -195,7 +195,7 @@ class MP(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="choicemp")
+    @commands.hybrid_command(name="choicemp")
     async def mp(self, ctx: commands.Context):
         """Gérer vos préférences de messages privés"""
         

@@ -172,7 +172,7 @@ class Check(commands.Cog):
         embed.description = summary
         return embed
 
-    @commands.command(name="checklist")
+    @commands.hybrid_command(name="checklist")
     @commands.has_permissions(administrator=True)
     async def check(self, ctx):
         await ctx.send(embed=self.generate_summary_embed(), view=MainView(self))

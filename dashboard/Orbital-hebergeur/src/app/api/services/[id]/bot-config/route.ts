@@ -15,11 +15,14 @@ import {
   colorToHex,
   embedPath,
   goodbyePath,
+  goodbyePathStaff,
   parseColor,
   readJsonFile,
   welcomePath,
+  welcomePathStaff,
   writeJsonFile,
 } from "@/lib/discord/guild-files";
+import { CUSTOM_PATH, DEFAULTS_PATH, normalizeDefault } from "@/lib/discord/custom-config";
 import type { ServiceType } from "@/lib/paths";
 
 export const runtime = "nodejs";
@@ -88,6 +91,12 @@ export async function GET(req: NextRequest, ctx: Ctx) {
     const embedRaw = selected
       ? { ...EMBED_DEFAULT, ...((await readJsonFile<Record<string, unknown>>(fsm, embedPath(selected))) || {}) }
       : { ...EMBED_DEFAULT };
+    const defaults = normalizeDefault((await readJsonFile(fsm, DEFAULTS_PATH)) || {});
+    const customRaw = selected ? ((await readJsonFile<Record<string, unknown>>(fsm, CUSTOM_PATH(selected))) || {}) : {};
+    const customIdentity =
+      customRaw.identity && typeof customRaw.identity === "object"
+        ? (customRaw.identity as Record<string, unknown>)
+        : {};
 
     return {
       guilds,
@@ -121,6 +130,9 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         thumbnail: String(embedRaw.thumbnail || ""),
         image: String(embedRaw.image || ""),
       },
+      defaults,
+      allow: defaults.allow,
+      displayName: String(customIdentity.displayName || ""),
       hasToken: Boolean(token),
     };
   });
@@ -138,8 +150,20 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
       goodbye?: Record<string, string>;
       embed?: Record<string, string>;
       avatarDataUrl?: string;
+      defaults?: Record<string, unknown>;
+      displayName?: string;
     }>(req);
     const fsm = new FilesystemManager(svc.type as ServiceType, svc.id);
+
+    if (payload.defaults) {
+      const defaults = normalizeDefault(payload.defaults);
+      await writeJsonFile(fsm, DEFAULTS_PATH, defaults);
+      await writeJsonFile(fsm, "data/addons/data_embed_type/global_config.json", {
+        color: parseColor(defaults.identity.embedColor),
+        footer: defaults.identity.embedFooter,
+        thumbnail: defaults.identity.embedThumbnail,
+      });
+    }
 
     if (payload.avatarDataUrl) {
       const token = await botToken(id);
@@ -163,7 +187,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     }
 
     const guildId = String(payload.guildId || "").trim();
-    if (!guildId && (payload.welcome || payload.goodbye || payload.embed)) {
+    if (!guildId && (payload.welcome || payload.goodbye || payload.embed || payload.displayName !== undefined)) {
       return fail("guildId is required");
     }
     if (guildId && payload.welcome) {
@@ -178,6 +202,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
         content_message: payload.welcome.content_message ?? current.content_message,
       };
       await writeJsonFile(fsm, welcomePath(guildId), next);
+      await writeJsonFile(fsm, welcomePathStaff(guildId), next);
     }
     if (guildId && payload.goodbye) {
       const current = (await readJsonFile<Record<string, unknown>>(fsm, goodbyePath(guildId))) || {
@@ -191,6 +216,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
         content_message: payload.goodbye.content_message ?? current.content_message,
       };
       await writeJsonFile(fsm, goodbyePath(guildId), next);
+      await writeJsonFile(fsm, goodbyePathStaff(guildId), next);
     }
     if (guildId && payload.embed) {
       const current = (await readJsonFile<Record<string, unknown>>(fsm, embedPath(guildId))) || {
@@ -205,6 +231,40 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
         image: payload.embed.image ?? current.image,
       };
       await writeJsonFile(fsm, embedPath(guildId), next);
+    }
+    if (guildId && (payload.embed || payload.welcome || payload.goodbye || payload.displayName !== undefined)) {
+      const existingCustom =
+        (await readJsonFile<Record<string, unknown>>(fsm, CUSTOM_PATH(guildId))) || {};
+      const identity =
+        existingCustom.identity && typeof existingCustom.identity === "object"
+          ? { ...(existingCustom.identity as Record<string, unknown>) }
+          : {};
+      const texts =
+        existingCustom.texts && typeof existingCustom.texts === "object"
+          ? { ...(existingCustom.texts as Record<string, unknown>) }
+          : {};
+      const channels =
+        existingCustom.channels && typeof existingCustom.channels === "object"
+          ? { ...(existingCustom.channels as Record<string, unknown>) }
+          : {};
+      if (payload.embed) {
+        identity.embedColor = colorToHex(
+          parseColor(payload.embed.color, parseColor(identity.embedColor, EMBED_DEFAULT.color)),
+        );
+        if (payload.embed.footer !== undefined) identity.footerText = payload.embed.footer;
+        if (payload.embed.thumbnail !== undefined) identity.logo = payload.embed.thumbnail;
+      }
+      if (payload.displayName !== undefined) identity.displayName = String(payload.displayName).slice(0, 32);
+      if (payload.welcome?.content_message !== undefined) texts.welcome = payload.welcome.content_message;
+      if (payload.goodbye?.content_message !== undefined) texts.goodbye = payload.goodbye.content_message;
+      if (payload.welcome?.channel_id !== undefined) channels.welcome = payload.welcome.channel_id || "";
+      if (payload.goodbye?.channel_id !== undefined) channels.goodbye = payload.goodbye.channel_id || "";
+      await writeJsonFile(fsm, CUSTOM_PATH(guildId), {
+        ...existingCustom,
+        identity,
+        texts,
+        channels,
+      });
     }
     return { ok: true };
   });

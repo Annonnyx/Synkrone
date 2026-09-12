@@ -268,7 +268,7 @@ class ProfilDevCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command(name="owner", help="Gérer les propriétaires du bot.")
+    @commands.hybrid_command(name="owner", help="Gérer les propriétaires du bot.")
     async def owner(self, ctx: commands.Context):
         owners = load_allowed()
         if ctx.author.id != CREATOR_ID and ctx.author.id not in owners:

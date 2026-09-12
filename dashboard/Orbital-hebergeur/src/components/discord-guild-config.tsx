@@ -23,6 +23,7 @@ type BotConfig = {
   welcome: { channel_id: string; embed_title: string; embed_description: string; content_message: string };
   goodbye: { channel_id: string; embed_title: string; embed_description: string; content_message: string };
   embed: { color: string; footer: string; author: string; thumbnail: string; image: string };
+  displayName?: string;
   hasToken: boolean;
 };
 
@@ -104,6 +105,7 @@ export function DiscordGuildConfig({ serviceId }: { serviceId: string }) {
           welcome: data.welcome,
           goodbye: data.goodbye,
           embed: data.embed,
+          displayName: data.displayName || "",
         },
       });
     } catch (err) {
@@ -169,32 +171,43 @@ export function DiscordGuildConfig({ serviceId }: { serviceId: string }) {
       </div>
 
       <div className="panel p-4 space-y-4">
+        <div>
+          <div className="label">{t("service.guild")}</div>
+          <p className="mt-1 text-sm text-[var(--muted)]">{t("service.customFontNote")}</p>
+        </div>
+        {data.guilds.length > 0 ? (
+          <select
+            className="input w-full"
+            value={guildId}
+            onChange={(e) => {
+              const next = e.target.value;
+              setGuildId(next);
+              void load(next);
+            }}
+          >
+            {data.guilds.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            className="input w-full"
+            value={guildId}
+            onChange={(e) => setGuildId(e.target.value)}
+            placeholder={t("service.guildIdFallback")}
+          />
+        )}
+
         <label className="block space-y-1">
-          <span className="label">{t("service.guild")}</span>
-          {data.guilds.length > 0 ? (
-            <select
-              className="input w-full"
-              value={guildId}
-              onChange={(e) => {
-                const next = e.target.value;
-                setGuildId(next);
-                void load(next);
-              }}
-            >
-              {data.guilds.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              className="input w-full"
-              value={guildId}
-              onChange={(e) => setGuildId(e.target.value)}
-              placeholder={t("service.guildIdFallback")}
-            />
-          )}
+          <span className="label">{t("service.customGuildName")}</span>
+          <input
+            className="input w-full"
+            maxLength={32}
+            value={data.displayName || ""}
+            onChange={(e) => setData({ ...data, displayName: e.target.value })}
+          />
         </label>
 
         <div className="grid gap-3 md:grid-cols-2">
@@ -232,11 +245,19 @@ export function DiscordGuildConfig({ serviceId }: { serviceId: string }) {
         <div className="grid gap-3 md:grid-cols-2">
           <label className="block space-y-1">
             <span className="label">{t("service.embedColor")}</span>
-            <input
-              className="input w-full"
-              value={data.embed.color}
-              onChange={(e) => setData({ ...data, embed: { ...data.embed, color: e.target.value } })}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-12 cursor-pointer border border-[var(--line)] bg-transparent"
+                value={/^#[0-9a-fA-F]{6}$/.test(data.embed.color) ? data.embed.color : "#660099"}
+                onChange={(e) => setData({ ...data, embed: { ...data.embed, color: e.target.value } })}
+              />
+              <input
+                className="input w-full"
+                value={data.embed.color}
+                onChange={(e) => setData({ ...data, embed: { ...data.embed, color: e.target.value } })}
+              />
+            </div>
           </label>
           <label className="block space-y-1">
             <span className="label">{t("service.embedFooter")}</span>
@@ -246,6 +267,16 @@ export function DiscordGuildConfig({ serviceId }: { serviceId: string }) {
               onChange={(e) => setData({ ...data, embed: { ...data.embed, footer: e.target.value } })}
             />
           </label>
+        </div>
+
+        <div
+          className="p-3 text-sm"
+          style={{ background: "#313338", color: "#dbdee1", borderLeft: `4px solid ${data.embed.color || "#660099"}` }}
+        >
+          <div className="label mb-1" style={{ color: "#949ba4" }}>{t("service.customPreview")}</div>
+          <div className="font-medium text-white">{data.welcome.embed_title || t("service.welcomeMessage")}</div>
+          <p className="mt-1 whitespace-pre-wrap">{data.welcome.content_message}</p>
+          {data.embed.footer ? <p className="mt-2 text-xs" style={{ color: "#949ba4" }}>{data.embed.footer}</p> : null}
         </div>
 
         <label className="block space-y-1">

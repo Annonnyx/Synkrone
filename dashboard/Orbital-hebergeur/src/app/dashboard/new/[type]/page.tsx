@@ -129,7 +129,6 @@ export default function CreateServicePage() {
   const [token, setToken] = useState("");
   const [applicationId, setApplicationId] = useState("");
   const [prefix, setPrefix] = useState("!");
-  const [slash, setSlash] = useState(true);
   const [botSource, setBotSource] = useState<"catalog" | "ticket">("catalog");
   const [supportInvite, setSupportInvite] = useState("https://discord.gg/p768u2Pgp3");
   const [modules, setModules] = useState<string[]>(["moderation", "public"]);
@@ -275,7 +274,7 @@ export default function CreateServicePage() {
           token: token.trim() || undefined,
           applicationId: applicationId.trim() || undefined,
           prefix,
-          slashCommands: slash,
+          slashCommands: true,
           flavor: "custom",
           modules,
           commands: Array.from(new Set([...commands, CONFIG_COMMAND])),
@@ -455,25 +454,7 @@ export default function CreateServicePage() {
             )}
             <div>
               <div className="label mb-1">{t("service.slashCommands")}</div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  className="btn"
-                  style={{ borderColor: slash ? "var(--accent)" : "var(--line)" }}
-                  onClick={() => setSlash(true)}
-                >
-                  {t("service.slashOn")}
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  style={{ borderColor: !slash ? "var(--accent)" : "var(--line)" }}
-                  onClick={() => setSlash(false)}
-                >
-                  {t("service.slashOff")}
-                </button>
-              </div>
-              <p className="mt-1 text-[11px] text-[var(--muted)]">{t("create.slashEnable")}</p>
+              <p className="text-sm leading-relaxed text-[var(--muted)]">{t("create.slashEnable")}</p>
             </div>
             {privilegedHint.length > 0 && (
               <p className="text-sm leading-relaxed text-[var(--muted)]">
@@ -842,7 +823,7 @@ export default function CreateServicePage() {
                 <div>
                   <span className="label">{t("create.prefix")}</span>
                   <div className="mt-1">
-                    {prefix} · {t("create.slashEnable")}: {String(slash)}
+                    {prefix} · {t("service.slashOn")}
                   </div>
                 </div>
                 <div>

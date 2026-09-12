@@ -4,37 +4,68 @@
     <script src="/assets/theme-boot.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synkrone — Serveur</title>
+    <title>Synkrone — Configuration</title>
     <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:wght@400;600&family=Fraunces:wght@400;600&display=swap">
     <link rel="stylesheet" href="/design/synkrone.css">
     <style>
         .srv-form { display: grid; gap: 14px; }
         .srv-form textarea { min-height: 5.5rem; }
         .srv-guilds { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
         .srv-guilds a {
-            display: block;
-            padding: 12px 14px;
-            border: 1px solid var(--sk-border);
-            background: var(--sk-surface-2);
-            color: inherit;
-            text-decoration: none;
-            font-weight: 600;
+            display: block; padding: 12px 14px; border: 1px solid var(--sk-border);
+            background: var(--sk-surface-2); color: inherit; text-decoration: none; font-weight: 600;
         }
         .srv-guilds a:hover { border-color: var(--mousse); }
-        .srv-guilds span { display: block; margin-top: 2px; font-weight: 400; color: var(--sk-text-muted); font-size: .85rem; }
+        .srv-guilds span { display: block; margin-top: 2px; font-weight: 400; color: var(--sk-text-muted); font-size: .9rem; }
         .srv-theme { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+        .srv-layout { display: grid; gap: 20px; }
+        @media (min-width: 900px) { .srv-layout { grid-template-columns: minmax(0, 1.15fr) minmax(16rem, .85fr); align-items: start; } }
+        .srv-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+        .srv-tabs button {
+            min-height: 40px; padding: 0 12px; border: 1px solid var(--sk-border);
+            background: transparent; color: inherit; font-weight: 600; cursor: pointer;
+        }
+        .srv-tabs button[aria-pressed="true"] { border-color: var(--mousse); background: var(--sk-surface-2); }
+        .srv-field { display: grid; gap: 6px; }
+        .srv-field > span { font-weight: 600; font-size: .95rem; }
+        .srv-lock {
+            display: inline-block; margin-left: 6px; font-size: .75rem; font-weight: 500;
+            color: var(--sk-text-faint); border: 1px solid var(--sk-border); padding: 1px 6px;
+        }
+        .srv-field[data-locked="true"] input,
+        .srv-field[data-locked="true"] textarea,
+        .srv-field[data-locked="true"] select { opacity: .55; }
+        .srv-row { display: grid; gap: 10px; }
+        @media (min-width: 640px) { .srv-row.cols-2 { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 720px) { .srv-row.cols-3 { grid-template-columns: 1.2fr .7fr 1fr; } }
+        .srv-colors { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .srv-swatch, .srv-theme-btn {
+            width: 28px; height: 28px; border: 1px solid var(--sk-border-strong); padding: 0; cursor: pointer;
+        }
+        .srv-theme-btn { width: auto; min-height: 34px; padding: 0 10px; font-weight: 600; background: var(--sk-surface-2); color: inherit; }
+        .srv-preview {
+            border: 1px solid var(--sk-border); background: #313338; color: #dbdee1;
+            padding: 14px 16px; font-size: 14px; line-height: 1.45;
+        }
+        .srv-preview h3 { margin: 0 0 6px; font-size: 1rem; color: #fff; }
+        .srv-preview .bar { height: 4px; width: 4px; border-radius: 2px; float: left; margin: 0 10px 0 0; min-height: 72px; }
+        .srv-preview .foot { margin-top: 10px; font-size: 12px; color: #949ba4; clear: both; }
+        .srv-note { font-size: .9rem; color: var(--sk-text-muted); margin: 0; }
+        .srv-toggle { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sk-border); }
+        .srv-toggle:last-child { border-bottom: 0; }
+        .srv-json { min-height: 10rem; font-family: var(--sk-mono); font-size: 12px; }
     </style>
 </head>
 <body>
-    <main class="sk-center-page sk-center-wide">
+    <main class="sk-center-page sk-center-config">
         <article class="sk-card" id="card">
             <div class="srv-theme" id="theme-bar"></div>
             <p class="sk-kicker">Configuration</p>
-            <h1>Configurer le bot</h1>
-            <p class="lede" id="lede">Messages d’arrivée, d’au revoir et couleur des embeds pour ce serveur.</p>
+            <h1 id="title">Configurer le bot</h1>
+            <p class="lede" id="lede">Deux couches : la config défaut du créateur, puis ce que les admins du serveur ont le droit de changer.</p>
             <div id="stage" class="sk-stack"></div>
         </article>
     </main>
@@ -63,25 +94,455 @@
         const params = new URLSearchParams(window.location.search);
         const stage = document.getElementById('stage');
         const lede = document.getElementById('lede');
+        const title = document.getElementById('title');
+        const ALLOW_LABELS = {
+            displayName: 'Nom affiché du bot',
+            avatar: 'Avatar sur ce serveur',
+            embedColor: 'Couleur des embeds',
+            embedPalette: 'Couleurs succès / erreur / warning / info',
+            embedLogo: 'Logo des embeds',
+            embedFooter: 'Pied des embeds',
+            font: 'Police des visuels générés',
+            whiteLabel: 'Marque blanche (nom, avatar, logo, pied)',
+            texts: 'Textes et messages',
+            channels: 'Salons des modules',
+            roles: 'Rôles des modules',
+            modules: 'Activer ou désactiver des modules',
+            cooldowns: 'Cooldowns des commandes',
+            commandPerms: 'Permissions des commandes'
+        };
 
         function esc(v) {
             return String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         }
-
-        function fillSelect(select, channels, current) {
-            const extra = current && !channels.some((c) => c.id === current);
-            select.innerHTML = '<option value="">Aucun</option>' +
-                (extra ? `<option value="${esc(current)}">${esc(current)}</option>` : '') +
-                channels.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
-            if (current) select.value = current;
-        }
-
         function queryForApi() {
             const q = new URLSearchParams();
             if (params.get('t')) q.set('t', params.get('t'));
             if (params.get('guild')) q.set('guild', params.get('guild'));
             if (params.get('application')) q.set('application', params.get('application'));
+            if (params.get('layer')) q.set('layer', params.get('layer'));
             return q;
+        }
+        function options(list, current, emptyLabel) {
+            const extra = current && !(list || []).some((item) => item.id === current);
+            return `<option value="">${esc(emptyLabel || 'Aucun')}</option>` +
+                (extra ? `<option value="${esc(current)}">${esc(current)}</option>` : '') +
+                (list || []).map((item) => `<option value="${esc(item.id)}">${esc(item.name)}</option>`).join('');
+        }
+        function lockedBadge(locked) {
+            return locked ? '<span class="srv-lock" title="Verrouillé par la config défaut du créateur">Verrouillé</span>' : '';
+        }
+        function field(id, label, control, locked) {
+            return `<label class="srv-field" data-locked="${locked ? 'true' : 'false'}"><span>${esc(label)}${lockedBadge(locked)}</span>${control}</label>`;
+        }
+        function commandRow(name, cooldown, roleId, roles, lockCd, lockPerm) {
+            return `<div class="srv-row cols-3" data-cmd-row>
+                <label class="srv-field" data-locked="${lockCd && lockPerm ? 'true' : 'false'}"><span>Commande</span>
+                    <input class="sk-input" data-cmd-name list="cmd-names" value="${esc(name)}" ${lockCd && lockPerm ? 'disabled' : ''}>
+                </label>
+                <label class="srv-field" data-locked="${lockCd ? 'true' : 'false'}"><span>Cooldown (s)${lockedBadge(lockCd)}</span>
+                    <input class="sk-input" type="number" min="0" max="3600" data-cmd-cd value="${esc(cooldown || 0)}" ${lockCd ? 'disabled' : ''}>
+                </label>
+                <label class="srv-field" data-locked="${lockPerm ? 'true' : 'false'}"><span>Rôle requis${lockedBadge(lockPerm)}</span>
+                    <select data-cmd-role ${lockPerm ? 'disabled' : ''}>${options(roles, roleId)}</select>
+                </label>
+            </div>`;
+        }
+        function colorRow(id, value, presets, locked) {
+            const chips = (presets || []).map((hex) => `<button type="button" class="srv-swatch" data-color-for="${esc(id)}" data-color="${esc(hex)}" style="background:${esc(hex)}" title="${esc(hex)}"></button>`).join('');
+            return `<div class="srv-colors">
+                <input id="${id}-picker" type="color" value="${esc(value || '#660099')}" ${locked ? 'disabled' : ''}>
+                <input id="${id}" class="sk-input" value="${esc(value || '')}" placeholder="#660099" ${locked ? 'disabled' : ''}>
+                ${chips}
+            </div>`;
+        }
+        function bindColor(id) {
+            const text = document.getElementById(id);
+            const picker = document.getElementById(id + '-picker');
+            if (!text || !picker) return;
+            const sync = (hex) => {
+                const next = hex && hex.startsWith('#') ? hex : ('#' + String(hex || '').replace('#', ''));
+                text.value = next;
+                if (/^#[0-9a-fA-F]{6}$/.test(next)) picker.value = next;
+                paint();
+            };
+            text.addEventListener('input', () => sync(text.value));
+            picker.addEventListener('input', () => sync(picker.value));
+            document.querySelectorAll(`[data-color-for="${id}"]`).forEach((btn) => {
+                btn.addEventListener('click', () => sync(btn.getAttribute('data-color')));
+            });
+        }
+        function readFormServer() {
+            const autoNames = {};
+            (state.catalog.modules || []).forEach((mod) => {
+                const el = document.getElementById('auto-' + mod.id);
+                if (el) autoNames[mod.id] = el.value;
+            });
+            const modules = {};
+            (state.catalog.modules || []).forEach((mod) => {
+                const el = document.getElementById('mod-' + mod.id);
+                modules[mod.id] = el ? el.checked : null;
+            });
+            const cooldowns = {};
+            const commandPerms = {};
+            document.querySelectorAll('[data-cmd-row]').forEach((row) => {
+                const name = String(row.querySelector('[data-cmd-name]')?.value || '').trim();
+                if (!name) return;
+                const cd = Number(row.querySelector('[data-cmd-cd]')?.value || 0);
+                if (Number.isFinite(cd) && cd > 0) cooldowns[name] = Math.min(3600, Math.trunc(cd));
+                const role = String(row.querySelector('[data-cmd-role]')?.value || '').trim();
+                if (role) commandPerms[name] = role;
+            });
+            return {
+                identity: {
+                    displayName: val('display-name'),
+                    avatarUrl: val('embed-avatar'),
+                    embedColor: val('embed-color'),
+                    colors: {
+                        success: val('color-success'),
+                        error: val('color-error'),
+                        warning: val('color-warning'),
+                        info: val('color-info')
+                    },
+                    logo: val('embed-logo'),
+                    footerText: val('embed-footer'),
+                    footerIcon: val('embed-footer-icon'),
+                    font: val('embed-font'),
+                    theme: val('embed-theme')
+                },
+                channels: {
+                    welcome: val('ch-welcome'),
+                    goodbye: val('ch-goodbye'),
+                    logs: val('ch-logs'),
+                    tickets: val('ch-tickets'),
+                    category: val('ch-category'),
+                    autoNames
+                },
+                roles: { mute: val('role-mute') },
+                texts: {
+                    welcome: val('txt-welcome'),
+                    welcomeTitle: val('txt-welcome-title'),
+                    welcomeDescription: val('txt-welcome-desc'),
+                    goodbye: val('txt-goodbye'),
+                    goodbyeTitle: val('txt-goodbye-title'),
+                    goodbyeDescription: val('txt-goodbye-desc'),
+                    buttonEmoji: val('txt-emoji')
+                },
+                modules,
+                cooldowns,
+                commandPerms
+            };
+        }
+        function val(id) {
+            const el = document.getElementById(id);
+            return el ? el.value : '';
+        }
+        function paint() {
+            const preview = document.getElementById('preview');
+            if (!preview) return;
+            const color = val('embed-color') || state.resolved?.identity?.embedColor || '#660099';
+            const titleText = val('txt-welcome-title') || 'Bienvenue sur {guild}';
+            const desc = val('txt-welcome-desc') || val('txt-welcome') || '';
+            const foot = val('embed-footer') || '';
+            const font = val('embed-font') || 'ibm-plex-sans';
+            const fontMap = {
+                'ibm-plex-sans': 'IBM Plex Sans, sans-serif',
+                'zilla-slab': 'Zilla Slab, serif',
+                'source-serif-4': 'Source Serif 4, serif',
+                'ibm-plex-mono': 'IBM Plex Mono, monospace',
+                'fraunces': 'Fraunces, serif'
+            };
+            preview.innerHTML = `<div class="bar" style="background:${esc(color)}"></div>
+                <h3>${esc(titleText)}</h3>
+                <p>${esc(desc)}</p>
+                <p class="foot">${esc(foot)}</p>`;
+            preview.style.fontFamily = fontMap[font] || fontMap['ibm-plex-sans'];
+        }
+
+        let state = { tab: 'visuel' };
+
+        function renderDefault(data) {
+            title.textContent = `Config défaut · ${data.botName}`;
+            lede.textContent = 'Cette couche s’applique à tous les serveurs, et elle décide ce que les admins ont le droit de modifier.';
+            const d = data.defaults;
+            const mods = data.catalog.modules || [];
+            const allows = Object.keys(ALLOW_LABELS).map((key) => `
+                <label class="srv-toggle"><span>${esc(ALLOW_LABELS[key])}</span>
+                    <input type="checkbox" data-allow="${esc(key)}" ${d.allow[key] ? 'checked' : ''}>
+                </label>`).join('');
+            const install = mods.map((mod) => `
+                <div class="srv-row cols-2">
+                    <label class="srv-field"><span>${esc(mod.label)} — création</span>
+                        <select data-install="${esc(mod.id)}">
+                            <option value="manual" ${d.install[mod.id]?.provision === 'manual' ? 'selected' : ''}>Sélection manuelle</option>
+                            <option value="auto" ${d.install[mod.id]?.provision === 'auto' ? 'selected' : ''}>Création automatique</option>
+                        </select>
+                    </label>
+                    <label class="srv-field"><span>Nom template</span>
+                        <input class="sk-input" data-autoname="${esc(mod.id)}" value="${esc(d.install[mod.id]?.autoName || mod.autoName)}">
+                    </label>
+                </div>`).join('');
+            const moduleOn = mods.map((mod) => `
+                <label class="srv-toggle"><span>${esc(mod.label)} actif par défaut</span>
+                    <input type="checkbox" data-modon="${esc(mod.id)}" ${d.modules[mod.id]?.enabled !== false ? 'checked' : ''}>
+                </label>`).join('');
+            stage.innerHTML = `
+                <form id="form" class="srv-form">
+                    <p class="srv-note">Identité globale. L’activité Discord est unique au bot, pas par serveur.</p>
+                    <div class="srv-row cols-2">
+                        <label class="srv-field"><span>Nom par défaut</span><input id="def-name" class="sk-input" maxlength="32" value="${esc(d.identity.displayName)}"></label>
+                        <label class="srv-field"><span>Couleur d’embed par défaut</span>${colorRow('def-color', d.identity.embedColor, data.catalog.colorPresets, false)}</label>
+                    </div>
+                    <div class="srv-row cols-2">
+                        <label class="srv-field"><span>Type d’activité</span>
+                            <select id="def-activity">
+                                ${(data.catalog.activityTypes || []).map((t) => `<option value="${esc(t)}" ${d.identity.activityType === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}
+                            </select>
+                        </label>
+                        <label class="srv-field"><span>Texte d’activité</span><input id="def-activity-text" class="sk-input" value="${esc(d.identity.activityText)}"></label>
+                    </div>
+                    <label class="srv-field"><span>Pied d’embed par défaut</span><input id="def-footer" class="sk-input" value="${esc(d.identity.embedFooter)}"></label>
+                    <h2 style="font-size:1.15rem;margin:8px 0 0">Permissions des admins de serveur</h2>
+                    <p class="srv-note">Chaque option de la config serveur a son interrupteur ici. Pas de cas par cas plus tard.</p>
+                    <div>${allows}</div>
+                    <h2 style="font-size:1.15rem;margin:8px 0 0">Installation des modules</h2>
+                    ${install}
+                    <h2 style="font-size:1.15rem;margin:8px 0 0">Modules allumés par défaut</h2>
+                    <div>${moduleOn}</div>
+                    <label class="srv-field"><span>Quota de salons/rôles auto-créés</span>
+                        <input id="def-quota" class="sk-input" type="number" min="0" max="100" value="${esc(d.limits.autoCreatedMax)}">
+                    </label>
+                    <p class="note" id="msg"></p>
+                    <div class="sk-actions">
+                        <button type="submit" class="sk-btn sk-btn-primary">Enregistrer la config défaut</button>
+                        ${data.guildId || params.get('guild') ? `<a class="sk-btn" href="/serveur?${esc(new URLSearchParams({ ...Object.fromEntries(queryForApi()), layer: 'server' }).toString())}">Config serveur</a>` : ''}
+                        <a class="sk-btn" href="/accueil" target="_top">Synkrone</a>
+                    </div>
+                </form>`;
+            bindColor('def-color');
+            document.getElementById('form').addEventListener('submit', async (ev) => {
+                ev.preventDefault();
+                const allow = {};
+                document.querySelectorAll('[data-allow]').forEach((el) => { allow[el.getAttribute('data-allow')] = el.checked; });
+                const install = {};
+                const modules = {};
+                (data.catalog.modules || []).forEach((mod) => {
+                    install[mod.id] = {
+                        provision: document.querySelector(`[data-install="${mod.id}"]`)?.value || 'manual',
+                        autoName: document.querySelector(`[data-autoname="${mod.id}"]`)?.value || mod.autoName
+                    };
+                    modules[mod.id] = { enabled: Boolean(document.querySelector(`[data-modon="${mod.id}"]`)?.checked) };
+                });
+                const msg = document.getElementById('msg');
+                msg.textContent = 'Enregistrement…';
+                const save = await fetch('/api/serveur/defaults', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        applicationId: data.applicationId,
+                        defaults: {
+                            identity: {
+                                displayName: val('def-name'),
+                                embedColor: val('def-color'),
+                                activityType: val('def-activity'),
+                                activityText: val('def-activity-text'),
+                                embedFooter: val('def-footer')
+                            },
+                            allow, install, modules,
+                            limits: { autoCreatedMax: Number(val('def-quota') || 20) }
+                        }
+                    })
+                });
+                const out = await save.json();
+                msg.textContent = save.ok ? 'Config défaut enregistrée. Elle s’applique à tous les serveurs.' : (out.error || 'Échec.');
+                msg.className = save.ok ? 'note' : 'err';
+            });
+        }
+
+        function renderServer(data) {
+            state = { ...state, ...data };
+            title.textContent = `${data.botName}`;
+            lede.textContent = 'Config de ce serveur, dans les limites posées par le créateur du bot. Les champs grisés sont verrouillés.';
+            const c = data.config;
+            const locked = data.locked || {};
+            const cat = data.catalog || {};
+            const channels = data.channels || [];
+            const roles = data.roles || [];
+            const L = (path) => Boolean(locked[path]);
+            const tabs = ['visuel', 'salons', 'textes', 'modules', 'commandes', 'json'];
+            const defaultsLink = data.canEditDefaults
+                ? `<a class="sk-btn" href="/serveur?${esc(new URLSearchParams({ application: data.applicationId, guild: data.guildId, t: params.get('t') || '', layer: 'default' }).toString())}">Config défaut</a>`
+                : '';
+            stage.innerHTML = `
+                <div class="srv-tabs" id="tabs">
+                    ${tabs.map((tab) => `<button type="button" data-tab="${tab}" aria-pressed="${state.tab === tab}">${tab[0].toUpperCase() + tab.slice(1)}</button>`).join('')}
+                </div>
+                <div class="srv-layout">
+                    <form id="form" class="srv-form">
+                        <div data-pane="visuel">
+                            <p class="srv-note">Discord n’accepte pas de police custom dans le texte d’un embed — seulement couleur et markdown. La police ci-dessous sert aux visuels générés (cartes de bienvenue, rank).</p>
+                            <div class="srv-field"><span>Thèmes</span>
+                                <div class="srv-colors">
+                                    ${(cat.themes || []).map((th) => `<button type="button" class="srv-theme-btn" data-theme-id="${esc(th.id)}">${esc(th.label)}</button>`).join('')}
+                                </div>
+                            </div>
+                            ${field('display-name', 'Nom affiché sur ce serveur', `<input id="display-name" class="sk-input" maxlength="32" value="${esc(c.identity.displayName)}" ${L('identity.displayName') ? 'disabled' : ''}>`, L('identity.displayName'))}
+                            ${field('embed-avatar', 'Avatar sur ce serveur (URL)', `<input id="embed-avatar" class="sk-input" value="${esc(c.identity.avatarUrl)}" placeholder="https://…" ${L('identity.avatarUrl') ? 'disabled' : ''}>`, L('identity.avatarUrl'))}
+                            ${field('embed-color', 'Couleur principale', colorRow('embed-color', c.identity.embedColor || data.resolved.identity.embedColor, cat.colorPresets, L('identity.embedColor')), L('identity.embedColor'))}
+                            <div class="srv-row cols-2">
+                                ${field('color-success', 'Succès', colorRow('color-success', c.identity.colors.success || data.resolved.identity.colors.success, cat.colorPresets, L('identity.colors.success')), L('identity.colors.success'))}
+                                ${field('color-error', 'Erreur', colorRow('color-error', c.identity.colors.error || data.resolved.identity.colors.error, cat.colorPresets, L('identity.colors.error')), L('identity.colors.error'))}
+                            </div>
+                            <div class="srv-row cols-2">
+                                ${field('color-warning', 'Warning', colorRow('color-warning', c.identity.colors.warning || data.resolved.identity.colors.warning, cat.colorPresets, L('identity.colors.warning')), L('identity.colors.warning'))}
+                                ${field('color-info', 'Info', colorRow('color-info', c.identity.colors.info || data.resolved.identity.colors.info, cat.colorPresets, L('identity.colors.info')), L('identity.colors.info'))}
+                            </div>
+                            ${field('embed-footer', 'Pied des embeds', `<input id="embed-footer" class="sk-input" value="${esc(c.identity.footerText)}" ${L('identity.footerText') ? 'disabled' : ''}>`, L('identity.footerText'))}
+                            ${field('embed-logo', 'Logo / thumbnail', `<input id="embed-logo" class="sk-input" value="${esc(c.identity.logo)}" placeholder="URL" ${L('identity.logo') ? 'disabled' : ''}>`, L('identity.logo'))}
+                            ${field('embed-font', 'Police des visuels', `<select id="embed-font" ${L('identity.font') ? 'disabled' : ''}>${(cat.fonts || []).map((f) => `<option value="${esc(f.id)}" ${c.identity.font === f.id ? 'selected' : ''}>${esc(f.label)}</option>`).join('')}</select>`, L('identity.font'))}
+                            <input type="hidden" id="embed-theme" value="${esc(c.identity.theme)}">
+                            <input type="hidden" id="embed-footer-icon" value="${esc(c.identity.footerIcon)}">
+                        </div>
+                        <div data-pane="salons" hidden>
+                            ${field('ch-welcome', 'Salon de bienvenue', `<select id="ch-welcome" ${L('channels.welcome') ? 'disabled' : ''}>${options(channels, c.channels.welcome)}</select>`, L('channels.welcome'))}
+                            ${field('ch-goodbye', 'Salon d’au revoir', `<select id="ch-goodbye" ${L('channels.goodbye') ? 'disabled' : ''}>${options(channels, c.channels.goodbye)}</select>`, L('channels.goodbye'))}
+                            ${field('ch-logs', 'Salon des journaux', `<select id="ch-logs" ${L('channels.logs') ? 'disabled' : ''}>${options(channels, c.channels.logs)}</select>`, L('channels.logs'))}
+                            ${field('ch-tickets', 'Salon tickets', `<select id="ch-tickets" ${L('channels.tickets') ? 'disabled' : ''}>${options(channels, c.channels.tickets)}</select>`, L('channels.tickets'))}
+                            ${field('ch-category', 'Catégorie des salons créés', `<input id="ch-category" class="sk-input" value="${esc(c.channels.category)}" placeholder="ID de catégorie" ${L('channels.category') ? 'disabled' : ''}>`, L('channels.category'))}
+                            ${field('role-mute', 'Rôle mute', `<select id="role-mute" ${L('roles.mute') ? 'disabled' : ''}>${options(roles, c.roles.mute)}</select>`, L('roles.mute'))}
+                            ${(cat.modules || []).map((mod) => field('auto-' + mod.id, `Nom auto · ${mod.label}`, `<input id="auto-${mod.id}" class="sk-input" value="${esc(c.channels.autoNames[mod.id] || '')}" ${L('channels.autoNames') ? 'disabled' : ''}>`, L('channels.autoNames'))).join('')}
+                        </div>
+                        <div data-pane="textes" hidden>
+                            <p class="srv-note">Variables : {user} {user.mention} {guild} {guild.count} {membercount} {serveur}</p>
+                            ${field('txt-welcome-title', 'Titre bienvenue', `<input id="txt-welcome-title" class="sk-input" value="${esc(c.texts.welcomeTitle)}" ${L('texts.welcomeTitle') ? 'disabled' : ''}>`, L('texts.welcomeTitle'))}
+                            ${field('txt-welcome-desc', 'Description bienvenue', `<textarea id="txt-welcome-desc" class="sk-input" ${L('texts.welcomeDescription') ? 'disabled' : ''}>${esc(c.texts.welcomeDescription)}</textarea>`, L('texts.welcomeDescription'))}
+                            ${field('txt-welcome', 'Message hors embed', `<textarea id="txt-welcome" class="sk-input" ${L('texts.welcome') ? 'disabled' : ''}>${esc(c.texts.welcome)}</textarea>`, L('texts.welcome'))}
+                            ${field('txt-goodbye-title', 'Titre au revoir', `<input id="txt-goodbye-title" class="sk-input" value="${esc(c.texts.goodbyeTitle)}" ${L('texts.goodbyeTitle') ? 'disabled' : ''}>`, L('texts.goodbyeTitle'))}
+                            ${field('txt-goodbye-desc', 'Description au revoir', `<textarea id="txt-goodbye-desc" class="sk-input" ${L('texts.goodbyeDescription') ? 'disabled' : ''}>${esc(c.texts.goodbyeDescription)}</textarea>`, L('texts.goodbyeDescription'))}
+                            ${field('txt-goodbye', 'Message d’au revoir', `<textarea id="txt-goodbye" class="sk-input" ${L('texts.goodbye') ? 'disabled' : ''}>${esc(c.texts.goodbye)}</textarea>`, L('texts.goodbye'))}
+                            ${field('txt-emoji', 'Emoji des boutons (serveur ou unicode)', `<input id="txt-emoji" class="sk-input" value="${esc(c.texts.buttonEmoji)}" ${L('texts.buttonEmoji') ? 'disabled' : ''}>`, L('texts.buttonEmoji'))}
+                        </div>
+                        <div data-pane="modules" hidden>
+                            <p class="srv-note">${L('modules') ? 'Les modules sont verrouillés par le créateur du bot.' : 'Décoche pour éteindre un module sur ce serveur.'}</p>
+                            ${(cat.modules || []).map((mod) => `
+                                <label class="srv-toggle"><span>${esc(mod.label)}</span>
+                                    <input id="mod-${mod.id}" type="checkbox" ${c.modules[mod.id] !== false && data.resolved.modules[mod.id] !== false ? 'checked' : ''} ${L('modules') ? 'disabled' : ''}>
+                                </label>`).join('')}
+                        </div>
+                        <div data-pane="commandes" hidden>
+                            <p class="srv-note">Cooldown en secondes (0 = aucun). Un rôle requis bloque la commande sauf pour le propriétaire et les administrateurs du serveur.</p>
+                            <datalist id="cmd-names">${(cat.commandNames || []).map((name) => `<option value="${esc(name)}">`).join('')}</datalist>
+                            <div id="cmd-rows">
+                                ${(() => {
+                                    const keys = [...new Set([
+                                        ...Object.keys(c.cooldowns || {}),
+                                        ...Object.keys(c.commandPerms || {})
+                                    ])];
+                                    const rows = keys.length ? keys : [''];
+                                    return rows.map((name) => commandRow(
+                                        name,
+                                        c.cooldowns?.[name] || 0,
+                                        c.commandPerms?.[name] || '',
+                                        roles,
+                                        L('cooldowns'),
+                                        L('commandPerms')
+                                    )).join('');
+                                })()}
+                            </div>
+                            ${L('cooldowns') && L('commandPerms') ? '' : '<button type="button" class="sk-btn" id="cmd-add">Ajouter une commande</button>'}
+                        </div>
+                        <div data-pane="json" hidden>
+                            <p class="srv-note">Import / export pour dupliquer une config d’un serveur à un autre. Les champs verrouillés restent ignorés à l’enregistrement.</p>
+                            <textarea id="json-box" class="sk-input srv-json">${esc(JSON.stringify(c, null, 2))}</textarea>
+                            <div class="sk-actions">
+                                <button type="button" class="sk-btn" id="json-apply">Appliquer ce JSON au formulaire</button>
+                            </div>
+                        </div>
+                        <p class="note" id="msg"></p>
+                        <div class="sk-actions">
+                            <button type="submit" class="sk-btn sk-btn-primary">Enregistrer</button>
+                            ${defaultsLink}
+                            <a class="sk-btn" href="/accueil" target="_top">Synkrone</a>
+                        </div>
+                    </form>
+                    <aside>
+                        <p class="srv-note" style="margin-bottom:8px">Aperçu embed (pas la police Discord — elle n’existe pas).</p>
+                        <div class="srv-preview" id="preview"></div>
+                    </aside>
+                </div>`;
+            ['embed-color', 'color-success', 'color-error', 'color-warning', 'color-info', 'def-color'].forEach(bindColor);
+            document.getElementById('form').addEventListener('input', paint);
+            paint();
+            document.getElementById('tabs').addEventListener('click', (ev) => {
+                const btn = ev.target.closest('[data-tab]');
+                if (!btn) return;
+                state.tab = btn.getAttribute('data-tab');
+                document.querySelectorAll('[data-tab]').forEach((el) => el.setAttribute('aria-pressed', el === btn ? 'true' : 'false'));
+                document.querySelectorAll('[data-pane]').forEach((pane) => {
+                    pane.hidden = pane.getAttribute('data-pane') !== state.tab;
+                });
+            });
+            document.querySelectorAll('[data-theme-id]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    if (L('identity.embedColor')) return;
+                    const id = btn.getAttribute('data-theme-id');
+                    const theme = (cat.themes || []).find((item) => item.id === id);
+                    if (!theme) return;
+                    document.getElementById('embed-theme').value = id;
+                    const set = (fid, hex) => {
+                        const t = document.getElementById(fid);
+                        const p = document.getElementById(fid + '-picker');
+                        if (t) t.value = hex;
+                        if (p) p.value = hex;
+                    };
+                    set('embed-color', theme.embedColor);
+                    set('color-success', theme.colors.success);
+                    set('color-error', theme.colors.error);
+                    set('color-warning', theme.colors.warning);
+                    set('color-info', theme.colors.info);
+                    paint();
+                });
+            });
+            document.getElementById('cmd-add')?.addEventListener('click', () => {
+                const box = document.getElementById('cmd-rows');
+                if (!box) return;
+                box.insertAdjacentHTML('beforeend', commandRow('', 0, '', roles, L('cooldowns'), L('commandPerms')));
+            });
+            document.getElementById('json-apply')?.addEventListener('click', () => {
+                try {
+                    const parsed = JSON.parse(document.getElementById('json-box').value);
+                    state.config = parsed;
+                    renderServer({ ...data, config: parsed });
+                } catch (err) {
+                    document.getElementById('msg').textContent = 'JSON invalide.';
+                    document.getElementById('msg').className = 'err';
+                }
+            });
+            document.getElementById('form').addEventListener('submit', async (ev) => {
+                ev.preventDefault();
+                const msg = document.getElementById('msg');
+                msg.textContent = 'Enregistrement…';
+                const body = {
+                    t: params.get('t') || '',
+                    guildId: data.guildId,
+                    applicationId: data.applicationId,
+                    config: readFormServer()
+                };
+                const save = await fetch('/api/serveur', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(body)
+                });
+                const out = await save.json();
+                msg.textContent = save.ok ? 'Enregistré. Le bot relit les fichiers tout de suite.' : (out.error || 'Échec.');
+                msg.className = save.ok ? 'note' : 'err';
+                if (save.ok && out.config) {
+                    const box = document.getElementById('json-box');
+                    if (box) box.value = JSON.stringify(out.config, null, 2);
+                }
+            });
         }
 
         (async () => {
@@ -89,23 +550,19 @@
             const res = await fetch(`/api/serveur?${queryForApi()}`, { credentials: 'same-origin' });
             const data = await res.json();
             if (res.status === 401 || data.discordOnly) {
-                lede.textContent = 'Connecte-toi avec Discord pour modifier ce serveur. Même compte que sur Hébergement.';
-                stage.innerHTML = `
-                    <div class="sk-actions">
-                        <a class="sk-btn sk-btn-discord" href="${esc(data.loginUrl || '/login?returnTo=/serveur')}" target="_top">Continuer avec Discord</a>
-                        <a class="sk-btn" href="/accueil" target="_top">Retour</a>
-                    </div>`;
+                lede.textContent = 'Connecte-toi avec Discord pour modifier ce serveur.';
+                stage.innerHTML = `<div class="sk-actions">
+                    <a class="sk-btn sk-btn-discord" href="${esc(data.loginUrl || '/login?returnTo=/serveur')}" target="_top">Continuer avec Discord</a>
+                    <a class="sk-btn" href="/accueil" target="_top">Retour</a>
+                </div>`;
                 return;
             }
             if (!res.ok) {
                 lede.textContent = data.expired
                     ? 'Le lien /config n’est plus valable (24 h). Relance la commande sur Discord.'
                     : 'Impossible d’ouvrir cette configuration.';
-                stage.innerHTML = `
-                    <p class="err">${esc(data.error || 'Accès refusé.')}</p>
-                    <div class="sk-actions">
-                        <a class="sk-btn" href="/accueil" target="_top">Retour</a>
-                    </div>`;
+                stage.innerHTML = `<p class="err">${esc(data.error || 'Accès refusé.')}</p>
+                    <div class="sk-actions"><a class="sk-btn" href="/accueil" target="_top">Retour</a></div>`;
                 return;
             }
             if (data.needLink) {
@@ -116,69 +573,14 @@
                 const list = guilds.length
                     ? `<ul class="srv-guilds">${guilds.map((g) => `<li><a href="${esc(g.href)}" target="_top">${esc(g.name)}<span>${esc(g.bot)}</span></a></li>`).join('')}</ul>`
                     : `<p class="note">${esc(data.hint || 'Ouvre /config dans Discord.')}</p>`;
-                stage.innerHTML = `${list}
-                    <div class="sk-actions">
-                        <a class="sk-btn" href="/compte" target="_top">Compte</a>
-                        <a class="sk-btn" href="/accueil" target="_top">Retour</a>
-                    </div>`;
+                stage.innerHTML = `${list}<div class="sk-actions">
+                    <a class="sk-btn" href="/compte" target="_top">Compte</a>
+                    <a class="sk-btn" href="/accueil" target="_top">Retour</a>
+                </div>`;
                 return;
             }
-            lede.textContent = `${data.botName} · messages d’arrivée, d’au revoir et couleur des embeds. L’avatar se change dans le panel ou via /config (propriétaire).`;
-            const channels = data.channels || [];
-            const channelField = (id, label) => channels.length
-                ? `<label><span>${label}</span><select id="${id}"></select></label>`
-                : `<label><span>${label}</span><input id="${id}" class="sk-input" placeholder="ID du salon"></label>`;
-            stage.innerHTML = `
-                <form id="form" class="srv-form">
-                    ${channelField('welcome-channel', 'Salon de bienvenue')}
-                    <label><span>Message de bienvenue</span><textarea id="welcome-msg" class="sk-input"></textarea></label>
-                    ${channelField('goodbye-channel', 'Salon d’au revoir')}
-                    <label><span>Message d’au revoir</span><textarea id="goodbye-msg" class="sk-input"></textarea></label>
-                    <label><span>Couleur des embeds</span><input id="embed-color" class="sk-input" placeholder="#660099"></label>
-                    <p class="note" id="msg"></p>
-                    <div class="sk-actions">
-                        <button type="submit" class="sk-btn sk-btn-primary">Enregistrer</button>
-                        <a class="sk-btn" href="/accueil" target="_top">Synkrone</a>
-                    </div>
-                </form>`;
-            if (channels.length) {
-                fillSelect(document.getElementById('welcome-channel'), channels, data.config.welcome.channel_id);
-                fillSelect(document.getElementById('goodbye-channel'), channels, data.config.goodbye.channel_id);
-            } else {
-                document.getElementById('welcome-channel').value = data.config.welcome.channel_id || '';
-                document.getElementById('goodbye-channel').value = data.config.goodbye.channel_id || '';
-            }
-            document.getElementById('welcome-msg').value = data.config.welcome.content_message || '';
-            document.getElementById('goodbye-msg').value = data.config.goodbye.content_message || '';
-            document.getElementById('embed-color').value = data.config.embed.color || '#660099';
-            const msg = document.getElementById('msg');
-            document.getElementById('form').addEventListener('submit', async (ev) => {
-                ev.preventDefault();
-                msg.textContent = 'Enregistrement…';
-                const body = {
-                    t: params.get('t') || '',
-                    guildId: data.guildId,
-                    applicationId: data.applicationId,
-                    welcome: {
-                        channel_id: document.getElementById('welcome-channel').value,
-                        content_message: document.getElementById('welcome-msg').value
-                    },
-                    goodbye: {
-                        channel_id: document.getElementById('goodbye-channel').value,
-                        content_message: document.getElementById('goodbye-msg').value
-                    },
-                    embed: { color: document.getElementById('embed-color').value }
-                };
-                const save = await fetch('/api/serveur', {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify(body)
-                });
-                const out = await save.json();
-                msg.textContent = save.ok ? 'Enregistré. Le bot relit le fichier tout de suite.' : (out.error || 'Échec.');
-                msg.className = save.ok ? 'note' : 'err';
-            });
+            if (data.layer === 'default') renderDefault(data);
+            else renderServer(data);
         })().catch((err) => {
             stage.innerHTML = `<p class="err">${esc(err.message || 'Page indisponible.')}</p>`;
         });

@@ -510,7 +510,7 @@ class OwnerCheck(commands.Cog):
         self.bot = bot
         log_success("Cog Check initialisé.")
 
-    @commands.command(name="check", description="Diagnostic rapide sur un ID")
+    @commands.hybrid_command(name="check", description="Diagnostic rapide sur un ID")
     async def check(self, ctx: commands.Context, target_id: str | None = None):
         if not ctx.guild:
             return await ctx.send(f"{Emoji.REFUSER} Cette commande doit être exécutée sur un serveur.")

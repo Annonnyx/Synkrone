@@ -40,7 +40,7 @@ class UnlockAllCommand(commands.Cog):
         self.bot = bot
 
     @perm_command(level=1)
-    @commands.command(name="unlockall", description="ðŸ”“ Réouverture complète du serveur.")
+    @commands.hybrid_command(name="unlockall", description="ðŸ”“ Réouverture complète du serveur.")
     async def unlockall(self, ctx: commands.Context):
         if not ctx.guild:
             return

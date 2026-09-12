@@ -551,7 +551,7 @@ class NoteCog(commands.Cog, name="Notes"):
         self.note_manager = NoteManager()
 
     @perm_command(level=3)
-    @commands.command(name="note", aliases=["notes"], description="Affiche le panel de gestion des notes ou le contenu d'une note.")
+    @commands.hybrid_command(name="note", aliases=["notes"], description="Affiche le panel de gestion des notes ou le contenu d'une note.")
     @app_commands.describe(name="La clé de la note à afficher (laisser vide pour le panel de gestion)")
     async def note_cmd(self, ctx: commands.Context, name: str = None):
         """Point d'entrée du module Note respectant les autorisations."""

@@ -79,7 +79,7 @@ class Unmute(commands.Cog):
         )
 
     @perm_command(level=2)
-    @commands.command(name="unmute", description="🔊 Démute immédiatement un utilisateur.")
+    @commands.hybrid_command(name="unmute", description="🔊 Démute immédiatement un utilisateur.")
     @commands.has_permissions(moderate_members=True)
     async def unmute(self, ctx: commands.Context, member: discord.Member = None, *, reason: str = None):
         if not ctx.guild:

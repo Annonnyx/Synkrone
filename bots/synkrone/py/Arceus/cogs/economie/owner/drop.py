@@ -58,12 +58,12 @@ class AdminDropCog(commands.Cog):
         status = "Shiny ✨" if shiny else "Normal"
         await ctx.send(f"✅ Ajouté `{quantite}x {name_fr} ({status})` à {target.mention}.", reference=ctx.message)
 
-    @commands.command(name="drop", description="[Admin] Ajoute des Pokémon normaux.")
+    @commands.hybrid_command(name="drop", description="[Admin] Ajoute des Pokémon normaux.")
     @commands.has_permissions(administrator=True)
     async def drop(self, ctx: commands.Context[commands.Bot], membre: discord.Member | discord.User = None, pokemon: str = None, quantite: int = 1):
         await self.execute_drop(ctx, membre, pokemon, quantite, shiny=False)
 
-    @commands.command(name="sdrop", description="[Admin] Ajoute des Pokémon shiny.")
+    @commands.hybrid_command(name="sdrop", description="[Admin] Ajoute des Pokémon shiny.")
     @commands.has_permissions(administrator=True)
     async def sdrop(self, ctx: commands.Context[commands.Bot], membre: discord.Member | discord.User = None, pokemon: str = None, quantite: int = 1):
         await self.execute_drop(ctx, membre, pokemon, quantite, shiny=True)

@@ -79,7 +79,7 @@ class RMute(commands.Cog):
         )
 
     @perm_command(level=2)
-    @commands.command(name="rmute", description="ðŸ”‡ Mute local permanent (Salon actuel).")
+    @commands.hybrid_command(name="rmute", description="ðŸ”‡ Mute local permanent (Salon actuel).")
     async def rmute(self, ctx: commands.Context, membre: discord.Member = None, *, raison: str = None):
         if not ctx.guild:
             return await ctx.send(f"{EMOJI_ERROR} Cette commande requiert un serveur.")

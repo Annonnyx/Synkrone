@@ -261,7 +261,7 @@ class DevMessaging(commands.Cog):
         except Exception: 
             return False
 
-    @commands.command(name="mp", help="Envoyer un message privé via le bot.")
+    @commands.hybrid_command(name="mp", help="Envoyer un message privé via le bot.")
     async def mp(self, ctx: commands.Context, user: discord.User, *, message: str = ""):
         if hasattr(ctx.author, "roles"):
             has_role = any(r.id in get_allowed_roles() for r in ctx.author.roles)

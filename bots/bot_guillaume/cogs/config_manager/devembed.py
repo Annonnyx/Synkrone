@@ -9,7 +9,7 @@ class DevEmbed(commands.Cog):
         self.bot = bot
 
 
-    @commands.command(name="devembed", help="Modifier le style global de l'embed par défaut du bot.")
+    @commands.hybrid_command(name="devembed", help="Modifier le style global de l'embed par défaut du bot.")
     async def devembed(self, ctx: commands.Context):
         # Vérification Owner
         if not await ctx.bot.is_owner(ctx.author):

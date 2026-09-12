@@ -346,7 +346,7 @@ class MuteList(commands.Cog):
                     _log(f"Erreur tâche d'arrière-plan Guild {guild.id}: {e}", "ERROR")
 
     @perm_command(level=2)
-    @commands.command(name="mutelist", description="ðŸ“œ Affiche la liste unifiee des sanctions mute actives.")
+    @commands.hybrid_command(name="mutelist", description="ðŸ“œ Affiche la liste unifiee des sanctions mute actives.")
     async def mutelist(self, ctx: commands.Context):
         if not ctx.guild:
             return await self._send_fallback(ctx, "Action impossible", "Cette commande doit etre utilisee sur un serveur.")

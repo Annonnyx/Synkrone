@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -87,7 +87,12 @@ const CUSTOM_MAIN_PY = [
   '    prefix = str(cfg.get("prefix") or os.getenv("BOT_PREFIX") or os.getenv("PREFIX") or "!")',
   "    return [prefix]",
   "",
-  "from synkrone_slash import sync_app_commands",
+  "from synkrone_slash import sync_app_commands, ensure_hybrid_commands",
+  "ensure_hybrid_commands()",
+  "try:",
+  "    from synkrone_custom import apply_runtime",
+  "except Exception:",
+  "    apply_runtime = None",
   "",
   "bot = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)",
   "bot.start_time = None",
@@ -106,11 +111,15 @@ const CUSTOM_MAIN_PY = [
   "        bot.start_time = datetime.datetime.now(datetime.timezone.utc)",
   '    print("[bot] logged in as %s" % bot.user)',
   "    await sync_app_commands(bot, runtime_config(), log_prefix=\"[bot]\")",
+  "    if apply_runtime:",
+  "        await apply_runtime(bot)",
   '    print("[bot] ready")',
   "",
   "@bot.event",
   "async def on_guild_join(guild):",
   "    await sync_app_commands(bot, runtime_config(), guild=guild, log_prefix=\"[bot]\")",
+  "    if apply_runtime:",
+  "        await apply_runtime(bot, guild)",
   "",
   "async def setup():",
   `    always = [${JSON.stringify(CONFIG_COG_MODULE)}, "cogs.config_manager.stats_store"]`,
@@ -141,6 +150,10 @@ const SYNKRONE_RUNTIME_PY = [
   "from discord.ext import commands",
   "",
   "from synkrone_slash import read_panel_config, sync_app_commands",
+  "try:",
+  "    from synkrone_custom import apply_runtime",
+  "except Exception:",
+  "    apply_runtime = None",
   "",
   "",
   "class SynkroneRuntime(commands.Cog):",
@@ -171,10 +184,14 @@ const SYNKRONE_RUNTIME_PY = [
   "            return",
   "        self._slash_done = True",
   "        await sync_app_commands(self.bot, cfg, log_prefix=\"[synkrone]\")",
+  "        if apply_runtime:",
+  "            await apply_runtime(self.bot)",
   "",
-  "    @commands.Cog.listener()",
-  "    async def on_guild_join(self, guild):",
-  "        await sync_app_commands(self.bot, guild=guild, log_prefix=\"[synkrone]\")",
+    "    @commands.Cog.listener()",
+    "    async def on_guild_join(self, guild):",
+    "        await sync_app_commands(self.bot, guild=guild, log_prefix=\"[synkrone]\")",
+    "        if apply_runtime:",
+    "            await apply_runtime(self.bot, guild)",
   "",
   "",
   "async def setup(bot):",
@@ -315,6 +332,7 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     }
     await this.syncPanelbotPrefix(fsm, prefix);
     await this.writeSlashHelper(fsm);
+    await this.writeCustomHelper(fsm);
     await this.patchHelpCog(fsm);
     await this.ensureConfigCog(fsm);
     if (flavor === "custom") {
@@ -366,6 +384,29 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
       await fsm.write("synkrone_slash.py", source);
     } catch {
       /* template missing in a partial checkout — generated main still has a fallback import */
+    }
+  }
+
+  private async writeCustomHelper(fsm: FilesystemManager) {
+    try {
+      const source = await readFile(
+        path.join(synkroneRepoRoot(), "templates/discord/synkrone_custom.py"),
+        "utf8",
+      );
+      await fsm.write("synkrone_custom.py", source);
+    } catch {
+      /* optional helper */
+    }
+    try {
+      const fontDir = path.join(synkroneRepoRoot(), "templates/discord/synkrone_fonts");
+      const files = await readdir(fontDir);
+      for (const name of files) {
+        if (!name.endsWith(".ttf")) continue;
+        const buf = await readFile(path.join(fontDir, name));
+        await fsm.write(`synkrone_fonts/${name}`, buf);
+      }
+    } catch {
+      /* fonts optional — helper can download them later */
     }
   }
 

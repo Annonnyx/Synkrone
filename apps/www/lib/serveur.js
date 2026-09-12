@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { panelAdmin, readPanelEnvValue } = require('./admin-ops');
+const custom = require('./bot-custom');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const OVERLAY_ROOT = path.join(__dirname, '..', 'data', 'serveur-config');
@@ -17,19 +18,9 @@ const OFFICIAL_BOTS = [
     { slug: 'yui', name: 'Yui', applicationId: '1460012999912853810', dir: 'bots/synkrone/py/Yui', tokenEnv: 'BOT_TOKEN_YUI' }
 ];
 
-const WELCOME_DEFAULT = {
-    channel_id: null,
-    embed_title: 'Bienvenue sur {guild}',
-    embed_description: '{user.mention} nous a rejoint !',
-    content_message: 'On acclame tous {user.mention} !\nNous sommes désormais {guild.count}.'
-};
-const GOODBYE_DEFAULT = {
-    channel_id: null,
-    embed_title: 'Départ de {user}',
-    embed_description: 'Triste de te voir partir...',
-    content_message: '{user.mention} nous a quitté.\nNous sommes désormais {guild.count}.'
-};
-const EMBED_DEFAULT = { color: 0x660099, footer: '', author: '', thumbnail: '', image: '' };
+const WELCOME_DEFAULT = custom.WELCOME_DEFAULT;
+const GOODBYE_DEFAULT = custom.GOODBYE_DEFAULT;
+const EMBED_DEFAULT = custom.EMBED_DEFAULT;
 
 function secrets() {
     const seen = new Set();
@@ -95,6 +86,10 @@ function overlayPath(applicationId, guildId) {
     return path.join(OVERLAY_ROOT, String(applicationId), `${guildId}.json`);
 }
 
+function defaultPath(applicationId) {
+    return path.join(OVERLAY_ROOT, String(applicationId), '_default.json');
+}
+
 function serveurPathFromQuery(query) {
     const q = new URLSearchParams();
     const src = query || {};
@@ -155,11 +150,26 @@ async function listHostedGuilds(discordId, email) {
 function welcomeRel(guildId) {
     return `cogs/ADMIN/configuration/joinleave/bienvenue/data/${guildId}/config.json`;
 }
+function welcomeRelStaff(guildId) {
+    return `cogs/staff/configuration/joinleave/bienvenue/data/${guildId}/config.json`;
+}
 function goodbyeRel(guildId) {
     return `cogs/ADMIN/configuration/joinleave/aurevoir/data_leave/${guildId}/config.json`;
 }
+function goodbyeRelStaff(guildId) {
+    return `cogs/staff/configuration/joinleave/aurevoir/data_leave/${guildId}/config.json`;
+}
 function embedRel(guildId) {
     return `data/addons/data_embed_type/${guildId}.json`;
+}
+function embedGlobalRel() {
+    return 'data/addons/data_embed_type/global_config.json';
+}
+function customRel(guildId) {
+    return `data/synkrone_custom/${guildId}.json`;
+}
+function defaultsRel() {
+    return 'config/defaults.json';
 }
 
 async function readJson(file) {
@@ -176,20 +186,98 @@ async function writeJson(file, data) {
 }
 
 function parseColor(value, fallback = EMBED_DEFAULT.color) {
-    if (typeof value === 'number' && Number.isFinite(value)) return value;
-    const raw = String(value || '').trim().replace(/^#/, '');
-    if (!raw) return fallback;
-    const n = Number.parseInt(raw, 16);
-    return Number.isFinite(n) ? n : fallback;
+    return custom.parseColor(value, fallback);
 }
 
-async function loadOverlay(applicationId, guildId) {
+async function loadDefault(applicationId) {
+    const raw = (await readJson(defaultPath(applicationId))) || {};
+    return custom.normalizeDefault(raw);
+}
+
+async function loadServer(applicationId, guildId) {
     const raw = (await readJson(overlayPath(applicationId, guildId))) || {};
-    return {
-        welcome: { ...WELCOME_DEFAULT, ...(raw.welcome || {}) },
-        goodbye: { ...GOODBYE_DEFAULT, ...(raw.goodbye || {}) },
-        embed: { ...EMBED_DEFAULT, ...(raw.embed || {}) }
-    };
+    return custom.normalizeServer(raw);
+}
+
+function botFileJobs({ guildId, defaults, resolved }) {
+    const bundle = custom.legacyBundle(resolved);
+    const jobs = [
+        [defaultsRel(), defaults],
+        [embedGlobalRel(), {
+            color: custom.parseColor(defaults.identity.embedColor),
+            footer: defaults.identity.embedFooter,
+            thumbnail: defaults.identity.embedThumbnail
+        }]
+    ];
+    if (guildId && resolved) {
+        jobs.push(
+            [welcomeRel(guildId), bundle.welcome],
+            [welcomeRelStaff(guildId), bundle.welcome],
+            [goodbyeRel(guildId), bundle.goodbye],
+            [goodbyeRelStaff(guildId), bundle.goodbye],
+            [embedRel(guildId), bundle.embed],
+            [customRel(guildId), resolved]
+        );
+    }
+    return jobs;
+}
+
+async function writeHosted(serviceId, jobs) {
+    for (const [rel, body] of jobs) {
+        await panelAdmin(`/services/${encodeURIComponent(serviceId)}/file`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ path: rel, content: `${JSON.stringify(body, null, 4)}\n` })
+        });
+    }
+}
+
+async function writeOfficialDisk(bot, jobs) {
+    const root = path.join(REPO_ROOT, bot.dir);
+    for (const [rel, body] of jobs) {
+        await writeJson(path.join(root, rel), body).catch(() => undefined);
+    }
+}
+
+async function pushBotFiles(applicationId, { guildId, defaults, resolved }) {
+    const jobs = botFileJobs({ guildId, defaults, resolved });
+    const official = officialByApp(applicationId);
+    if (official) await writeOfficialDisk(official, jobs);
+    const hosted = await hostedLookup(applicationId);
+    if (hosted.found && hosted.serviceId) await writeHosted(hosted.serviceId, jobs);
+    return { official: Boolean(official), hosted: Boolean(hosted.found) };
+}
+
+async function ownedApplicationIds(discordId, email) {
+    const query = new URLSearchParams();
+    if (discordId) query.set('discordUserId', discordId);
+    if (email) query.set('email', String(email).trim().toLowerCase());
+    if (!query.toString()) return new Set();
+    try {
+        const data = await panelAdmin(`/discord?${query.toString()}`);
+        return new Set((data.services || []).map((svc) => String(svc.applicationId || '')).filter(Boolean));
+    } catch {
+        return new Set();
+    }
+}
+
+async function isBotCreator(user, applicationId) {
+    if (!user || !applicationId) return false;
+    if (officialByApp(applicationId) && (user.isTeamOwner || user.role === 'Admin')) return true;
+    const owned = await ownedApplicationIds(discordUserId(user), user.email);
+    return owned.has(String(applicationId));
+}
+
+function textChannels(list) {
+    return (Array.isArray(list) ? list : [])
+        .filter((ch) => ch.type === 0 || ch.type === 5 || ch.type == null)
+        .map((ch) => ({ id: String(ch.id), name: String(ch.name || ch.id) }));
+}
+
+function guildRoles(list) {
+    return (Array.isArray(list) ? list : [])
+        .filter((role) => role.name !== '@everyone')
+        .map((role) => ({ id: String(role.id), name: String(role.name || role.id) }));
 }
 
 async function discordGet(token, pathname) {
@@ -206,63 +294,33 @@ async function discordGet(token, pathname) {
     }
 }
 
-async function writeHosted(serviceId, guildId, config) {
-    const files = [
-        [welcomeRel(guildId), { ...WELCOME_DEFAULT, ...config.welcome, channel_id: config.welcome.channel_id || null }],
-        [goodbyeRel(guildId), { ...GOODBYE_DEFAULT, ...config.goodbye, channel_id: config.goodbye.channel_id || null }],
-        [embedRel(guildId), { ...EMBED_DEFAULT, ...config.embed, color: parseColor(config.embed.color) }]
-    ];
-    for (const [rel, body] of files) {
-        await panelAdmin(`/services/${encodeURIComponent(serviceId)}/file`, {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ path: rel, content: `${JSON.stringify(body, null, 4)}\n` })
-        });
-    }
-}
+const ADMINISTRATOR = 0x8n;
+const MANAGE_GUILD = 0x20n;
 
-async function writeOfficialDisk(bot, guildId, config) {
-    const root = path.join(REPO_ROOT, bot.dir);
-    const payload = {
-        welcome: { ...WELCOME_DEFAULT, ...config.welcome },
-        goodbye: { ...GOODBYE_DEFAULT, ...config.goodbye },
-        embed: { ...EMBED_DEFAULT, ...config.embed, color: parseColor(config.embed.color) }
-    };
-    await writeJson(path.join(root, 'data', 'synkrone_guild', `${guildId}.json`), payload);
-    const welcomeFile = path.join(root, welcomeRel(guildId));
-    const goodbyeFile = path.join(root, goodbyeRel(guildId));
-    const embedFile = path.join(root, embedRel(guildId));
-    try {
-        await fs.access(path.dirname(path.dirname(welcomeFile)));
-        await writeJson(welcomeFile, payload.welcome);
-    } catch {
-        /* official tree without template welcome cog */
-    }
-    try {
-        await fs.access(path.dirname(path.dirname(goodbyeFile)));
-        await writeJson(goodbyeFile, payload.goodbye);
-    } catch {
-        /* skip */
-    }
-    await writeJson(embedFile, payload.embed).catch(() => undefined);
+function isGuildAdminFromSnapshot({ ownerId, userId, memberRoleIds, roles }) {
+    if (String(ownerId || '') === String(userId || '')) return true;
+    const mine = new Set(memberRoleIds || []);
+    return (roles || []).some((role) => {
+        if (!mine.has(role.id)) return false;
+        const perms = BigInt(role.permissions || '0');
+        return (perms & ADMINISTRATOR) === ADMINISTRATOR || (perms & MANAGE_GUILD) === MANAGE_GUILD;
+    });
 }
 
 async function memberCanManage(token, guildId, userId) {
     if (!token) return false;
     const guild = await discordGet(token, `/guilds/${guildId}`);
-    if (guild && String(guild.owner_id) === String(userId)) return true;
     const member = await discordGet(token, `/guilds/${guildId}/members/${userId}`);
     const roles = await discordGet(token, `/guilds/${guildId}/roles`);
-    if (!member || !Array.isArray(roles)) return false;
-    const mine = new Set(member.roles || []);
-    const MANAGE_GUILD = 0x20n;
-    return roles.some((role) => mine.has(role.id) && (BigInt(role.permissions || '0') & MANAGE_GUILD) === MANAGE_GUILD);
+    return isGuildAdminFromSnapshot({
+        ownerId: guild?.owner_id,
+        userId,
+        memberRoleIds: member?.roles,
+        roles: Array.isArray(roles) ? roles : []
+    });
 }
 
-async function assertConfigurer(discordId, guildId, applicationId, claims) {
-    if (claims && claims.userId === discordId && claims.guildId === guildId && claims.applicationId === applicationId) {
-        return true;
-    }
+async function assertConfigurer(discordId, guildId, applicationId) {
     const official = officialByApp(applicationId);
     if (official) {
         return memberCanManage(tokenForOfficial(official), guildId, discordId);
@@ -316,8 +374,26 @@ function mountServeur(app) {
         const stored = sessionServeurLink(req, discordId);
         const guildId = String(claims?.guildId || req.query.guild || stored?.guildId || '').trim();
         const applicationId = String(claims?.applicationId || req.query.application || stored?.applicationId || '').trim();
+        const layer = String(req.query.layer || '').trim() === 'default' ? 'default' : 'server';
         if (claims && claims.userId !== discordId) {
             return res.status(403).json({ ok: false, error: 'Ce lien Discord appartient à un autre compte.' });
+        }
+        const creator = applicationId ? await isBotCreator(user, applicationId) : false;
+        if (applicationId && (layer === 'default' || !guildId) && creator) {
+            const official = officialByApp(applicationId);
+            const hosted = await hostedLookup(applicationId);
+            const defaults = await loadDefault(applicationId);
+            return res.json({
+                ok: true,
+                layer: 'default',
+                canEditDefaults: true,
+                user: { id: discordId, username: user.username },
+                applicationId,
+                botName: official?.name || hosted.name || 'Bot custom',
+                kind: official ? 'official' : hosted.found ? 'hosted' : 'unknown',
+                defaults,
+                catalog: custom.catalog()
+            });
         }
         if (!guildId || !applicationId) {
             const guilds = await listHostedGuilds(discordId, user.email);
@@ -331,6 +407,13 @@ function mountServeur(app) {
                     : 'Ouvre /config sur le serveur Discord, puis Configurer sur le site.'
             });
         }
+        const allowed = await assertConfigurer(discordId, guildId, applicationId);
+        if (!allowed) {
+            return res.status(403).json({
+                ok: false,
+                error: 'Il faut être propriétaire ou administrateur de ce serveur Discord.'
+            });
+        }
         const official = officialByApp(applicationId);
         let hosted = { found: false };
         try {
@@ -339,45 +422,42 @@ function mountServeur(app) {
             hosted = { found: false };
         }
         let channels = [];
+        let roles = [];
         if (hosted.found && hosted.serviceId) {
             try {
                 const extra = await panelAdmin(
                     `/discord?applicationId=${encodeURIComponent(applicationId)}&guildId=${encodeURIComponent(guildId)}&memberId=${encodeURIComponent(discordId)}`
                 );
-                channels = extra.channels || [];
+                channels = textChannels(extra.channels || []);
+                roles = guildRoles(extra.roles || []);
             } catch {
                 channels = [];
             }
         } else if (official) {
             const token = tokenForOfficial(official);
-            const remote = await discordGet(token, `/guilds/${guildId}/channels`);
-            channels = Array.isArray(remote)
-                ? remote.filter((ch) => ch.type === 0 || ch.type === 5).map((ch) => ({ id: ch.id, name: ch.name }))
-                : [];
+            channels = textChannels(await discordGet(token, `/guilds/${guildId}/channels`));
+            roles = guildRoles(await discordGet(token, `/guilds/${guildId}/roles`));
         }
-        const config = await loadOverlay(applicationId, guildId);
+        const defaults = await loadDefault(applicationId);
+        const config = await loadServer(applicationId, guildId);
+        const resolved = custom.resolveConfig(defaults, config);
         return res.json({
             ok: true,
+            layer: 'server',
+            canEditDefaults: creator,
             user: { id: discordId, username: user.username },
             guildId,
             applicationId,
             botName: official?.name || hosted.name || 'Bot custom',
             kind: official ? 'official' : hosted.found ? 'hosted' : 'unknown',
             channels,
-            config: {
-                welcome: {
-                    ...config.welcome,
-                    channel_id: config.welcome.channel_id ? String(config.welcome.channel_id) : ''
-                },
-                goodbye: {
-                    ...config.goodbye,
-                    channel_id: config.goodbye.channel_id ? String(config.goodbye.channel_id) : ''
-                },
-                embed: {
-                    ...config.embed,
-                    color: `#${parseColor(config.embed.color).toString(16).padStart(6, '0')}`
-                }
-            }
+            roles,
+            defaults,
+            allow: defaults.allow,
+            locked: custom.lockedFields(defaults.allow),
+            config,
+            resolved,
+            catalog: custom.catalog()
         });
     });
 
@@ -397,32 +477,47 @@ function mountServeur(app) {
         if (claims && claims.userId !== discordId) {
             return res.status(403).json({ ok: false, error: 'Ce lien Discord appartient à un autre compte.' });
         }
-        const allowed = await assertConfigurer(discordId, guildId, applicationId, claims || stored);
+        const allowed = await assertConfigurer(discordId, guildId, applicationId);
         if (!allowed) {
-            return res.status(403).json({ ok: false, error: 'Lien expiré ou permission insuffisante. Relance /config.' });
+            return res.status(403).json({ ok: false, error: 'Il faut être propriétaire ou administrateur de ce serveur Discord.' });
         }
+        const defaults = await loadDefault(applicationId);
+        const existing = await loadServer(applicationId, guildId);
         const body = req.body || {};
-        const config = {
-            welcome: { ...WELCOME_DEFAULT, ...(body.welcome || {}) },
-            goodbye: { ...GOODBYE_DEFAULT, ...(body.goodbye || {}) },
-            embed: { ...EMBED_DEFAULT, ...(body.embed || {}), color: parseColor(body.embed?.color) }
-        };
-        await writeJson(overlayPath(applicationId, guildId), config);
-        const official = officialByApp(applicationId);
-        if (official) {
-            await writeOfficialDisk(official, guildId, config);
-        }
+        const patch = body.config || body;
+        const next = custom.applyServerPatch(existing, patch, defaults.allow);
+        const resolved = custom.resolveConfig(defaults, next);
+        const storedConfig = custom.persistServer(next, resolved);
+        await writeJson(overlayPath(applicationId, guildId), storedConfig);
         try {
-            const hosted = await hostedLookup(applicationId);
-            if (hosted.found && hosted.serviceId) {
-                await writeHosted(hosted.serviceId, guildId, config);
-            }
+            await pushBotFiles(applicationId, { guildId, defaults, resolved });
         } catch (err) {
-            if (!official) {
+            if (!officialByApp(applicationId)) {
                 return res.status(503).json({ ok: false, error: err.message || 'Volume hébergé injoignable.' });
             }
         }
-        return res.json({ ok: true });
+        return res.json({ ok: true, config: next, resolved, locked: custom.lockedFields(defaults.allow) });
+    });
+
+    app.post('/api/serveur/defaults', async (req, res) => {
+        const user = sessionUser(req);
+        const discordId = discordUserId(user);
+        if (!discordId) return res.status(401).json({ ok: false, discordOnly: true });
+        const applicationId = String(req.body?.applicationId || req.query.application || '').trim();
+        if (!applicationId) return res.status(400).json({ ok: false, error: 'Application manquante.' });
+        if (!(await isBotCreator(user, applicationId))) {
+            return res.status(403).json({ ok: false, error: 'Seul le créateur du bot règle la config défaut.' });
+        }
+        const defaults = custom.normalizeDefault(req.body?.defaults || req.body || {});
+        await writeJson(defaultPath(applicationId), defaults);
+        try {
+            await pushBotFiles(applicationId, { defaults, resolved: null });
+        } catch (err) {
+            if (!officialByApp(applicationId)) {
+                return res.status(503).json({ ok: false, error: err.message || 'Volume hébergé injoignable.' });
+            }
+        }
+        return res.json({ ok: true, defaults });
     });
 }
 
@@ -431,5 +526,6 @@ module.exports = {
     verifyToken,
     discordUserId,
     serveurPathFromQuery,
+    isGuildAdminFromSnapshot,
     OFFICIAL_BOTS
 };

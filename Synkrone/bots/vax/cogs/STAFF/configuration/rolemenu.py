@@ -752,7 +752,7 @@ class RoleMenuCog(commands.Cog):
             log_sys("UPDATE_ERR", f"Échec de mise à  jour du message {m_data['deploy_msg']}: {e}", is_error=True)
 
     @perm_command(level=2) # Verrouillage métier via la config_perm[cite: 1, 3]
-    @commands.command(name="rolemenu", description="Tableau de bord de gestion des rôles interactifs.")
+    @commands.hybrid_command(name="rolemenu", description="Tableau de bord de gestion des rôles interactifs.")
     async def rolemenu_cmd(self, ctx: commands.Context):
         log_sys("CMD_CALL", f"Commande /rolemenu déclenchée par {ctx.author.name}")
         if not ctx.guild:

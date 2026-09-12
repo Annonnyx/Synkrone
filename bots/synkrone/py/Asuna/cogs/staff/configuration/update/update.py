@@ -467,7 +467,7 @@ class UpdateClient(commands.Cog):
         logger.debug("Initialisation du cog UpdateClient")
         self.bot = bot
 
-    @commands.command(name="update", help="Configurer le salon des nouveautés.")
+    @commands.hybrid_command(name="update", help="Configurer le salon des nouveautés.")
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def update_cmd(self, ctx):

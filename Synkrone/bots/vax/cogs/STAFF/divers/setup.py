@@ -307,7 +307,7 @@ class SetupCommand(commands.Cog):
                 continue
 
     @perm_command(level=1)
-    @commands.command(name="setup", description="Affiche le menu de configuration de base du bot")
+    @commands.hybrid_command(name="setup", description="Affiche le menu de configuration de base du bot")
     async def setup_command(self, ctx: commands.Context):
         if not await ensure_command_permission(ctx, command_name="setup"):
             return

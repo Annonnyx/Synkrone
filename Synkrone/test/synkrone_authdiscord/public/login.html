@@ -65,7 +65,8 @@
             return '/';
         }
         function isDiscordAccount(user) {
-            return /^\d{15,22}$/.test(String(user?.id || ''));
+            return /^\d{15,22}$/.test(String(user?.id || ''))
+                || /^\d{15,22}$/.test(String(user?.providers?.discord || user?.discordId || ''));
         }
         const returnTo = readReturnTo();
         const needsDiscord = returnTo.startsWith('/serveur');

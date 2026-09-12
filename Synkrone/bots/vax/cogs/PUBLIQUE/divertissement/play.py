@@ -340,7 +340,7 @@ class MusicBot(commands.Cog):
             else:
                 self.interfaces[gid] = await ctx.send(view=view)
 
-    @commands.command(name="play", description="Interface de contrôle et lecture musicale")
+    @commands.hybrid_command(name="play", description="Interface de contrôle et lecture musicale")
     async def play(self, ctx: commands.Context, *, search: str = None):
         if not ctx.guild:
             await ctx.send(f"{EMOJI_ERROR} Cette commande doit être utilisée sur un serveur.")

@@ -995,7 +995,7 @@ class ShopCog(commands.Cog):
 
         return f"✅ {labels[feature]} {'activé' if new_value else 'désactivé'} pour {role.mention}."
 
-    @commands.command(name="adminshop", help="Gérer la boutique administrateur du serveur.")
+    @commands.hybrid_command(name="adminshop", help="Gérer la boutique administrateur du serveur.")
     @commands.has_permissions(administrator=True)
     async def adminshop(self, ctx: commands.Context):
         view = AdminShopView(self, ctx.author.id, ctx.guild)

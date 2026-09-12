@@ -192,7 +192,7 @@ class IACog(commands.Cog):
             file = discord.File(tmp_name, filename="reponse.txt")
             await message.channel.send("La réponse est trop longue pour Discord, voici un fichier texte :", file=file)
 
-    @commands.command(name="ia-reset", aliases=["ia_reset"])
+    @commands.hybrid_command(name="ia-reset", aliases=["ia_reset"])
     async def ia_reset(self, ctx: commands.Context):
         """Réinitialise ta mémoire de conversation avec l'IA."""
         self._histories[ctx.author.id].clear()

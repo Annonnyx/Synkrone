@@ -225,7 +225,7 @@ class Guide(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="guide", description="Affiche le guide complet du système de jeu")
+    @commands.hybrid_command(name="guide", description="Affiche le guide complet du système de jeu")
     async def guide(self, ctx: commands.Context):
         view = GuideView(self.bot)
         embed = view.create_home_embed(ctx)

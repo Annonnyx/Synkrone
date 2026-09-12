@@ -645,7 +645,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           .update(discordBots)
           .set({
             prefix,
-            slashCommands: payload.slashCommands ?? bot.slashCommands,
+            slashCommands: true,
             applicationId:
               payload.applicationId !== undefined
                 ? payload.applicationId.trim() || null

@@ -433,7 +433,7 @@ class Access(commands.Cog):
         return f"Les accès se gèrent via la commande `{self._get_access_prefix(ctx)}acces`."
 
     @perm_command(level=1)
-    @commands.command(name="acces", description="Configurer les accès globaux du bot")
+    @commands.hybrid_command(name="acces", description="Configurer les accès globaux du bot")
     async def acces(self, ctx: commands.Context):
         if not ctx.guild:
             return await ctx.send(f"{getattr(E, 'ERREUR', '❌')} Cette commande doit être utilisée sur un serveur.")

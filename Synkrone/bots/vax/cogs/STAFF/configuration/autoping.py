@@ -329,7 +329,7 @@ class AutoPingCog(commands.Cog):
                     log_sys("API_ERROR", f"Erreur HTTP lors du ping dans {message.channel.name}: {e}", is_error=True)
 
     @perm_command(level=2) # Niveau administratif requis
-    @commands.command(name="autoping", description="Ouvre le panneau de configuration des pings automatiques")
+    @commands.hybrid_command(name="autoping", description="Ouvre le panneau de configuration des pings automatiques")
     async def autoping_cmd(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{E_OFF} Cette commande exige un contexte serveur.")

@@ -624,7 +624,7 @@ class LogsCog(commands.Cog):
     # --- COMMANDE D'ADMINISTRATION ---
     # ==============================================================================
     @perm_command(level=2) # Protection métier Vax V3
-    @commands.command(name="logs", description="Ouvrir le panneau de configuration des Logs.")
+    @commands.hybrid_command(name="logs", description="Ouvrir le panneau de configuration des Logs.")
     async def logs_cmd(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{E_OFF} Cette commande exige un contexte de serveur.")

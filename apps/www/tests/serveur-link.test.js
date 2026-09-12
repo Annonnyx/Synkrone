@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const test = require('node:test');
-const { verifyToken, serveurPathFromQuery } = require('../lib/serveur');
+const { verifyToken, serveurPathFromQuery, isGuildAdminFromSnapshot } = require('../lib/serveur');
 
 function sign(payload, secret) {
     const raw = Buffer.from(JSON.stringify(payload), 'utf8');
@@ -44,4 +44,37 @@ test('expired tokens are rejected', () => {
     const claims = verifyToken(token);
     process.env.SESSION_SECRET = prev;
     assert.equal(claims, null);
+});
+
+test('guild owner and administrator can configure a server', () => {
+    assert.equal(isGuildAdminFromSnapshot({
+        ownerId: '1',
+        userId: '1',
+        memberRoleIds: [],
+        roles: []
+    }), true);
+    assert.equal(isGuildAdminFromSnapshot({
+        ownerId: '1',
+        userId: '2',
+        memberRoleIds: ['r-admin'],
+        roles: [{ id: 'r-admin', permissions: String(0x8) }]
+    }), true);
+    assert.equal(isGuildAdminFromSnapshot({
+        ownerId: '1',
+        userId: '2',
+        memberRoleIds: ['r-manage'],
+        roles: [{ id: 'r-manage', permissions: String(0x20) }]
+    }), true);
+    assert.equal(isGuildAdminFromSnapshot({
+        ownerId: '1',
+        userId: '2',
+        memberRoleIds: ['r-mod'],
+        roles: [{ id: 'r-mod', permissions: String(0x4) }]
+    }), false);
+    assert.equal(isGuildAdminFromSnapshot({
+        ownerId: '1',
+        userId: '2',
+        memberRoleIds: [],
+        roles: [{ id: 'r-admin', permissions: String(0x8) }]
+    }), false);
 });

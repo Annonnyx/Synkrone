@@ -235,7 +235,7 @@ class DevStats(commands.Cog):
         pages = [self.create_embed("Stats Serveurs", "### 📊 Top Guilds Global\n" + "\n".join([f"`#{i+1:02d}` **{n}**\n└ Total: `{s+p}` `[S:{s}|P:{p}]`" for i, (n, s, p) in enumerate(rows[p:p+10], p+1)])) for p in range(0, len(rows), 10)]
         return pages if pages else [self.create_embed("Stats Guilds", "Aucune donnée.")]
 
-    @commands.command(name="devstats", description="Menu statistiques de développement")
+    @commands.hybrid_command(name="devstats", description="Menu statistiques de développement")
     async def devstats(self, ctx: commands.Context):
         is_owner = await self.bot.is_owner(ctx.author)
         if not is_owner:

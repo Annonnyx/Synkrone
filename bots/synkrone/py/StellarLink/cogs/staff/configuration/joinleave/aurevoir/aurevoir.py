@@ -267,8 +267,14 @@ class AuRevoir(commands.Cog):
         image = Image.alpha_composite(image, overlay)
         
         draw = ImageDraw.Draw(image)
-        try: font = ImageFont.truetype(str(self.data_manager.default_font), 45)
-        except: font = ImageFont.load_default()
+        try:
+            from synkrone_custom import card_font
+            font = card_font(g_id, 45, fallback=self.data_manager.default_font)
+        except Exception:
+            try:
+                font = ImageFont.truetype(str(self.data_manager.default_font), 45)
+            except Exception:
+                font = ImageFont.load_default()
         draw.text((270, 100), "AU REVOIR", fill=(255,255,255), font=font)
         
         # Nom avec majuscule

@@ -140,7 +140,7 @@ class MusicBot(commands.Cog):
             else:
                 self.interfaces[gid] = await ctx.send(embed=embed, view=view)
 
-    @commands.command(name="play")
+    @commands.hybrid_command(name="play")
     async def play(self, ctx, *, search: str = None):
         if not ctx.author.voice:
             return await ctx.send("Vocal requis !")

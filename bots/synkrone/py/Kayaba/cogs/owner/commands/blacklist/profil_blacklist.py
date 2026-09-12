@@ -170,7 +170,7 @@ class BlacklistAdminCog(commands.Cog):
                 await msg.edit(embed=embed, view=BlacklistView())
                 break
 
-    @commands.command(name="blacklist", help="Gérer la sécurité de Vax Développeur.")
+    @commands.hybrid_command(name="blacklist", help="Gérer la sécurité de Vax Développeur.")
     async def blacklist(self, ctx: commands.Context):
         owners = load_owner_ids()
         if ctx.author.id != CREATOR_ID and ctx.author.id not in owners:

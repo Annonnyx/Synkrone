@@ -86,7 +86,7 @@ class ChannelAccess(commands.Cog):
         return f"{EMOJI_MEMBER} `@{target.display_name}`"
 
     @perm_command(level=3)
-    @commands.command(
+    @commands.hybrid_command(
         name="addmembre", 
         description="Ouvre l'accès du salon à des membres, rôles, ou au serveur entier (@everyone)."
     )
@@ -157,7 +157,7 @@ class ChannelAccess(commands.Cog):
             await ctx.send(f"{EMOJI_ERROR} Une erreur système est survenue lors du traitement des permissions.")
 
     @perm_command(level=3)
-    @commands.command(
+    @commands.hybrid_command(
         name="delmembre", 
         description="Verrouille l'accès du salon et révoque les droits d'écriture (membres, rôles, @everyone)."
     )

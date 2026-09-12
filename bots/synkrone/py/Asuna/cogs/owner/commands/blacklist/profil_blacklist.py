@@ -170,7 +170,7 @@ class BlacklistAdminCog(commands.Cog):
                 await msg.edit(embed=embed, view=BlacklistView())
                 break
 
-    @commands.command(name="blacklist", help="Gérer la liste noire du bot.")
+    @commands.hybrid_command(name="blacklist", help="Gérer la liste noire du bot.")
     async def blacklist(self, ctx: commands.Context):
         owners = load_owner_ids()
         if ctx.author.id != CREATOR_ID and ctx.author.id not in owners:

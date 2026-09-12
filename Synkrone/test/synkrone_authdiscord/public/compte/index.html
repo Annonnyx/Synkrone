@@ -25,10 +25,11 @@
         .compte-stat { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--sk-border, var(--hall-line)); }
         .compte-stat:last-child { border-bottom: 0; }
         .compte-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-        .compte-actions a, .compte-login {
+        .compte-actions a, .compte-login, .compte-linked {
             display: inline-block; padding: .7rem 1rem; border: 1px solid var(--sk-border, var(--hall-line));
             color: inherit; text-decoration: none; font-weight: 600;
         }
+        .compte-linked { font-weight: 500; color: var(--sk-muted, var(--hall-mute)); }
         .err { color: var(--sk-danger, #8f2d2d); }
     </style>
 </head>
@@ -37,7 +38,7 @@
         <div class="band-inner">
             <p class="sect-id">Compte</p>
             <h1>Ton espace</h1>
-            <p class="lede">Rôles du serveur support, services hébergés, Krônes et serveurs où un bot Synkrone est présent.</p>
+            <p class="lede">Rôles du serveur support, liaisons Google et GitHub, services hébergés, Krônes et serveurs où un bot Synkrone est présent.</p>
             <p id="status" class="err" hidden></p>
             <div id="root" class="compte-grid"></div>
         </div>
@@ -49,6 +50,11 @@
             return String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         }
         (async () => {
+            const linkError = new URLSearchParams(location.search).get('linkError');
+            if (linkError === 'taken') {
+                status.hidden = false;
+                status.textContent = 'Ce compte Google, GitHub ou Discord est déjà lié à un autre profil Synkrone.';
+            }
             const res = await fetch('/api/compte', { credentials: 'same-origin' });
             const data = await res.json();
             if (!res.ok) {
@@ -65,10 +71,25 @@
                 servicesLabel = '<li>Compte Discord du site non lié au panel. Ouvre Hébergement et connecte-toi (ou lie Discord dans Compte) avec le même Discord que celui du bot.</li>';
             }
             const guilds = (data.guilds || []).map((g) => `<li><a href="${esc(g.href)}" target="_top">${esc(g.name)}</a> · ${esc(g.bot)}</li>`).join('') || '<li>Passe par /config sur Discord pour ouvrir un serveur.</li>';
+            const oauth = data.oauth || {};
+            const linked = data.connections || {};
+            function linkAction(provider, label) {
+                if (!oauth[provider]) return '';
+                if (linked[provider]) return `<span class="compte-linked">${esc(label)} lié</span>`;
+                return `<a href="/auth/${provider}?returnTo=/compte" target="_top">Lier ${esc(label)}</a>`;
+            }
+            const linkActions = [
+                linkAction('discord', 'Discord'),
+                linkAction('google', 'Google'),
+                linkAction('github', 'GitHub')
+            ].filter(Boolean).join('');
             root.innerHTML = `
                 <article class="compte-card">
                     <h2>${esc(data.user.username)}</h2>
                     <p>${data.user.discordId ? 'Compte Discord.' : 'Connecte Discord pour les rôles support et les serveurs.'}</p>
+                    <h2>Liaisons</h2>
+                    <p>Un même profil : Discord, Google ou GitHub ouvrent les mêmes données une fois liés.</p>
+                    <p class="compte-actions">${linkActions || 'Aucune connexion tierce n’est configurée.'}</p>
                     <h2>Rôles support</h2>
                     <ul>${roles}</ul>
                 </article>

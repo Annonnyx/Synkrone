@@ -6,7 +6,7 @@ class ServEmbed(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="servembed", help="Personnaliser les embeds du serveur.")
+    @commands.hybrid_command(name="servembed", help="Personnaliser les embeds du serveur.")
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def servembed(self, ctx: commands.Context):

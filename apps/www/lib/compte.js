@@ -6,6 +6,24 @@ const { discordUserId, OFFICIAL_BOTS } = require('./serveur');
 
 const DISCORD_API = 'https://discord.com/api/v10';
 
+function oauthProviders() {
+    return {
+        discord: Boolean(
+            String(process.env.DISCORD_CLIENT_ID || '').trim()
+            && String(process.env.DISCORD_CLIENT_SECRET || '').trim()
+            && String(process.env.DISCORD_REDIRECT_URI || '').trim()
+        ),
+        github: Boolean(
+            String(process.env.GITHUB_CLIENT_ID || '').trim()
+            && String(process.env.GITHUB_CLIENT_SECRET || '').trim()
+        ),
+        google: Boolean(
+            String(process.env.GOOGLE_CLIENT_ID || '').trim()
+            && String(process.env.GOOGLE_CLIENT_SECRET || '').trim()
+        )
+    };
+}
+
 function supportGuildId() {
     return String(process.env.DISCORD_SUPPORT_GUILD_ID || process.env.DISCORD_GUILD_ID || '').trim();
 }
@@ -52,6 +70,10 @@ function mountCompte(app) {
         }
         const discordId = discordUserId(user);
         const email = String(user.email || '').trim().toLowerCase();
+        const providers = user.providers && typeof user.providers === 'object' ? { ...user.providers } : {};
+        if (discordId) providers.discord = discordId;
+        const prefixed = String(user.id || '').match(/^(github|google):(.+)$/);
+        if (prefixed && !providers[prefixed[1]]) providers[prefixed[1]] = prefixed[2];
         const wallet = await peekWallet(user.id).catch(() => null);
         const spend = spendFromLedger(wallet?.ledger || []);
         let services = [];
@@ -97,8 +119,15 @@ function mountCompte(app) {
                 username: user.username,
                 avatar: user.avatar,
                 role: user.role,
-                discordId
+                discordId,
+                email
             },
+            connections: {
+                discord: Boolean(discordId),
+                github: Boolean(providers.github),
+                google: Boolean(providers.google)
+            },
+            oauth: oauthProviders(),
             support: roles,
             krones: {
                 balance: wallet?.balance ?? 0,

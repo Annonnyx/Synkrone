@@ -618,7 +618,7 @@ class LayoutCog(commands.Cog):
         self.bot = bot
 
     @perm_command(level=1)
-    @commands.command(name="layout", description="Lance l'éditeur de Layouts V2 complet.")
+    @commands.hybrid_command(name="layout", description="Lance l'éditeur de Layouts V2 complet.")
     async def layout_command(self, ctx: commands.Context):
         if not ctx.guild:
             if DEBUG_MODE:

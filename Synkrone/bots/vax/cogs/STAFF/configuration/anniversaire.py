@@ -443,7 +443,7 @@ class AnniversaireCog(commands.Cog):
                 return True
         return False
 
-    @commands.command(name="anniversaire", description="Gérez et configurez les anniversaires du serveur.")
+    @commands.hybrid_command(name="anniversaire", description="Gérez et configurez les anniversaires du serveur.")
     async def cmd_anniversaire(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{E_OFF} Cette commande exige un contexte serveur.")

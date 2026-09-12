@@ -109,7 +109,7 @@ class Mute(commands.Cog):
         )
 
     @perm_command(level=2)
-    @commands.command(name="mute", description="ðŸ”‡ Mute global permanent (Tout le serveur).")
+    @commands.hybrid_command(name="mute", description="ðŸ”‡ Mute global permanent (Tout le serveur).")
     async def mute(self, ctx: commands.Context, membre: discord.Member = None, *, raison: str = None):
         if not ctx.guild:
             return await ctx.send(f"{EMOJI_ERROR} Cette commande doit être exécutée sur un serveur.")

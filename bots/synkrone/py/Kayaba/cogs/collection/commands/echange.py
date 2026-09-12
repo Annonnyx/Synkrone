@@ -9,7 +9,7 @@ class Echange(commands.Cog):
         self.bot = bot
         self.user_data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'interserver')
         
-    @commands.command(name='echange')
+    @commands.hybrid_command(name='echange')
     async def echange(self, ctx, action: str = None, target_user: discord.User = None, card_id: str = None, amount: int = 1):
         """Gère les échanges de cartes entre utilisateurs"""
         

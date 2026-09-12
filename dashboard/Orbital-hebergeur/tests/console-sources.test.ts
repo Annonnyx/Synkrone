@@ -37,6 +37,7 @@ test("cogs paths are protected, config is not", () => {
   assert.equal(isProtectedBotSource("cogs/PUBLIC/ping/pingpong.py"), true);
   assert.equal(isProtectedBotSource("/cogs"), true);
   assert.equal(isProtectedBotSource("synkrone_slash.py"), true);
+  assert.equal(isProtectedBotSource("synkrone_custom.py"), true);
   assert.equal(isProtectedBotSource("config/bot.json"), false);
   assert.equal(isProtectedBotSource("main.py"), false);
   assert.equal(isVolumeRoot("/"), true);

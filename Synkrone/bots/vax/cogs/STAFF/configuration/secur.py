@@ -524,7 +524,7 @@ class ConfigSecurCog(commands.Cog):
         log_sys("INIT", "Module Sécurité V3 déployé.")
 
     @perm_command(level=2) # Verrouillage métier via la config_perm
-    @commands.command(name="secur", description="Ouvrir le panel de sécurité intégrale.")
+    @commands.hybrid_command(name="secur", description="Ouvrir le panel de sécurité intégrale.")
     async def secur_cmd(self, ctx: commands.Context):
         log_sys("CMD_CALL", f"Commande /secur déclenchée par {ctx.author.name}")
         

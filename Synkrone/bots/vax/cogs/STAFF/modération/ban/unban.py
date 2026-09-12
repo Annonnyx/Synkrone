@@ -83,7 +83,7 @@ class Unban(commands.Cog):
         await ctx.send(view=view)
 
     @perm_command(level=2)
-    @commands.command(name="unban", description="Débannir un utilisateur par son ID Discord.")
+    @commands.hybrid_command(name="unban", description="Débannir un utilisateur par son ID Discord.")
     @app_commands.describe(user_id="L'ID Discord exact de l'utilisateur à débannir")
     async def unban(self, ctx: commands.Context, user_id: str | None = None):
         if not ctx.guild:

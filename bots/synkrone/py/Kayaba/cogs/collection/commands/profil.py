@@ -412,7 +412,7 @@ class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="profil", aliases=["profile"])
+    @commands.hybrid_command(name="profil", aliases=["profile"])
     async def profil(self, ctx: commands.Context, target: discord.Member = None):
         """Affiche le profil d'un utilisateur avec menus détaillés"""
         if target is None:

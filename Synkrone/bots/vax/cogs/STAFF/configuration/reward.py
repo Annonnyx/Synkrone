@@ -370,7 +370,7 @@ class RewardsCog(commands.Cog):
             log_system("ROLES_ERR", f"Échec d'attribution des rôles pour {member.id} : {e}", is_error=True)
 
     @perm_command(level=2) # Niveau administratif
-    @commands.command(name="reward", description="Affiche le profil Reward ou gère le système.")
+    @commands.hybrid_command(name="reward", description="Affiche le profil Reward ou gère le système.")
     @app_commands.describe(cible="L'utilisateur dont vous souhaitez voir le profil (Optionnel)")
     async def reward_cmd(self, ctx: commands.Context, cible: Optional[discord.Member] = None):
         if not ctx.guild:

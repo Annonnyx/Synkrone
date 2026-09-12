@@ -10,7 +10,7 @@ class AdminCog(commands.Cog):
         self.bot = bot
         self.eco = EconomyService(bot)
 
-    @commands.command(name="add", description="Ajoute ou retire des Pokédollars (Owner only).")
+    @commands.hybrid_command(name="add", description="Ajoute ou retire des Pokédollars (Owner only).")
     @commands.is_owner() # Sécurité : seul le propriétaire du bot peut exécuter cette commande
     async def add_money(self, ctx: commands.Context, arg1: str, arg2: str = None):
         """

@@ -11,4 +11,5 @@ test("discord boot installs packages on the volume, not pip --user", async () =>
   assert.match(source, /pip install --target \/app\/\.orbital\/py/);
   assert.match(source, /python -c "import discord"/);
   assert.doesNotMatch(source, /pip install --user/);
+  assert.match(source, /ensure_hybrid_commands/);
 });

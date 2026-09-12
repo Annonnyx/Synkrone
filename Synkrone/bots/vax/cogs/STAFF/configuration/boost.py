@@ -732,7 +732,7 @@ class BoostersCog(commands.Cog):
 
     # --- COMMANDE D'ADMINISTRATION ---
     @perm_command(level=2) # Verrouillage métier via le gestionnaire global de permissions
-    @commands.command(name="boost", description="Configuration de l'interface et du système de boosters.")
+    @commands.hybrid_command(name="boost", description="Configuration de l'interface et du système de boosters.")
     async def boost_cmd(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{E_OFF} Cette commande exige un contexte de serveur.")

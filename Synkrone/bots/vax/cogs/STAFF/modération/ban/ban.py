@@ -109,7 +109,7 @@ class Ban(commands.Cog):
             pass
 
     @perm_command(level=2)
-    @commands.command(name="ban", description="Bannir un membre ou un utilisateur par ID avec animation et notification MP.")
+    @commands.hybrid_command(name="ban", description="Bannir un membre ou un utilisateur par ID avec animation et notification MP.")
     @app_commands.describe(target="ID ou mention de l'utilisateur à bannir", reason="Raison du bannissement")
     async def ban(self, ctx: commands.Context, target: str | None = None, *, reason: str = "Aucune raison fournie"):
         if not ctx.guild:

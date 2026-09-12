@@ -12,6 +12,7 @@ import { useToast } from "@/components/toast";
 import { Console } from "@/components/console";
 import { FileManager } from "@/components/files";
 import { DiscordInviteLink, DiscordTokenPanel } from "@/components/discord-token";
+import { DiscordDefaultConfig } from "@/components/discord-default-config";
 import { DiscordGuildConfig } from "@/components/discord-guild-config";
 import { IntentPicker, PrivilegedPortalChecklist } from "@/components/discord-intents";
 import { isPrivilegedIntent, mergeIntentsForModules } from "@/lib/discord/intents";
@@ -485,7 +486,12 @@ function ServiceDetail() {
           }
         />
       )}
-      {tab === "config" && data.discord && <DiscordGuildConfig serviceId={id} />}
+      {tab === "config" && data.discord && (
+        <div className="space-y-4">
+          <DiscordDefaultConfig serviceId={id} />
+          <DiscordGuildConfig serviceId={id} />
+        </div>
+      )}
 
       {tab === "version" && data.minecraft && (
         <MinecraftRuntime
@@ -990,27 +996,23 @@ const PREFIX_PRESETS = ["!", "?", ".", "$", "-"];
 
 function DiscordRuntimeSettings({
   prefix,
-  slash,
   busy,
   onSave,
 }: {
   prefix: string;
-  slash: boolean;
   busy: boolean;
   onSave: (payload: { prefix: string; slashCommands: boolean }) => void;
 }) {
   const t = useT();
   const [nextPrefix, setNextPrefix] = useState(prefix);
-  const [nextSlash, setNextSlash] = useState(slash);
 
   useEffect(() => {
     setNextPrefix(prefix);
-    setNextSlash(slash);
-  }, [prefix, slash]);
+  }, [prefix]);
 
   const trimmed = nextPrefix.trim();
   const valid = trimmed.length >= 1 && trimmed.length <= 10 && !/[\u0000-\u001F\u007F]/.test(trimmed);
-  const dirty = trimmed !== prefix || nextSlash !== slash;
+  const dirty = trimmed !== prefix;
 
   return (
     <div className="panel space-y-4 p-4">
@@ -1041,32 +1043,11 @@ function DiscordRuntimeSettings({
         </div>
         <p className="mt-1 text-[11px] text-[var(--muted)]">{t("service.prefixHint")}</p>
       </div>
-      <div>
-        <div className="label mb-1">{t("service.slashCommands")}</div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="btn"
-            style={{ borderColor: nextSlash ? "var(--accent)" : "var(--line)" }}
-            onClick={() => setNextSlash(true)}
-          >
-            {t("service.slashOn")}
-          </button>
-          <button
-            type="button"
-            className="btn"
-            style={{ borderColor: !nextSlash ? "var(--accent)" : "var(--line)" }}
-            onClick={() => setNextSlash(false)}
-          >
-            {t("service.slashOff")}
-          </button>
-        </div>
-        <p className="mt-1 text-[11px] text-[var(--muted)]">{t("service.slashHint")}</p>
-      </div>
+      <p className="text-sm leading-relaxed text-[var(--muted)]">{t("service.slashHint")}</p>
       <button
         className="btn btn-primary"
         disabled={busy || !valid || !dirty}
-        onClick={() => onSave({ prefix: trimmed, slashCommands: nextSlash })}
+        onClick={() => onSave({ prefix: trimmed, slashCommands: true })}
       >
         {t("service.saveBotCommands")}
       </button>
@@ -1100,7 +1081,6 @@ function Settings({
       {discord && (
         <DiscordRuntimeSettings
           prefix={discord.prefix}
-          slash={discord.slashCommands}
           busy={busy}
           onSave={onSaveBotCommands}
         />

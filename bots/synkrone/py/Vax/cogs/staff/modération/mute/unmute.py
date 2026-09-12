@@ -5,7 +5,7 @@ class Unmute(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="unmute")
+    @commands.hybrid_command(name="unmute")
     @commands.has_permissions(moderate_members=True)
     async def unmute(self, ctx, member: discord.Member, *, reason: str = None):
         """

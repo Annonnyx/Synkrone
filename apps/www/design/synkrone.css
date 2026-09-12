@@ -48,13 +48,13 @@
     --sk-nav-h: 64px;
     --sk-subnav-h: 56px;
     --sk-footer-h: 40px;
-    --sk-fs: 14px;
-    --sk-fs-sm: 12px;
-    --sk-fs-xs: 11px;
-    --sk-fs-lg: 15px;
-    --sk-fs-xl: 18px;
-    --sk-fs-2xl: 22px;
-    --sk-fs-3xl: 28px;
+    --sk-fs: 16px;
+    --sk-fs-sm: 14px;
+    --sk-fs-xs: 13px;
+    --sk-fs-lg: 17px;
+    --sk-fs-xl: 21px;
+    --sk-fs-2xl: 26px;
+    --sk-fs-3xl: 32px;
     --sk-space: 8px;
 
     --bg-main: var(--sk-bg);
@@ -189,6 +189,9 @@ html:has(.sk-center-page) body {
 }
 .sk-center-page.sk-center-wide > .sk-card {
     width: min(36rem, 100%);
+}
+.sk-center-page.sk-center-config > .sk-card {
+    width: min(72rem, 100%);
 }
 .sk-center-page .sk-kicker {
     margin: 0 0 10px;
@@ -851,10 +854,10 @@ nav.sk-nav {
     justify-content: center;
     gap: 0;
     height: auto;
-    min-height: 40px;
-    padding: 8px 14px;
+    min-height: 48px;
+    padding: 12px 18px;
     color: var(--sk-text-muted);
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 600;
     letter-spacing: -0.01em;
     text-transform: none;
@@ -1049,7 +1052,7 @@ footer.sk-footer {
 }
 
 .sk-page {
-    max-width: 1120px;
+    max-width: 1480px;
     margin: 0 auto;
     padding: 16px;
     display: flex;

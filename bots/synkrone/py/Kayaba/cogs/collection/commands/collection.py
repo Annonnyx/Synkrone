@@ -950,7 +950,7 @@ class Collection(commands.Cog):
         self.bot = bot
         self.card_manager = CardManager()
     
-    @commands.command(name="collection", description="Consultez la collection de cartes")
+    @commands.hybrid_command(name="collection", description="Consultez la collection de cartes")
     async def collection_command(self, ctx: commands.Context, *, id: str = None, personnage: str = None):
         """Affiche la collection de cartes disponibles"""
         await ctx.defer()

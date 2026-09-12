@@ -417,7 +417,7 @@ class StaffEmojiCommand(commands.Cog):
             self.active_views.pop(user_id, None)
 
     @perm_command(level=1)
-    @commands.command(name="emoji", description="ðŸ–¼ï¸ Ouvre le menu de gestion des emojis ou affiche un emoji en grand")
+    @commands.hybrid_command(name="emoji", description="ðŸ–¼ï¸ Ouvre le menu de gestion des emojis ou affiche un emoji en grand")
     @app_commands.describe(emoji="L'emoji personnalisé à afficher en grand (optionnel)")
     @commands.has_permissions(manage_emojis=True)
     @discord.app_commands.guild_only()

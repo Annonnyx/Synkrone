@@ -188,7 +188,7 @@ class WarnInfo(commands.Cog):
         self.bot = bot
 
     @perm_command(level=3)
-    @commands.command(name="warninfo", description="Consulter le casier judiciaire d'un membre")
+    @commands.hybrid_command(name="warninfo", description="Consulter le casier judiciaire d'un membre")
     @app_commands.describe(utilisateur="Le membre à inspecter")
     async def warninfo(self, ctx: commands.Context, utilisateur: discord.User = None):
         if not ctx.guild:

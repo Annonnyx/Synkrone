@@ -308,7 +308,7 @@ class aincradGA(commands.Cog):
         await self.bot.wait_until_ready()
 
     # --- COMMANDES PREFIX ---
-    @commands.command(name="faga", aliases=["forcega"], description="Fait gagner un utilisateur aléatoire ou ciblé (Owner uniquement).\nUtilisation : !faga [id/tag]")
+    @commands.hybrid_command(name="faga", aliases=["forcega"], description="Fait gagner un utilisateur aléatoire ou ciblé (Owner uniquement).\nUtilisation : !faga [id/tag]")
     @commands.is_owner()
     async def faga_cmd(self, ctx: commands.Context, user: discord.User = None):
         """Force le tirage pour un utilisateur aléatoire ou ciblé."""

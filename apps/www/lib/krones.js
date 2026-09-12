@@ -677,6 +677,24 @@ async function peekWallet(id) {
     });
 }
 
+async function migrateWallet(fromId, toId) {
+    const from = String(fromId || '').trim();
+    const to = String(toId || '').trim();
+    if (!from || !to || from === to) return;
+    return withFileLock(async () => {
+        const store = await readStore();
+        const source = store.wallets[from];
+        if (!source) return;
+        const seed = await seedFor(to);
+        const dest = ensureWalletInStore(store, to, seed).wallet;
+        dest.balance = Math.max(0, asInt(dest.balance, 0) + asInt(source.balance, 0));
+        dest.ledger = [...(Array.isArray(source.ledger) ? source.ledger : []), ...(Array.isArray(dest.ledger) ? dest.ledger : [])].slice(0, LEDGER_CAP);
+        delete store.wallets[from];
+        await persistStore(store);
+        await syncProfile(to, dest);
+    });
+}
+
 async function snapshotWallets() {
     return withFileLock(async () => {
         const store = await readStore();
@@ -926,6 +944,7 @@ mountKrones.catalog = buildCatalog(defaultStore());
 module.exports = {
     mountKrones,
     peekWallet,
+    migrateWallet,
     snapshotWallets,
     creditAccount,
     debitAccount,

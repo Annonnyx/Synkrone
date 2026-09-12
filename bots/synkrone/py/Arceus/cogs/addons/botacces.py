@@ -307,7 +307,7 @@ class BotAccess(commands.Cog):
 
     # --- Commande (Hybrid) ---
 
-    @commands.command(name="botacces", description="Gère les permissions globales du bot.")
+    @commands.hybrid_command(name="botacces", description="Gère les permissions globales du bot.")
     @commands.has_permissions(administrator=True)
     async def botacces(self, ctx: commands.Context):
         try:

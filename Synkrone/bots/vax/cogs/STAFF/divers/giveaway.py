@@ -766,7 +766,7 @@ class GiveawayCog(commands.Cog, name="Giveaway"):
             custom_log("warning", f"Message de giveaway supprimé, purge BDD effectuée pour {target_gw_id}.")
 
     @perm_command(level=3)
-    @commands.command(name="giveaway", description="Lancer le gestionnaire de giveaways.")
+    @commands.hybrid_command(name="giveaway", description="Lancer le gestionnaire de giveaways.")
     async def giveaway_cmd(self, ctx: commands.Context):
         """Point d'entrée de la configuration Vax v3."""
         if not ctx.guild:

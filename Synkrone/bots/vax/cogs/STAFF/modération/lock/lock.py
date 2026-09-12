@@ -70,7 +70,7 @@ class Lock(commands.Cog):
         self.bot = bot
 
     @perm_command(level=3)
-    @commands.command(name="lock", description="ðŸ”’ Verrouille l'écriture en préservant strictement la visibilité.")
+    @commands.hybrid_command(name="lock", description="ðŸ”’ Verrouille l'écriture en préservant strictement la visibilité.")
     async def lock(self, ctx: commands.Context):
         if not ctx.guild:
             return

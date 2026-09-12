@@ -334,6 +334,12 @@ async def on_ready():
     except Exception as e:
         print(f'\033[93m[!] Erreur lors de la synchronisation des slash commands : {e}\033[0m')
 
+    try:
+        from synkrone_custom import apply_runtime
+        await apply_runtime(bot)
+    except Exception:
+        pass
+
     # Envoi du MP à l'owner si erreurs de cogs
     if COGS_ERRORS:
         try:
@@ -378,6 +384,15 @@ async def on_ready():
                     await owner.send(embed=embed)
         except Exception as e:
             print(f"[!] Impossible d'envoyer le MP d'erreurs à l'owner: {e}")
+
+
+@bot.event
+async def on_guild_join(guild):
+    try:
+        from synkrone_custom import apply_runtime
+        await apply_runtime(bot, guild)
+    except Exception:
+        pass
 
 async def main():
     async with bot:

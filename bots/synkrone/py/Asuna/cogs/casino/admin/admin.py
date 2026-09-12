@@ -157,7 +157,7 @@ class AdminPanelView(ui.View):
 class AdminCommand(commands.Cog):
     def __init__(self, bot): self.bot = bot
 
-    @commands.command(name="admin")
+    @commands.hybrid_command(name="admin")
     @commands.has_permissions(administrator=True)
     async def admin_panel(self, ctx, target: discord.User):
         data = load_admin_data(ctx.guild.id, target.id)

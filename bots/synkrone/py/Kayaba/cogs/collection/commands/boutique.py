@@ -522,7 +522,7 @@ class Boutique(commands.Cog):
                 pass
         return None, None
 
-    @commands.command(name="boutique")
+    @commands.hybrid_command(name="boutique")
     async def shop(self, ctx):
         """Ouvre la boutique quotidienne de Kayaba"""
         user_data = get_user_data(ctx.author.id)

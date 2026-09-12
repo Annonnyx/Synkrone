@@ -15,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 const DISCORD_API = "https://discord.com/api/v10";
 const MANAGE_GUILD = BigInt(0x20);
+const ADMINISTRATOR = BigInt(0x8);
 
 async function discordGet<T>(token: string, path: string): Promise<T | null> {
   try {
@@ -42,7 +43,11 @@ async function memberCanManage(token: string, guildId: string, userId: string): 
   const roles = await discordGet<Array<{ id: string; permissions: string }>>(token, `/guilds/${guildId}/roles`);
   if (!member || !roles) return false;
   const mine = new Set(member.roles || []);
-  return roles.some((role) => mine.has(role.id) && (BigInt(role.permissions || "0") & MANAGE_GUILD) === MANAGE_GUILD);
+  return roles.some((role) => {
+    if (!mine.has(role.id)) return false;
+    const perms = BigInt(role.permissions || "0");
+    return (perms & ADMINISTRATOR) === ADMINISTRATOR || (perms & MANAGE_GUILD) === MANAGE_GUILD;
+  });
 }
 
 export async function GET(req: NextRequest) {
@@ -83,8 +88,13 @@ export async function GET(req: NextRequest) {
             .filter((ch) => ch.type === 0 || ch.type === 5)
             .map((ch) => ({ id: ch.id, name: ch.name }))
         : [];
+      const roles = token
+        ? ((await discordGet<Array<{ id: string; name: string }>>(token, `/guilds/${guildId}/roles`)) || [])
+            .filter((role) => role.name !== "@everyone")
+            .map((role) => ({ id: role.id, name: role.name }))
+        : [];
       const manageGuild = token && memberId ? await memberCanManage(token, guildId, memberId) : false;
-      return { found: true, serviceId: svc.serviceId, channels, manageGuild };
+      return { found: true, serviceId: svc.serviceId, channels, roles, manageGuild };
     }
 
     if (applicationId) {

@@ -1124,7 +1124,7 @@ class TicketCog(commands.Cog):
                         except: pass
 
     @perm_command(level=2)
-    @commands.command(name="ticket", description="Ouvre le panneau de configuration des tickets.")
+    @commands.hybrid_command(name="ticket", description="Ouvre le panneau de configuration des tickets.")
     async def ticket_cmd(self, ctx: commands.Context):
         if not ctx.guild: return await ctx.send(f"{E_OFF} Commande de serveur.")
         if HAS_VAX_CORE:

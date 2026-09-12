@@ -154,7 +154,7 @@ class ModerationWarn(commands.Cog):
             _log(f"Impossible d'envoyer le MP à {cible_user.id} (DMs fermés)", "DEBUG")
 
     @perm_command(level=3)
-    @commands.command(name="warn", description="Avertir formellement un membre du serveur.")
+    @commands.hybrid_command(name="warn", description="Avertir formellement un membre du serveur.")
     @app_commands.describe(utilisateur="Le membre à avertir", raison="Raison (optionnel en slash, ouvre un formulaire)")
     async def warn(self, ctx: commands.Context, utilisateur: discord.Member = None, *, raison: str = None):
         if not ctx.guild:

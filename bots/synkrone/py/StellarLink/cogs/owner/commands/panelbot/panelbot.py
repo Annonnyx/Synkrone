@@ -183,7 +183,7 @@ class BotAdmin(commands.Cog):
             f"**Descriptions :**\n{self._get_description_list_text()}"
         )
 
-    @commands.command(name="panelbot", description="Accéder au panneau de configuration technique du bots.")
+    @commands.hybrid_command(name="panelbot", description="Accéder au panneau de configuration technique du bots.")
     async def panelbot(self, ctx: commands.Context):
         if ctx.author.id not in self._load_owners() and not await self.bot.is_owner(ctx.author):
             return await ctx.send("❌ Accès refusé.", ephemeral=True)

@@ -831,7 +831,7 @@ class Theme(commands.Cog):
             await interaction.channel.send(f"{getattr(E, 'TEMPS', '⏳')} {interaction.user.mention}, délai écoulé pour l'image. Relancez l'action.", delete_after=6)
 
     @perm_command(level=1)
-    @commands.command(name="theme", description="Personnaliser l'apparence du serveur")
+    @commands.hybrid_command(name="theme", description="Personnaliser l'apparence du serveur")
     async def theme(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{getattr(E, 'ERREUR', '❌')} Cette commande doit etre utilisee sur un serveur.")

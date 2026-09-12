@@ -63,7 +63,7 @@ class Say(commands.Cog):
         log_debug("Cog Say initialisé avec succès.", "success")
 
     @perm_command(level=2) if perm_command else lambda x: x
-    @commands.command(
+    @commands.hybrid_command(
         name="say",
         description="Fait parler le bot avec support des balises"
     )

@@ -459,7 +459,7 @@ class Premium(commands.Cog):
         
         return embed
 
-    @commands.command(name="premium", description="Affiche les avantages premium et votre statut")
+    @commands.hybrid_command(name="premium", description="Affiche les avantages premium et votre statut")
     async def premium_command(self, ctx: commands.Context):
         """Affiche les informations sur l'offre premium (disponible en MP et serveur)"""
         print(f"[PREMIUM] Commande premium exécutée par {ctx.author.name} (ID: {ctx.author.id})")

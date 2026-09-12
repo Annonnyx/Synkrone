@@ -1212,7 +1212,7 @@ class Dev(commands.Cog):
         prefixes = get_prefixes_with_priority(ctx.guild.id)
         return prefixes[0] if prefixes else "."  # Retourne le premier préfixe
         
-    @commands.command(name="dev", description="Commande de développement réservée aux owners.")
+    @commands.hybrid_command(name="dev", description="Commande de développement réservée aux owners.")
     async def dev(self, ctx: commands.Context):
         if not await ctx.bot.is_owner(ctx.author) and ctx.author.id not in self.owner_ids:
             return await ctx.send("❌ Accès restreint aux owners du bot.", ephemeral=True)

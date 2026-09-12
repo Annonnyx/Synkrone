@@ -213,7 +213,7 @@ class Banlist(commands.Cog):
         await ctx.send(view=view)
 
     @perm_command(level=2)
-    @commands.command(name="banlist", description="Affiche le registre unifié (25/page) de tous les bannis du serveur.")
+    @commands.hybrid_command(name="banlist", description="Affiche le registre unifié (25/page) de tous les bannis du serveur.")
     async def banlist(self, ctx: commands.Context):
         if not ctx.guild:
             return await self._send_fallback(ctx, "Action impossible", "Cette commande doit être utilisée sur un serveur.")

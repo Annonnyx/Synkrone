@@ -400,7 +400,7 @@ class Test(commands.Cog):
         self.bot = bot
 
     @perm_command(level=2) if perm_command else lambda x: x
-    @commands.command(name="embed", description="Lance l'éditeur d'embed complet.")
+    @commands.hybrid_command(name="embed", description="Lance l'éditeur d'embed complet.")
     async def test(self, ctx: commands.Context):
         if ctx.guild and ensure_command_permission:
             if not await ensure_command_permission(ctx, command_name="embed"):

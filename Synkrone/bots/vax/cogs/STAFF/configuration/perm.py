@@ -790,7 +790,7 @@ class Perm(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command(name="perm")
+    @commands.hybrid_command(name="perm")
     async def perm(self, ctx: commands.Context):
         try:
             guild_id = getattr(getattr(ctx, "guild", None), "id", "unknown")

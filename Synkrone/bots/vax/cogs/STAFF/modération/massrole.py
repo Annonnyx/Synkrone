@@ -561,7 +561,7 @@ class MassRole(commands.Cog):
         await self.bot.wait_until_ready()
 
     @perm_command(level=3)
-    @commands.command(name="massrole", description="Interface Vax avancée pour la gestion de rôles en masse.")
+    @commands.hybrid_command(name="massrole", description="Interface Vax avancée pour la gestion de rôles en masse.")
     async def massrole(self, ctx: commands.Context):
         """Point d'entrée du système MassRole sécurisé[cite: 6, 8]."""
         log_info(f"Exécution de massrole par {ctx.author} sur {ctx.guild.name}")

@@ -807,7 +807,7 @@ class ServerStatsCog(commands.Cog):
     # --- Commandes ---
 
     @perm_command(level=2)
-    @commands.command(name="autostats", description="Déploie le panneau de configuration dynamique des statistiques.")
+    @commands.hybrid_command(name="autostats", description="Déploie le panneau de configuration dynamique des statistiques.")
     async def autostats_cmd(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{E_OFF} Cette commande exige un contexte de serveur.")

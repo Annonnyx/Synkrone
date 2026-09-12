@@ -191,7 +191,7 @@ class Help(commands.Cog):
         # 3. Fallback final : préfixe par défaut
         return "."
 
-    @commands.command(name="help", description="Affiche le menu d'aide complet et interactif")
+    @commands.hybrid_command(name="help", description="Affiche le menu d'aide complet et interactif")
     async def help_command(self, ctx: commands.Context):
         # On récupère le bon préfixe avant de générer la vue
         prefix = await self.get_prefix(ctx)

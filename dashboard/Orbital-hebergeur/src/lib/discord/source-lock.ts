@@ -9,6 +9,7 @@ export function isProtectedBotSource(relPath: string): boolean {
   if (!n || n === ".") return false;
   if (n === "cogs" || n.startsWith("cogs/")) return true;
   if (n === "synkrone_slash.py") return true;
+  if (n === "synkrone_custom.py") return true;
   return false;
 }
 

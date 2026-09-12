@@ -324,7 +324,7 @@ class Prefix(commands.Cog):
         self.bot = bot
         self.prefix_manager = PrefixManager()
     
-    @commands.command(name="prefix", help="Configurer les préfixes du serveur.")
+    @commands.hybrid_command(name="prefix", help="Configurer les préfixes du serveur.")
     @commands.has_permissions(administrator=True)
     async def prefix_command(self, ctx):
         """Affiche le panneau de configuration des préfixes"""

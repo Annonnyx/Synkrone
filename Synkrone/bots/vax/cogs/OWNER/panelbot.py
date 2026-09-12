@@ -801,7 +801,7 @@ class PanelBot(commands.Cog):
         self.bot = bot
         log_success("Cog PanelBot initialisé avec succès.")
 
-    @commands.command(name="panelbot", description="Ouvre le centre de contrôle global du bot")
+    @commands.hybrid_command(name="panelbot", description="Ouvre le centre de contrôle global du bot")
     async def panelbot(self, ctx: commands.Context):
         if not ctx.guild:
             return await ctx.send(f"{Emoji.REFUSER} Cette commande doit être exécutée sur un serveur.")

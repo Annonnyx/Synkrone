@@ -97,7 +97,7 @@ class TempMute(commands.Cog):
         )
 
     @perm_command(level=2)
-    @commands.command(name="tempmute", description="â³ Mute global temporaire.")
+    @commands.hybrid_command(name="tempmute", description="â³ Mute global temporaire.")
     async def tempmute(self, ctx: commands.Context, membre: discord.Member = None, durée: str = None, *, raison: str = None):
         if not ctx.guild:
             return await ctx.send(f"{EMOJI_ERROR} Cette commande nécessite un serveur.")

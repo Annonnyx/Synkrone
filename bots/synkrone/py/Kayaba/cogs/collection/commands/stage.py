@@ -18,7 +18,7 @@ class Stage(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command(
+    @commands.hybrid_command(
         name="stage", 
         description="Affiche les informations de progression."
     )

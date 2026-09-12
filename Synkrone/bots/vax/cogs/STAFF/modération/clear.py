@@ -702,7 +702,7 @@ class Clear(commands.Cog):
         debug_log("Cog Clear initialisé avec succès.", "SUCCESS")
 
     @perm_command(level=2) # Niveau de permission standard Vax pour la modération[cite: 6]
-    @commands.command(name="clear", aliases=["purge"], description="Outil de purge complet.")
+    @commands.hybrid_command(name="clear", aliases=["purge"], description="Outil de purge complet.")
     async def clear_cmd(self, ctx: commands.Context, *args):
         debug_log(f"Commande !clear invoquée par {ctx.author}", "INFO")
 

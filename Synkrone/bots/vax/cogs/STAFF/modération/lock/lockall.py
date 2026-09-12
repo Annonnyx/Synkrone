@@ -40,7 +40,7 @@ class LockAllCommand(commands.Cog):
         self.bot = bot
 
     @perm_command(level=1)
-    @commands.command(name="lockall", description="ðŸš¨ Verrouillage global du serveur.")
+    @commands.hybrid_command(name="lockall", description="ðŸš¨ Verrouillage global du serveur.")
     async def lockall(self, ctx: commands.Context):
         if not ctx.guild:
             return

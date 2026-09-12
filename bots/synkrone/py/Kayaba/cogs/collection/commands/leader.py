@@ -614,7 +614,7 @@ class Leader(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="leader", description="Affiche les classements")
+    @commands.hybrid_command(name="leader", description="Affiche les classements")
     async def leader(self, ctx: commands.Context):
         """Affiche les classements avec une interface élégante et directe"""
         print(f"[leader.py] Commande leader exécutée par {ctx.author.id}")

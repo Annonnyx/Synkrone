@@ -199,7 +199,7 @@ export async function createService(userId: string, input: CreateServiceInput) {
       applicationId:
         d.applicationId?.trim() || (token ? applicationIdFromToken(token) : null) || null,
       prefix: normalizeBotPrefix(d.prefix) ?? "!",
-      slashCommands: d.slashCommands ?? true,
+      slashCommands: true,
       flavor: "custom",
       intents: resolveGatewayIntents(d.intents, modules),
       modules,

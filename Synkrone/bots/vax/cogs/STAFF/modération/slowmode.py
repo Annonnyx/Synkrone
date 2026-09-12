@@ -244,7 +244,7 @@ class Slowmode(commands.Cog):
         debug_log("Cog Slowmode déchargé.", "WARNING")
 
     @perm_command(level=3)
-    @commands.command(
+    @commands.hybrid_command(
         name="slowmode",
         description="Affiche ou modifie le délai de slowmode du salon."
     )

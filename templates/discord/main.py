@@ -173,6 +173,11 @@ COGS_ERRORS = []  # Liste globale pour stocker les erreurs de cogs
 
 async def load_cogs():
     """Charge les cogs en ignorant les scripts util_*.py mais pas les dossiers utilitaires"""
+    try:
+        from synkrone_slash import ensure_hybrid_commands
+        ensure_hybrid_commands()
+    except Exception:
+        pass
     global COGS_TOTAL, COGS_LOADED, COGS_ERRORS_COUNT
     total_cogs = 0
     loaded_cogs = 0
@@ -252,16 +257,12 @@ except ImportError:
     sync_app_commands = None
 
     def _slash_enabled() -> bool:
-        if os.path.exists(_PANEL_CFG_PATH):
-            try:
-                with open(_PANEL_CFG_PATH, 'r', encoding='utf-8') as f:
-                    flag = json.load(f).get('slashCommands')
-                    if flag is not None:
-                        return bool(flag)
-            except Exception:
-                pass
-        raw = os.getenv('ENABLE_SLASH_COMMANDS', 'true')
-        return str(raw).lower() in ('1', 'true', 'yes')
+        return True
+
+try:
+    from synkrone_custom import apply_runtime as _apply_runtime
+except ImportError:
+    _apply_runtime = None
 
 def _get_global_prefix() -> str:
     """Retourne le préfixe global actif : panneau → BotAdmin → bot_config.json → env"""
@@ -341,6 +342,11 @@ async def on_ready():
                 print('\033[93m[!] Commandes slash désactivées\033[0m')
         except Exception as e:
             print(f'\033[93m[!] Erreur lors de la synchronisation des slash commands : {e}\033[0m')
+    if _apply_runtime:
+        try:
+            await _apply_runtime(bot)
+        except Exception as e:
+            print(f'\033[93m[!] Custom runtime : {e}\033[0m')
     if COGS_ERRORS:
         print('\033[93m[!] Erreurs de chargement des cogs :\033[0m')
         for cog, msg in COGS_ERRORS:

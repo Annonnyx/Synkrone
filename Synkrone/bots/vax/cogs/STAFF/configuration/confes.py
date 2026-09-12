@@ -709,7 +709,7 @@ class Confessions(commands.Cog):
         log_debug("Module Confessions Vax v3 initialisé avec succès.")
 
     @perm_command(level=2)
-    @commands.command(name="confess", aliases=["confes", "confession", "confessions"], description="Configurer et gérer le système de confessions anonymes")
+    @commands.hybrid_command(name="confess", aliases=["confes", "confession", "confessions"], description="Configurer et gérer le système de confessions anonymes")
     async def confess(self, ctx: commands.Context):
         if not ctx.guild:
             return await ctx.send(f"{E_ERROR} Cette commande doit être utilisée sur un serveur.")

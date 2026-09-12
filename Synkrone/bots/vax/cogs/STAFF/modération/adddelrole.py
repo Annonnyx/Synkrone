@@ -219,7 +219,7 @@ class AddDelRole(commands.Cog):
 
     # --- COMMANDE ADDROLE ---
     @perm_command(level=3)
-    @commands.command(name="addrole", description="Ajoute un rôle spécifique à un membre.")
+    @commands.hybrid_command(name="addrole", description="Ajoute un rôle spécifique à un membre.")
     @app_commands.describe(member="Mention, ID ou nom du membre", role="Mention, ID ou nom du rôle")
     async def addrole(self, ctx: commands.Context, member: Optional[str] = None, *, role: Optional[str] = None):
         """Commande d'ajout de rôle (Persistante, LayoutV2)."""
@@ -283,7 +283,7 @@ class AddDelRole(commands.Cog):
 
     # --- COMMANDE DELROLE ---
     @perm_command(level=3)
-    @commands.command(name="delrole", description="Retire un rôle spécifique d'un membre.")
+    @commands.hybrid_command(name="delrole", description="Retire un rôle spécifique d'un membre.")
     @app_commands.describe(member="Mention, ID ou nom du membre", role="Mention, ID ou nom du rôle")
     async def delrole(self, ctx: commands.Context, member: Optional[str] = None, *, role: Optional[str] = None):
         """Commande de révocation de rôle (Persistante, LayoutV2)."""

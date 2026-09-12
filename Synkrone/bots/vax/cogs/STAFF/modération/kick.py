@@ -136,7 +136,7 @@ class Kick(commands.Cog):
         debug_log("Cog Kick déchargé.", "WARNING")
 
     @perm_command(level=2)
-    @commands.command(
+    @commands.hybrid_command(
         name="kick",
         description="Expulse un membre du serveur (mention, ID ou pseudo)."
     )

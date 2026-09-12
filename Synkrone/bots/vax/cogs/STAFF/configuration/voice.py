@@ -520,7 +520,7 @@ class TemporaryVoice(commands.Cog):
                     log_sys("CHANNEL_CLEANUP_ERR", f"Échec de suppression {before.channel.id}: {e}", is_error=True)
 
     @perm_command(level=2)
-    @commands.command(name="voice", description="Menu d'administration des salons vocaux temporaires.")
+    @commands.hybrid_command(name="voice", description="Menu d'administration des salons vocaux temporaires.")
     async def voice_cmd(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{E_OFF} Cette commande exige un contexte serveur.")

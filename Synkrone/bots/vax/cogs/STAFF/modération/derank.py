@@ -116,7 +116,7 @@ class Derank(commands.Cog):
         debug_log("Cog Derank initialisé avec succès.", "SUCCESS")
 
     @perm_command(level=3) # Niveau 3 défini par défaut pour des actions de modération lourdes
-    @commands.command(
+    @commands.hybrid_command(
         name="derank", 
         description="Retire tous les rôles d'un membre (Action définitive)"
     )

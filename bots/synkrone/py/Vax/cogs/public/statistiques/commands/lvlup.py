@@ -263,7 +263,9 @@ class LvlUp(commands.Cog):
                 font_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "cogs", "pack", "statistiques", "assets", "TradeWinds-Regular.ttf")
 
             try:
-                font_title = ImageFont.truetype(font_path, 70)
+                from synkrone_custom import card_font
+                gid = getattr(getattr(user, "guild", None), "id", None)
+                font_title = card_font(gid, 70, fallback=font_path)
             except Exception:
                 font_title = ImageFont.load_default()
 
@@ -283,7 +285,9 @@ class LvlUp(commands.Cog):
                 font_size = base_size
 
             try:
-                font_title = ImageFont.truetype(font_path, font_size)
+                from synkrone_custom import card_font
+                gid = getattr(getattr(user, "guild", None), "id", None)
+                font_title = card_font(gid, font_size, fallback=font_path)
             except Exception:
                 font_title = ImageFont.load_default()
 

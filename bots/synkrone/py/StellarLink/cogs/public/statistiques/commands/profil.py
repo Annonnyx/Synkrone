@@ -29,14 +29,16 @@ class Profil(commands.Cog):
             assets_dir = base_dir.parent / "assets"
             font_path = assets_dir / "TradeWinds-Regular.ttf"
             try:
+                from synkrone_custom import card_font
+                gid = ctx.guild.id if ctx.guild else None
                 fonts = {
-                    "pseudo": ImageFont.truetype(str(font_path), 60),
-                    "titre": ImageFont.truetype(str(font_path), 40),
-                    "niveau": ImageFont.truetype(str(font_path), 50),
-                    "stats_label": ImageFont.truetype(str(font_path), 30),
-                    "stats_value": ImageFont.truetype(str(font_path), 40),
-                    "info": ImageFont.truetype(str(font_path), 28),
-                    "xp": ImageFont.truetype(str(font_path), 28)
+                    "pseudo": card_font(gid, 60, fallback=font_path),
+                    "titre": card_font(gid, 40, fallback=font_path),
+                    "niveau": card_font(gid, 50, fallback=font_path),
+                    "stats_label": card_font(gid, 30, fallback=font_path),
+                    "stats_value": card_font(gid, 40, fallback=font_path),
+                    "info": card_font(gid, 28, fallback=font_path),
+                    "xp": card_font(gid, 28, fallback=font_path)
                 }
                 font_error = False
             except Exception as e:
@@ -241,7 +243,8 @@ class Profil(commands.Cog):
             try:
                 # Utilise str(font_path) pour garantir la compatibilité
                 from pathlib import Path
-                titre_font = ImageFont.truetype(str(font_path), 55)
+                from synkrone_custom import card_font
+                titre_font = card_font(ctx.guild.id if ctx.guild else None, 55, fallback=font_path)
             except Exception as e:
                 print(f"[Profil] Erreur chargement police titre: {e}")
                 titre_font = fonts["titre"]

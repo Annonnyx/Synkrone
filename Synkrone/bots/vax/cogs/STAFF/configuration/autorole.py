@@ -767,7 +767,7 @@ class AutoRoleCog(commands.Cog):
         await self.bot.wait_until_ready()
 
     @perm_command(level=2)
-    @commands.command(name="autorole", description="Ouvre l'interface de gestion de l'attribution automatique des rôles.")
+    @commands.hybrid_command(name="autorole", description="Ouvre l'interface de gestion de l'attribution automatique des rôles.")
     async def autorole_cmd(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{E_OFF} Cette commande exige un contexte de serveur Discord.")

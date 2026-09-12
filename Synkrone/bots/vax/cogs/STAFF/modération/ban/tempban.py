@@ -151,7 +151,7 @@ class TempBan(commands.Cog):
         await ctx.send(view=view)
 
     @perm_command(level=2)
-    @commands.command(name="tempban", description="Bannir temporairement un utilisateur via menu ou commande rapide.")
+    @commands.hybrid_command(name="tempban", description="Bannir temporairement un utilisateur via menu ou commande rapide.")
     @app_commands.describe(cible="Membre ou ID cible", duree="Durée (ex: 24h, 1h)", raison="Motif optionnel")
     async def tempban(self, ctx: commands.Context, cible: str = None, duree: str = "24h", *, raison: str = "Aucune raison fournie"):
         if not ctx.guild:

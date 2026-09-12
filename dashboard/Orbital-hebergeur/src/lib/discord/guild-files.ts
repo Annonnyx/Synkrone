@@ -26,8 +26,16 @@ export function welcomePath(guildId: string) {
   return `cogs/ADMIN/configuration/joinleave/bienvenue/data/${guildId}/config.json`;
 }
 
+export function welcomePathStaff(guildId: string) {
+  return `cogs/staff/configuration/joinleave/bienvenue/data/${guildId}/config.json`;
+}
+
 export function goodbyePath(guildId: string) {
   return `cogs/ADMIN/configuration/joinleave/aurevoir/data_leave/${guildId}/config.json`;
+}
+
+export function goodbyePathStaff(guildId: string) {
+  return `cogs/staff/configuration/joinleave/aurevoir/data_leave/${guildId}/config.json`;
 }
 
 export function embedPath(guildId: string) {

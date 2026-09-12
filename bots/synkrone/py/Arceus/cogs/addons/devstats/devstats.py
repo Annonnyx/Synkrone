@@ -146,7 +146,7 @@ class DevStatsView(discord.ui.View):
 
 class DevStats(commands.Cog):
 
-    @commands.command(name="resetdevstats", description="Réinitialise toutes les statistiques de développement (owner seulement)")
+    @commands.hybrid_command(name="resetdevstats", description="Réinitialise toutes les statistiques de développement (owner seulement)")
     async def resetdevstats(self, ctx: commands.Context):
         is_owner = await self.bot.is_owner(ctx.author)
         if not is_owner:
@@ -393,7 +393,7 @@ class DevStats(commands.Cog):
             pages.append(self.create_embed(None, desc))
         return pages if pages else [self.create_embed(None, "Aucune donnée.")]
 
-    @commands.command(name="devstats", description="Menu statistiques de développement")
+    @commands.hybrid_command(name="devstats", description="Menu statistiques de développement")
     async def devstats(self, ctx: commands.Context):
         is_owner = await self.bot.is_owner(ctx.author)
         if not is_owner:

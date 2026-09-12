@@ -67,7 +67,7 @@ class Unlock(commands.Cog):
         self.bot = bot
 
     @perm_command(level=3)
-    @commands.command(name="unlock", description="ðŸ”“ Déverrouille le salon actuel (si verrouillé par le bot).")
+    @commands.hybrid_command(name="unlock", description="ðŸ”“ Déverrouille le salon actuel (si verrouillé par le bot).")
     async def unlock(self, ctx: commands.Context):
         if not ctx.guild:
             return

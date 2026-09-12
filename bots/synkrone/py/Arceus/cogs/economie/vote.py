@@ -312,7 +312,7 @@ class Vote(commands.Cog):
             error_msg = "❌ Une erreur est survenue lors de l'exécution de la commande."
             await self._send_vote_response(ctx, content=error_msg, ephemeral=True)
 
-    @commands.command(name="testvote", description="Teste la récompense de vote.")
+    @commands.hybrid_command(name="testvote", description="Teste la récompense de vote.")
     async def testvote(self, ctx: commands.Context):
         try:
             if not await self.bot.is_owner(ctx.author):

@@ -97,7 +97,7 @@ class WarnList(commands.Cog):
         self.bot = bot
 
     @perm_command(level=3)
-    @commands.command(name="warnlist", description="Affiche le registre et le classement des avertissements du serveur")
+    @commands.hybrid_command(name="warnlist", description="Affiche le registre et le classement des avertissements du serveur")
     async def warnlist(self, ctx: commands.Context):
         if not ctx.guild:
             return

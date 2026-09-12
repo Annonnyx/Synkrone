@@ -473,7 +473,7 @@ class InfiniteCog(commands.Cog):
                     pass
 
     @perm_command(level=2)
-    @commands.command(name="infinite", description="Configuration du jeu de comptage infini.")
+    @commands.hybrid_command(name="infinite", description="Configuration du jeu de comptage infini.")
     async def infinite_cmd(self, ctx: commands.Context):
         if not ctx.guild:
             await ctx.send(f"{E_OFF} Cette commande exige un contexte de serveur.")

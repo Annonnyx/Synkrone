@@ -405,7 +405,7 @@ class DataControlCog(commands.Cog, name="Owner Data Control"):
     # --------------------------- HYBRID COMMAND DEFINITION ------------------------
     # ==============================================================================
 
-    @commands.command(name="data", description="[Owner] Analyse l'arborescence des données.")
+    @commands.hybrid_command(name="data", description="[Owner] Analyse l'arborescence des données.")
     @commands.is_owner()
     async def data_command(self, ctx: commands.Context, id_serveur: Optional[str] = None):
         if ctx.interaction:

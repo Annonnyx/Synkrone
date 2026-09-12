@@ -415,7 +415,7 @@ class PartenariatCog(commands.Cog, name="Partenariat"):
         self.bot = bot
 
     @perm_command(level=2)
-    @commands.command(name="partenariat", description="Interface Vax pour configurer et envoyer des partenariats.")
+    @commands.hybrid_command(name="partenariat", description="Interface Vax pour configurer et envoyer des partenariats.")
     async def partenariat_cmd(self, ctx: commands.Context):
         """Déclenche le panneau LayoutV2 du partenariat."""
         if not ctx.guild:

@@ -242,9 +242,10 @@ async def generate_leaderboard_image(bot, guild, classement_type, author_id, pag
 
     # Polices
     try:
-        font_title = ImageFont.truetype(str(FONT_PATH), 120)
-        font_entry = ImageFont.truetype(str(FONT_PATH), 64)
-        font_small = ImageFont.truetype(str(FONT_PATH), 42)
+        from synkrone_custom import card_font
+        font_title = card_font(guild.id, 120, fallback=FONT_PATH)
+        font_entry = card_font(guild.id, 64, fallback=FONT_PATH)
+        font_small = card_font(guild.id, 42, fallback=FONT_PATH)
     except Exception:
         font_title = font_entry = font_small = ImageFont.load_default()
 

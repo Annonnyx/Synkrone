@@ -369,7 +369,7 @@ class PVP(commands.Cog):
         
         return embed, None
 
-    @commands.command(name="pvp")
+    @commands.hybrid_command(name="pvp")
     async def pvp(self, ctx, user: discord.Member = None):
         """Commande principale PvP"""
         

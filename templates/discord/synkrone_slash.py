@@ -16,11 +16,20 @@ def read_panel_config():
 
 
 def slash_enabled(cfg=None):
-    data = cfg if isinstance(cfg, dict) else read_panel_config()
-    if "slashCommands" in data:
-        return bool(data.get("slashCommands"))
-    raw = os.getenv("ENABLE_SLASH_COMMANDS", "true")
-    return str(raw).lower() in ("1", "true", "yes")
+    return True
+
+
+def ensure_hybrid_commands():
+    """Prefix commands also register as slash, including older hosted cogs."""
+    try:
+        from discord.ext import commands
+    except Exception:
+        return
+    if getattr(commands, "_synkrone_hybrid_forced", False):
+        return
+    commands.command = commands.hybrid_command
+    commands.group = commands.hybrid_group
+    commands._synkrone_hybrid_forced = True
 
 
 def runtime_prefix(bot=None, default=None):
@@ -44,6 +53,7 @@ def runtime_prefix(bot=None, default=None):
 
 
 async def sync_app_commands(bot, cfg=None, guild=None, log_prefix="[synkrone]"):
+    ensure_hybrid_commands()
     data = cfg if isinstance(cfg, dict) else read_panel_config()
     enabled = slash_enabled(data)
     try:
@@ -80,3 +90,6 @@ async def sync_app_commands(bot, cfg=None, guild=None, log_prefix="[synkrone]"):
         print("%s slash commands registered globally (%s)" % (log_prefix, len(synced)))
     except Exception as err:
         print("%s slash sync failed: %s" % (log_prefix, err))
+
+
+ensure_hybrid_commands()

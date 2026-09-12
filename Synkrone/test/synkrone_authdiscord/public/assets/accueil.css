@@ -30,8 +30,8 @@
     --serif: "Zilla Slab", Georgia, serif;
     --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
     --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    --pad: clamp(20px, 5vw, 72px);
-    --max: 1120px;
+    --pad: clamp(24px, 4vw, 56px);
+    --max: 1480px;
     --sk-bg: var(--hall-bg);
     --sk-surface: var(--hall-elev);
     --sk-surface-2: var(--hall-elev-2);
@@ -98,8 +98,8 @@ body {
 
 body {
     font-family: var(--sans);
-    font-size: 15px;
-    line-height: 1.5;
+    font-size: 16px;
+    line-height: 1.55;
     color: var(--hall-ink);
     background: var(--hall-bg);
     -webkit-font-smoothing: antialiased;
@@ -200,7 +200,7 @@ a {
 .kicker {
     margin: 0 0 18px;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.02em;
     color: var(--hall-faint);
@@ -250,9 +250,9 @@ a {
 
 .lede {
     margin: 22px 0 0;
-    max-width: 46ch;
-    font-size: clamp(15px, 1.5vw, 18px);
-    line-height: 1.45;
+    max-width: 54ch;
+    font-size: clamp(16px, 1.45vw, 19px);
+    line-height: 1.5;
     color: var(--hall-mute);
 }
 
@@ -268,13 +268,13 @@ a {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 44px;
+    min-height: 46px;
     padding: 0 18px;
     border-radius: 4px;
     border: 1px solid var(--hall-line-strong);
     background: transparent;
     color: var(--hall-ink);
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     letter-spacing: 0.01em;
     text-decoration: none;
@@ -309,7 +309,7 @@ a {
 .coords {
     margin: 28px 0 0;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.02em;
     color: var(--hall-faint);
 }
@@ -524,7 +524,7 @@ a {
     margin: 8px 0 0;
     max-width: 62ch;
     color: var(--hall-mute);
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.55;
 }
 
@@ -578,7 +578,7 @@ a {
     margin: 0;
     padding-top: 8px;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 14px;
     letter-spacing: 0.02em;
     color: var(--hall-faint);
     border-top: 1px solid var(--hall-line);
@@ -625,7 +625,7 @@ a {
     display: flex;
     justify-content: space-between;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.02em;
     color: var(--hall-faint);
 }
@@ -648,7 +648,7 @@ a {
 
 .plate .go {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.01em;
     color: var(--mousse-fonce);
     font-weight: 500;
@@ -685,7 +685,7 @@ a {
 
 .u-id {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.14em;
     color: var(--hall-faint);
 }
@@ -707,15 +707,15 @@ a {
 
 .u-role {
     margin: 2px 0 0;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--hall-mute);
 }
 
 .u-pre {
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--hall-ink);
-    padding: 4px 8px;
+    padding: 6px 10px;
     border: 1px solid var(--hall-line);
     background: var(--hall-elev-2);
 }
@@ -759,42 +759,44 @@ a {
 .bot-cards {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
+    gap: 20px;
 }
 
 .bot-card {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     min-width: 0;
-    padding: 20px 18px 16px;
+    padding: 28px 22px 22px;
     background: var(--hall-elev);
     border: 1px solid var(--hall-line);
     border-radius: 6px;
 }
 
 .bot-card img {
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
     border-radius: 2px;
     object-fit: cover;
     border: 1px solid var(--hall-line);
 }
 
 .bot-card .u-name {
-    font-size: 1.15rem;
+    font-size: 1.35rem;
 }
 
 .bot-card-desc {
     margin: 0;
     flex: 1;
-    font-size: 13px;
-    line-height: 1.45;
+    font-size: 16px;
+    line-height: 1.55;
     color: var(--hall-mute);
 }
 
 .bot-card .u-pre {
     width: fit-content;
+    font-size: 16px;
+    padding: 8px 12px;
 }
 
 .bot-card-actions {
@@ -809,6 +811,8 @@ a {
     justify-content: center;
     text-align: center;
     font-weight: 600;
+    min-height: 44px;
+    font-size: 15px;
 }
 
 .bay-foot a:hover {
@@ -898,7 +902,7 @@ a {
 
 .pack-row p {
     margin: 3px 0 0;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--hall-mute);
 }
 
@@ -909,9 +913,9 @@ a {
 }
 
 .pack-actions .btn {
-    min-height: 34px;
-    padding: 0 12px;
-    font-size: 12px;
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 14px;
 }
 
 .vux-row {
@@ -969,7 +973,7 @@ a {
     display: block;
     margin-top: 6px;
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--hall-faint);
 }
 
@@ -1048,12 +1052,12 @@ a {
 }
 
 .offer-e {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--brique);
 }
 
 .offer-r {
-    font-size: 11px;
+    font-size: 13px;
     font-family: var(--mono);
     color: var(--hall-faint);
 }
@@ -1085,15 +1089,15 @@ a {
 
 .grade-price {
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--hall-gold);
 }
 
 .grade-perk {
     margin: 6px 0 12px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--hall-mute);
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 .grade-card[data-grade="Kronium"] { border-color: rgba(140, 98, 38, 0.35); }
@@ -1143,7 +1147,7 @@ a {
 
 .filter-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.02em;
     color: var(--hall-faint);
 }
@@ -1191,7 +1195,7 @@ a {
 
 .news-badge {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.02em;
     color: var(--mousse-fonce);
     border: 1px solid var(--ardoise-30);
@@ -1201,7 +1205,7 @@ a {
 }
 
 .news-date {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--hall-faint);
 }
 
@@ -1233,7 +1237,7 @@ a {
     border-top: 1px solid var(--hall-line);
     color: var(--hall-faint);
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.02em;
 }
 
@@ -1300,7 +1304,7 @@ a {
 
 .modal-kicker {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.02em;
     color: var(--ardoise);
     margin: 0 0 4px;

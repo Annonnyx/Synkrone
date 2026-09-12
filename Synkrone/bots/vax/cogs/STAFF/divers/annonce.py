@@ -535,7 +535,7 @@ class AnnonceCog(commands.Cog, name="Annonce"):
         self.bot = bot
 
     @perm_command(level=2)
-    @commands.command(name="annonce", description="Gérer et créer des annonces sur le serveur.")
+    @commands.hybrid_command(name="annonce", description="Gérer et créer des annonces sur le serveur.")
     async def annonce_cmd(self, ctx: commands.Context):
         """Point d'entrée du module Annonce respectant les autorisations."""
         if not ctx.guild:
