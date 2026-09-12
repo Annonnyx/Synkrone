@@ -64,6 +64,7 @@ export const fr = {
     newService: "Nouveau",
     krones: "Krônes",
     advanced: "Avancé",
+    publicSite: "Site principal",
   },
   engine: {
     online: "Moteur en ligne",
@@ -310,6 +311,7 @@ export const fr = {
     slashCommands: "Commandes slash",
     token: "Token",
     tokenStored: "enregistré ({fp})",
+    tokenUnreadable: "enregistré mais illisible — recoller le token",
     tokenMissing: "non défini",
     recreate: "Recréer le conteneur",
     deployNow: "Déployer maintenant",
@@ -553,6 +555,7 @@ export const fr = {
     appIdOptional: "ID d'application (optionnel)",
     readFromToken: "Lu depuis le token s'il est laissé vide",
     storedFp: "enregistré · empreinte {fp}",
+    unreadableFp: "enregistré mais illisible · empreinte {fp}",
     noToken: "aucun token — le bot ne peut pas démarrer",
     pasteReplace: "Collez un nouveau token pour remplacer celui enregistré",
     pasteToken: "Collez le token du bot",

@@ -26,12 +26,21 @@
     --hall-red: var(--mousse);
     --hall-red-soft: var(--mousse-clair);
     --hall-gold: var(--ambre);
-    --hall-elev-2: var(--hall-elev-2);
+    --hall-elev-2: var(--pierre-2);
     --serif: "Zilla Slab", Georgia, serif;
     --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
     --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
     --pad: clamp(20px, 5vw, 72px);
     --max: 1120px;
+    --sk-bg: var(--hall-bg);
+    --sk-surface: var(--hall-elev);
+    --sk-surface-2: var(--hall-elev-2);
+    --sk-text: var(--hall-ink);
+    --sk-text-muted: var(--hall-mute);
+    --sk-text-faint: var(--hall-faint);
+    --sk-border: var(--hall-line);
+    --sk-border-strong: var(--hall-line-strong);
+    --sk-accent: var(--mousse);
 }
 
 *,
@@ -55,12 +64,30 @@ html[data-theme="dark"] {
     --hall-faint: #6d7c76;
     --hall-line: #333e38;
     --hall-line-strong: #3d4a44;
-    --hall-red-soft: rgba(63, 107, 82, 0.35);
+    --hall-red-soft: rgba(107, 157, 126, 0.32);
+    --pierre-2: #2a332e;
+    --ardoise: #8fa096;
+    --ardoise-30: #8fa09666;
+    --ardoise-15: #8fa09633;
+    --mousse: #6b9d7e;
+    --mousse-fonce: #9ecfb0;
+    --mousse-clair: rgba(107, 157, 126, 0.28);
+    --ambre-clair: rgba(184, 130, 61, 0.22);
+    --brique-clair: rgba(168, 70, 47, 0.22);
+    --hall-red: #6b9d7e;
 }
 
 html[data-theme="dark"] .hero-mosaic,
 html[data-theme="dark"] .hero-logo {
-    mix-blend-mode: screen;
+    mix-blend-mode: normal;
+}
+
+html[data-theme="dark"] .hero-mosaic {
+    opacity: 0.14;
+}
+
+html[data-theme="dark"] .scene-fade {
+    display: none;
 }
 
 html,
@@ -697,13 +724,13 @@ a {
 .u-open {
     font-size: 12px;
     font-weight: 600;
-    color: var(--hall-mute);
+    color: var(--hall-ink);
     text-decoration: none;
     padding: 6px 0 6px 8px;
 }
 
 .u-open {
-    color: var(--hall-ink);
+    color: var(--hall-red);
 }
 
 .u:hover .u-open {
@@ -725,6 +752,62 @@ a {
 .bay-foot a {
     color: var(--mousse-fonce);
     text-decoration: none;
+}
+
+/* Accueil — cartes bots verticales */
+
+.bot-cards {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.bot-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 20px 18px 16px;
+    background: var(--hall-elev);
+    border: 1px solid var(--hall-line);
+    border-radius: 6px;
+}
+
+.bot-card img {
+    width: 44px;
+    height: 44px;
+    border-radius: 2px;
+    object-fit: cover;
+    border: 1px solid var(--hall-line);
+}
+
+.bot-card .u-name {
+    font-size: 1.15rem;
+}
+
+.bot-card-desc {
+    margin: 0;
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--hall-mute);
+}
+
+.bot-card .u-pre {
+    width: fit-content;
+}
+
+.bot-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.bot-card-actions .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
     font-weight: 600;
 }
 
@@ -746,7 +829,7 @@ a {
     padding: 28px;
     border: 1px solid var(--hall-line);
     background:
-        linear-gradient(180deg, rgba(227, 230, 221, 0.2), rgba(238, 240, 234, 0.92)),
+        linear-gradient(180deg, rgba(63, 107, 82, 0.12), transparent 42%),
         repeating-linear-gradient(
             90deg,
             rgba(92, 106, 102, 0.1) 0 1px,
@@ -1337,8 +1420,9 @@ body.modal-open {
     .play-grid,
     .krone-split,
     .offer-row,
-    .ladder {
-        grid-template-columns: 1fr;
+    .ladder,
+    .bot-cards {
+        grid-template-columns: 1fr 1fr;
     }
 
     .ladder {
@@ -1390,6 +1474,23 @@ body.modal-open {
 
     .cta .btn-red {
         flex-basis: 100%;
+    }
+
+    .bot-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .plates,
+    .plates.cols-2,
+    .play-grid,
+    .krone-split,
+    .offer-row {
+        grid-template-columns: 1fr;
+    }
+
+    .band {
+        padding-left: 16px;
+        padding-right: 16px;
     }
 
     .u {

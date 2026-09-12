@@ -23,6 +23,40 @@ test("tampered ciphertext does not decrypt", () => {
   assert.equal(decryptSecret(`${enc}x`), null);
 });
 
+test("empty PLATFORM_SECRET_KEY is not used as the cipher key", () => {
+  const prevKey = process.env.PLATFORM_SECRET_KEY;
+  const prevUrl = process.env.DATABASE_URL;
+  try {
+    process.env.PLATFORM_SECRET_KEY = "";
+    process.env.DATABASE_URL = "postgres://fallback";
+    const enc = encryptSecret("tok");
+    process.env.PLATFORM_SECRET_KEY = "later-real-key";
+    assert.equal(decryptSecret(enc), "tok");
+  } finally {
+    if (prevKey === undefined) delete process.env.PLATFORM_SECRET_KEY;
+    else process.env.PLATFORM_SECRET_KEY = prevKey;
+    if (prevUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = prevUrl;
+  }
+});
+
+test("decrypt still opens secrets encrypted with the development fallback", () => {
+  const prevKey = process.env.PLATFORM_SECRET_KEY;
+  const prevUrl = process.env.DATABASE_URL;
+  try {
+    delete process.env.PLATFORM_SECRET_KEY;
+    delete process.env.DATABASE_URL;
+    const enc = encryptSecret("legacy");
+    process.env.PLATFORM_SECRET_KEY = "now-configured";
+    assert.equal(decryptSecret(enc), "legacy");
+  } finally {
+    if (prevKey === undefined) delete process.env.PLATFORM_SECRET_KEY;
+    else process.env.PLATFORM_SECRET_KEY = prevKey;
+    if (prevUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = prevUrl;
+  }
+});
+
 test("passwords use salted scrypt", () => {
   const hash = hashPassword("correct horse battery");
   assert.ok(verifyPassword("correct horse battery", hash));

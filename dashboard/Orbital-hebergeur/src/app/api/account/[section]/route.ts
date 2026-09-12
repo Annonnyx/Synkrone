@@ -6,6 +6,7 @@ import { body, fail, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { encryptSecret, randomToken, sha256 } from "@/lib/crypto";
+import { publicSftpEndpoint } from "@/lib/sftp/manager";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -60,7 +61,8 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
           .from(sftpCredentials)
           .innerJoin(services, eq(services.id, sftpCredentials.serviceId))
           .where(eq(services.ownerId, user.id));
-        return { accounts: rows };
+        const endpoint = publicSftpEndpoint();
+        return { accounts: rows.map((row) => ({ ...row, host: endpoint.host, port: endpoint.port })) };
       }
       case "webhooks":
         return {

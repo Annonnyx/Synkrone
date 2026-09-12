@@ -3,11 +3,11 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { discordBots } from "@/db/schema";
-import { decryptSecret } from "@/lib/crypto";
+import { decryptSecret, encryptSecret, opensWithPreferredKey } from "@/lib/crypto";
 import type { ServiceType } from "@/lib/paths";
 import { COMMAND_COGS, cogForCommand, flavorFromModules, officialBot } from "@/lib/discord/catalog";
 import { synkroneRepoRoot } from "@/lib/repo-root";
-import { BaseRuntimeProvider, appendConsole, currentContainer, loadServiceRecord } from "./base";
+import { BaseRuntimeProvider, appendConsole, currentContainer, loadServiceRecord, serviceEnvironment } from "./base";
 import { FilesystemManager } from "@/lib/filesystem/manager";
 import { ContainerManager } from "@/lib/docker/adapter";
 import { DISALLOWED_INTENTS_FATAL } from "@/lib/discord/intents";
@@ -328,7 +328,7 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     const bot = (
       await db.select().from(discordBots).where(eq(discordBots.serviceId, service.id)).limit(1)
     )[0];
-    const token = decryptSecret(bot?.tokenEnc);
+    const token = await this.storedToken(service.id);
     const configSecret =
       process.env.SESSION_SECRET || process.env.BOT_CONFIG_SECRET || process.env.PLATFORM_SECRET_KEY || "";
     const siteOrigin = String(process.env.PUBLIC_ORIGIN || process.env.ORBITAL_PUBLIC_ORIGIN || "")
@@ -373,7 +373,15 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
   }
 
   async restart(serviceId: string) {
-    await this.requireToken(serviceId);
+    const token = await this.storedToken(serviceId);
+    if (!token) {
+      const row = await currentContainer(serviceId);
+      if (row?.dockerContainerId && (await this.containerHasToken(row.dockerContainerId)) === true) {
+        await super.restart(serviceId);
+        return;
+      }
+      await this.requireToken(serviceId);
+    }
     const record = await loadServiceRecord(serviceId);
     if (!record) throw new Error("Service not found");
     await this.writePlatformRuntime(record);
@@ -385,13 +393,29 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     const bot = (
       await db.select().from(discordBots).where(eq(discordBots.serviceId, serviceId)).limit(1)
     )[0];
-    return decryptSecret(bot?.tokenEnc);
+    const fromEnc = decryptSecret(bot?.tokenEnc);
+    if (fromEnc) {
+      if (bot?.id && bot.tokenEnc && !opensWithPreferredKey(bot.tokenEnc)) {
+        await db
+          .update(discordBots)
+          .set({ tokenEnc: encryptSecret(fromEnc) })
+          .where(eq(discordBots.id, bot.id));
+      }
+      return fromEnc;
+    }
+    const env = await serviceEnvironment(serviceId);
+    const fromEnv = (env.DISCORD_TOKEN || env.BOT_TOKEN || "").trim();
+    return fromEnv || null;
   }
 
   private async requireToken(serviceId: string): Promise<string> {
+    const bot = (
+      await db.select().from(discordBots).where(eq(discordBots.serviceId, serviceId)).limit(1)
+    )[0];
     const token = await this.storedToken(serviceId);
-    if (!token) throw new Error("BOT_TOKEN is not set");
-    return token;
+    if (token) return token;
+    if (bot?.tokenEnc) throw new Error("BOT_TOKEN is stored but cannot be decrypted");
+    throw new Error("BOT_TOKEN is not set");
   }
 
   private async containerHasToken(containerId: string): Promise<boolean | null> {
@@ -409,7 +433,7 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
     const row = await currentContainer(serviceId);
     if (row?.dockerContainerId) {
       const hasToken = await this.containerHasToken(row.dockerContainerId);
-      if (hasToken !== false) return;
+      if (hasToken === true) return;
       await appendConsole(serviceId, "Applying the saved Discord token to a new container...");
       await this.remove(serviceId);
     }

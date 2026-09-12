@@ -157,12 +157,14 @@ export function TokenField({
 /** Token panel used on an existing service: rotate, clear, show the fingerprint. */
 export function DiscordTokenPanel({
   hasToken,
+  tokenUnreadable = false,
   fingerprint,
   applicationId,
   onSubmit,
   onApplicationId,
 }: {
   hasToken: boolean;
+  tokenUnreadable?: boolean;
   fingerprint: string | null;
   applicationId: string | null;
   onSubmit: (payload: { token: string; applicationId?: string }) => Promise<unknown>;
@@ -198,7 +200,12 @@ export function DiscordTokenPanel({
     <div className="panel space-y-3 p-4">
       <div className="flex flex-wrap items-center gap-2">
         <span className="label">{t("discord.botToken")}</span>
-        {hasToken ? (
+        {tokenUnreadable ? (
+          <span className="inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[11px] text-[var(--warning)]"
+            style={{ borderColor: "rgba(184, 130, 61, 0.45)" }}>
+            {t("discord.unreadableFp", { fp: fingerprint ?? t("discord.unknown") })}
+          </span>
+        ) : hasToken ? (
           <span className="inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[11px] text-[var(--success)]"
             style={{ borderColor: "rgba(63, 107, 82, 0.45)" }}>
             <ShieldCheck size={12} /> {t("discord.storedFp", { fp: fingerprint ?? t("discord.unknown") })}
@@ -219,7 +226,7 @@ export function DiscordTokenPanel({
           autoComplete="off"
           spellCheck={false}
           onChange={(e) => setToken(e.target.value)}
-          placeholder={hasToken ? t("discord.pasteReplace") : t("discord.pasteToken")}
+          placeholder={hasToken || tokenUnreadable ? t("discord.pasteReplace") : t("discord.pasteToken")}
         />
         <button className="btn" type="button" onClick={() => setReveal(!reveal)}>
           {reveal ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -229,9 +236,9 @@ export function DiscordTokenPanel({
           disabled={busy || !valid}
           onClick={() => void run(trimmed)}
         >
-          {hasToken ? t("discord.replaceToken") : t("discord.saveToken")}
+          {hasToken || tokenUnreadable ? t("discord.replaceToken") : t("discord.saveToken")}
         </button>
-        {hasToken && (
+        {(hasToken || tokenUnreadable) && (
           <button
             className="btn btn-danger"
             disabled={busy}

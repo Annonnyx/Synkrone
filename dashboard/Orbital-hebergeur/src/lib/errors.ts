@@ -32,6 +32,23 @@ const RULES: Rule[] = [
     },
   },
   {
+    match: /COMMAND_SOURCES_LOCKED/i,
+    fr: {
+      title: "Sources des commandes protégées",
+      explanation:
+        "Le contenu exact des cogs Synkrone n'est pas lisible depuis Fichiers : ce sont nos commandes.",
+      action:
+        "Le rang Kronalloy (et au-dessus) débloque la lecture et la modification de ces fichiers. Liste des dossiers, config et le reste du volume restent accessibles. SFTP n'est pas filtré de la même façon.",
+    },
+    en: {
+      title: "Command sources are locked",
+      explanation:
+        "The exact Synkrone cog files cannot be read from Files: those are our commands.",
+      action:
+        "Kronalloy (and above) unlocks reading and editing those files. Directory listing, config and the rest of the volume stay available. SFTP is not filtered the same way.",
+    },
+  },
+  {
     match: /DATABASE_UNAVAILABLE|The database is unreachable|connect ECONNREFUSED/i,
     fr: {
       title: "Base de données injoignable",
@@ -78,6 +95,23 @@ const RULES: Rule[] = [
         "The bot requests privileged intents that the developer portal has not enabled yet.",
       action:
         "In the Discord portal → Bot, enable Server Members Intent and Message Content Intent, or uncheck GuildMembers / MessageContent / GuildPresences in the panel, then restart.",
+    },
+  },
+  {
+    match: /stored but cannot be decrypted|could not be encrypted with the current server key/i,
+    fr: {
+      title: "Token Discord illisible",
+      explanation:
+        "Un token est bien enregistré, mais le panel ne peut plus le déchiffrer (clé serveur changée ou héritée d'un autre process).",
+      action:
+        "Collez à nouveau le token dans l'onglet Token, enregistrez, puis redémarrez. Inutile de le réinitialiser sur Discord s'il n'a pas fuité.",
+    },
+    en: {
+      title: "Discord token unreadable",
+      explanation:
+        "A token is stored, but the panel can no longer decrypt it (server key changed or inherited from another process).",
+      action:
+        "Paste the token again in the Token tab, save, then restart. You do not need to reset it on Discord unless it leaked.",
     },
   },
   {

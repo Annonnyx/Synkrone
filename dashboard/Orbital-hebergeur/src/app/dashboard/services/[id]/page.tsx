@@ -51,6 +51,7 @@ type Detail = {
     modules: string[];
     intents: string[];
     hasToken: boolean;
+    tokenUnreadable?: boolean;
     tokenFingerprint: string | null;
     applicationId: string | null;
     commands: Array<{ name: string; module: string; enabled: boolean; cooldown: number; description: string }>;
@@ -410,9 +411,11 @@ function ServiceDetail() {
                 </div>
                 <div>
                   {t("service.token")}:{" "}
-                  {data.discord.hasToken
-                    ? t("service.tokenStored", { fp: data.discord.tokenFingerprint ?? "" })
-                    : t("service.tokenMissing")}
+                  {data.discord.tokenUnreadable
+                    ? t("service.tokenUnreadable")
+                    : data.discord.hasToken
+                      ? t("service.tokenStored", { fp: data.discord.tokenFingerprint ?? "" })
+                      : t("service.tokenMissing")}
                 </div>
                 {data.discord.applicationId && (
                   <div className="pt-2">
@@ -443,6 +446,7 @@ function ServiceDetail() {
       {tab === "token" && data.discord && (
         <DiscordTokenPanel
           hasToken={data.discord.hasToken}
+          tokenUnreadable={data.discord.tokenUnreadable}
           fingerprint={data.discord.tokenFingerprint}
           applicationId={data.discord.applicationId}
           onSubmit={async ({ token: value, applicationId }) => {

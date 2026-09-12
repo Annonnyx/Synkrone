@@ -1,8 +1,8 @@
 /* Fiches bots — lecture aérée, DA Racine. Chargé après les styles locaux. */
 
 html, body {
-    background: var(--sk-bg, #eef0ea) !important;
-    color: var(--sk-text, #1b211e) !important;
+    background: var(--hall-bg, var(--sk-bg, #eef0ea)) !important;
+    color: var(--hall-ink, var(--sk-text, #1b211e)) !important;
     font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif !important;
     height: auto !important;
     min-height: 100% !important;
@@ -17,12 +17,12 @@ body {
 
 .info-bar {
     display: block !important;
-    background: var(--sk-surface, #fff) !important;
-    border: 1px solid var(--sk-border, #5c6a661f) !important;
+    background: var(--hall-elev, var(--sk-surface, #fff)) !important;
+    border: 1px solid var(--hall-line, var(--sk-border, #5c6a661f)) !important;
     border-radius: 6px !important;
     padding: 20px 24px !important;
     margin-bottom: 28px !important;
-    color: var(--sk-text, #1b211e) !important;
+    color: var(--hall-ink, var(--sk-text, #1b211e)) !important;
     font-size: 15px !important;
     line-height: 1.55 !important;
 }
@@ -38,9 +38,9 @@ body {
 .info-bar-text code,
 .cmd-name {
     font-family: "IBM Plex Mono", ui-monospace, monospace !important;
-    background: var(--sk-surface-2, #e3e6dd) !important;
+    background: var(--hall-elev-2, var(--sk-surface-2, #e3e6dd)) !important;
     color: var(--mousse-fonce, #2e5039) !important;
-    border: 1px solid var(--sk-border, #5c6a661f) !important;
+    border: 1px solid var(--hall-line, var(--sk-border, #5c6a661f)) !important;
     font-size: 13px !important;
     font-weight: 500 !important;
     padding: 3px 8px !important;
@@ -70,14 +70,14 @@ body {
 }
 
 .category-card {
-    background: var(--sk-surface, #fff) !important;
-    border: 1px solid var(--sk-border, #5c6a661f) !important;
+    background: var(--hall-elev, var(--sk-surface, #fff)) !important;
+    border: 1px solid var(--hall-line, var(--sk-border, #5c6a661f)) !important;
     border-radius: 6px !important;
     padding: 22px 22px 18px !important;
 }
 
 .category-title {
-    color: var(--sk-text, #1b211e) !important;
+    color: var(--hall-ink, var(--sk-text, #1b211e)) !important;
     font-family: "Zilla Slab", Georgia, serif !important;
     font-size: 1.15rem !important;
     font-weight: 700 !important;
@@ -85,7 +85,7 @@ body {
     letter-spacing: -0.01em !important;
     text-align: left !important;
     justify-content: flex-start !important;
-    border-bottom: 1px solid var(--sk-border, #5c6a661f) !important;
+    border-bottom: 1px solid var(--hall-line, var(--sk-border, #5c6a661f)) !important;
     padding-bottom: 12px !important;
     margin-bottom: 16px !important;
 }
@@ -98,7 +98,7 @@ body {
     font-size: 14px !important;
     gap: 6px !important;
     padding-bottom: 12px !important;
-    border-bottom: 1px solid var(--sk-border, #5c6a661f) !important;
+    border-bottom: 1px solid var(--hall-line, var(--sk-border, #5c6a661f)) !important;
 }
 
 .cmd-header {
@@ -108,7 +108,7 @@ body {
 }
 
 .cmd-desc {
-    color: var(--sk-text-muted, #5c6a66) !important;
+    color: var(--hall-mute, var(--sk-text-muted, #5c6a66)) !important;
     padding-left: 0 !important;
     font-size: 14px !important;
     line-height: 1.55 !important;
@@ -118,8 +118,8 @@ body {
 
 .bay-foot {
     margin-top: 32px !important;
-    background: var(--sk-surface, #fff) !important;
-    border: 1px solid var(--sk-border, #5c6a661f) !important;
+    background: var(--hall-elev, var(--sk-surface, #fff)) !important;
+    border: 1px solid var(--hall-line, var(--sk-border, #5c6a661f)) !important;
     border-radius: 6px;
 }
 

@@ -46,7 +46,7 @@
                 <p class="sect-id">01 — Hébergement</p>
                 <div>
                     <h2>Vos services, sur Synkrone.</h2>
-                    <p>Un panel pour bots, Minecraft et sites — payé en Krônes.</p>
+                    <p>Un atelier pour créer, allumer et suivre bots, Minecraft et sites — payé en Krônes, sans carte à chaque relance.</p>
                 </div>
             </div>
             <div class="prose reveal">
@@ -76,7 +76,7 @@
                 <p class="sect-id">02 — Statut</p>
                 <div>
                     <h2>La plateforme, mesurée.</h2>
-                    <p>Uptime, machines Minecraft / Discord / web, bots et listings.</p>
+                    <p>Voir d’un coup d’œil si Synkrone tourne : uptime, machines Minecraft / Discord / web, bots et listings.</p>
                 </div>
             </div>
             <div class="stat-strip reveal" id="home-stats">
@@ -108,7 +108,7 @@
                 <p class="sect-id">03 — Compte</p>
                 <div>
                     <h2>Se connecter</h2>
-                    <p>Discord, Google ou GitHub — un compte pour tout Synkrone.</p>
+                    <p>Un compte pour tout Synkrone : Discord, Google ou GitHub, puis le même solde Krônes partout.</p>
                 </div>
             </div>
             <div class="prose reveal">
@@ -138,60 +138,65 @@
                 <p class="sect-id">04 — Bots</p>
                 <div>
                     <h2>Cinq bots officiels.</h2>
-                    <p>Chaque fiche liste les commandes, le préfixe et le rôle. Catalogue public, Dashbot et packs restent dans Bots, au-dessus des fiches.</p>
+                    <p>Des bots pour tous vos serveurs, selon le besoin : fun, modération, jeu, argent, XP. Fiche pour les commandes, bouton pour l’ajouter tout de suite.</p>
                 </div>
             </div>
-            <div class="bay reveal">
-                <a class="u" href="/discord/bots/vax" onclick="goSection(event, 'discord', { botsTab: 'vax' })">
-                    <span class="u-id">U01</span>
+            <div class="bot-cards reveal">
+                <article class="bot-card">
                     <img src="/assets/images/vax.png" alt="">
-                    <div>
-                        <div class="u-name">Vax</div>
-                        <p class="u-role">Modération, tickets, logs. Préfixe !</p>
-                    </div>
+                    <div class="u-name">Vax</div>
+                    <p class="u-role">Modération</p>
+                    <p class="bot-card-desc">Warns, mutes, bans, tickets et journaux. Le socle pour un serveur qui reste lisible.</p>
                     <code class="u-pre">!</code>
-                    <span class="u-open">Fiche</span>
-                </a>
-                <a class="u" href="/discord/bots/arceus" onclick="goSection(event, 'discord', { botsTab: 'arceus' })">
-                    <span class="u-id">U02</span>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/vax" onclick="goSection(event, 'discord', { botsTab: 'vax' })">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1367891720871874560&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
+                    </div>
+                </article>
+                <article class="bot-card">
                     <img src="/assets/images/arceus.png" alt="">
-                    <div>
-                        <div class="u-name">Arceus</div>
-                        <p class="u-role">Pokémon. Préfixe '</p>
-                    </div>
+                    <div class="u-name">Arceus</div>
+                    <p class="u-role">Pokémon</p>
+                    <p class="bot-card-desc">Capture, combats et collection. Un jeu long pour occuper le serveur sans cinq bots d’à côté.</p>
                     <code class="u-pre">'</code>
-                    <span class="u-open">Fiche</span>
-                </a>
-                <a class="u" href="/discord/bots/asuna" onclick="goSection(event, 'discord', { botsTab: 'asuna' })">
-                    <span class="u-id">U03</span>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/arceus" onclick="goSection(event, 'discord', { botsTab: 'arceus' })">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1492591949792940183&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
+                    </div>
+                </article>
+                <article class="bot-card">
                     <img src="/assets/images/asuna.png" alt="">
-                    <div>
-                        <div class="u-name">Asuna</div>
-                        <p class="u-role">Jeux. Préfixe $</p>
-                    </div>
+                    <div class="u-name">Asuna</div>
+                    <p class="u-role">Jeux</p>
+                    <p class="bot-card-desc">Mini-jeux, économie ludique, XP. Le bot fun quand il faut du mouvement dans les salons.</p>
                     <code class="u-pre">$</code>
-                    <span class="u-open">Fiche</span>
-                </a>
-                <a class="u" href="/discord/bots/kayaba" onclick="goSection(event, 'discord', { botsTab: 'kayaba' })">
-                    <span class="u-id">U04</span>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/asuna" onclick="goSection(event, 'discord', { botsTab: 'asuna' })">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1428865683986452640&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
+                    </div>
+                </article>
+                <article class="bot-card">
                     <img src="/assets/images/kayaba.png" alt="">
-                    <div>
-                        <div class="u-name">Kayaba</div>
-                        <p class="u-role">Combat. Préfixe .</p>
-                    </div>
+                    <div class="u-name">Kayaba</div>
+                    <p class="u-role">Combat</p>
+                    <p class="bot-card-desc">Combats et progression. Du PvP cadré, pas seulement un lancer de dé.</p>
                     <code class="u-pre">.</code>
-                    <span class="u-open">Fiche</span>
-                </a>
-                <a class="u" href="/discord/bots/yui" onclick="goSection(event, 'discord', { botsTab: 'yui' })">
-                    <span class="u-id">U05</span>
-                    <img src="/assets/images/yui.png" alt="">
-                    <div>
-                        <div class="u-name">Yui</div>
-                        <p class="u-role">Architecture / structure. Préfixe ?</p>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/kayaba" onclick="goSection(event, 'discord', { botsTab: 'kayaba' })">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1385913159717621780&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
                     </div>
+                </article>
+                <article class="bot-card">
+                    <img src="/assets/images/yui.png" alt="">
+                    <div class="u-name">Yui</div>
+                    <p class="u-role">Architecture</p>
+                    <p class="bot-card-desc">Salons, rôles, organisation. La structure du serveur sans tout faire à la main.</p>
                     <code class="u-pre">?</code>
-                    <span class="u-open">Fiche</span>
-                </a>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/yui" onclick="goSection(event, 'discord', { botsTab: 'yui' })">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1460012999912853810&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
+                    </div>
+                </article>
             </div>
         </div>
     </section>
@@ -202,7 +207,7 @@
                 <p class="sect-id">05 — Minecraft</p>
                 <div>
                     <h2>Cantale et trois modpacks.</h2>
-                    <p>Serveur Java 1.21 factions à trois vies. Xenus, The French Baguette et Vanipack se téléchargent sur CurseForge.</p>
+                    <p>Un serveur Java 1.21 à trois vies, plus trois modpacks prêts à télécharger — pour jouer tout de suite, pas pour chercher une IP pendant une heure.</p>
                 </div>
             </div>
             <div class="play-grid reveal">
@@ -249,7 +254,7 @@
                 <p class="sect-id">06 — Bump</p>
                 <div>
                     <h2>Bump</h2>
-                    <p>Un listing de serveurs Discord, comme Disboard.</p>
+                    <p>Faire connaître votre serveur Discord : listing public, bump, mise en avant — le même principe qu’un Disboard, dans Synkrone.</p>
                 </div>
             </div>
             <div class="prose reveal">
@@ -293,7 +298,7 @@
                 <p class="sect-id">07 — Communauté</p>
                 <div>
                     <h2>Me et catalogue.</h2>
-                    <p>Profils publics, bots communautaires.</p>
+                    <p>Un profil public pour se retrouver, et un catalogue de bots communautaires à parcourir avant d’en héberger un.</p>
                 </div>
             </div>
             <div class="plates cols-2 reveal">

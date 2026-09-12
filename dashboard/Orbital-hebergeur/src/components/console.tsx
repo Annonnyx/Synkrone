@@ -5,7 +5,7 @@ import { Check, Copy, Download, Eraser, Search, WrapText } from "lucide-react";
 import { api } from "@/lib/client";
 import { notify } from "@/lib/notify";
 import { useT } from "@/lib/i18n";
-import { withPanelBase } from "@/lib/panel-base";
+import { formatConsoleClock } from "@/lib/console/docker-log";
 import { StateBadge } from "@/components/panel";
 import {
   clearHistory,
@@ -133,7 +133,7 @@ export function Console({
       id: nextId.current,
       stream,
       message,
-      at: at ?? new Date().toISOString(),
+      at,
     });
     if (flushScheduled.current) return;
     flushScheduled.current = true;
@@ -524,10 +524,10 @@ export function Console({
                       : "#eef0ea",
             }}
           >
-            <span className="shrink-0 text-[10px] text-[var(--muted)]">
-              {line.at ? `[${new Date(line.at).toLocaleTimeString()}]` : ""}
+            <span className="min-w-0 flex-1">
+              {line.at ? `[${formatConsoleClock(line.at)}] ` : ""}
+              {line.message}
             </span>
-            <span className="min-w-0 flex-1">{line.message}</span>
             <button
               type="button"
               className={`shrink-0 text-[11px] ${

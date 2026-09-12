@@ -19,6 +19,15 @@ import { sftpUserConfLine } from "@/lib/sftp/format";
  */
 const ACCOUNT_MARKER = "account";
 
+export function publicSftpEndpoint() {
+  const host = String(process.env.SFTP_HOST || "").trim() || "sftp.localhost";
+  const port = Number(process.env.SFTP_PORT || 2022);
+  return {
+    host,
+    port: Number.isFinite(port) && port > 0 ? port : 2022,
+  };
+}
+
 type OwnerCryptMap = Record<string, string>;
 
 function ownerCryptFile(): string {
@@ -57,12 +66,13 @@ export const SFTPManager = {
       .toLowerCase();
     const chroot = `/data/${type}/${serviceId}`;
     await db.delete(sftpCredentials).where(eq(sftpCredentials.serviceId, serviceId));
+    const endpoint = publicSftpEndpoint();
     await db.insert(sftpCredentials).values({
       serviceId,
       username,
       passwordEnc: encryptSecret(ACCOUNT_MARKER),
-      host: process.env.SFTP_HOST ?? "sftp.localhost",
-      port: Number(process.env.SFTP_PORT ?? 2022),
+      host: endpoint.host,
+      port: endpoint.port,
       chroot,
     });
     await this.sync();

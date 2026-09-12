@@ -83,7 +83,8 @@ const GRADE_META = {
             'Rôle Discord VIP',
             'Kits Minecraft',
             'Avantages Me et Bump',
-            'Options Dashbot'
+            'Options Dashbot',
+            'Sources des commandes (lire et modifier les cogs dans Fichiers)'
         ]
     },
     Synkronite: {
@@ -139,6 +140,7 @@ const COMPARE_ROWS = [
     { id: 'mc_kits', label: 'Kits Minecraft', kind: 'from', from: 'Kronalloy' },
     { id: 'me_bump', label: 'Avantages profil Me et listing Bump', kind: 'from', from: 'Kronalloy' },
     { id: 'dashbot', label: 'Options Dashbot', kind: 'from', from: 'Kronalloy' },
+    { id: 'command_sources', label: 'Sources des commandes (fichiers /cogs)', kind: 'from', from: 'Kronalloy' },
     { id: 'priority', label: 'Support prioritaire', kind: 'from', from: 'Synkronite' }
 ];
 

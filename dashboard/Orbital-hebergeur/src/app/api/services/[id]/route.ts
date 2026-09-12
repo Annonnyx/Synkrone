@@ -17,7 +17,8 @@ import {
 import { body, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
-import { decryptSecret } from "@/lib/crypto";
+import { decryptSecret, isLockedSecret } from "@/lib/crypto";
+import { publicSftpEndpoint } from "@/lib/sftp/manager";
 import { applicationIdFromToken } from "@/lib/discord/token";
 import { authorizeService } from "@/lib/runtime";
 import { dnsRecordsFor, domainHints } from "@/lib/domains/public";
@@ -49,8 +50,14 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
           bot.applicationId = fromToken;
         }
       }
+      const plain = decryptSecret(bot?.tokenEnc);
       detail.discord = bot
-        ? { ...bot, tokenEnc: undefined, hasToken: Boolean(bot.tokenEnc) }
+        ? {
+            ...bot,
+            tokenEnc: undefined,
+            hasToken: Boolean(plain),
+            tokenUnreadable: isLockedSecret(bot.tokenEnc),
+          }
         : null;
     }
     if (svc.type === "minecraft") {
@@ -94,7 +101,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
       .select()
       .from(sftpCredentials)
       .where(eq(sftpCredentials.serviceId, id));
-    detail.sftp = sftp ? { ...sftp, passwordEnc: undefined } : null;
+    detail.sftp = sftp ? { ...sftp, passwordEnc: undefined, ...publicSftpEndpoint() } : null;
     detail.databases = (
       await db.select().from(serviceDatabases).where(eq(serviceDatabases.serviceId, id))
     ).map((d) => ({ ...d, passwordEnc: undefined }));

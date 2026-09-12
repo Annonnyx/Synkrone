@@ -66,6 +66,7 @@ export const en: Dict = {
     newService: "New",
     krones: "Krônes",
     advanced: "Advanced",
+    publicSite: "Main site",
   },
   engine: {
     online: "Engine online",
@@ -312,6 +313,7 @@ export const en: Dict = {
     slashCommands: "Slash commands",
     token: "Token",
     tokenStored: "stored ({fp})",
+    tokenUnreadable: "stored but unreadable — paste the token again",
     tokenMissing: "not set",
     recreate: "Recreate container",
     deployNow: "Deploy now",
@@ -554,6 +556,7 @@ export const en: Dict = {
     appIdOptional: "Application ID (optional)",
     readFromToken: "Read from the token when left empty",
     storedFp: "stored · fingerprint {fp}",
+    unreadableFp: "stored but unreadable · fingerprint {fp}",
     noToken: "no token — the bot cannot start",
     pasteReplace: "Paste a new token to replace the stored one",
     pasteToken: "Paste the bot token",

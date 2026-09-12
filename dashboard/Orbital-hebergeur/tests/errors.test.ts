@@ -16,6 +16,18 @@ test("missing discord token suggests the Token tab", () => {
   assert.match(hit.action ?? "", /Token/);
 });
 
+test("undecryptable stored token asks to paste again without resetting Discord", () => {
+  const hit = explainError("BOT_TOKEN is stored but cannot be decrypted", "fr");
+  assert.equal(hit.title, "Token Discord illisible");
+  assert.match(hit.action ?? "", /Collez à nouveau/);
+});
+
+test("locked command sources point at Kronalloy", () => {
+  const hit = explainError("COMMAND_SOURCES_LOCKED", "fr");
+  assert.equal(hit.title, "Sources des commandes protégées");
+  assert.match(hit.action ?? "", /Kronalloy/);
+});
+
 test("rate limit is recognized", () => {
   const hit = explainError("Too many requests, slow down", "en");
   assert.equal(hit.title, "Too many requests");

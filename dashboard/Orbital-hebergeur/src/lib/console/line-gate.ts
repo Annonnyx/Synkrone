@@ -42,6 +42,8 @@ const NOISE = [
   /PyNaCl is not installed/i,
   /davey is not installed/i,
   /voice will NOT be supported/i,
+  /\[ANTISCAM\]\[DEBUG\]/i,
+  /has successfully RESUMED session/i,
 ];
 
 export function isConsoleNoise(line: string): boolean {

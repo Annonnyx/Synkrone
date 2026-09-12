@@ -160,7 +160,7 @@ logging.getLogger('asyncio').setLevel(logging.CRITICAL)
 
 # Configuration initiale
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN") or os.getenv("BOT_TOKEN")
 DEFAULT_PREFIX = os.getenv("BOT_PREFIX") or os.getenv("PREFIX", "!")
 
 intents = discord.Intents.all()  # Active tous les intents pour le développement
@@ -365,4 +365,4 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"\033[91m[!] Erreur fatale : {e}\033[0m")
     else:
-        print("\033[91m[!] Erreur: DISCORD_TOKEN introuvable dans le .env\033[0m")
+        print("[fatal] BOT_TOKEN is not set")

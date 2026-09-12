@@ -295,12 +295,22 @@ export function Sidebar({
     >
       <div className="flex items-center gap-2.5 border-b border-[var(--line)] px-4 py-4">
         <Logo />
-        <div>
+        <div className="min-w-0 flex-1">
           <div className="font-serif text-lg font-bold leading-none tracking-tight">Synkrone</div>
           <div className="text-[11px] text-[var(--muted)]">
             {t("nav.tagline")}
           </div>
         </div>
+      </div>
+      <div className="border-b border-[var(--line)] px-3 py-2">
+        <a
+          href="/"
+          target="_top"
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] text-[var(--muted)] transition hover:bg-[var(--panel-2)] hover:text-[var(--text)]"
+        >
+          <Globe size={15} />
+          {t("nav.publicSite")}
+        </a>
       </div>
       <nav className="scroll flex-1 overflow-y-auto px-2 py-3 text-sm">
         {NAV.map((group, i) => (
@@ -471,7 +481,7 @@ export function ErrorText({ error }: { error: string | null }) {
       <div className="font-semibold">{explained.title}</div>
       <div className="mt-0.5 opacity-90">{explained.explanation}</div>
       {explained.action && <div className="mt-1 text-[var(--text)]">{explained.action}</div>}
-      {/INSUFFICIENT_KRONES|Solde insuffisant/i.test(error) && (
+      {/INSUFFICIENT_KRONES|Solde insuffisant|COMMAND_SOURCES_LOCKED/i.test(error) && (
         <ShopKronesLink className="btn btn-primary mt-2" />
       )}
     </div>

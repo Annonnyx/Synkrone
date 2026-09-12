@@ -434,7 +434,7 @@ export const docker = {
 
   async logs(id: string, tail = 200): Promise<string> {
     const res = await request({
-      path: `/containers/${id}/logs?stdout=true&stderr=true&timestamps=false&tail=${tail}`,
+      path: `/containers/${id}/logs?stdout=true&stderr=true&timestamps=true&tail=${tail}`,
       timeoutMs: 20_000,
     });
     if (res.status >= 400) throw new DockerApiError(res.status, res.body.toString("utf8"));
@@ -451,7 +451,7 @@ export const docker = {
     return new Promise((resolve, reject) => {
       const req = http.request({
         socketPath: DOCKER_SOCKET,
-        path: `/${API_VERSION}/containers/${id}/logs?stdout=true&stderr=true&follow=true&tail=100`,
+        path: `/${API_VERSION}/containers/${id}/logs?stdout=true&stderr=true&follow=true&timestamps=true&tail=100`,
         method: "GET",
       });
       let stream: Readable | null = null;

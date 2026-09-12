@@ -20,9 +20,12 @@ import {
 import { body, fail, rateLimit, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { HttpError, requireUser, type SessionUser } from "@/lib/auth";
-import { encryptSecret, fingerprint } from "@/lib/crypto";
+import { decryptSecret, encryptSecret, fingerprint } from "@/lib/crypto";
 import { FilesystemManager } from "@/lib/filesystem/manager";
 import { createLineGate, createLineSplitter, isConsoleNoise } from "@/lib/console/line-gate";
+import { consoleLineFields } from "@/lib/console/docker-log";
+import { getWallet } from "@/lib/krones/store";
+import { canEditCommandSources, isProtectedBotSource, isVolumeRoot } from "@/lib/discord/source-lock";
 import { authorizeService, getProvider, toRecord, type AuthorizedService } from "@/lib/runtime";
 import { appendConsole } from "@/lib/runtime/base";
 import { MINECRAFT_SOFTWARE, resolveGatewayIntents } from "@/lib/runtime/templates";
@@ -41,7 +44,7 @@ import {
   restoreBackupJob,
 } from "@/lib/jobs/handlers";
 import { DatabaseManager } from "@/lib/database/manager";
-import { SFTPManager } from "@/lib/sftp/manager";
+import { SFTPManager, publicSftpEndpoint } from "@/lib/sftp/manager";
 import { dnsRecordsFor, normalizeHostname } from "@/lib/domains/public";
 import { syncTraefikConfig } from "@/lib/domains/traefik";
 
@@ -64,6 +67,24 @@ function fsFor(svc: AuthorizedService) {
   return new FilesystemManager(svc.type as ServiceType, svc.id);
 }
 
+async function assertCommandSourceAccess(
+  userId: string,
+  svc: AuthorizedService,
+  paths: Array<string | undefined>,
+  opts: { tree?: boolean } = {},
+) {
+  if (svc.type !== "discord") return;
+  const locked = paths.some((item) => {
+    if (item == null) return false;
+    if (isProtectedBotSource(item)) return true;
+    return Boolean(opts.tree && isVolumeRoot(item));
+  });
+  if (!locked) return;
+  const wallet = await getWallet(userId);
+  if (canEditCommandSources(wallet)) return;
+  throw new HttpError(403, "COMMAND_SOURCES_LOCKED");
+}
+
 /* ----------------------------------- GET ---------------------------------- */
 
 export async function GET(req: NextRequest, ctx: Ctx) {
@@ -80,7 +101,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   }
 
   return route(async () => {
-    const { svc } = await ctxService(id, "viewer");
+    const { user, svc } = await ctxService(id, "viewer");
     const provider = getProvider(svc.type);
 
     switch (action) {
@@ -122,8 +143,12 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         const op = url.searchParams.get("op") ?? "list";
         const target = url.searchParams.get("path") ?? "/";
         const fsm = fsFor(svc);
-        if (op === "read") return { path: target, content: await fsm.read(target) };
+        if (op === "read") {
+          await assertCommandSourceAccess(user.id, svc, [target]);
+          return { path: target, content: await fsm.read(target) };
+        }
         if (op === "download") {
+          await assertCommandSourceAccess(user.id, svc, [target]);
           const buffer = await fsm.readBuffer(target);
           return new NextResponse(new Uint8Array(buffer), {
             headers: {
@@ -133,6 +158,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           });
         }
         if (op === "archive") {
+          await assertCommandSourceAccess(user.id, svc, [target], { tree: true });
           const { name, buffer } = await fsm.zip(target);
           return new NextResponse(new Uint8Array(buffer), {
             headers: {
@@ -174,7 +200,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           .select()
           .from(sftpCredentials)
           .where(eq(sftpCredentials.serviceId, id));
-        return { sftp: row ? { ...row, passwordEnc: undefined } : null };
+        return { sftp: row ? { ...row, passwordEnc: undefined, ...publicSftpEndpoint() } : null };
       }
       case "backups":
         return {
@@ -247,15 +273,18 @@ function streamConsole(svc: AuthorizedService) {
       );
       for (const line of history) {
         if (isConsoleNoise(line.message)) continue;
-        send({ type: "line", stream: line.stream, message: line.message, at: line.createdAt });
+        const fields = consoleLineFields(line.message, line.createdAt);
+        if (isConsoleNoise(fields.message)) continue;
+        send({ type: "line", stream: line.stream, message: fields.message, at: fields.at });
       }
 
       const gate = createLineGate(240, 1000);
       let lastDropNotice = 0;
       const emitLive = (stream: string, message: string) => {
-        if (isConsoleNoise(message)) return;
+        const fields = consoleLineFields(message);
+        if (isConsoleNoise(fields.message)) return;
         if (gate.allow(1) < 1) return;
-        send({ type: "line", stream, message });
+        send({ type: "line", stream, message: fields.message, at: fields.at });
       };
       const splitter = createLineSplitter(emitLive);
 
@@ -308,7 +337,9 @@ function streamConsole(svc: AuthorizedService) {
             if (delivered.has(line.id)) continue;
             if (line.createdAt.getTime() > lastSeen.getTime()) lastSeen = line.createdAt;
             if (isConsoleNoise(line.message)) continue;
-            send({ type: "line", stream: line.stream, message: line.message, at: line.createdAt });
+            const fields = consoleLineFields(line.message, line.createdAt);
+            if (isConsoleNoise(fields.message)) continue;
+            send({ type: "line", stream: line.stream, message: fields.message, at: fields.at });
           }
           delivered = new Set(
             rows.filter((l) => l.createdAt.getTime() >= lastSeen.getTime()).map((l) => l.id),
@@ -378,8 +409,10 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           const dir = String(form.get("path") ?? "/");
           if (!(file instanceof File)) return fail("file is required");
           if (file.size > 512 * 1024 * 1024) return fail("Upload exceeds the 512MB limit", 413);
+          const dest = path.posix.join(dir, path.basename(file.name));
+          await assertCommandSourceAccess(user.id, svc, [dir, dest]);
           const buffer = Buffer.from(await file.arrayBuffer());
-          await fsm.write(path.posix.join(dir, path.basename(file.name)), buffer);
+          await fsm.write(dest, buffer);
           await audit({ userId: user.id, serviceId: id, action: "files.upload", detail: file.name });
           return { ok: true, name: file.name, size: file.size };
         }
@@ -394,23 +427,30 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         switch (payload.op) {
           case "write":
             if (!payload.path) return fail("path is required");
+            await assertCommandSourceAccess(user.id, svc, [payload.path]);
             await fsm.write(payload.path, payload.content ?? "");
             await audit({ userId: user.id, serviceId: id, action: "files.write", detail: payload.path });
             return { ok: true };
           case "mkdir":
             if (!payload.path) return fail("path is required");
+            await assertCommandSourceAccess(user.id, svc, [payload.path]);
             await fsm.mkdir(payload.path);
             return { ok: true };
           case "rename":
             if (!payload.from || !payload.to) return fail("from and to are required");
+            await assertCommandSourceAccess(user.id, svc, [payload.from, payload.to]);
             await fsm.rename(payload.from, payload.to);
             return { ok: true };
           case "copy":
             if (!payload.from || !payload.to) return fail("from and to are required");
+            await assertCommandSourceAccess(user.id, svc, [payload.from, payload.to]);
             await fsm.copy(payload.from, payload.to);
             return { ok: true };
           case "unzip":
             if (!payload.path) return fail("path is required");
+            await assertCommandSourceAccess(user.id, svc, [payload.path, payload.destination ?? "/"], {
+              tree: true,
+            });
             await fsm.unzip(payload.path, payload.destination ?? "/");
             return { ok: true };
           default:
@@ -545,10 +585,17 @@ export async function POST(req: NextRequest, ctx: Ctx) {
             payload.applicationId?.trim() ||
             bot.applicationId ||
             applicationIdFromToken(token);
+          const tokenEnc = encryptSecret(token);
+          if (decryptSecret(tokenEnc) !== token) {
+            return fail(
+              "BOT_TOKEN could not be encrypted with the current server key. Check PLATFORM_SECRET_KEY.",
+              500,
+            );
+          }
           await db
             .update(discordBots)
             .set({
-              tokenEnc: encryptSecret(token),
+              tokenEnc,
               tokenFingerprint: fingerprint(token),
               applicationId,
             })
@@ -797,6 +844,7 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
     switch (action) {
       case "files": {
         if (!target) return fail("path is required");
+        await assertCommandSourceAccess(user.id, svc, [target], { tree: true });
         await fsFor(svc).remove(target);
         await audit({ userId: user.id, serviceId: id, action: "files.delete", detail: target });
         return { ok: true };

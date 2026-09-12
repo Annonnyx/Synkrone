@@ -10,63 +10,11 @@
     <style>
         body { min-height: 100%; }
         .band { padding-top: 40px; padding-bottom: 48px; border-top: 0; }
-        .bot-grid {
-            display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 16px;
-            background: transparent;
-            border: 0;
-        }
-        .bot-tile {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 24px 20px 20px;
-            background: var(--hall-elev);
-            border: 1px solid var(--hall-line);
-            border-radius: 6px;
-            text-decoration: none;
-            color: inherit;
-            min-height: 200px;
-            transition: background 0.15s ease;
-        }
-        .bot-tile:hover { background: var(--pierre-2, #e3e6dd); }
-        .bot-tile:hover .u-open { color: var(--hall-red); }
-        .bot-tile img {
-            width: 44px;
-            height: 44px;
-            border-radius: 2px;
-            object-fit: cover;
-            border: 1px solid var(--hall-line);
-        }
-        .bot-tile .u-id { margin: 0; }
-        .bot-tile .u-role { margin: 2px 0 0; }
-        .bot-tile-desc {
-            margin: 8px 0 0;
-            font-size: 13px;
-            line-height: 1.45;
-            color: var(--hall-mute, #5c6a66);
-        }
-        .bot-tile .u-pre { width: fit-content; margin-top: auto; }
-        .bot-tile .u-open {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--basalte, #1b211e);
-        }
-        .fiche-tuto {
-            margin-top: 0;
-        }
+        .fiche-tuto { margin-top: 16px; }
         .fiche-tuto .btn {
             min-height: 34px;
             padding: 0 12px;
             font-size: 12px;
-        }
-        @media (max-width: 1100px) {
-            .bot-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        }
-        @media (max-width: 720px) {
-            .bot-grid { grid-template-columns: 1fr; }
-            .bot-tile { min-height: 0; }
         }
     </style>
 </head>
@@ -77,65 +25,65 @@
                 <p class="sect-id">Fiches</p>
                 <div>
                     <h2>Cinq bots officiels.</h2>
-                    <p>Chaque fiche liste les commandes, le préfixe et le rôle du bot. Le catalogue public, Dashbot et les packs de commandes restent dans la barre au-dessus.</p>
+                    <p>Des bots pour tous vos serveurs, selon le besoin : fun, modération, jeu, argent, XP. Ouvrez la fiche ou ajoutez-le directement.</p>
                 </div>
             </div>
-            <div class="bot-grid">
-                <a class="bot-tile" href="/discord/bots/vax" onclick="goBots(event, 'vax')">
-                    <span class="u-id">U01</span>
+            <div class="bot-cards">
+                <article class="bot-card">
                     <img src="/assets/images/vax.png" alt="">
-                    <div>
-                        <div class="u-name">Vax</div>
-                        <p class="u-role">Modération</p>
-                        <p class="bot-tile-desc">Warns, mutes, bans, tickets et logs. Préfixe ! et slash.</p>
-                    </div>
+                    <div class="u-name">Vax</div>
+                    <p class="u-role">Modération</p>
+                    <p class="bot-card-desc">Warns, mutes, bans, tickets et journaux. Le socle pour un serveur qui reste lisible.</p>
                     <code class="u-pre">!</code>
-                    <span class="u-open">Fiche</span>
-                </a>
-                <a class="bot-tile" href="/discord/bots/arceus" onclick="goBots(event, 'arceus')">
-                    <span class="u-id">U02</span>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/vax" onclick="goBots(event, 'vax')">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1367891720871874560&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
+                    </div>
+                </article>
+                <article class="bot-card">
                     <img src="/assets/images/arceus.png" alt="">
-                    <div>
-                        <div class="u-name">Arceus</div>
-                        <p class="u-role">Pokémon</p>
-                        <p class="bot-tile-desc">Capture, combat et collection. Préfixe '</p>
-                    </div>
+                    <div class="u-name">Arceus</div>
+                    <p class="u-role">Pokémon</p>
+                    <p class="bot-card-desc">Capture, combats et collection. Un jeu long pour occuper le serveur sans cinq bots d’à côté.</p>
                     <code class="u-pre">'</code>
-                    <span class="u-open">Fiche</span>
-                </a>
-                <a class="bot-tile" href="/discord/bots/asuna" onclick="goBots(event, 'asuna')">
-                    <span class="u-id">U03</span>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/arceus" onclick="goBots(event, 'arceus')">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1492591949792940183&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
+                    </div>
+                </article>
+                <article class="bot-card">
                     <img src="/assets/images/asuna.png" alt="">
-                    <div>
-                        <div class="u-name">Asuna</div>
-                        <p class="u-role">Jeux</p>
-                        <p class="bot-tile-desc">Mini-jeux et économie ludique. Préfixe $</p>
-                    </div>
+                    <div class="u-name">Asuna</div>
+                    <p class="u-role">Jeux</p>
+                    <p class="bot-card-desc">Mini-jeux, économie ludique, XP. Le bot fun quand il faut du mouvement dans les salons.</p>
                     <code class="u-pre">$</code>
-                    <span class="u-open">Fiche</span>
-                </a>
-                <a class="bot-tile" href="/discord/bots/kayaba" onclick="goBots(event, 'kayaba')">
-                    <span class="u-id">U04</span>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/asuna" onclick="goBots(event, 'asuna')">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1428865683986452640&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
+                    </div>
+                </article>
+                <article class="bot-card">
                     <img src="/assets/images/kayaba.png" alt="">
-                    <div>
-                        <div class="u-name">Kayaba</div>
-                        <p class="u-role">Combat</p>
-                        <p class="bot-tile-desc">Combats et progression. Préfixe .</p>
-                    </div>
+                    <div class="u-name">Kayaba</div>
+                    <p class="u-role">Combat</p>
+                    <p class="bot-card-desc">Combats et progression. Du PvP cadré, pas seulement un lancer de dé.</p>
                     <code class="u-pre">.</code>
-                    <span class="u-open">Fiche</span>
-                </a>
-                <a class="bot-tile" href="/discord/bots/yui" onclick="goBots(event, 'yui')">
-                    <span class="u-id">U05</span>
-                    <img src="/assets/images/yui.png" alt="">
-                    <div>
-                        <div class="u-name">Yui</div>
-                        <p class="u-role">Architecture</p>
-                        <p class="bot-tile-desc">Outils de structure et d’organisation. Préfixe ?</p>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/kayaba" onclick="goBots(event, 'kayaba')">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1385913159717621780&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
                     </div>
+                </article>
+                <article class="bot-card">
+                    <img src="/assets/images/yui.png" alt="">
+                    <div class="u-name">Yui</div>
+                    <p class="u-role">Architecture</p>
+                    <p class="bot-card-desc">Salons, rôles, organisation. La structure du serveur sans tout faire à la main.</p>
                     <code class="u-pre">?</code>
-                    <span class="u-open">Fiche</span>
-                </a>
+                    <div class="bot-card-actions">
+                        <a class="btn" href="/discord/bots/yui" onclick="goBots(event, 'yui')">Voir la fiche</a>
+                        <a class="btn btn-red" href="https://discord.com/oauth2/authorize?client_id=1460012999912853810&permissions=8&scope=bot%20applications.commands" target="_blank" rel="noopener noreferrer">Ajouter au serveur</a>
+                    </div>
+                </article>
             </div>
             <div class="bay-foot fiche-tuto">
                 <span>Créer son propre bot</span>

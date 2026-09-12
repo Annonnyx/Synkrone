@@ -180,6 +180,29 @@ function panelBuilt() {
     return fs.existsSync(path.join(PANEL_DIR, '.next', 'BUILD_ID'));
 }
 
+function loadPanelEnvFile() {
+    const file = path.join(PANEL_DIR, '.env');
+    const out = {};
+    if (!fs.existsSync(file)) return out;
+    for (const line of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eq = trimmed.indexOf('=');
+        if (eq <= 0) continue;
+        const key = trimmed.slice(0, eq).trim();
+        let value = trimmed.slice(eq + 1).trim();
+        if (
+            (value.startsWith('"') && value.endsWith('"'))
+            || (value.startsWith("'") && value.endsWith("'"))
+        ) {
+            value = value.slice(1, -1);
+        }
+        if (!key || value === '') continue;
+        out[key] = value;
+    }
+    return out;
+}
+
 function spawnPanel({ publicPort }) {
     if (String(process.env.SYNKRONE_SKIP_PANEL || '') === '1') {
         console.warn('[panel] SYNKRONE_SKIP_PANEL=1 — panel non lancé');
@@ -207,6 +230,10 @@ function spawnPanel({ publicPort }) {
         stdio: ['ignore', 'inherit', 'inherit'],
         env: {
             ...process.env,
+            // Panel .env must win: an empty PLATFORM_SECRET_KEY inherited from
+            // the site process would otherwise block Next from loading the file
+            // and make stored Discord tokens undecryptable.
+            ...loadPanelEnvFile(),
             PORT: String(PANEL_PORT),
             SYNKRONE_PANEL_ORIGIN: origin
         }
