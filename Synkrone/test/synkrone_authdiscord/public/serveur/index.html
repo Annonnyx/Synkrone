@@ -92,6 +92,7 @@
             });
         })();
 
+        (function () {
         const params = new URLSearchParams(window.location.search);
         const stage = document.getElementById('stage');
         const lede = document.getElementById('lede');
@@ -597,6 +598,7 @@
         })().catch((err) => {
             stage.innerHTML = `<p class="err">${esc(err.message || 'Page indisponible.')}</p>`;
         });
+        })();
     </script>
 </body>
 </html>

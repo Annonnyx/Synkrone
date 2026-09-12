@@ -443,6 +443,7 @@
             const href = event && event.currentTarget && event.currentTarget.getAttribute('href');
             if (href) window.location.href = href;
         }
+        window.goSection = goSection;
 
         const STORAGE_TYPES = 'synkroneAnnouncementTypes';
         const STORAGE_ITEMS = 'synkroneAnnouncements';
@@ -588,6 +589,8 @@
             modal.classList.remove('open');
             modal.setAttribute('aria-hidden', 'true');
         }
+        window.openModal = openModal;
+        window.closeModal = closeModal;
 
         function showToast(title, message) {
             const toast = document.getElementById('toast');

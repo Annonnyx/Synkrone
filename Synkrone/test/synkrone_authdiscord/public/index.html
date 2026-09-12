@@ -864,9 +864,12 @@
                     old.remove();
                     continue;
                 }
+                const code = String(old.textContent || '');
                 const copy = document.createElement('script');
                 for (const attr of old.attributes) copy.setAttribute(attr.name, attr.value);
-                copy.textContent = old.textContent;
+                copy.textContent = (!src && code.trim())
+                    ? `(function(){\n${code}\n})();`
+                    : code;
                 old.replaceWith(copy);
             }
             EventTarget.prototype.addEventListener = orig;
