@@ -548,7 +548,19 @@
 
         (async () => {
             stage.innerHTML = '<p class="note">Chargement…</p>';
-            const res = await fetch(`/api/serveur?${queryForApi()}`, { credentials: 'same-origin' });
+            const ctrl = new AbortController();
+            const timer = window.setTimeout(() => ctrl.abort(), 8000);
+            let res;
+            try {
+                res = await fetch(`/api/serveur?${queryForApi()}`, { credentials: 'same-origin', signal: ctrl.signal });
+            } catch (err) {
+                const hung = err && err.name === 'AbortError';
+                throw new Error(hung
+                    ? 'Le panel d’hébergement ne répond pas. Relancez-le, ou ouvrez /config sur Discord.'
+                    : (err.message || 'Réseau indisponible.'));
+            } finally {
+                window.clearTimeout(timer);
+            }
             const data = await res.json();
             if (res.status === 401 || data.discordOnly) {
                 lede.textContent = 'Connectez-vous avec Discord pour modifier ce serveur.';

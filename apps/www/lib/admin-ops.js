@@ -62,9 +62,15 @@ async function panelAdmin(pathname, init = {}) {
         authorization: `Bearer ${token}`,
         ...(init.headers || {})
     };
+    const timeoutMs = Number(init.timeoutMs) > 0 ? Number(init.timeoutMs) : 4000;
+    const { timeoutMs: _ignored, signal, ...rest } = init;
     let res;
     try {
-        res = await fetch(url, { ...init, headers });
+        res = await fetch(url, {
+            ...rest,
+            headers,
+            signal: signal || AbortSignal.timeout(timeoutMs)
+        });
     } catch (error) {
         const err = new Error('Panel d’hébergement injoignable.');
         err.status = 503;

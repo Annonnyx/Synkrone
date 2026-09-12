@@ -351,6 +351,19 @@ function sessionUser(req) {
 
 function mountServeur(app) {
     app.get('/api/serveur', async (req, res) => {
+        try {
+            return await getServeur(req, res);
+        } catch (err) {
+            return res.status(Number(err.status) || 503).json({
+                ok: false,
+                error: err.message || 'Configuration indisponible.'
+            });
+        }
+    });
+    mountServeurWrites(app);
+}
+
+async function getServeur(req, res) {
         const user = sessionUser(req);
         const discordId = discordUserId(user);
         const rawToken = String(req.query.t || '').trim();
@@ -381,7 +394,7 @@ function mountServeur(app) {
         const creator = applicationId ? await isBotCreator(user, applicationId) : false;
         if (applicationId && (layer === 'default' || !guildId) && creator) {
             const official = officialByApp(applicationId);
-            const hosted = await hostedLookup(applicationId);
+            const hosted = official ? { found: false } : await hostedLookup(applicationId);
             const defaults = await loadDefault(applicationId);
             return res.json({
                 ok: true,
@@ -459,8 +472,9 @@ function mountServeur(app) {
             resolved,
             catalog: custom.catalog()
         });
-    });
+}
 
+function mountServeurWrites(app) {
     app.post('/api/serveur', async (req, res) => {
         const user = sessionUser(req);
         const discordId = discordUserId(user);
