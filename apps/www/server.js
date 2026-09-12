@@ -30,6 +30,8 @@ const { mountKrones } = require('./lib/krones');
 const { mountDashbot } = require('./lib/dashbot');
 const { mountCommands } = require('./lib/commands');
 const { mountStatus } = require('./lib/status');
+const { mountServeur } = require('./lib/serveur');
+const { mountCompte } = require('./lib/compte');
 const {
     PANEL_PREFIX,
     panelPublicOrigin,
@@ -133,6 +135,8 @@ mountKrones(app);
 mountStatus(app);
 mountDashbot(app);
 mountCommands(app);
+mountServeur(app);
+mountCompte(app);
 mountPanelFallbacks(app);
 mountPublic(app, { skipBodyParser: true, skipSession: true });
 

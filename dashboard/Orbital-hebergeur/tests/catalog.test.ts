@@ -7,10 +7,10 @@ import { hostingCost } from "../src/lib/krones/pricing";
 import { PANEL_BASE_PATH, withPanelBase } from "../src/lib/panel-base";
 import { panelUrl, publicOrigin } from "../src/lib/oauth/providers";
 
-test("command catalog has 177 commands mapped", () => {
+test("command catalog has 179 commands mapped", () => {
   const count = COMMAND_CATALOG.categories.reduce((n, cat) => n + cat.commands.length, 0);
-  assert.equal(count, 177);
-  assert.equal(COMMAND_CATALOG.count, 177);
+  assert.equal(count, 179);
+  assert.equal(COMMAND_CATALOG.count, 179);
   for (const cat of COMMAND_CATALOG.categories) {
     for (const cmd of cat.commands) {
       assert.ok(COMMAND_COGS[cmd.id] || COMMAND_COGS[cmd.name], `missing cog map for ${cmd.id}`);

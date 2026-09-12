@@ -12,6 +12,7 @@ import { useToast } from "@/components/toast";
 import { Console } from "@/components/console";
 import { FileManager } from "@/components/files";
 import { DiscordInviteLink, DiscordTokenPanel } from "@/components/discord-token";
+import { DiscordGuildConfig } from "@/components/discord-guild-config";
 import { IntentPicker, PrivilegedPortalChecklist } from "@/components/discord-intents";
 import { isPrivilegedIntent, mergeIntentsForModules } from "@/lib/discord/intents";
 import { COMMAND_CATALOG, customCategories, flavorFromModules, officialBot } from "@/lib/discord/catalog";
@@ -202,7 +203,7 @@ function ServiceDetail() {
     "overview",
     "console",
     "files",
-    ...(svc.type === "discord" ? ["token", "modules", "commands"] : []),
+    ...(svc.type === "discord" ? ["token", "modules", "commands", "config"] : []),
     ...(svc.type === "minecraft" ? ["version", "properties", "addons"] : []),
     ...(svc.type === "web" ? ["deployments", "domains"] : []),
     "environment",
@@ -480,6 +481,7 @@ function ServiceDetail() {
           }
         />
       )}
+      {tab === "config" && data.discord && <DiscordGuildConfig serviceId={id} />}
 
       {tab === "version" && data.minecraft && (
         <MinecraftRuntime
@@ -837,6 +839,7 @@ function DiscordModules({
           <IntentPicker
             selected={chosenIntents}
             modules={selected}
+            applicationId={applicationId}
             onToggle={(id) =>
               setChosenIntents((prev) =>
                 prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],

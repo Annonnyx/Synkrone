@@ -408,6 +408,23 @@ function applyPrivilegePlan(wallet, privilege) {
     return false;
 }
 
+function spendFromLedger(ledger) {
+    const rows = Array.isArray(ledger) ? ledger : [];
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    let total = 0;
+    let month = 0;
+    for (const entry of rows) {
+        if (String(entry?.type || '') !== 'debit') continue;
+        const amount = Math.max(0, asInt(entry?.amount, 0));
+        total += amount;
+        const at = new Date(Number(entry?.at) || 0);
+        if (at.getFullYear() === y && at.getMonth() === m) month += amount;
+    }
+    return { total, month };
+}
+
 function walletDto(wallet, meta = {}) {
     const authenticated = meta.authenticated === true;
     const privilege = meta.privilege || null;
@@ -914,6 +931,7 @@ module.exports = {
     setAccountPlan,
     sessionAccount,
     claimJoinBonus,
+    spendFromLedger,
     GRADE_ORDER,
     DATA_PATH
 };

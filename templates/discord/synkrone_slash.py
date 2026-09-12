@@ -23,6 +23,26 @@ def slash_enabled(cfg=None):
     return str(raw).lower() in ("1", "true", "yes")
 
 
+def runtime_prefix(bot=None, default=None):
+    data = read_panel_config()
+    prefix = data.get("prefix")
+    if prefix:
+        return str(prefix)
+    if bot is not None:
+        admin = bot.cogs.get("BotAdmin")
+        if admin and getattr(admin, "default_prefix", None):
+            return str(admin.default_prefix)
+    panelbot = Path("cogs") / "DEV" / "panelbot" / "bot_config.json"
+    if panelbot.exists():
+        try:
+            raw = json.loads(panelbot.read_text(encoding="utf-8"))
+            if isinstance(raw, dict) and raw.get("prefix"):
+                return str(raw.get("prefix"))
+        except Exception:
+            pass
+    return str(os.getenv("BOT_PREFIX") or os.getenv("PREFIX") or default or "*")
+
+
 async def sync_app_commands(bot, cfg=None, guild=None, log_prefix="[synkrone]"):
     data = cfg if isinstance(cfg, dict) else read_panel_config()
     enabled = slash_enabled(data)

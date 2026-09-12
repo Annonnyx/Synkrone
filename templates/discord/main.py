@@ -324,6 +324,8 @@ bot.help_command = None  # Désactive l'aide par défaut
 
 @bot.event
 async def on_ready():
+    if getattr(bot, "start_time", None) is None:
+        bot.start_time = datetime.datetime.now(datetime.timezone.utc)
     print(f'\033[92m🤖 Connecté en tant que {bot.user.name}\033[0m')
     print('\033[94m' + '─' * 60 + '\033[0m')
     if sync_app_commands:

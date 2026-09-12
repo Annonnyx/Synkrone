@@ -418,6 +418,14 @@
             stats: {
                 route: '/stats',
                 page: '/stats/index.html'
+            },
+            compte: {
+                route: '/compte',
+                page: '/compte/index.html'
+            },
+            serveur: {
+                route: '/serveur',
+                page: '/serveur/index.html'
             }
         };
 
@@ -742,13 +750,15 @@
                                 Roulette
                             </button>
                             
-                            <div class="user-left-section">
-                                <div class="avatar-wrapper">
-                                    <img class="user-avatar" src="${safeAvatar}" alt="Avatar" onerror="this.src='/assets/images/logo.jpg';">
-                                    <div class="${badgeClass}"><span>${safeRole}</span></div>
+                            <button type="button" class="user-account-link" onclick="navigateToMainSection('compte', { updateUrl: true })" title="Compte">
+                                <div class="user-left-section">
+                                    <div class="avatar-wrapper">
+                                        <img class="user-avatar" src="${safeAvatar}" alt="" onerror="this.src='/assets/images/logo.jpg';">
+                                        <div class="${badgeClass}"><span>${safeRole}</span></div>
+                                    </div>
+                                    <span class="user-name">${user.username}</span>
                                 </div>
-                                <span class="user-name">${user.username}</span>
-                            </div>
+                            </button>
                             
                             <div class="krones-center-section">${kronesBadgeHtml()}</div>
                             

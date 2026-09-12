@@ -187,13 +187,42 @@ class BotAdmin(commands.Cog):
             f"**Descriptions :**\n{self._get_description_list_text()}"
         )
 
-    @commands.command(name="panelbot", description="Accéder au panneau de configuration technique du bots.")
+    @commands.hybrid_command(name="panelbot", description="Accéder au panneau de configuration technique du bot.")
     async def panelbot(self, ctx: commands.Context):
         if ctx.author.id not in self._load_owners() and not await self.bot.is_owner(ctx.author):
             return await ctx.send("❌ Accès refusé.", ephemeral=True)
         
         embed = self.get_custom_embed(ctx, f"Console de {self.bot.user.name}", self._main_desc())
         await ctx.send(embed=embed, view=MainAdminView(self))
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        import time
+        pending = self.avatar_waiting_list.get(message.author.id)
+        if not pending:
+            return
+        if pending < time.time():
+            self.avatar_waiting_list.pop(message.author.id, None)
+            return
+        if message.author.bot or not message.attachments:
+            return
+        if message.author.id not in self._load_owners() and not await self.bot.is_owner(message.author):
+            return
+        att = message.attachments[0]
+        ctype = (att.content_type or "").lower()
+        name = att.filename.lower()
+        if att.size > 8 * 1024 * 1024 or not (
+            ctype.startswith("image/png") or ctype.startswith("image/jpeg") or name.endswith((".png", ".jpg", ".jpeg"))
+        ):
+            await message.channel.send("Image refusée : PNG ou JPEG, 8 Mo maximum.", delete_after=20)
+            return
+        try:
+            data = await att.read()
+            await self.bot.user.edit(avatar=data)
+            self.avatar_waiting_list.pop(message.author.id, None)
+            await message.channel.send("Avatar du bot mis à jour.", delete_after=20)
+        except Exception as err:
+            await message.channel.send(f"Impossible de changer l'avatar : {err}", delete_after=20)
 
 # ==============================================================================
 # --------------------------- VUES PRINCIPALES ---------------------------------
@@ -220,6 +249,10 @@ class MainAdminView(ui.View):
         btn_desc = ui.Button(label="Descriptions", style=discord.ButtonStyle.secondary, emoji="⚙️", row=0)
         btn_desc.callback = self.descriptions
         self.add_item(btn_desc)
+
+        btn_avatar = ui.Button(label="Avatar", style=discord.ButtonStyle.secondary, emoji="🖼️", row=0)
+        btn_avatar.callback = self.ask_avatar
+        self.add_item(btn_avatar)
 
         # --- LIGNE 3 (SELECT STATUS) ---
         stat_opts = [
@@ -278,6 +311,14 @@ class MainAdminView(ui.View):
         
         self._add_items()
         await interaction.response.edit_message(embed=self.cog.get_custom_embed(interaction, f"Console de {self.cog.bot.user.name}", self.cog._main_desc()), view=self)
+
+    async def ask_avatar(self, interaction: discord.Interaction):
+        import time
+        self.cog.avatar_waiting_list[interaction.user.id] = time.time() + 120
+        await interaction.response.send_message(
+            "Envoie une image PNG ou JPEG (max. 8 Mo) dans les deux minutes.",
+            ephemeral=True,
+        )
 
 # ==============================================================================
 # --------------------------- AUTRES MODALS ------------------------------------

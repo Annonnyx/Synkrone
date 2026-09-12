@@ -47,10 +47,12 @@ export function IntentPicker({
   selected,
   onToggle,
   modules = [],
+  applicationId,
 }: {
   selected: string[];
   onToggle: (id: string) => void;
   modules?: string[];
+  applicationId?: string | null;
 }) {
   const t = useT();
   const suggested = suggestedPrivilegedIntents(modules);
@@ -91,7 +93,10 @@ export function IntentPicker({
         })}
       </div>
       {hasPrivileged && (
-        <p className="text-xs text-[var(--warning)]">{t("create.privilegedIntentWarn")}</p>
+        <div className="space-y-2">
+          <p className="text-xs text-[var(--warning)]">{t("create.privilegedIntentWarn")}</p>
+          <PrivilegedPortalChecklist selected={selected} applicationId={applicationId} />
+        </div>
       )}
       {!hasPrivileged && suggested.length > 0 && (
         <p className="text-[11px] text-[var(--muted)]">

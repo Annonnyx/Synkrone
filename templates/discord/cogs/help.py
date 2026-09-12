@@ -1,80 +1,29 @@
 import discord
 from discord.ext import commands
 from discord import ui
-import os
-import sqlite3
-from datetime import datetime
-from dotenv import load_dotenv
 
-# Chargement des variables d'environnement
-load_dotenv()
-PREFIX = os.getenv("PREFIX", "*")
-
-# ==============================================================================
-# --------------------------- IMPORTATION UTILS --------------------------------
-# ==============================================================================
 try:
     from cogs.config_manager.utils import config_manager
 except ImportError:
     config_manager = None
 
-# ==============================================================================
-# --------------------------- GESTIONNAIRE DE STATS ----------------------------
-# ==============================================================================
-class StatsDatabase:
-    def __init__(self, db_path="data/stats.db"):
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        self.conn = sqlite3.connect(db_path, check_same_thread=False)
-        self.create_table()
+try:
+    from cogs.config_manager.stats_store import stats_db
+except ImportError:
+    stats_db = None
 
-    def create_table(self):
-        with self.conn:
-            self.conn.execute("""
-                CREATE TABLE IF NOT EXISTS command_logs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    command_name TEXT,
-                    user_id INTEGER,
-                    timestamp TEXT
-                )
-            """)
+try:
+    from synkrone_slash import runtime_prefix, slash_enabled
+except ImportError:
+    def runtime_prefix(bot=None, default="*"):
+        return default
 
-    def log_command(self, command_name: str, user_id: int):
-        now = datetime.utcnow().isoformat()
-        with self.conn:
-            self.conn.execute(
-                "INSERT INTO command_logs (command_name, user_id, timestamp) VALUES (?, ?, ?)",
-                (command_name, user_id, now)
-            )
-
-    def get_stats(self):
-        now = datetime.utcnow()
-        current_month = now.strftime("%Y-%m")
-        current_day = now.strftime("%Y-%m-%d")
-
-        with self.conn:
-            # Total
-            total = self.conn.execute("SELECT COUNT(*) FROM command_logs").fetchone()[0]
-            
-            # Ce mois-ci
-            month = self.conn.execute(
-                "SELECT COUNT(*) FROM command_logs WHERE timestamp LIKE ?", 
-                (f"{current_month}%",)
-            ).fetchone()[0]
-            
-            # Aujourd'hui
-            today = self.conn.execute(
-                "SELECT COUNT(*) FROM command_logs WHERE timestamp LIKE ?", 
-                (f"{current_day}%",)
-            ).fetchone()[0]
-
-        return total, month, today
-
-db = StatsDatabase()
+    def slash_enabled():
+        return True
 
 # ==============================================================================
 # --------------------------- DONNÉES DES COMMANDES ----------------------------
 # ==============================================================================
-# Organisation par catégories et sous-catégories triées alphabétiquement
 COMMANDS_STRUCTURE = {
     "Propriétaire": {
         "Général": [
@@ -94,9 +43,10 @@ COMMANDS_STRUCTURE = {
         ],
         "Styles & Modules": [
             ("🛡️", "antiscam", "Configurer le mode antiscam"),
-            ("📝", "custom", "Configurer les messages customs"),
+            ("📝", "custom", "Configurer les messages customs (mots-clés)"),
             ("🎨", "servembed", "Configurer le style de l'embed du serveur"),
             ("🎫", "ticket", "Configurer le système de tickets"),
+            ("⚙️", "config", "Ouvrir le hub de configuration du serveur"),
         ]
     },
     "Utilitaires ADMIN": {
@@ -142,9 +92,12 @@ COMMANDS_STRUCTURE = {
     },
     "Public": {
         "Général": [
-            ("🔍", "custom", "Afficher les mots-clés custom disponibles"),
+            ("🔍", "custom", "Afficher les mots-clés custom disponibles (commande publique)"),
             ("🎲", "dice", "Lancer des dés (nombre et faces au choix)"),
             ("🏓", "ping", "Afficher la latence du bot"),
+            ("🔧", "prefix", "Afficher ou changer le préfixe"),
+            ("📊", "stats", "Afficher les statistiques runtime du bot"),
+            ("❓", "help", "Menu d'aide interactif"),
         ]
     }
 }
@@ -174,11 +127,27 @@ SUBCATEGORY_COMMAND_ORDER = {
 
 
 def sort_commands(sub_name: str, cmd_list: list[tuple[str, str, str]]) -> list[tuple[str, str, str]]:
-    """Applique un ordre métier pour certaines sous-catégories, sinon tri alphabétique."""
     custom_order = SUBCATEGORY_COMMAND_ORDER.get(sub_name)
     if custom_order:
         return sorted(cmd_list, key=lambda cmd: (custom_order.get(cmd[1], 999), cmd[1]))
     return sorted(cmd_list, key=lambda cmd: cmd[1])
+
+
+def loaded_command_names(bot: commands.Bot) -> set[str]:
+    names = set()
+    for cmd in bot.commands:
+        names.add(cmd.name)
+        names.update(cmd.aliases or [])
+    return names
+
+
+def format_invocation(name: str, prefix: str, slash_on: bool) -> str:
+    prefix_form = f"`{prefix}{name}`"
+    slash_form = f"`/{name}`"
+    if slash_on:
+        return f"{slash_form} {prefix_form}"
+    return prefix_form
+
 
 # ==============================================================================
 # --------------------------- UI : MENU DÉROULANT ------------------------------
@@ -240,10 +209,25 @@ class HelpCog(commands.Cog):
         self.bot = bot
         self.bot.remove_command("help")
 
-    @commands.Cog.listener()
-    async def on_command_completion(self, ctx):
-        if ctx.command:
-            db.log_command(ctx.command.name, ctx.author.id)
+    def _prefix(self, ctx: commands.Context | None = None) -> str:
+        used = getattr(ctx, "prefix", None) if ctx else None
+        if used and used not in ("/", ""):
+            return str(used)
+        return runtime_prefix(self.bot, default="*")
+
+    def _slash_on(self) -> bool:
+        try:
+            return bool(slash_enabled())
+        except Exception:
+            return True
+
+    def _visible_commands(self, cmd_list: list[tuple[str, str, str]]) -> list[tuple[str, str, str]]:
+        loaded = loaded_command_names(self.bot)
+        return [item for item in cmd_list if item[1] in loaded]
+
+    def _format_line(self, emoji: str, name: str, desc: str, ctx: commands.Context) -> str:
+        inv = format_invocation(name, self._prefix(ctx), self._slash_on())
+        return f"{emoji} {inv} - *{desc}*\n"
 
     async def get_home_embed(self, ctx: commands.Context) -> discord.Embed:
         guild = ctx.guild
@@ -252,29 +236,39 @@ class HelpCog(commands.Cog):
         app_info = await self.bot.application_info()
         owner_mention = app_info.owner.mention if app_info.owner else "Inconnu"
 
-        total_members = guild.member_count
-        bots_count = sum(1 for member in guild.members if member.bot)
+        total_members = guild.member_count if guild else 0
+        bots_count = sum(1 for member in guild.members if member.bot) if guild else 0
         humans_count = total_members - bots_count
         bot_texte = "bot" if bots_count <= 1 else "bots"
         
-        # Récupération des vraies stats depuis la DB
-        cmd_total, cmd_month, cmd_today = db.get_stats()
+        if stats_db:
+            cmd_total, cmd_month, cmd_today = stats_db.get_stats()
+        else:
+            cmd_total = cmd_month = cmd_today = 0
+
+        prefix = self._prefix(ctx)
+        if self._slash_on():
+            invoke_hint = (
+                f"Toutes les commandes existent en slash (`/commande`) et en préfixe (`{prefix}commande`)."
+            )
+        else:
+            invoke_hint = f"Les commandes s'utilisent avec le préfixe `{prefix}` (slash désactivé)."
 
         desc = (
-            f"👋 Bonjour ! Je suis **{bot_user.name}**, un bot exclusif au serveur **{guild.name}** !\n\n"
+            f"👋 Bonjour ! Je suis **{bot_user.name}**, un bot exclusif au serveur **{guild.name if guild else '?'}** !\n\n"
             f"👑 Mon propriétaire est {owner_mention}.\n\n"
             f"👥 Nous sommes actuellement **{total_members}** personnes sur le serveur, comptant **{bots_count}** {bot_texte} pour **{humans_count}** humains !\n\n"
             f"📈 **{cmd_total:,}** commandes ont été lancées avec ce bot depuis sa création, dont **{cmd_month:,}** ce mois-ci & **{cmd_today:,}** aujourd'hui.\n\n"
-            f"💡 *Le saviez-vous ?* Toutes les commandes existent en version préfixe (`{PREFIX}commande`) et en version Slash (`/commande`).\n\n"
+            f"💡 *Le saviez-vous ?* {invoke_hint}\n\n"
             f"🔽 **Utilisez le menu déroulant ci-dessous pour naviguer entre les catégories.**"
         )
 
         if config_manager:
-            embed = config_manager.get_formatted_embed(guild, ctx.author, self.bot, "🏠 Accueil - Centre d'Aide", desc, guild.id)
+            embed = config_manager.get_formatted_embed(guild, ctx.author, self.bot, "🏠 Accueil - Centre d'Aide", desc, guild.id if guild else None)
         else:
             embed = discord.Embed(title="🏠 Accueil - Centre d'Aide", description=desc, color=0x2b2d31)
 
-        if bot_user.avatar:
+        if bot_user and bot_user.avatar:
             embed.set_thumbnail(url=bot_user.avatar.url)
         
         return embed
@@ -284,18 +278,21 @@ class HelpCog(commands.Cog):
         desc = f"Retrouvez ci-dessous l'ensemble des fonctionnalités pour la catégorie **{category_name}**.\n\n"
         
         for sub_name, cmd_list in subcategories.items():
+            visible = self._visible_commands(cmd_list)
+            if not visible:
+                continue
             desc += f"### 📌 {sub_name}\n"
-            sorted_commands = sort_commands(sub_name, cmd_list)
+            sorted_commands = sort_commands(sub_name, visible)
             for emoji, cmd_name, cmd_desc in sorted_commands:
-                desc += f"{emoji} `{PREFIX}{cmd_name}` - *{cmd_desc}*\n"
+                desc += self._format_line(emoji, cmd_name, cmd_desc, ctx)
             desc += "\n"
 
         if config_manager:
-            embed = config_manager.get_formatted_embed(ctx.guild, ctx.author, self.bot, f"📂 Catégorie : {category_name}", desc, ctx.guild.id)
+            embed = config_manager.get_formatted_embed(ctx.guild, ctx.author, self.bot, f"📂 Catégorie : {category_name}", desc, ctx.guild.id if ctx.guild else None)
         else:
             embed = discord.Embed(title=f"📂 Catégorie : {category_name}", description=desc, color=0x2b2d31)
 
-        if self.bot.user.avatar:
+        if self.bot.user and self.bot.user.avatar:
             embed.set_thumbnail(url=self.bot.user.avatar.url)
             
         return embed
@@ -307,20 +304,25 @@ class HelpCog(commands.Cog):
             if category_name == "Propriétaire" and not is_owner:
                 continue
 
-            desc += f"## 📁 {category_name}\n"
+            block = ""
             for sub_name, cmd_list in subcategories.items():
-                desc += f"### 📌 {sub_name}\n"
-                sorted_commands = sort_commands(sub_name, cmd_list)
+                visible = self._visible_commands(cmd_list)
+                if not visible:
+                    continue
+                block += f"### 📌 {sub_name}\n"
+                sorted_commands = sort_commands(sub_name, visible)
                 for emoji, cmd_name, cmd_desc in sorted_commands:
-                    desc += f"{emoji} `{PREFIX}{cmd_name}` - *{cmd_desc}*\n"
-                desc += "\n"
+                    block += self._format_line(emoji, cmd_name, cmd_desc, ctx)
+                block += "\n"
+            if block:
+                desc += f"## 📁 {category_name}\n{block}"
 
         if config_manager:
-            embed = config_manager.get_formatted_embed(ctx.guild, ctx.author, self.bot, "📑 Vue Complète - Liste des commandes", desc, ctx.guild.id)
+            embed = config_manager.get_formatted_embed(ctx.guild, ctx.author, self.bot, "📑 Vue Complète - Liste des commandes", desc, ctx.guild.id if ctx.guild else None)
         else:
             embed = discord.Embed(title="📑 Vue Complète - Liste des commandes", description=desc, color=0x2b2d31)
 
-        if self.bot.user.avatar:
+        if self.bot.user and self.bot.user.avatar:
             embed.set_thumbnail(url=self.bot.user.avatar.url)
             
         return embed
@@ -328,7 +330,7 @@ class HelpCog(commands.Cog):
     @commands.hybrid_command(name="help", description="Affiche le menu d'aide interactif du bot.")
     async def help_cmd(self, ctx: commands.Context):
         is_owner = await self.bot.is_owner(ctx.author)
-        is_admin = ctx.author.guild_permissions.administrator or ctx.author.guild_permissions.manage_guild
+        is_admin = bool(ctx.guild and (ctx.author.guild_permissions.administrator or ctx.author.guild_permissions.manage_guild))
 
         view = HelpView(ctx, self, is_owner, is_admin)
         embed = await self.get_home_embed(ctx)

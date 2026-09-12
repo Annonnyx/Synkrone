@@ -13,6 +13,7 @@ import { SoftwarePicker, VersionPicker } from "@/components/mc-runtime";
 import { PropertyControl } from "@/components/mc-properties";
 import { PROPERTY_BY_KEY, defaultProperties } from "@/lib/minecraft/properties";
 import { mergeIntentsForModules, suggestedPrivilegedIntents } from "@/lib/discord/intents";
+import { IntentPicker } from "@/components/discord-intents";
 import { COMMAND_COGS, customCategories } from "@/lib/discord/catalog";
 import { hostingCost } from "@/lib/krones/pricing";
 import { activeDiscounts, type PromoDiscount } from "@/lib/krones/discounts";
@@ -556,9 +557,13 @@ export default function CreateServicePage() {
       }
       case "discord:intents":
         return (
-          <p className="text-sm text-[var(--muted)]">
-            Les intents sont calculés automatiquement. Activez Server Members / Message Content dans le portail Discord si le bot en a besoin.
-          </p>
+          <IntentPicker
+            selected={intents}
+            modules={modules}
+            onToggle={(id) =>
+              setIntents((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+            }
+          />
         );
       case "minecraft:software":
         return (

@@ -71,7 +71,10 @@ class EmbedConfigManager:
         
         return {
             "color": server_conf.get("color") if server_conf.get("color") is not None else (global_conf.get("color") or self.DEFAULT_COLOR),
-            "footer": server_conf.get("footer") or global_conf.get("footer") or self.DEFAULT_FOOTER
+            "footer": server_conf.get("footer") or global_conf.get("footer") or self.DEFAULT_FOOTER,
+            "author": server_conf.get("author") if "author" in server_conf else (global_conf.get("author") or ""),
+            "thumbnail": server_conf.get("thumbnail") if "thumbnail" in server_conf else (global_conf.get("thumbnail") or ""),
+            "image": server_conf.get("image") if "image" in server_conf else (global_conf.get("image") or ""),
         }
 
     def get_formatted_embed(self, guild, user, bot, title=None, description=None, target_id=None, force_global=False):
@@ -102,7 +105,15 @@ class EmbedConfigManager:
             return text
 
         embed = discord.Embed(title=title, description=description, color=vals['color'])
-        # Suppression du set_author
+        author = vals.get("author") or ""
+        if author:
+            embed.set_author(name=parse(author))
+        thumbnail = vals.get("thumbnail") or ""
+        if thumbnail:
+            embed.set_thumbnail(url=thumbnail)
+        image = vals.get("image") or ""
+        if image:
+            embed.set_image(url=image)
         if vals['footer']:
             embed.set_footer(text=parse(vals['footer']), icon_url=bot.user.display_avatar.url)
         return embed
@@ -134,12 +145,21 @@ class ConfigModal(discord.ui.Modal):
         self.bot = bot
         
         self.color_input = discord.ui.TextInput(
-            label="Code Couleur (Hex)", default=f"#{current_values['color']:06x}", required=False, min_length=6, max_length=7
+            label="Code Couleur (Hex)", default=f"#{int(current_values.get('color') or config_manager.DEFAULT_COLOR):06x}", required=False, min_length=6, max_length=7
         )
         self.footer_input = discord.ui.TextInput(
-            label="Texte du Bas (Footer)", default=current_values['footer'], required=False, style=discord.TextStyle.long, max_length=80
+            label="Texte du Bas (Footer)", default=current_values.get("footer") or "", required=False, style=discord.TextStyle.long, max_length=80
         )
-        for item in [self.color_input, self.footer_input]:
+        self.author_input = discord.ui.TextInput(
+            label="Auteur", default=current_values.get("author") or "", required=False, max_length=80
+        )
+        self.thumb_input = discord.ui.TextInput(
+            label="URL miniature", default=current_values.get("thumbnail") or "", required=False, max_length=200
+        )
+        self.image_input = discord.ui.TextInput(
+            label="URL image", default=current_values.get("image") or "", required=False, max_length=200
+        )
+        for item in [self.color_input, self.footer_input, self.author_input, self.thumb_input, self.image_input]:
             self.add_item(item)
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -152,7 +172,13 @@ class ConfigModal(discord.ui.Modal):
         footer_text = self.footer_input.value or ""
         if len(footer_text) > 80:
             return await interaction.response.send_message(f"❌ Le footer ne doit pas dépasser 80 caractères (actuel : {len(footer_text)}).", ephemeral=True)
-        data = {"color": new_color, "footer": footer_text}
+        data = {
+            "color": new_color,
+            "footer": footer_text,
+            "author": (self.author_input.value or "").strip(),
+            "thumbnail": (self.thumb_input.value or "").strip(),
+            "image": (self.image_input.value or "").strip(),
+        }
         config_manager.save_config(data, self.guild_id)
         
         view = EmbedCustomizerView(self.is_server, self.guild_id, self.bot, interaction.user.id)

@@ -175,6 +175,12 @@
       "file": "cogs/ADMIN/configuration/joinleave/bienvenue/bienvenue.py",
       "custom": true
     },
+    "config": {
+      "category": "configuration",
+      "source": "templates/discord",
+      "file": "cogs/ADMIN/configuration/confighub/config.py",
+      "custom": true
+    },
     "bonjour": {
       "category": "configuration",
       "source": "templates/discord",
@@ -382,7 +388,7 @@
     "prefix": {
       "category": "public",
       "source": "templates/discord",
-      "file": null,
+      "file": "cogs/PUBLIC/prefix/prefix.py",
       "custom": true
     },
     "8ball": {
@@ -852,6 +858,12 @@
       "source": "bots/Vax",
       "file": null,
       "custom": false
+    },
+    "botstats": {
+      "category": "public",
+      "source": "templates/discord",
+      "file": "cogs/PUBLIC/botstats/stats_bot.py",
+      "custom": true
     },
     "calc": {
       "category": "utilitaires",

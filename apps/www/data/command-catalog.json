@@ -24,7 +24,7 @@
     "currency": "krones",
     "note": "2 ₭ de base + 1 ₭ par commande à la création du pack. Les mises à jour sont gratuites."
   },
-  "count": 177,
+  "count": 179,
   "categories": [
     {
       "id": "moderation",
@@ -225,6 +225,12 @@
           "source": "bots/Vax"
         },
         {
+          "id": "config",
+          "name": "config",
+          "description": "Hub de configuration du serveur (modules, site, identité)",
+          "source": "templates/discord"
+        },
+        {
           "id": "custom",
           "name": "custom",
           "description": "Configurer les messages customs par mots-clés",
@@ -422,6 +428,12 @@
           "id": "ping",
           "name": "ping",
           "description": "Afficher la latence du bot",
+          "source": "templates/discord"
+        },
+        {
+          "id": "botstats",
+          "name": "stats",
+          "description": "Statistiques runtime du bot (disponibilité, serveurs, commandes)",
           "source": "templates/discord"
         },
         {

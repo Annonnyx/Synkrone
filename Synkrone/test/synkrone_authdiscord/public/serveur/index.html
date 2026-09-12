@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script src="/assets/theme-boot.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone — Serveur</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/accueil.css">
+    <link rel="stylesheet" href="/design/synkrone.css">
+    <style>
+        .srv { padding: 40px 0 80px; max-width: 40rem; }
+        .srv h1 { font-family: var(--sk-serif, "Zilla Slab", Georgia, serif); font-size: 2.2rem; margin: 0 0 .4rem; }
+        .srv .lede { color: var(--sk-muted, var(--hall-mute)); margin: 0 0 1.5rem; }
+        .srv label { display: block; margin: 0 0 12px; font-size: .92rem; }
+        .srv span { display: block; margin-bottom: 4px; font-weight: 600; }
+        .srv input, .srv select, .srv textarea {
+            width: 100%; padding: .65rem .75rem; border: 1px solid var(--sk-border, var(--hall-line));
+            background: var(--sk-surface, var(--blanc)); color: inherit; font: inherit;
+        }
+        .srv textarea { min-height: 5rem; }
+        .srv-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+        .srv-actions button, .srv-actions a {
+            padding: .7rem 1rem; border: 1px solid var(--sk-border, var(--hall-line));
+            background: var(--sk-surface, var(--blanc)); color: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
+        }
+        .srv-actions button.primary { border-color: var(--mousse, #3d8b6e); }
+        .note, .err { font-size: .92rem; }
+        .err { color: var(--sk-danger, #8f2d2d); }
+    </style>
+</head>
+<body>
+    <section class="band srv">
+        <div class="band-inner">
+            <p class="sect-id">Configuration serveur</p>
+            <h1>Configurer le bot</h1>
+            <p class="lede">Réservé à Discord, avec la permission Gérer le serveur. L’avatar du bot se change dans le panel ou via /config (propriétaire).</p>
+            <p id="msg" class="note"></p>
+            <form id="form" hidden>
+                <label><span>Salon de bienvenue</span><select id="welcome-channel"></select></label>
+                <label><span>Message de bienvenue</span><textarea id="welcome-msg"></textarea></label>
+                <label><span>Salon d'au revoir</span><select id="goodbye-channel"></select></label>
+                <label><span>Message d'au revoir</span><textarea id="goodbye-msg"></textarea></label>
+                <label><span>Couleur des embeds</span><input id="embed-color" placeholder="#660099"></label>
+                <div class="srv-actions">
+                    <button type="submit" class="primary">Enregistrer</button>
+                    <a href="/accueil" target="_top">Synkrone</a>
+                </div>
+            </form>
+            <p id="fallback" class="srv-actions" hidden></p>
+        </div>
+    </section>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('t') || '';
+        const msg = document.getElementById('msg');
+        const form = document.getElementById('form');
+        const fallback = document.getElementById('fallback');
+
+        function fillSelect(select, channels, current) {
+            const extra = current && !channels.some((c) => c.id === current);
+            select.innerHTML = '<option value="">—</option>' +
+                (extra ? `<option value="${current}">${current}</option>` : '') +
+                channels.map((c) => `<option value="${c.id}">${c.name}</option>`).join('');
+            if (current) select.value = current;
+        }
+
+        (async () => {
+            const q = new URLSearchParams();
+            if (token) q.set('t', token);
+            if (params.get('guild')) q.set('guild', params.get('guild'));
+            if (params.get('application')) q.set('application', params.get('application'));
+            const res = await fetch(`/api/serveur?${q}`, { credentials: 'same-origin' });
+            const data = await res.json();
+            if (res.status === 401 || data.discordOnly) {
+                msg.textContent = 'Connecte-toi avec Discord.';
+                fallback.hidden = false;
+                fallback.innerHTML = `<a href="${data.loginUrl || '/login?returnTo=/serveur'}" target="_top">Continuer avec Discord</a>`;
+                return;
+            }
+            if (!res.ok) {
+                msg.textContent = data.error || 'Accès refusé.';
+                fallback.hidden = false;
+                fallback.innerHTML = '<a href="/accueil" target="_top">Synkrone</a>';
+                return;
+            }
+            if (data.needLink) {
+                msg.textContent = data.hint || 'Ouvre /config dans Discord.';
+                fallback.hidden = false;
+                fallback.innerHTML = '<a href="/accueil" target="_top">Synkrone</a>';
+                return;
+            }
+            msg.textContent = `${data.botName} · serveur ${data.guildId}`;
+            form.hidden = false;
+            const channels = data.channels || [];
+            fillSelect(document.getElementById('welcome-channel'), channels, data.config.welcome.channel_id);
+            fillSelect(document.getElementById('goodbye-channel'), channels, data.config.goodbye.channel_id);
+            document.getElementById('welcome-msg').value = data.config.welcome.content_message || '';
+            document.getElementById('goodbye-msg').value = data.config.goodbye.content_message || '';
+            document.getElementById('embed-color').value = data.config.embed.color || '#660099';
+
+            if (!channels.length) {
+                const w = document.getElementById('welcome-channel');
+                const g = document.getElementById('goodbye-channel');
+                w.replaceWith(Object.assign(document.createElement('input'), { id: 'welcome-channel', value: data.config.welcome.channel_id || '' }));
+                g.replaceWith(Object.assign(document.createElement('input'), { id: 'goodbye-channel', value: data.config.goodbye.channel_id || '' }));
+            }
+
+            form.addEventListener('submit', async (ev) => {
+                ev.preventDefault();
+                msg.textContent = 'Enregistrement…';
+                const body = {
+                    t: token,
+                    guildId: data.guildId,
+                    applicationId: data.applicationId,
+                    welcome: {
+                        channel_id: document.getElementById('welcome-channel').value,
+                        content_message: document.getElementById('welcome-msg').value
+                    },
+                    goodbye: {
+                        channel_id: document.getElementById('goodbye-channel').value,
+                        content_message: document.getElementById('goodbye-msg').value
+                    },
+                    embed: { color: document.getElementById('embed-color').value }
+                };
+                const save = await fetch('/api/serveur', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(body)
+                });
+                const out = await save.json();
+                msg.textContent = save.ok ? 'Enregistré. Le bot relit le JSON à la volée.' : (out.error || 'Échec.');
+            });
+        })().catch((err) => {
+            msg.textContent = err.message || 'Page indisponible.';
+        });
+    </script>
+</body>
+</html>

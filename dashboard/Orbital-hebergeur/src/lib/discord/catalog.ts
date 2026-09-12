@@ -104,6 +104,16 @@ export function officialBot(id: string) {
   return OFFICIAL_BOTS.find((b) => b.id === id) ?? null;
 }
 
+export function cogForCommand(cmd: { name: string; module?: string; id?: string }) {
+  const byId = cmd.id ? COMMAND_COGS[cmd.id] : undefined;
+  if (byId?.file) return byId;
+  const byName = COMMAND_COGS[cmd.name];
+  if (byName?.file) return byName;
+  if (cmd.name === "stats" && COMMAND_COGS.botstats?.file) return COMMAND_COGS.botstats;
+  if (cmd.module && COMMAND_COGS[cmd.module]?.file) return COMMAND_COGS[cmd.module];
+  return byName ?? byId ?? null;
+}
+
 export function flavorFromModules(modules: string[]): OfficialBotId | "custom" {
   const official = modules.find((m) => m.startsWith("official:"));
   if (official) {

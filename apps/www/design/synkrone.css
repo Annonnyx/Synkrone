@@ -602,6 +602,20 @@ header#app-header,
     min-width: 0;
 }
 
+.user-account-link {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    min-width: 0;
+}
+.user-account-link:hover .user-name { text-decoration: underline; }
+
 .avatar-wrapper { display: flex; align-items: center; gap: 8px; }
 
 .user-avatar {

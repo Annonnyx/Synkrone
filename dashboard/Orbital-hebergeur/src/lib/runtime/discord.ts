@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { discordBots } from "@/db/schema";
 import { decryptSecret } from "@/lib/crypto";
 import type { ServiceType } from "@/lib/paths";
-import { COMMAND_COGS, flavorFromModules, officialBot } from "@/lib/discord/catalog";
+import { COMMAND_COGS, cogForCommand, flavorFromModules, officialBot } from "@/lib/discord/catalog";
 import { synkroneRepoRoot } from "@/lib/repo-root";
 import { BaseRuntimeProvider, appendConsole, currentContainer, loadServiceRecord } from "./base";
 import { FilesystemManager } from "@/lib/filesystem/manager";
@@ -78,6 +78,7 @@ const CUSTOM_MAIN_PY = [
   "from synkrone_slash import sync_app_commands",
   "",
   "bot = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)",
+  "bot.start_time = None",
   "",
   "def enabled_files():",
   '    path = Path("config/enabled_cogs.json")',
@@ -88,6 +89,9 @@ const CUSTOM_MAIN_PY = [
   "",
   "@bot.event",
   "async def on_ready():",
+  "    import datetime",
+  "    if getattr(bot, 'start_time', None) is None:",
+  "        bot.start_time = datetime.datetime.now(datetime.timezone.utc)",
   '    print("[bot] logged in as %s" % bot.user)',
   "    await sync_app_commands(bot, runtime_config(), log_prefix=\"[bot]\")",
   '    print("[bot] ready")',
@@ -212,7 +216,7 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
       const enabled: string[] = [];
       const commands = (bot?.commands ?? []).filter((c) => c.enabled);
       for (const cmd of commands) {
-        const mapped = COMMAND_COGS[cmd.name] ?? COMMAND_COGS[cmd.module];
+        const mapped = cogForCommand(cmd) ?? COMMAND_COGS[cmd.name] ?? COMMAND_COGS[cmd.module];
         const rel = mapped?.file;
         if (!rel) continue;
         const from = path.join(templateRoot, rel);
@@ -222,6 +226,9 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
           filter: (src) => !skipCopy(path.basename(src)),
         }).catch(() => undefined);
         enabled.push(rel.replace(/\.py$/i, "").replaceAll("\\", "/").replaceAll("/", "."));
+      }
+      if (!enabled.includes("cogs.config_manager.stats_store")) {
+        enabled.push("cogs.config_manager.stats_store");
       }
       await fsm.write("main.py", CUSTOM_MAIN_PY);
       await fsm.write("config/enabled_cogs.json", JSON.stringify(enabled, null, 2));
@@ -322,11 +329,21 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
       await db.select().from(discordBots).where(eq(discordBots.serviceId, service.id)).limit(1)
     )[0];
     const token = decryptSecret(bot?.tokenEnc);
+    const configSecret =
+      process.env.SESSION_SECRET || process.env.BOT_CONFIG_SECRET || process.env.PLATFORM_SECRET_KEY || "";
+    const siteOrigin = String(process.env.PUBLIC_ORIGIN || process.env.ORBITAL_PUBLIC_ORIGIN || "")
+      .trim()
+      .replace(/\/hebergement\/?$/, "")
+      .replace(/\/$/, "");
     return {
       PYTHONUNBUFFERED: "1",
       PREFIX: bot?.prefix ?? "!",
       BOT_PREFIX: bot?.prefix ?? "!",
       ENABLE_SLASH_COMMANDS: String(bot?.slashCommands ?? true),
+      ...(configSecret
+        ? { BOT_CONFIG_SECRET: configSecret, SESSION_SECRET: configSecret }
+        : {}),
+      ...(siteOrigin ? { PUBLIC_SITE_ORIGIN: siteOrigin } : {}),
       ...(token ? { BOT_TOKEN: token, DISCORD_TOKEN: token } : {}),
     };
   }
