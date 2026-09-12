@@ -18,6 +18,7 @@ import { BaseRuntimeProvider, appendConsole, currentContainer, loadServiceRecord
 import { FilesystemManager } from "@/lib/filesystem/manager";
 import { ContainerManager } from "@/lib/docker/adapter";
 import { DISALLOWED_INTENTS_FATAL } from "@/lib/discord/intents";
+import { discordSiteLinkEnv } from "@/lib/discord/site-link-env";
 import { DISCORD_TEMPLATE, intentsBitfield, resolveGatewayIntents } from "./templates";
 import type { RuntimeTemplate, ServiceRecord } from "./types";
 
@@ -391,21 +392,12 @@ export class DiscordRuntimeProvider extends BaseRuntimeProvider {
       await db.select().from(discordBots).where(eq(discordBots.serviceId, service.id)).limit(1)
     )[0];
     const token = await this.storedToken(service.id);
-    const configSecret =
-      process.env.SESSION_SECRET || process.env.BOT_CONFIG_SECRET || process.env.PLATFORM_SECRET_KEY || "";
-    const siteOrigin = String(process.env.PUBLIC_ORIGIN || process.env.ORBITAL_PUBLIC_ORIGIN || "")
-      .trim()
-      .replace(/\/hebergement\/?$/, "")
-      .replace(/\/$/, "");
     return {
       PYTHONUNBUFFERED: "1",
       PREFIX: bot?.prefix ?? "!",
       BOT_PREFIX: bot?.prefix ?? "!",
       ENABLE_SLASH_COMMANDS: String(bot?.slashCommands ?? true),
-      ...(configSecret
-        ? { BOT_CONFIG_SECRET: configSecret, SESSION_SECRET: configSecret }
-        : {}),
-      ...(siteOrigin ? { PUBLIC_SITE_ORIGIN: siteOrigin } : {}),
+      ...discordSiteLinkEnv(),
       ...(token ? { BOT_TOKEN: token, DISCORD_TOKEN: token } : {}),
     };
   }

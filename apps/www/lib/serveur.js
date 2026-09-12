@@ -3,7 +3,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { panelAdmin } = require('./admin-ops');
+const { panelAdmin, readPanelEnvValue } = require('./admin-ops');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const OVERLAY_ROOT = path.join(__dirname, '..', 'data', 'serveur-config');
@@ -32,11 +32,22 @@ const GOODBYE_DEFAULT = {
 const EMBED_DEFAULT = { color: 0x660099, footer: '', author: '', thumbnail: '', image: '' };
 
 function secrets() {
-    return [
-        String(process.env.SESSION_SECRET || '').trim(),
-        String(process.env.BOT_CONFIG_SECRET || '').trim(),
-        String(process.env.PLATFORM_SECRET_KEY || '').trim()
-    ].filter((s) => s.length >= 8);
+    const seen = new Set();
+    const out = [];
+    for (const raw of [
+        process.env.SESSION_SECRET,
+        process.env.BOT_CONFIG_SECRET,
+        process.env.PLATFORM_SECRET_KEY,
+        readPanelEnvValue('PLATFORM_SECRET_KEY'),
+        readPanelEnvValue('BOT_CONFIG_SECRET'),
+        readPanelEnvValue('SESSION_SECRET')
+    ]) {
+        const value = String(raw || '').trim();
+        if (value.length < 8 || seen.has(value)) continue;
+        seen.add(value);
+        out.push(value);
+    }
+    return out;
 }
 
 function discordUserId(user) {
