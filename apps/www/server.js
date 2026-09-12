@@ -121,8 +121,17 @@ if (INTERNAL_TOOLS) {
 }
 
 mountVux(app);
-app.use('/logo', express.static(path.join(WWW_DIR, 'logo')));
-app.use('/design', express.static(path.join(WWW_DIR, 'design')));
+function staticAssetHeaders(res, filePath) {
+    if (String(filePath).endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-store');
+        return;
+    }
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+}
+const staticOpts = { etag: true, setHeaders: staticAssetHeaders };
+
+app.use('/logo', express.static(path.join(WWW_DIR, 'logo'), { maxAge: '7d', etag: true }));
+app.use('/design', express.static(path.join(WWW_DIR, 'design'), staticOpts));
 
 app.get('/api/config', (_req, res) => {
     const billing = billingPublicDto(null);

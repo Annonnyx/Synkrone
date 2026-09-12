@@ -872,18 +872,35 @@ html[data-theme="dark"] .sub-nav-tab.active {
     min-height: 0;
 }
 
-.content-frame {
-    display: block;
-    width: 100%;
+.content-stage {
+    position: relative;
     flex: 1 1 0;
     min-height: 0;
     height: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.content-frame {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    height: 100%;
     border: 0;
     background: var(--sk-bg);
+    overflow: auto;
+}
+
+.content-stage > .content-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .content-frame.with-section-menu {
-    height: 0;
+    height: 100%;
 }
 
 .app-container > footer,

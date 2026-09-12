@@ -24,6 +24,18 @@ test('file store round-trips a session across get/set', async () => {
     fs.rmSync(dir, { recursive: true, force: true });
 });
 
+test('empty or invalid session files are treated as missing', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sk-sess-'));
+    const store = new FileSessionStore(dir);
+    fs.writeFileSync(path.join(dir, `${safeSid('empty')}.json`), '');
+    fs.writeFileSync(path.join(dir, `${safeSid('bad')}.json`), '{');
+    const empty = await new Promise((resolve, reject) => store.get('empty', (err, value) => (err ? reject(err) : resolve(value))));
+    const bad = await new Promise((resolve, reject) => store.get('bad', (err, value) => (err ? reject(err) : resolve(value))));
+    assert.equal(empty, null);
+    assert.equal(bad, null);
+    fs.rmSync(dir, { recursive: true, force: true });
+});
+
 test('expired sessions are treated as missing', async () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sk-sess-'));
     const store = new FileSessionStore(dir);

@@ -598,6 +598,11 @@
         }
 
         function bindReveal() {
+            const pane = document.getElementById('content-root');
+            if (pane && typeof window.restartLeafReveal === 'function') {
+                window.restartLeafReveal(pane);
+                return;
+            }
             const nodes = document.querySelectorAll('.reveal');
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 nodes.forEach((n) => n.classList.add('in'));
@@ -610,7 +615,7 @@
                         io.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.12 });
+            }, { threshold: 0.08, rootMargin: '64px 0px' });
             nodes.forEach((n) => io.observe(n));
         }
 

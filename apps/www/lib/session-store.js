@@ -27,7 +27,18 @@ class FileSessionStore extends session.Store {
     get(sid, cb) {
         fsp.readFile(this.file(sid), 'utf8')
             .then((raw) => {
-                const data = JSON.parse(raw);
+                const text = String(raw || '').trim();
+                if (!text) {
+                    this.destroy(sid, () => cb(null, null));
+                    return;
+                }
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    this.destroy(sid, () => cb(null, null));
+                    return;
+                }
                 if (!data || Number(data.expires) <= Date.now()) {
                     this.destroy(sid, () => cb(null, null));
                     return;

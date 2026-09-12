@@ -178,14 +178,35 @@
             } catch { /* ignore */ }
         }
 
-        async function initData() {
+        function fetchJson(url, ms = 4000) {
+            const ctrl = new AbortController();
+            const timer = window.setTimeout(() => ctrl.abort(), ms);
+            return fetch(url, { signal: ctrl.signal }).finally(() => window.clearTimeout(timer));
+        }
+
+        function initialMeRoute() {
+            const profileParam = new URLSearchParams(window.location.search).get('profile');
+            if (profileParam) return ['profile', profileParam];
             try {
-                const meRes = await fetch('/api/me');
+                const parentPath = window.parent !== window ? window.parent.location.pathname : window.location.pathname;
+                const segments = parentPath.split('/').filter(Boolean);
+                if (segments[0] && segments[0] !== 'discord' && segments[0] !== 'accueil') {
+                    return ['profile', segments[0]];
+                }
+            } catch { /* ignore */ }
+            return ['home'];
+        }
+
+        async function initData() {
+            const route = initialMeRoute();
+            navigate(...route);
+            try {
+                const meRes = await fetchJson('/api/me');
                 if (meRes.ok) {
                     const meData = await meRes.json();
                     if (meData.authenticated) MonProfil = hydrateMe(meData.user);
                 }
-                const profilesRes = await fetch('/api/profiles');
+                const profilesRes = await fetchJson('/api/profiles');
                 if (profilesRes.ok) {
                     const profData = await profilesRes.json();
                     Utilisateurs = (profData.profiles || []).map(hydrateMe);
@@ -193,17 +214,7 @@
             } catch (err) {
                 console.error(err);
             }
-
-            const profileParam = new URLSearchParams(window.location.search).get('profile');
-            if (profileParam) return navigate('profile', profileParam);
-            try {
-                const parentPath = window.parent !== window ? window.parent.location.pathname : window.location.pathname;
-                const segments = parentPath.split('/').filter(Boolean);
-                if (segments[0] && segments[0] !== 'discord' && segments[0] !== 'accueil') {
-                    return navigate('profile', segments[0]);
-                }
-            } catch { /* ignore */ }
-            navigate('home');
+            navigate(...route);
         }
 
         function goKrones() {

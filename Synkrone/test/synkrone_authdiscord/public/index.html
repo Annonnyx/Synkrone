@@ -46,9 +46,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"></noscript>
-    <link rel="stylesheet" href="/design/synkrone.css">
+    <link rel="stylesheet" href="/design/synkrone.css?v=stage1">
     <style>
-        html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; background: var(--sk-bg); color: var(--sk-text); }
+        html, body { width: 100%; max-width: 100%; height: 100%; height: 100dvh; overflow: hidden; background: var(--sk-bg); color: var(--sk-text); }
+        .content-stage {
+            position: relative;
+            flex: 1 1 0;
+            min-height: 0;
+            height: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+        .content-stage > .content-frame {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            min-height: 0;
+        }
         .header-login-row {
     display: flex;
     flex-wrap: wrap;
@@ -82,7 +98,10 @@
         </div>
         <main>
             <div id="section-menu-container"></div>
+            <div class="content-stage">
             <div id="content-root" class="content-frame" data-leaf=""></div><!--LEAF_BODY-->
+            <iframe id="content-frame" class="content-frame hidden" title="Contenu de la section" src="about:blank"></iframe>
+            </div>
         </main>
         <footer>
             <div class="footer-brand">
@@ -221,9 +240,17 @@
         function setSiteTheme(theme) {
             if (!window.synkroneTheme) return;
             synkroneTheme.set(theme);
+            document.querySelectorAll('iframe').forEach((frame) => synkroneTheme.applyToFrame(frame));
             renderUI();
         }
-        function bindFrameTheme() {}
+        function bindFrameTheme() {
+            const frame = document.getElementById('content-frame');
+            if (!frame || frame.dataset.themeBound) return;
+            frame.dataset.themeBound = '1';
+            frame.addEventListener('load', () => {
+                if (window.synkroneTheme) synkroneTheme.applyToFrame(frame);
+            });
+        }
         function publicToolsHtml() {
             if (!store.internal) return '';
             return `<nav class="sk-app-nav" aria-label="Hub">
@@ -660,14 +687,164 @@
             window.history.pushState({}, '', href);
         }
 
+        const SKIP_LEAF_HREF = /fonts\.googleapis|fonts\.gstatic|font-awesome|cdnjs\.cloudflare|cdn\.tailwindcss|\/design\/synkrone\.css/;
+        const ISOLATED_APP_RE = /\/discord\/(bump|me|publicbot|dashbot|commandes)(\/|\.html|$)|\/admin\/|\/equipe\/|\/minecraft\/modpack|\/discord\/bots\/(vax|arceus|asuna|kayaba|yui|bot)(\.html)?$/;
+
+        function isIsolatedAppPath(path) {
+            return ISOLATED_APP_RE.test(String(path || '').split('?')[0]);
+        }
+
+        function contentPanes() {
+            return [
+                document.getElementById('content-root'),
+                document.getElementById('content-frame')
+            ].filter(Boolean);
+        }
+
+        const leafCache = new Map();
+
+        function leafCacheKey(path) {
+            return String(path || '').split('?')[0];
+        }
+
+        function isAccueilLeaf(path) {
+            const key = leafCacheKey(path);
+            return key === '/accueil/index.html' || key === '/accueil' || key === '/';
+        }
+
+        function hasLeafContent(root, path) {
+            if (!root || !root.childNodes.length) return false;
+            if (isAccueilLeaf(path || root.dataset.leaf)) {
+                return Boolean(root.querySelector('.hero, #scene-hero, h1'));
+            }
+            return Boolean(String(root.innerHTML || '').trim());
+        }
+
+        function snapshotLeaf(root) {
+            if (!root) return;
+            const key = leafCacheKey(root.dataset.leaf || '');
+            if (!key || !hasLeafContent(root, key)) return;
+            leafCache.set(key, {
+                html: root.innerHTML,
+                head: [...document.querySelectorAll('[data-leaf-asset]')].map((el) => el.outerHTML).join('')
+            });
+        }
+
+        function restartLeafReveal(root) {
+            const pane = root || document.getElementById('content-root');
+            if (!pane) return;
+            const nodes = pane.querySelectorAll('.reveal');
+            if (pane._revealIo) {
+                pane._revealIo.disconnect();
+                pane._revealIo = null;
+            }
+            if (!nodes.length) return;
+            nodes.forEach((node) => node.classList.remove('in'));
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                nodes.forEach((node) => node.classList.add('in'));
+                return;
+            }
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { root: pane, threshold: 0.08, rootMargin: '64px 0px' });
+            nodes.forEach((node) => io.observe(node));
+            pane._revealIo = io;
+        }
+        window.restartLeafReveal = restartLeafReveal;
+
+        function playLeafReveal(root) {
+            if (!root) return;
+            root.scrollTop = 0;
+            requestAnimationFrame(() => restartLeafReveal(root));
+        }
+
+        function restoreLeaf(root, path, cached) {
+            applyLeafHead(cached.head);
+            root.innerHTML = cached.html;
+            root.dataset.leaf = leafCacheKey(path);
+            root.scrollTop = 0;
+            replayLeafScripts(root);
+            playLeafReveal(root);
+        }
+
+        function showFramePane() {
+            const root = document.getElementById('content-root');
+            const frame = document.getElementById('content-frame');
+            snapshotLeaf(root);
+            if (root) root.classList.add('hidden');
+            if (frame) frame.classList.remove('hidden');
+        }
+
+        function showLeafPane() {
+            const root = document.getElementById('content-root');
+            const frame = document.getElementById('content-frame');
+            if (frame) {
+                frame.classList.add('hidden');
+                const src = frame.getAttribute('src') || '';
+                if (src && src !== 'about:blank') frame.src = 'about:blank';
+            }
+            if (root) root.classList.remove('hidden');
+        }
+
+        function frameSrcMatches(frame, path) {
+            try {
+                const now = new URL(frame.getAttribute('src') || '', window.location.origin);
+                const next = new URL(path, window.location.origin);
+                return now.pathname + now.search === next.pathname + next.search;
+            } catch {
+                return (frame.getAttribute('src') || '') === path;
+            }
+        }
+
+        function setFrameSrc(path) {
+            const frame = document.getElementById('content-frame');
+            if (!frame || !path) return;
+            showFramePane();
+            if (frameSrcMatches(frame, path)) return;
+            frame.src = path;
+        }
+
         function applyLeafHead(html) {
-            document.querySelectorAll('[data-leaf-asset]').forEach((el) => el.remove());
+            document.querySelectorAll('[data-leaf-asset="1"]').forEach((el) => el.remove());
             const wrap = document.createElement('div');
             wrap.innerHTML = html || '';
             [...wrap.querySelectorAll('link,style')].forEach((el) => {
-                el.setAttribute('data-leaf-asset', '1');
+                const href = el.getAttribute('href') || '';
+                if (href && document.querySelector(`link[rel="stylesheet"][href="${href}"]`)) return;
+                el.setAttribute('data-leaf-asset', href.includes('accueil.css') ? 'shared' : '1');
                 document.head.appendChild(el);
             });
+        }
+
+        function resolveLeafHref(href, leafPath) {
+            if (!href || /^(https?:|\/|data:)/i.test(href)) return href;
+            try {
+                return new URL(href, `${window.location.origin}${leafPath}`).pathname;
+            } catch {
+                return href;
+            }
+        }
+
+        function leafDocumentParts(html, leafPath) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const nested = doc.getElementById('content-root');
+            const isShell = Boolean(doc.getElementById('app-chrome') || doc.querySelector('.app-container'));
+            const links = [...doc.head.querySelectorAll('link[rel="stylesheet"]')]
+                .map((el) => {
+                    const href = resolveLeafHref(el.getAttribute('href') || '', leafPath);
+                    if (SKIP_LEAF_HREF.test(href)) return '';
+                    el.setAttribute('href', href);
+                    return el.outerHTML;
+                })
+                .filter(Boolean);
+            const styles = [...doc.head.querySelectorAll('style')].map((el) => el.outerHTML);
+            const body = isShell ? (nested ? nested.innerHTML : '') : doc.body.innerHTML;
+            return { links, styles, body };
         }
 
         function replayLeafScripts(root) {
@@ -701,23 +878,57 @@
         async function loadLeaf(path) {
             const root = document.getElementById('content-root');
             if (!root || !path) return;
-            if (root.dataset.leaf === path && root.childNodes.length) return;
+            const key = leafCacheKey(path);
+            showLeafPane();
+            if (root.dataset.leaf === path && hasLeafContent(root, path)) {
+                if (root.dataset.visited === '1') playLeafReveal(root);
+                root.dataset.visited = '1';
+                return;
+            }
+            if (root.dataset.leaf && root.dataset.leaf !== path) snapshotLeaf(root);
+            const cached = leafCache.get(key);
+            if (cached && String(cached.html || '').trim()) {
+                restoreLeaf(root, path, cached);
+                root.dataset.visited = '1';
+                return;
+            }
             const res = await fetch(path, { credentials: 'same-origin', cache: 'no-store' });
             if (!res.ok) {
                 root.innerHTML = '<p style="padding:24px">Page indisponible.</p>';
                 root.dataset.leaf = '';
                 return;
             }
-            const html = await res.text();
-            const doc = new DOMParser().parseFromString(html, 'text/html');
-            const links = [...doc.head.querySelectorAll('link[rel="stylesheet"]')]
-                .filter((el) => !/fonts\.googleapis|fonts\.gstatic/.test(el.href || ''))
-                .map((el) => el.outerHTML);
-            const styles = [...doc.head.querySelectorAll('style')].map((el) => el.outerHTML);
-            applyLeafHead(`${links.join('')}${styles.join('')}`);
-            root.innerHTML = doc.body.innerHTML;
-            root.dataset.leaf = path;
+            const parts = leafDocumentParts(await res.text(), path);
+            if (!String(parts.body || '').trim()) {
+                const onHome = ['/', '/accueil'].includes(normalizePath(window.location.pathname));
+                if (isAccueilLeaf(path) && onHome) {
+                    root.innerHTML = '<p style="padding:24px">Page indisponible.</p>';
+                    root.dataset.leaf = '';
+                    return;
+                }
+                const route = isAccueilLeaf(path)
+                    ? '/accueil'
+                    : (path.replace(/\/index\.html$/, '').replace(/\.html$/, '') || '/accueil');
+                window.location.assign(route.startsWith('/') ? route : `/${route}`);
+                return;
+            }
+            applyLeafHead(`${parts.links.join('')}${parts.styles.join('')}`);
+            root.innerHTML = parts.body;
+            root.dataset.leaf = key;
+            leafCache.set(key, {
+                html: parts.body,
+                head: `${parts.links.join('')}${parts.styles.join('')}`
+            });
             replayLeafScripts(root);
+            root.dataset.visited = '1';
+        }
+
+        function loadContent(path) {
+            if (isIsolatedAppPath(path)) {
+                setFrameSrc(path);
+                return Promise.resolve();
+            }
+            return loadLeaf(path);
         }
 
         function setActiveMainTab(mainSection) {
@@ -738,27 +949,27 @@
 
         async function loadSectionMenu(mainSection) {
             const sectionMenuContainer = document.getElementById('section-menu-container');
-            const root = document.getElementById('content-root');
+            const panes = contentPanes();
             const section = APP_STRUCTURE[mainSection];
-            if (!sectionMenuContainer || !root || !section) return;
+            if (!sectionMenuContainer || !panes.length || !section) return;
             if (!section.menu) {
                 sectionMenuContainer.innerHTML = '';
-                root.classList.remove('with-section-menu');
+                panes.forEach((el) => el.classList.remove('with-section-menu'));
                 return;
             }
             try {
-                const res = await fetch(`${section.menu}?v=2`, { cache: 'no-store' });
+                const res = await fetch(section.menu);
                 if (!res.ok) {
                     sectionMenuContainer.innerHTML = '';
-                    root.classList.remove('with-section-menu');
+                    panes.forEach((el) => el.classList.remove('with-section-menu'));
                     return;
                 }
                 sectionMenuContainer.innerHTML = await res.text();
-                root.classList.add('with-section-menu');
+                panes.forEach((el) => el.classList.add('with-section-menu'));
             } catch (e) {
                 console.error("Erreur lors du chargement du menu de section", e);
                 sectionMenuContainer.innerHTML = '';
-                root.classList.remove('with-section-menu');
+                panes.forEach((el) => el.classList.remove('with-section-menu'));
             }
         }
 
@@ -773,7 +984,7 @@
                     if (!pagePath) return;
                     e.preventDefault();
                     setActiveSubTab(subTarget);
-                    loadLeaf(pagePath);
+                    loadContent(pagePath);
                     const targetRoute = section.routes?.[subTarget] || section.route;
                     syncBrowserPath(targetRoute);
                 };
@@ -805,7 +1016,7 @@
                     leafPath = `${section.page}?profile=${encodeURIComponent(profileTab.replace(/^\//, ''))}`;
                 }
                 const query = leafSearch(mainSection, search);
-                await loadLeaf(withSearch(leafPath, query));
+                await loadContent(withSearch(leafPath, query));
                 if (updateUrl) {
                     const leafRoute = (mainSection === 'me' && profileTab)
                         ? profileTab
@@ -830,7 +1041,7 @@
                 framePath = `${framePath}?cloudPath=${encodeURIComponent(cloudPath)}`;
             }
 
-            await loadLeaf(framePath);
+            await loadContent(framePath);
             
             if (updateUrl) {
                 const sectionRoutes = section.routes || {};

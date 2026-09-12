@@ -576,6 +576,7 @@ async function sendShell(res, pathname) {
         publicDir: path.join(__dirname, 'public'),
         pathname
     });
+    res.set('Cache-Control', 'no-store');
     res.type('html').send(html);
 }
 
@@ -702,7 +703,13 @@ function mountPublic(app, options = {}) {
     }
 
     const designDir = path.join(__dirname, '..', '..', '..', 'apps', 'www', 'design');
-    app.use('/design', express.static(designDir));
+    app.use('/design', express.static(designDir, {
+        etag: true,
+        setHeaders(res, filePath) {
+            if (String(filePath).endsWith('.html')) res.setHeader('Cache-Control', 'no-store');
+            else res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
+    }));
     app.use('/me-media', express.static(ME_UPLOADS_DIR, { fallthrough: true, maxAge: '7d' }));
     void fs.mkdir(ME_UPLOADS_DIR, { recursive: true }).catch(() => undefined);
 
@@ -1668,7 +1675,13 @@ app.get(/^\/(.*)$/i, async (req, res, next) => {
     return sendShell(res, normalizedPath);
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+        etag: true,
+        setHeaders(res, filePath) {
+            if (String(filePath).endsWith('.html')) res.setHeader('Cache-Control', 'no-store');
+            else res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
+    }));
 app.get(/^(.*)$/, (req, res, next) => {
     if (isReservedPublicPath(req.path)) return next();
     return sendShell(res, req.path);

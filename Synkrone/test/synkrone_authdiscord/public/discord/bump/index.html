@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone — Bump</title>
     <meta name="description" content="Listing public des serveurs Discord de la communauté Synkrone.">
-    <!-- Ajout de FontAwesome pour les icônes -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
     <style>
         :root {
             --bg: #eef0ea;
@@ -42,8 +43,8 @@
         html, body {
             margin: 0 !important;
             padding: 0 !important;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
             color: var(--text);
@@ -171,6 +172,29 @@
     </style>
     <link rel="stylesheet" href="/design/synkrone.css">
     <link rel="stylesheet" href="/assets/app-pages.css">
+    <style>
+        .btn {
+            min-height: 36px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #3f6b52;
+            color: #fff;
+            border: 1px solid transparent;
+        }
+        .btn-primary:hover { background: #2e5039; }
+        .btn-outline {
+            background: #fff;
+            color: #1b211e;
+            border: 1px solid #5c6a6640;
+        }
+        .btn-outline:hover { background: #e4ece4; border-color: #1b211e; }
+    </style>
 </head>
 <body>
 
@@ -390,7 +414,7 @@
                         ${store.user ? `
                             <button class="btn btn-primary" onclick="navigate('myservers')">Mes serveurs</button>
                         ` : `
-                            <button class="btn btn-outline" onclick="window.top.location.href='/login?returnTo=/discord/bump'">Se connecter pour ajouter un serveur</button>
+                            <button class="btn btn-primary" onclick="window.top.location.href='/login?returnTo=/discord/bump'">Se connecter pour ajouter un serveur</button>
                         `}
                     </div>
                 </div>
@@ -918,37 +942,43 @@
             }
         }
 
-        async function initApp() { 
-            try { 
-                const r = await fetch("/api/me"); 
-                const d = await r.json(); 
-                store.user = d.authenticated ? d.user : null; 
-                
-                let srv = await fetch("/api/discord/bump/servers");
-                if (!srv.ok) srv = await fetch("/api/discord/bump/public");
-                if(srv.ok) { 
-                    const sd = await srv.json(); 
-                    AllServers = (sd.servers || []).map(x=>({
-                        id: x.id, 
-                        name: x.name, 
-                        desc: "Serveur synchronisé avec l'infrastructure Synkrone.", 
-                        icon: x.icon && String(x.icon).startsWith('http') ? x.icon : (x.icon ? ("https://cdn.discordapp.com/icons/" + x.id + "/" + x.icon + ".png") : "/assets/images/logo.jpg"), 
-                        banner: "", 
-                        stats: {views:0, likes:0, members: x.members || 0, online: 0}, 
-                        userRole: x.role || 'visitor', 
-                        hasSynkrone: false, 
-                        isFeatured: Boolean(x.featuredUntil && x.featuredUntil > Date.now()), 
-                        unlockedFeatures: [], 
+        function fetchJson(url, ms = 4000) {
+            const ctrl = new AbortController();
+            const timer = window.setTimeout(() => ctrl.abort(), ms);
+            return fetch(url, { signal: ctrl.signal }).finally(() => window.clearTimeout(timer));
+        }
+
+        async function initApp() {
+            navigate("explorer");
+            try {
+                const r = await fetchJson("/api/me");
+                const d = await r.json();
+                store.user = d.authenticated ? d.user : null;
+
+                let srv = await fetchJson("/api/discord/bump/servers");
+                if (!srv.ok) srv = await fetchJson("/api/discord/bump/public");
+                if (srv.ok) {
+                    const sd = await srv.json();
+                    AllServers = (sd.servers || []).map(x => ({
+                        id: x.id,
+                        name: x.name,
+                        desc: "Serveur synchronisé avec l'infrastructure Synkrone.",
+                        icon: x.icon && String(x.icon).startsWith('http') ? x.icon : (x.icon ? ("https://cdn.discordapp.com/icons/" + x.id + "/" + x.icon + ".png") : "/assets/images/logo.jpg"),
+                        banner: "",
+                        stats: { views: 0, likes: 0, members: x.members || 0, online: 0 },
+                        userRole: x.role || 'visitor',
+                        hasSynkrone: false,
+                        isFeatured: Boolean(x.featuredUntil && x.featuredUntil > Date.now()),
+                        unlockedFeatures: [],
                         disabledFeatures: [],
-                        customTheme: {active: false}, 
+                        customTheme: { active: false },
                         internalData: { owners: [], admins: [], bots: [], roles: [], channels: [] }
-                    })); 
+                    }));
                 }
-            } catch (e) { console.error(e); } 
-            
-            navigate("explorer"); 
-        } 
-        
+            } catch (e) { console.error(e); }
+            navigate("explorer");
+        }
+
         initApp();
     </script>
 </body>

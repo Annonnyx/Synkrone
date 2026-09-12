@@ -50,20 +50,23 @@ const LEAF_BY_PATH = {
     '/login': '/login.html',
     '/discord': '/discord/bots/index.html',
     '/discord/bots': '/discord/bots/index.html',
+    '/minecraft': '/minecraft/serveur/index.html',
+    '/minecraft/serveur': '/minecraft/serveur/index.html',
+    '/compte': '/compte/index.html',
+    '/serveur': '/serveur/index.html'
+};
+
+const FRAME_BY_PATH = {
     '/discord/publicbot': '/discord/publicbot/index.html',
     '/discord/dashbot': '/discord/dashbot/index.html',
     '/discord/commandes': '/discord/commandes/index.html',
     '/discord/bump': '/discord/bump/index.html',
     '/discord/me': '/discord/me/index.html',
-    '/minecraft': '/minecraft/serveur/index.html',
-    '/minecraft/serveur': '/minecraft/serveur/index.html',
     '/minecraft/modpack': '/minecraft/modpack/index.html',
-    '/minecraft/modpack/accueil': '/minecraft/modpack/accueil.html',
-    '/minecraft/modpack/xenus': '/minecraft/modpack/xenus.html',
-    '/minecraft/modpack/thefrenchbaguette': '/minecraft/modpack/thefrenchbaguette.html',
-    '/minecraft/modpack/vanipack': '/minecraft/modpack/vanipack.html',
-    '/compte': '/compte/index.html',
-    '/serveur': '/serveur/index.html',
+    '/minecraft/modpack/accueil': '/minecraft/modpack/index.html?tab=accueil',
+    '/minecraft/modpack/xenus': '/minecraft/modpack/index.html?tab=xenus',
+    '/minecraft/modpack/thefrenchbaguette': '/minecraft/modpack/index.html?tab=thefrenchbaguette',
+    '/minecraft/modpack/vanipack': '/minecraft/modpack/index.html?tab=vanipack',
     '/discord/bots/vax': '/discord/bots/vax.html',
     '/discord/bots/arceus': '/discord/bots/arceus.html',
     '/discord/bots/asuna': '/discord/bots/asuna.html',
@@ -82,23 +85,42 @@ const LEAF_BY_PATH = {
     '/equipe/cloud': '/equipe/cloud/index.html'
 };
 
+const BOT_FRAME_SLUGS = new Set(['vax', 'arceus', 'asuna', 'kayaba', 'yui', 'bot']);
+
 function normalizePath(pathname) {
     let value = String(pathname || '/');
     if (value.length > 1 && value.endsWith('/')) value = value.slice(0, -1);
     return value || '/';
 }
 
-function leafForPath(pathname) {
+function isFramePath(pathname) {
+    return Boolean(frameSrcForPath(pathname));
+}
+
+function frameSrcForPath(pathname) {
     const current = normalizePath(pathname);
-    if (LEAF_BY_PATH[current]) return LEAF_BY_PATH[current];
+    if (FRAME_BY_PATH[current]) return FRAME_BY_PATH[current];
     if (current.startsWith('/discord/bots/')) {
         const slug = current.slice('/discord/bots/'.length);
-        if (LEAF_BY_PATH[`/discord/bots/${slug}`]) return LEAF_BY_PATH[`/discord/bots/${slug}`];
+        if (BOT_FRAME_SLUGS.has(slug)) return `/discord/bots/${slug}.html`;
     }
     if (current.startsWith('/minecraft/modpack/')) {
-        const slug = current.slice('/minecraft/modpack/'.length);
-        if (LEAF_BY_PATH[`/minecraft/modpack/${slug}`]) return LEAF_BY_PATH[`/minecraft/modpack/${slug}`];
+        const tab = current.slice('/minecraft/modpack/'.length);
+        if (tab) return `/minecraft/modpack/index.html?tab=${encodeURIComponent(tab)}`;
     }
+    if (current.startsWith('/equipe/cloud/') && current !== '/equipe/cloud') {
+        const cloudPath = current.slice('/equipe/cloud/'.length);
+        return `/equipe/cloud/index.html?cloudPath=${encodeURIComponent(cloudPath)}`;
+    }
+    if (current.startsWith('/admin/')) return FRAME_BY_PATH['/admin/utilisateur'];
+    if (current.startsWith('/equipe/')) return FRAME_BY_PATH['/equipe/espace-travail'];
+    return null;
+}
+
+function leafForPath(pathname) {
+    const current = normalizePath(pathname);
+    if (frameSrcForPath(current)) return null;
+    if (LEAF_BY_PATH[current]) return LEAF_BY_PATH[current];
     return null;
 }
 
@@ -117,13 +139,27 @@ function extractAttr(html, tag, attr) {
     return match ? match[1] : '';
 }
 
+const CHROME_BREAKING_HREF = /fonts\.googleapis|fonts\.gstatic|font-awesome|cdnjs\.cloudflare|cdn\.tailwindcss|\/design\/synkrone\.css/i;
+const CHROME_BREAKING_SCRIPT = /<script\b[^>]*\bsrc=["'][^"']*(?:tailwindcss|font-awesome|cdnjs\.cloudflare)[^"']*["'][^>]*>\s*<\/script>/gi;
+
+function styleLeaksToChrome(css) {
+    const text = String(css || '');
+    if (/(?:html|body)[^{]*\{[^}]*(?:100vw|\bdisplay\s*:\s*flex\b)/i.test(text)) return true;
+    if (/\*\s*\{[^}]*(?:margin\s*:\s*0)[^}]*padding\s*:\s*0/i.test(text)) return true;
+    return false;
+}
+
 function extractLeafParts(html) {
     const head = extractTagInner(html, 'head');
-    const body = extractTagInner(html, 'body') || String(html || '');
+    let body = extractTagInner(html, 'body') || String(html || '');
+    body = body.replace(CHROME_BREAKING_SCRIPT, '');
     const links = [...head.matchAll(/<link\b[^>]*>/gi)]
         .map((row) => row[0])
-        .filter((tag) => /rel=["']stylesheet["']/i.test(tag) && !/fonts\.googleapis|fonts\.gstatic/i.test(tag));
-    const styles = [...head.matchAll(/<style\b[\s\S]*?<\/style>/gi)].map((row) => row[0]);
+        .filter((tag) => /rel=["']stylesheet["']/i.test(tag))
+        .filter((tag) => !CHROME_BREAKING_HREF.test(tag));
+    const styles = [...head.matchAll(/<style\b[\s\S]*?<\/style>/gi)]
+        .map((row) => row[0])
+        .filter((tag) => !styleLeaksToChrome(tag));
     const title = (extractTagInner(html, 'title') || '').trim();
     const description = extractAttr(head, 'meta', 'content') && /name=["']description["']/i.test(head)
         ? (head.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i)
@@ -156,10 +192,26 @@ function applyMeta(shell, { title, description, pathname }) {
     return html;
 }
 
+function applyFrameShell(html, frameSrc) {
+    let next = html.replace(
+        /<div id="content-root"[^>]*>[\s\S]*?<\/div>\s*<!--LEAF_BODY-->/,
+        '<div id="content-root" class="content-frame hidden" data-leaf=""></div><!--LEAF_BODY-->'
+    );
+    next = next.replace(
+        /<iframe id="content-frame"[^>]*>/,
+        `<iframe id="content-frame" class="content-frame" title="Contenu de la section" src="${frameSrc}">`
+    );
+    return next;
+}
+
 async function renderShell({ shellPath, publicDir, pathname }) {
     const shell = await fs.readFile(shellPath, 'utf8');
     const leafRel = leafForPath(pathname);
+    const frameSrc = frameSrcForPath(pathname);
     const description = descriptionForPath(pathname);
+    if (frameSrc) {
+        return applyFrameShell(applyMeta(shell, { title: '', description, pathname }), frameSrc);
+    }
     if (!leafRel) {
         return applyMeta(shell, { title: '', description, pathname });
     }
@@ -173,7 +225,10 @@ async function renderShell({ shellPath, publicDir, pathname }) {
     const title = parts.title || '';
     const desc = parts.description || description;
     let html = applyMeta(shell, { title, description: desc, pathname });
-    const markedHead = parts.headExtras.replace(/<(link|style)\b/gi, '<$1 data-leaf-asset="1"');
+    const markedHead = parts.headExtras.replace(/<(link|style)\b[^>]*>/gi, (tag) => {
+        const attr = /accueil\.css/i.test(tag) ? 'shared' : '1';
+        return tag.replace(/<(link|style)\b/i, `<$1 data-leaf-asset="${attr}"`);
+    });
     html = html.replace('<!--LEAF_HEAD-->', markedHead);
     html = html.replace(
         /<div id="content-root"[^>]*>[\s\S]*?<\/div>\s*<!--LEAF_BODY-->/,
@@ -185,9 +240,13 @@ async function renderShell({ shellPath, publicDir, pathname }) {
 module.exports = {
     PAGE_DESCRIPTIONS,
     LEAF_BY_PATH,
+    FRAME_BY_PATH,
     leafForPath,
+    frameSrcForPath,
+    isFramePath,
     descriptionForPath,
     extractLeafParts,
+    styleLeaksToChrome,
     renderShell,
     SITE_ORIGIN
 };
