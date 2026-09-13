@@ -175,7 +175,7 @@ export class FilesystemManager {
     }
   }
 
-  async diskUsageMb(): Promise<number> {
+  async diskUsageBytes(): Promise<number> {
     let total = 0;
     const walk = async (dir: string) => {
       const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -197,6 +197,36 @@ export class FilesystemManager {
     } catch {
       return 0;
     }
+    return total;
+  }
+
+  async diskUsageMb(): Promise<number> {
+    const total = await this.diskUsageBytes();
     return Math.round((total / (1024 * 1024)) * 10) / 10;
+  }
+
+  async sizeOf(relative: string): Promise<number> {
+    try {
+      const abs = await this.resolve(relative, true);
+      const st = await fs.lstat(abs);
+      if (!st.isDirectory()) return st.size;
+      let total = 0;
+      const walk = async (dir: string) => {
+        const entries = await fs.readdir(dir, { withFileTypes: true });
+        for (const e of entries) {
+          const full = path.join(dir, e.name);
+          try {
+            if (e.isDirectory()) await walk(full);
+            else total += (await fs.lstat(full)).size;
+          } catch {
+            /* ignore */
+          }
+        }
+      };
+      await walk(abs);
+      return total;
+    } catch {
+      return 0;
+    }
   }
 }

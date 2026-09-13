@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { TYPE_CPU_HARD_CAP } from "@/lib/services/resource-presets";
 
 export type TypeLimits = {
   cpuMillicores: number;
@@ -42,9 +43,9 @@ const DEFAULTS: PlatformSettings = {
   maxMemoryMb: 8192,
   maxStorageMb: 51200,
   limits: {
-    discord: { cpuMillicores: 2000, memoryMb: 2048, storageMb: 10240 },
+    discord: { cpuMillicores: 1000, memoryMb: 2048, storageMb: 10240 },
     minecraft: { cpuMillicores: 4000, memoryMb: 8192, storageMb: 51200 },
-    web: { cpuMillicores: 2000, memoryMb: 4096, storageMb: 20480 },
+    web: { cpuMillicores: 1000, memoryMb: 4096, storageMb: 20480 },
   },
   discounts: [],
 };
@@ -81,7 +82,12 @@ export function normalizePlatform(raw: unknown): PlatformSettings {
     const row = limitsIn[type] || {};
     const fallback = DEFAULTS.limits[type];
     out.limits[type] = {
-      cpuMillicores: asInt(row.cpuMillicores, fallback.cpuMillicores, 100, out.maxCpuMillicores),
+      cpuMillicores: asInt(
+        row.cpuMillicores,
+        fallback.cpuMillicores,
+        100,
+        Math.min(out.maxCpuMillicores, TYPE_CPU_HARD_CAP[type]),
+      ),
       memoryMb: asInt(row.memoryMb, fallback.memoryMb, 64, out.maxMemoryMb),
       storageMb: asInt(row.storageMb, fallback.storageMb, 512, out.maxStorageMb),
     };

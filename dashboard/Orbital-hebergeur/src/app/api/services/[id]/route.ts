@@ -16,7 +16,7 @@ import {
 } from "@/db/schema";
 import { body, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
-import { requireUser } from "@/lib/auth";
+import { HttpError, requireUser } from "@/lib/auth";
 import { decryptSecret, isLockedSecret, rewrapSecret } from "@/lib/crypto";
 import { publicSftpEndpoint } from "@/lib/sftp/manager";
 import { applicationIdFromToken } from "@/lib/discord/token";
@@ -25,6 +25,10 @@ import { authorizeService } from "@/lib/runtime";
 import { dnsRecordsFor, domainHints } from "@/lib/domains/public";
 import { createJob, dispatch } from "@/lib/jobs/queue";
 import { deleteServiceJob } from "@/lib/jobs/handlers";
+import { deletionDeadline } from "@/lib/services/inactivity";
+import { isPerServiceSftpSecret } from "@/lib/sftp/password";
+import { deleteValidationMessage, validateServiceDelete } from "@/lib/services/delete-confirm";
+import { touchOwnerActivity } from "@/lib/services/lifecycle";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -110,10 +114,25 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
       .select()
       .from(sftpCredentials)
       .where(eq(sftpCredentials.serviceId, id));
-    detail.sftp = sftp ? { ...sftp, passwordEnc: undefined, ...publicSftpEndpoint() } : null;
+    const sftpPlain = sftp ? decryptSecret(sftp.passwordEnc) : null;
+    detail.sftp = sftp
+      ? {
+          ...sftp,
+          passwordEnc: undefined,
+          hasPassword: isPerServiceSftpSecret(sftpPlain),
+          ...publicSftpEndpoint(),
+        }
+      : null;
     detail.databases = (
       await db.select().from(serviceDatabases).where(eq(serviceDatabases.serviceId, id))
     ).map((d) => ({ ...d, passwordEnc: undefined }));
+    const suspendedAt = svc.suspendedAt?.getTime() ?? null;
+    detail.inactivity = {
+      suspended: Boolean(suspendedAt) || svc.state === "SUSPENDED",
+      warned: Boolean(svc.deletionWarnedAt),
+      deleteAt: suspendedAt ? new Date(deletionDeadline(suspendedAt)).toISOString() : null,
+      storageOverflow: Boolean(svc.storageOverflowAt),
+    };
     return detail;
   });
 }
@@ -154,6 +173,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
         updatedAt: new Date(),
       })
       .where(eq(servicesTable.id, id));
+    await touchOwnerActivity(id);
     await audit({ userId: user.id, serviceId: id, action: "service.update" });
     return {
       ok: true,
@@ -162,11 +182,14 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   });
 }
 
-export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   return route(async () => {
     const user = await requireUser();
     const svc = await authorizeService(id, user.id, "owner");
+    const payload = await body<{ name?: string; confirmDiskGone?: boolean }>(req);
+    const check = validateServiceDelete(svc.name, String(payload.name ?? ""), payload.confirmDiskGone === true);
+    if (!check.ok) throw new HttpError(400, deleteValidationMessage(check.code), check.code);
     const jobId = await createJob({
       type: "DELETE_CONTAINER",
       serviceId: id,

@@ -40,3 +40,11 @@ export function isUndefinedTable(err: unknown): boolean {
     return /relation ["'].+["'] does not exist/i.test(message);
   });
 }
+
+/** True when a unique index / primary key rejected the write. */
+export function isUniqueViolation(err: unknown): boolean {
+  return walkError(err, (code, message) => {
+    if (code === "23505") return true;
+    return /duplicate key value violates unique constraint/i.test(message);
+  });
+}

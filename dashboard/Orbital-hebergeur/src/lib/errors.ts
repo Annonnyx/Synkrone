@@ -19,6 +19,47 @@ type Rule = {
  */
 const RULES: Rule[] = [
   {
+    match: /STORAGE_QUOTA_EXCEEDED/i,
+    fr: {
+      title: "Quota de stockage atteint",
+      explanation:
+        "Le volume de ce service dépasse la limite choisie. Les uploads et le SFTP sont bloqués, et le conteneur est arrêté pour empêcher d'autres écritures.",
+      action: "Supprimez des fichiers dans l'onglet Fichiers, puis redémarrez le service.",
+    },
+    en: {
+      title: "Storage quota exceeded",
+      explanation:
+        "This service's volume is over the chosen limit. Uploads and SFTP are blocked, and the container is stopped so it cannot keep writing.",
+      action: "Delete files in the Files tab, then start the service again.",
+    },
+  },
+  {
+    match: /DELETE_NAME_MISMATCH|Type the exact service name/i,
+    fr: {
+      title: "Nom du service incorrect",
+      explanation: "La suppression exige de retaper le nom exact du service.",
+      action: "Saisissez le nom affiché, puis confirmez que le disque sera effacé.",
+    },
+    en: {
+      title: "Service name does not match",
+      explanation: "Deletion requires typing the exact service name.",
+      action: "Type the name shown on the page, then confirm that the disk will be erased.",
+    },
+  },
+  {
+    match: /DELETE_CONFIRM_REQUIRED|Tick the box confirming/i,
+    fr: {
+      title: "Confirmation manquante",
+      explanation: "Il faut cocher que le disque sera définitivement effacé.",
+      action: "Cochez la case, puis confirmez la suppression.",
+    },
+    en: {
+      title: "Confirmation required",
+      explanation: "You must confirm that the disk will be permanently erased.",
+      action: "Tick the checkbox, then confirm deletion.",
+    },
+  },
+  {
     match: /INSUFFICIENT_KRONES|Solde insuffisant/i,
     fr: {
       title: "Solde Krônes insuffisant",

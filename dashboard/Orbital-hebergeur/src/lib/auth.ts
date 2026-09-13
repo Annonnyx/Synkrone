@@ -4,8 +4,6 @@ import { db } from "@/db";
 import { isDatabaseUnavailable } from "@/lib/db-errors";
 import { apiKeys, sessions, users } from "@/db/schema";
 import { hashPassword, randomToken, sha256, verifyPassword } from "@/lib/crypto";
-import { SFTPManager } from "@/lib/sftp/manager";
-
 export const SESSION_COOKIE = "synkrone_session";
 const LEGACY_SESSION_COOKIE = "orbital_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 21;
@@ -153,7 +151,6 @@ export async function registerUser(email: string, name: string, password: string
       passwordHash: hashPassword(password),
     })
     .returning({ id: users.id });
-  await syncSftpPassword(row.id, password);
   return row.id;
 }
 
@@ -165,7 +162,6 @@ export async function loginUser(email: string, password: string) {
     .limit(1);
   if (!rows.length || !verifyPassword(password, rows[0].passwordHash))
     throw new HttpError(401, "Invalid email or password");
-  await syncSftpPassword(rows[0].id, password);
   return rows[0].id;
 }
 
@@ -187,13 +183,4 @@ export async function changePassword(
     .update(users)
     .set({ passwordHash: hashPassword(newPassword) })
     .where(eq(users.id, userId));
-  await syncSftpPassword(userId, newPassword);
-}
-
-async function syncSftpPassword(userId: string, password: string): Promise<void> {
-  try {
-    await SFTPManager.applyOwnerPassword(userId, password);
-  } catch (err) {
-    console.error("[sftp] failed to sync gateway password", err);
-  }
 }

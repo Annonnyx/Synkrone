@@ -9,7 +9,8 @@ export type LifecycleState =
   | "RESTARTING"
   | "CRASHED"
   | "ERROR"
-  | "DELETING";
+  | "DELETING"
+  | "SUSPENDED";
 
 export type ServiceStatus = {
   state: LifecycleState;

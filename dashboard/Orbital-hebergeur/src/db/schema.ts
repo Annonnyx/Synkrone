@@ -147,6 +147,11 @@ export const services = pgTable(
     storageLimitMb: integer("storage_limit_mb").notNull().default(5120),
     restartPolicy: text("restart_policy").notNull().default("on-failure"),
     maxRestarts: integer("max_restarts").notNull().default(5),
+    lastOwnerActivityAt: timestamp("last_owner_activity_at", { withTimezone: true }),
+    suspendedAt: timestamp("suspended_at", { withTimezone: true }),
+    inactivityNotifiedAt: timestamp("inactivity_notified_at", { withTimezone: true }),
+    deletionWarnedAt: timestamp("deletion_warned_at", { withTimezone: true }),
+    storageOverflowAt: timestamp("storage_overflow_at", { withTimezone: true }),
     createdAt: createdAt(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()

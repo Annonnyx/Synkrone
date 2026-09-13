@@ -6,7 +6,7 @@ import type { GithubRepo } from "@/lib/oauth/types";
 import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
-import { ErrorText } from "@/components/panel";
+import { ErrorText, SecretBanner } from "@/components/panel";
 import { useToast } from "@/components/toast";
 import { TokenField } from "@/components/discord-token";
 import { SoftwarePicker, VersionPicker } from "@/components/mc-runtime";
@@ -21,6 +21,12 @@ import { activeDiscounts, type PromoDiscount } from "@/lib/krones/discounts";
 import { withPanelBase } from "@/lib/panel-base";
 import { PageHeader } from "@/components/ui";
 import { isCreationEnabled } from "@/lib/services/creation-flags";
+import {
+  cpuPluralSuffix,
+  cpuPresetsFor,
+  defaultCpuMillicores,
+  formatCpuCores,
+} from "@/lib/services/resource-presets";
 
 const CREATE_TYPES = ["discord", "minecraft", "web"] as const;
 type CreateType = (typeof CREATE_TYPES)[number];
@@ -86,12 +92,13 @@ export default function CreateServicePage() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [serviceId, setServiceId] = useState<string | null>(null);
+  const [sftpPassword, setSftpPassword] = useState<string | null>(null);
 
   // shared
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [memoryMb, setMemoryMb] = useState(type === "minecraft" ? 4096 : 512);
-  const [cpu, setCpu] = useState(type === "minecraft" ? 2000 : 1000);
+  const [cpu, setCpu] = useState(defaultCpuMillicores(type));
   const [storageMb, setStorageMb] = useState(type === "minecraft" ? 20480 : 5120);
   const [platform, setPlatform] = useState<{
     discordEnabled: boolean;
@@ -122,7 +129,7 @@ export default function CreateServicePage() {
 
   const typeLimits = platform?.limits?.[type];
   const ramPresets = [512, 1024, 2048, 4096, 8192, 16384].filter((m) => m <= (typeLimits?.memoryMb ?? 16384));
-  const cpuPresets = [500, 1000, 2000, 4000].filter((c) => c <= (typeLimits?.cpuMillicores ?? 4000));
+  const cpuPresets = cpuPresetsFor(type, typeLimits?.cpuMillicores ?? 4000);
   const [envText, setEnvText] = useState("");
 
   // discord
@@ -300,11 +307,19 @@ export default function CreateServicePage() {
           autoDeploy,
         };
 
-      const res = await api<{ service: { id: string }; jobId: string }>("/api/services", {
+      const res = await api<{ service: { id: string }; jobId: string; sftpPassword?: string }>("/api/services", {
         json: payload,
       });
       setServiceId(res.service.id);
       setJobId(res.jobId);
+      if (res.sftpPassword) {
+        setSftpPassword(res.sftpPassword);
+        try {
+          sessionStorage.setItem(`sftp-once:${res.service.id}`, res.sftpPassword);
+        } catch {
+          /* private mode */
+        }
+      }
       toast.success(t("toast.serviceCreated"), t("toast.serviceCreatedBody"));
     } catch (err) {
       setError((err as Error).message);
@@ -318,6 +333,13 @@ export default function CreateServicePage() {
       <div className="mx-auto max-w-xl">
         <h1 className="text-2xl font-bold">{t("create.creating")}</h1>
         <p className="mb-5 text-xs text-[var(--muted)]">{t("create.creatingHint")}</p>
+        {sftpPassword && (
+          <SecretBanner
+            label={t("create.sftpPasswordOnce")}
+            value={sftpPassword}
+            onClose={() => setSftpPassword(null)}
+          />
+        )}
         <div className="panel p-5">
           <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-[var(--panel-3)]">
             <div
@@ -762,7 +784,7 @@ export default function CreateServicePage() {
                     style={{ borderColor: cpu === c ? "var(--accent)" : "var(--line)" }}
                     onClick={() => setCpu(c)}
                   >
-                    {t("create.cores", { n: c / 1000, s: c > 1000 ? "s" : "" })}
+                    {t("create.cores", { n: formatCpuCores(c), s: cpuPluralSuffix(c) })}
                   </button>
                 ))}
                 <input
@@ -785,6 +807,7 @@ export default function CreateServicePage() {
               />,
             )}
             <p className="text-sm text-[var(--muted)]">{t("create.limitsHint")}</p>
+            <p className="text-sm text-[var(--muted)]">{t("create.storageHint")}</p>
             <p className="text-sm">
               {t("create.monthlyCost", { n: cost })} — {t("create.costHint")}
             </p>

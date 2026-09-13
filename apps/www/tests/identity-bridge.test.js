@@ -31,6 +31,27 @@ test('panel UUID users still bridge Discord from providers', () => {
     assert.equal(bridge.profile.id, '1368235294192570520');
 });
 
+test('linking Google from a Discord site user still attaches the Discord panel user', () => {
+    const { panelAttachPayload } = require('../lib/identity-bridge');
+    const payload = panelAttachPayload(
+        {
+            id: '1368235294192570520',
+            dbId: '70f4f7f6-df0a-4d0c-99f2-1a1c97fd1f68',
+            username: 'Onyx',
+            email: 'onyx@gmail.com',
+            avatar: '/a.png',
+            providers: { discord: '1368235294192570520' }
+        },
+        'google',
+        { id: 'google-sub-1', username: 'Onyx', email: 'onyx@gmail.com' }
+    );
+    assert.equal(payload.provider, 'discord');
+    assert.equal(payload.userId, '70f4f7f6-df0a-4d0c-99f2-1a1c97fd1f68');
+    assert.equal(payload.profile.id, '1368235294192570520');
+    assert.equal(payload.link.provider, 'google');
+    assert.equal(payload.link.profile.id, 'google-sub-1');
+});
+
 test('a panel UUID without Discord is not invented as linked', () => {
     assert.equal(
         panelBridgeFromSiteUser({

@@ -9,7 +9,7 @@ import { usePoll } from "@/lib/use-poll";
 import { useToast } from "@/components/toast";
 import { EmptyState, ErrorText, SecretBanner } from "@/components/panel";
 import { PageHeader } from "@/components/ui";
-import { SftpFields, SftpHowTo, SftpPasswordHint } from "@/components/sftp-connect";
+import { SftpFields, SftpHowTo } from "@/components/sftp-connect";
 
 type Database = {
   id: string;
@@ -155,9 +155,6 @@ export default function InfrastructurePage() {
       {section === "sftp" && (
         <div className="space-y-3">
           <SftpHowTo />
-          <div className="panel p-4">
-            <SftpPasswordHint />
-          </div>
           {accounts.map((a) => (
             <div key={a.id} className="panel space-y-4 p-4">
               <div>

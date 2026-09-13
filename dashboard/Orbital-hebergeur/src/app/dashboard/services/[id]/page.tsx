@@ -8,7 +8,7 @@ import { cpuPercentOfQuota } from "@/lib/runtime/cpu";
 import { useT } from "@/lib/i18n";
 import { usePoll } from "@/lib/use-poll";
 import { Bar, ErrorText, SecretBanner, Skeleton, StateBadge, TypeIcon } from "@/components/panel";
-import { SftpFields, SftpHowTo, SftpPasswordHint } from "@/components/sftp-connect";
+import { SftpFields, SftpHowTo, SftpPasswordActions } from "@/components/sftp-connect";
 import { useToast } from "@/components/toast";
 import { Console } from "@/components/console";
 import { FileManager } from "@/components/files";
@@ -37,6 +37,12 @@ type Detail = {
     storageLimitMb: number;
     restartPolicy: string;
     lastError: string | null;
+  };
+  inactivity?: {
+    suspended: boolean;
+    warned: boolean;
+    deleteAt: string | null;
+    storageOverflow: boolean;
   };
   container: {
     containerName: string;
@@ -106,7 +112,7 @@ type Detail = {
   };
   env: Array<{ id: string; key: string; secret: boolean }>;
   backups: Array<{ id: string; fileName: string; sizeBytes: number; status: string; createdAt: string }>;
-  sftp: { username: string; host: string; port: number; chroot: string } | null;
+  sftp: { username: string; host: string; port: number; chroot: string; hasPassword?: boolean } | null;
   databases: Array<{ id: string; dbName: string; dbUser: string; host: string; port: number; engine: string }>;
 };
 
@@ -152,12 +158,40 @@ function ServiceDetail() {
 
   usePoll(load, 8000, id);
 
+  useEffect(() => {
+    try {
+      const once = sessionStorage.getItem(`sftp-once:${id}`);
+      if (once) {
+        setSecret({ label: t("service.sftpPasswordOnce"), value: once });
+        sessionStorage.removeItem(`sftp-once:${id}`);
+      }
+    } catch {
+      /* private mode */
+    }
+  }, [id, t]);
+
+  useEffect(() => {
+    const ping = () => {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      void api(`/api/services/${id}/activity`, { json: {}, silent: true }).catch(() => undefined);
+    };
+    ping();
+    const timer = window.setInterval(ping, 10 * 60 * 1000);
+    document.addEventListener("visibilitychange", ping);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", ping);
+    };
+  }, [id]);
+
   const SUCCESS: Record<string, string> = {
     start: t("service.started"),
     stop: t("service.stopped"),
     restart: t("service.restarted"),
     kill: t("service.killed"),
     recreate: t("service.recreated"),
+    resume: t("service.started"),
+    sftp: t("toast.sftpRotated"),
     deploy: t("service.deployed"),
     backups: t("service.backupCreated"),
     database: t("service.dbProvisioned"),
@@ -245,6 +279,25 @@ function ServiceDetail() {
       </div>
 
       <ErrorText error={error} />
+      {data.inactivity?.storageOverflow && (
+        <div className="mb-3 rounded-lg border border-[var(--danger)] px-3 py-2 text-sm text-[var(--danger)]">
+          {t("service.quotaBanner")}
+        </div>
+      )}
+      {data.inactivity?.suspended && (
+        <div className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-[var(--warning)] px-3 py-2 text-sm">
+          <span>
+            {t(data.inactivity.warned ? "service.pausedBannerWarn" : "service.pausedBanner", {
+              date: data.inactivity.deleteAt
+                ? new Date(data.inactivity.deleteAt).toLocaleString()
+                : "—",
+            })}
+          </span>
+          <button className="btn btn-primary" disabled={busy} onClick={() => act("resume")}>
+            {t("service.resume")}
+          </button>
+        </div>
+      )}
       {secret && (
         <SecretBanner
           label={secret.label}
@@ -731,7 +784,18 @@ function ServiceDetail() {
                 username={data.sftp.username}
                 chroot={data.sftp.chroot}
               />
-              <SftpPasswordHint />
+              <SftpPasswordActions
+                hasPassword={Boolean(data.sftp.hasPassword)}
+                busy={busy}
+                onRegenerate={async () => {
+                  if (!confirm(t("service.sftpRegenerateConfirm"))) return;
+                  const res = await act("sftp");
+                  const password = typeof res?.password === "string" ? res.password : null;
+                  if (password) {
+                    setSecret({ label: t("service.sftpPasswordOnce"), value: password });
+                  }
+                }}
+              />
             </div>
           ) : (
             <div className="panel p-4 text-sm text-[var(--muted)]">{t("service.noSftp")}</div>
@@ -771,9 +835,8 @@ function ServiceDetail() {
               setBusy(false);
             }
           }}
-          onDelete={async () => {
-            if (!confirm(t("service.deleteConfirm"))) return;
-            await api(`/api/services/${id}`, { method: "DELETE" });
+          onDelete={async (payload) => {
+            await api(`/api/services/${id}`, { method: "DELETE", json: payload });
             router.push("/dashboard");
           }}
         />
@@ -1069,13 +1132,15 @@ function Settings({
   busy: boolean;
   onSaveBotCommands: (payload: { prefix: string; slashCommands: boolean }) => void;
   onSave: (patch: Record<string, unknown>) => void;
-  onDelete: () => void;
+  onDelete: (payload: { name: string; confirmDiskGone: boolean }) => void;
 }) {
   const t = useT();
   const [name, setName] = useState(service.name);
   const [memoryMb, setMemoryMb] = useState(service.memoryLimitMb);
   const [cpu, setCpu] = useState(service.cpuLimit);
   const [restartPolicy, setRestartPolicy] = useState(service.restartPolicy);
+  const [deleteName, setDeleteName] = useState("");
+  const [deleteAck, setDeleteAck] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -1130,9 +1195,33 @@ function Settings({
           {t("service.saveSettings")}
         </button>
       </div>
-      <div className="panel p-4">
+      <div className="panel space-y-3 p-4">
         <div className="label mb-2">{t("service.danger")}</div>
-        <button className="btn btn-danger" onClick={onDelete}>
+        <p className="text-sm text-[var(--muted)]">{t("service.deleteConfirm")}</p>
+        <div>
+          <div className="label mb-1">{t("service.deleteNameLabel")}</div>
+          <input
+            className="input"
+            value={deleteName}
+            onChange={(e) => setDeleteName(e.target.value)}
+            placeholder={service.name}
+            autoComplete="off"
+            spellCheck={false}
+          />
+        </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={deleteAck}
+            onChange={(e) => setDeleteAck(e.target.checked)}
+          />
+          {t("service.deleteDiskGone")}
+        </label>
+        <button
+          className="btn btn-danger"
+          disabled={deleteName !== service.name || !deleteAck}
+          onClick={() => onDelete({ name: deleteName, confirmDiskGone: deleteAck })}
+        >
           <Trash2 size={14} /> {t("service.deleteService")}
         </button>
       </div>

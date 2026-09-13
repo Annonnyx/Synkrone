@@ -41,8 +41,32 @@ test('a Discord snowflake still yields an oauth link when the panel UUID already
     assert.deepEqual(links[0], ['discord', '1368235294192570520']);
 });
 
+test('canonical panel user prefers the Discord owner over a stale Google UUID', () => {
+    const { pickCanonicalUserId } = require('../lib/pg-account');
+    assert.equal(
+        pickCanonicalUserId(
+            ['aaaaaaa1-bbbb-4ccc-8ddd-eeeeeeeeeee1', '70f4f7f6-df0a-4d0c-99f2-1a1c97fd1f68'],
+            {
+                snowflakeOwnerId: '70f4f7f6-df0a-4d0c-99f2-1a1c97fd1f68',
+                dbId: 'aaaaaaa1-bbbb-4ccc-8ddd-eeeeeeeeeee1'
+            }
+        ),
+        '70f4f7f6-df0a-4d0c-99f2-1a1c97fd1f68'
+    );
+});
+
 test('site schema SQL creates the same account tables as the panel', () => {
     assert.match(SCHEMA_SQL, /CREATE TABLE IF NOT EXISTS site_profiles/);
     assert.match(SCHEMA_SQL, /CREATE TABLE IF NOT EXISTS wallets/);
     assert.match(SCHEMA_SQL, /CREATE TABLE IF NOT EXISTS wallet_ledger/);
+});
+
+test('site user ensure merges oauth taken by another uuid instead of skipping the link', () => {
+    const fs = require('node:fs');
+    const path = require('node:path');
+    const source = fs.readFileSync(path.join(__dirname, '../lib/pg-account.js'), 'utf8');
+    assert.match(source, /async function mergeDuplicateUsers/);
+    assert.match(source, /findUserIdByDiscord/);
+    assert.match(source, /preferFromProviders/);
+    assert.match(source, /UPDATE services SET owner_id/);
 });

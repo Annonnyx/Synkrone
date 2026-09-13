@@ -250,6 +250,173 @@ async function findUserIdByPublicId(client, publicId) {
     return found.rows[0]?.user_id || null;
 }
 
+async function findUserIdByEmail(client, email) {
+    const value = String(email || '').trim().toLowerCase();
+    if (!value) return null;
+    const found = await client.query(`SELECT id FROM users WHERE lower(email) = $1 LIMIT 1`, [value]);
+    return found.rows[0]?.id || null;
+}
+
+async function findUserIdByDiscord(client, snowflake) {
+    const id = String(snowflake || '').trim();
+    if (!/^\d{15,22}$/.test(id)) return null;
+    const byOauth = await findUserIdByOAuth(client, 'discord', id);
+    if (byOauth) return byOauth;
+    const byPublic = await findUserIdByPublicId(client, id);
+    if (byPublic) return byPublic;
+    const byEmail = await findUserIdByEmail(client, placeholderEmail('discord', id));
+    if (byEmail) return byEmail;
+    try {
+        const identity = await readJson(IDENTITY_JSON, {});
+        const hinted =
+            identity.byDiscordId?.[id]?.panelUserId || identity.bySiteId?.[id]?.panelUserId || '';
+        if (hinted) {
+            const exists = await client.query(`SELECT id FROM users WHERE id = $1 LIMIT 1`, [hinted]);
+            if (exists.rows[0]?.id) return exists.rows[0].id;
+        }
+    } catch {
+        /* optional */
+    }
+    return null;
+}
+
+function pickCanonicalUserId(candidates, { snowflakeOwnerId, dbId } = {}) {
+    const ids = [...new Set((candidates || []).map((id) => String(id || '').trim()).filter(Boolean))];
+    if (snowflakeOwnerId && ids.includes(snowflakeOwnerId)) return snowflakeOwnerId;
+    if (dbId && ids.includes(dbId)) return dbId;
+    return ids[0] || null;
+}
+
+async function ignoreMissingTable(promise) {
+    try {
+        return await promise;
+    } catch (err) {
+        if (String(err.code) === '42P01') return null;
+        throw err;
+    }
+}
+
+async function mergeDuplicateUsers(client, fromId, intoId, opts = {}) {
+    const from = String(fromId || '').trim();
+    const into = String(intoId || '').trim();
+    if (!from || !into || from === into) return into || from;
+    const both = await client.query(`SELECT id FROM users WHERE id = ANY($1::text[])`, [[from, into]]);
+    const have = new Set(both.rows.map((row) => row.id));
+    if (!have.has(from) || !have.has(into)) return into;
+
+    const prefer = new Set(opts.preferFromProviders || []);
+    const intoOauth = await client.query(
+        `SELECT id, provider FROM oauth_accounts WHERE user_id = $1`,
+        [into]
+    );
+    const fromOauth = await client.query(
+        `SELECT id, provider FROM oauth_accounts WHERE user_id = $1`,
+        [from]
+    );
+    const intoByProvider = new Map(intoOauth.rows.map((row) => [row.provider, row]));
+    for (const row of fromOauth.rows) {
+        const existing = intoByProvider.get(row.provider);
+        if (existing && prefer.has(row.provider)) {
+            await client.query(`DELETE FROM oauth_accounts WHERE id = $1`, [existing.id]);
+            await client.query(`UPDATE oauth_accounts SET user_id = $2, updated_at = NOW() WHERE id = $1`, [
+                row.id,
+                into
+            ]);
+        } else if (existing) {
+            await client.query(`DELETE FROM oauth_accounts WHERE id = $1`, [row.id]);
+        } else {
+            await client.query(`UPDATE oauth_accounts SET user_id = $2, updated_at = NOW() WHERE id = $1`, [
+                row.id,
+                into
+            ]);
+        }
+    }
+
+    await ignoreMissingTable(client.query(`UPDATE services SET owner_id = $2 WHERE owner_id = $1`, [from, into]));
+    await ignoreMissingTable(client.query(`UPDATE projects SET owner_id = $2 WHERE owner_id = $1`, [from, into]));
+    await ignoreMissingTable(
+        client.query(
+            `DELETE FROM project_members a USING project_members b
+             WHERE a.user_id = $1 AND b.user_id = $2 AND a.project_id = b.project_id`,
+            [from, into]
+        )
+    );
+    await ignoreMissingTable(client.query(`UPDATE project_members SET user_id = $2 WHERE user_id = $1`, [from, into]));
+    await ignoreMissingTable(client.query(`UPDATE sessions SET user_id = $2 WHERE user_id = $1`, [from, into]));
+    await ignoreMissingTable(
+        client.query(`UPDATE service_databases SET owner_id = $2 WHERE owner_id = $1`, [from, into])
+    );
+    await ignoreMissingTable(client.query(`UPDATE api_keys SET user_id = $2 WHERE user_id = $1`, [from, into]));
+    await ignoreMissingTable(client.query(`UPDATE webhooks SET user_id = $2 WHERE user_id = $1`, [from, into]));
+    await ignoreMissingTable(client.query(`UPDATE audit_logs SET user_id = $2 WHERE user_id = $1`, [from, into]));
+    await ignoreMissingTable(client.query(`UPDATE jobs SET user_id = $2 WHERE user_id = $1`, [from, into]));
+
+    await ensureWalletRow(client, into);
+    await ensureWalletRow(client, from);
+    const a = await client.query(`SELECT * FROM wallets WHERE user_id = $1 FOR UPDATE`, [from]);
+    const b = await client.query(`SELECT * FROM wallets WHERE user_id = $1 FOR UPDATE`, [into]);
+    const fromLedger = await loadLedger(client, from);
+    const toLedger = await loadLedger(client, into);
+    const merged = mergeWalletState(
+        {
+            balance: a.rows[0]?.balance,
+            plan: a.rows[0]?.plan,
+            ledger: fromLedger,
+            joinBonusAt: a.rows[0]?.join_bonus_at
+        },
+        {
+            balance: b.rows[0]?.balance,
+            plan: b.rows[0]?.plan,
+            ledger: toLedger,
+            joinBonusAt: b.rows[0]?.join_bonus_at
+        }
+    );
+    await client.query(
+        `UPDATE wallets SET balance = $2, plan = $3, join_bonus_at = $4, updated_at = NOW() WHERE user_id = $1`,
+        [into, merged.balance, merged.plan, merged.joinBonusAt]
+    );
+    await client.query(`UPDATE wallet_ledger SET user_id = $2 WHERE user_id = $1`, [from, into]);
+    await client.query(`DELETE FROM wallets WHERE user_id = $1`, [from]);
+
+    const fromProfile = await client.query(`SELECT public_id FROM site_profiles WHERE user_id = $1 LIMIT 1`, [from]);
+    const intoProfile = await client.query(`SELECT public_id FROM site_profiles WHERE user_id = $1 LIMIT 1`, [into]);
+    const fromPublic = String(fromProfile.rows[0]?.public_id || '');
+    const intoPublic = String(intoProfile.rows[0]?.public_id || '');
+    const preferPublic =
+        /^\d{15,22}$/.test(fromPublic) && !/^\d{15,22}$/.test(intoPublic) ? fromPublic : intoPublic || fromPublic;
+    if (fromProfile.rows[0]) {
+        await client.query(`UPDATE site_profiles SET public_id = $2, updated_at = NOW() WHERE user_id = $1`, [
+            from,
+            `merged:${from}`
+        ]);
+    }
+    if (intoProfile.rows[0] && preferPublic && preferPublic !== intoPublic) {
+        await client.query(`UPDATE site_profiles SET public_id = $2, updated_at = NOW() WHERE user_id = $1`, [
+            into,
+            preferPublic
+        ]);
+    } else if (!intoProfile.rows[0] && fromProfile.rows[0]) {
+        await client.query(
+            `UPDATE site_profiles SET user_id = $2, public_id = $3, updated_at = NOW() WHERE user_id = $1`,
+            [from, into, preferPublic || fromPublic]
+        );
+    }
+    await client.query(`DELETE FROM site_profiles WHERE user_id = $1`, [from]);
+
+    const emails = await client.query(`SELECT id, email FROM users WHERE id = ANY($1::text[])`, [[from, into]]);
+    const fromEmail = String(emails.rows.find((row) => row.id === from)?.email || '');
+    const intoEmail = String(emails.rows.find((row) => row.id === into)?.email || '');
+    if (isPlaceholderEmail(intoEmail) && fromEmail && !isPlaceholderEmail(fromEmail)) {
+        try {
+            await client.query(`UPDATE users SET email = $2 WHERE id = $1`, [into, fromEmail]);
+        } catch {
+            /* unique email */
+        }
+    }
+    await client.query(`DELETE FROM users WHERE id = $1`, [from]);
+    return into;
+}
+
 async function upsertOAuthUser(client, { provider, providerId, name, email, avatarUrl, admin }) {
     const existing = await findUserIdByOAuth(client, provider, providerId);
     const nowName = String(name || provider).slice(0, 120);
@@ -267,18 +434,33 @@ async function upsertOAuthUser(client, { provider, providerId, name, email, avat
         );
         return existing;
     }
+    if (realEmail && !isPlaceholderEmail(realEmail)) {
+        const byEmail = await findUserIdByEmail(client, realEmail);
+        if (byEmail) {
+            await linkOAuthAccount(client, byEmail, provider, providerId, { name: nowName, email: realEmail, avatarUrl: avatar });
+            return byEmail;
+        }
+    }
     const userId = crypto.randomUUID();
-    await client.query(
-        `INSERT INTO users (id, email, name, avatar_url, password_hash, role)
-         VALUES ($1, $2, $3, $4, NULL, $5)`,
-        [
-            userId,
-            realEmail || placeholderEmail(provider, providerId),
-            nowName,
-            avatar,
-            admin ? 'admin' : 'user'
-        ]
-    );
+    try {
+        await client.query(
+            `INSERT INTO users (id, email, name, avatar_url, password_hash, role)
+             VALUES ($1, $2, $3, $4, NULL, $5)`,
+            [
+                userId,
+                realEmail || placeholderEmail(provider, providerId),
+                nowName,
+                avatar,
+                admin ? 'admin' : 'user'
+            ]
+        );
+    } catch (err) {
+        if (String(err.code) !== '23505' || !realEmail) throw err;
+        const byEmail = await findUserIdByEmail(client, realEmail);
+        if (!byEmail) throw err;
+        await linkOAuthAccount(client, byEmail, provider, providerId, { name: nowName, email: realEmail, avatarUrl: avatar });
+        return byEmail;
+    }
     await client.query(
         `INSERT INTO oauth_accounts (
             id, user_id, provider, provider_account_id, provider_login, email, avatar_url, created_at, updated_at
@@ -318,7 +500,10 @@ async function linkOAuthAccount(client, userId, provider, providerId, meta = {})
     const id = String(providerId || '').trim();
     if (!provider || !id) return false;
     const taken = await findUserIdByOAuth(client, provider, id);
-    if (taken && taken !== userId) return false;
+    if (taken && taken !== userId) {
+        await mergeDuplicateUsers(client, taken, userId, { preferFromProviders: [provider] });
+        return true;
+    }
     if (taken === userId) return true;
     const existing = await client.query(
         `SELECT id, provider_account_id FROM oauth_accounts WHERE user_id = $1 AND provider = $2 LIMIT 1`,
@@ -357,17 +542,38 @@ async function linkOAuthAccount(client, userId, provider, providerId, meta = {})
             meta.avatarUrl || null
         ]
     );
+    const again = await findUserIdByOAuth(client, provider, id);
+    if (again && again !== userId) {
+        await mergeDuplicateUsers(client, again, userId, { preferFromProviders: [provider] });
+    }
     return true;
 }
 
 async function ensureUserFromSite(client, user) {
     const admin = Boolean(user.isTeamOwner) || String(user.role || '').toLowerCase() === 'admin';
     const order = oauthProviderLinks(user);
-    let userId = null;
+    const snowflake =
+        order.find(([provider]) => provider === 'discord')?.[1] ||
+        (/^\d{15,22}$/.test(String(user.id || '').trim()) ? String(user.id).trim() : '');
+    const candidates = [];
+    const snowflakeOwner = snowflake ? await findUserIdByDiscord(client, snowflake) : null;
+    if (snowflakeOwner) candidates.push(snowflakeOwner);
     if (user?.dbId) {
         const exists = await client.query(`SELECT id FROM users WHERE id = $1 LIMIT 1`, [user.dbId]);
-        if (exists.rows[0]) userId = user.dbId;
+        if (exists.rows[0]) candidates.push(user.dbId);
     }
+    const byPublic = await findUserIdByPublicId(client, user.id);
+    if (byPublic) candidates.push(byPublic);
+    for (const [provider, providerId] of order) {
+        const found = await findUserIdByOAuth(client, provider, providerId);
+        if (found) candidates.push(found);
+    }
+    const realEmail = String(user.email || '').trim().toLowerCase();
+    if (realEmail && !isPlaceholderEmail(realEmail)) {
+        const byEmail = await findUserIdByEmail(client, realEmail);
+        if (byEmail) candidates.push(byEmail);
+    }
+    let userId = pickCanonicalUserId(candidates, { snowflakeOwnerId: snowflakeOwner, dbId: user?.dbId });
     if (!userId) {
         for (const [provider, providerId] of order) {
             userId = await upsertOAuthUser(client, {
@@ -380,10 +586,6 @@ async function ensureUserFromSite(client, user) {
             });
             break;
         }
-    }
-    if (!userId) userId = await findUserIdByPublicId(client, user.id);
-    if (!userId && order.length) {
-        userId = await findUserIdByOAuth(client, order[0][0], order[0][1]);
     }
     if (!userId) {
         const publicId = String(user.id || '').trim();
@@ -398,6 +600,10 @@ async function ensureUserFromSite(client, user) {
             admin
         });
     }
+    const unique = [...new Set(candidates.filter(Boolean))];
+    for (const other of unique) {
+        if (other !== userId) await mergeDuplicateUsers(client, other, userId);
+    }
     for (const [provider, providerId] of order) {
         await linkOAuthAccount(client, userId, provider, providerId, {
             name: user.username || user.name,
@@ -411,30 +617,55 @@ async function ensureUserFromSite(client, user) {
 async function upsertSiteProfile(client, userId, user) {
     const publicId = String(user.id || '').trim();
     const profile = profileFromUser(user);
-    await client.query(
-        `INSERT INTO site_profiles (
-            user_id, public_id, role, is_team_owner, last_seen_at, last_login_at, created_at, updated_at, profile
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb)
-         ON CONFLICT (user_id) DO UPDATE SET
-            public_id = EXCLUDED.public_id,
-            role = EXCLUDED.role,
-            is_team_owner = EXCLUDED.is_team_owner,
-            last_seen_at = EXCLUDED.last_seen_at,
-            last_login_at = EXCLUDED.last_login_at,
-            updated_at = EXCLUDED.updated_at,
-            profile = EXCLUDED.profile`,
-        [
-            userId,
-            publicId,
-            String(user.role || 'Krobi'),
-            Boolean(user.isTeamOwner),
-            toDate(user.lastSeenAt),
-            toDate(user.lastLoginAt),
-            toDate(user.createdAt) || new Date(),
-            toDate(user.updatedAt) || new Date(),
-            JSON.stringify(profile)
-        ]
-    );
+    const params = [
+        userId,
+        publicId,
+        String(user.role || 'Krobi'),
+        Boolean(user.isTeamOwner),
+        toDate(user.lastSeenAt),
+        toDate(user.lastLoginAt),
+        toDate(user.createdAt) || new Date(),
+        toDate(user.updatedAt) || new Date(),
+        JSON.stringify(profile)
+    ];
+    try {
+        await client.query(
+            `INSERT INTO site_profiles (
+                user_id, public_id, role, is_team_owner, last_seen_at, last_login_at, created_at, updated_at, profile
+             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb)
+             ON CONFLICT (user_id) DO UPDATE SET
+                public_id = EXCLUDED.public_id,
+                role = EXCLUDED.role,
+                is_team_owner = EXCLUDED.is_team_owner,
+                last_seen_at = EXCLUDED.last_seen_at,
+                last_login_at = EXCLUDED.last_login_at,
+                updated_at = EXCLUDED.updated_at,
+                profile = EXCLUDED.profile`,
+            params
+        );
+    } catch (err) {
+        if (String(err.code) !== '23505') throw err;
+        const other = await findUserIdByPublicId(client, publicId);
+        if (other && other !== userId) {
+            await mergeDuplicateUsers(client, other, userId);
+            await client.query(
+                `INSERT INTO site_profiles (
+                    user_id, public_id, role, is_team_owner, last_seen_at, last_login_at, created_at, updated_at, profile
+                 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb)
+                 ON CONFLICT (user_id) DO UPDATE SET
+                    public_id = EXCLUDED.public_id,
+                    role = EXCLUDED.role,
+                    is_team_owner = EXCLUDED.is_team_owner,
+                    last_seen_at = EXCLUDED.last_seen_at,
+                    last_login_at = EXCLUDED.last_login_at,
+                    updated_at = EXCLUDED.updated_at,
+                    profile = EXCLUDED.profile`,
+                params
+            );
+        } else {
+            throw err;
+        }
+    }
 }
 
 async function ensureWalletRow(client, userId, seed = {}) {
@@ -1066,6 +1297,7 @@ module.exports = {
     snapshotWallets,
     mergeWalletState,
     pickPlan,
+    pickCanonicalUserId,
     oauthProviderLinks,
     SCHEMA_SQL,
     GRADE_ORDER,

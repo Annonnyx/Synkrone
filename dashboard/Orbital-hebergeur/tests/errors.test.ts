@@ -28,6 +28,13 @@ test("undecryptable stored token asks to paste again without resetting Discord",
   assert.match(hit.action ?? "", /Collez à nouveau/);
 });
 
+test("storage quota and delete confirmation are explained", () => {
+  const quota = explainError("STORAGE_QUOTA_EXCEEDED", "fr");
+  assert.equal(quota.title, "Quota de stockage atteint");
+  const name = explainError("DELETE_NAME_MISMATCH", "en");
+  assert.equal(name.title, "Service name does not match");
+});
+
 test("locked command sources point at Kronalloy", () => {
   const hit = explainError("COMMAND_SOURCES_LOCKED", "fr");
   assert.equal(hit.title, "Sources des commandes protégées");

@@ -32,6 +32,7 @@ test("session-bridge keeps Discord on the existing panel user when the site send
   );
   assert.match(source, /currentUserId: body\.userId/);
   assert.match(source, /ensurePanelIdentity/);
+  assert.match(source, /body\.link/);
 });
 
 

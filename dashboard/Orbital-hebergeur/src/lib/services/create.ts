@@ -165,6 +165,7 @@ export async function createService(userId: string, input: CreateServiceInput) {
       state: "CREATING",
       cpuLimit: resources.cpuMillicores,
       memoryLimitMb: resources.memoryMb,
+      lastOwnerActivityAt: new Date(),
       storageLimitMb: resources.storageMb,
       restartPolicy: input.restartPolicy ?? defaultRestartPolicy(input.type),
       maxRestarts: defaultMaxRestarts(input.type),
@@ -263,7 +264,13 @@ export async function createService(userId: string, input: CreateServiceInput) {
     });
   }
 
-  await SFTPManager.issue(svc.id, input.type, slug).catch(() => undefined);
+  let sftpPassword: string | undefined;
+  try {
+    const issued = await SFTPManager.issue(svc.id, input.type, slug);
+    sftpPassword = issued.password;
+  } catch (err) {
+    console.error("[sftp] failed to issue service password", err);
+  }
 
   const jobId = await createJob({
     type: "CREATE_CONTAINER",
@@ -281,5 +288,5 @@ export async function createService(userId: string, input: CreateServiceInput) {
     detail: svc.name,
   });
 
-  return { service: svc, jobId };
+  return { service: svc, jobId, sftpPassword };
 }

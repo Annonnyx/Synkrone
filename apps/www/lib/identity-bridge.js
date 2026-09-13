@@ -55,15 +55,28 @@ async function writeMap(map) {
 
 async function rememberIdentity({ siteUserId, panelUserId, discordId, email }) {
     const map = await readMap();
+    const siteId = siteUserId ? String(siteUserId) : '';
+    const panelId = panelUserId ? String(panelUserId) : '';
+    const snowflake = discordId ? String(discordId) : '';
+    const prev =
+        (siteId && map.bySiteId[siteId]) ||
+        (snowflake && map.byDiscordId[snowflake]) ||
+        (panelId && map.byPanelId[panelId]) ||
+        {};
+    const keepPanel =
+        prev.discordId && !snowflake && prev.panelUserId && panelId && prev.panelUserId !== panelId
+            ? String(prev.panelUserId)
+            : panelId || String(prev.panelUserId || '');
     const row = {
-        siteUserId: siteUserId ? String(siteUserId) : '',
-        panelUserId: panelUserId ? String(panelUserId) : '',
-        discordId: discordId ? String(discordId) : '',
-        email: email ? String(email).toLowerCase() : '',
+        siteUserId: siteId || String(prev.siteUserId || ''),
+        panelUserId: keepPanel,
+        discordId: snowflake || String(prev.discordId || ''),
+        email: String(email || prev.email || '').toLowerCase(),
         updatedAt: Date.now()
     };
     if (row.siteUserId) map.bySiteId[row.siteUserId] = row;
     if (row.panelUserId) map.byPanelId[row.panelUserId] = row;
+    if (panelId && panelId !== row.panelUserId) map.byPanelId[panelId] = row;
     if (row.discordId) map.byDiscordId[row.discordId] = row;
     await writeMap(map);
     return row;
@@ -96,6 +109,49 @@ async function issueSiteSession(userPayload) {
         store.set(sid, sess, (err) => (err ? reject(err) : resolve()));
     });
     return sid;
+}
+
+function isPanelUserId(value) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        String(value || '').trim()
+    );
+}
+
+function discordIdFromSiteUser(user) {
+    if (!user || user.isGuest) return '';
+    const id = String(user.id || '').trim();
+    const providers = user.providers && typeof user.providers === 'object' ? user.providers : {};
+    if (/^\d{15,22}$/.test(id)) return id;
+    const fromProviders = String(providers.discord || '').trim();
+    return /^\d{15,22}$/.test(fromProviders) ? fromProviders : '';
+}
+
+function panelAttachPayload(user, linkingProvider, linkingProfile = {}) {
+    const provider = String(linkingProvider || '').trim();
+    const userId = isPanelUserId(user?.dbId) ? String(user.dbId).trim() : undefined;
+    const profile = {
+        id: String(linkingProfile.id || user?.id || ''),
+        name: user?.username || linkingProfile.username || provider,
+        login: linkingProfile.username || user?.username || provider,
+        email: user?.email || linkingProfile.email || '',
+        avatarUrl: user?.avatar || linkingProfile.avatar || undefined
+    };
+    const discord = discordIdFromSiteUser(user);
+    if (discord && provider && provider !== 'discord') {
+        return {
+            provider: 'discord',
+            userId,
+            profile: {
+                id: discord,
+                name: user?.username || profile.name,
+                login: user?.username || profile.login,
+                email: user?.email || profile.email || '',
+                avatarUrl: user?.avatar || profile.avatarUrl
+            },
+            link: { provider, profile }
+        };
+    }
+    return { provider, userId, profile };
 }
 
 function panelBridgeFromSiteUser(user) {
@@ -182,6 +238,7 @@ module.exports = {
     identityFor,
     issueSiteSession,
     panelBridgeFromSiteUser,
+    panelAttachPayload,
     requestPanelSession,
     panelCookieOptions,
     siteCookieOptions,

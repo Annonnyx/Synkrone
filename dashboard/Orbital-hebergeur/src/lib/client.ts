@@ -72,6 +72,7 @@ export const STATE_COLORS: Record<string, string> = {
   CREATING: "#8fa096",
   DELETING: "#a8462f",
   STOPPED: "#8fa096",
+  SUSPENDED: "#b8823d",
   CRASHED: "#a8462f",
   ERROR: "#a8462f",
 };

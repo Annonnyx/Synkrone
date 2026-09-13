@@ -19,7 +19,8 @@ const {
     issueSiteSession,
     requireInternalAuth,
     panelCookieOptions,
-    panelBridgeFromSiteUser
+    panelBridgeFromSiteUser,
+    panelAttachPayload
 } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'identity-bridge'));
 const { mountTemoignages, addOptInQuote } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'temoignages'));
 const {
@@ -545,7 +546,12 @@ async function upsertUserFromOAuth(provider, profile, attachToId) {
     const db = await readUsersDb();
     const byProvider = findUserByProvider(db, provider, providerId);
     if (attachToId && db.users[attachToId] && byProvider && String(byProvider.id) !== String(attachToId)) {
-        throw providerTakenError();
+        const otherDiscord = String(providersOf(byProvider).discord || '').trim();
+        const targetDiscord = String(providersOf(db.users[attachToId]).discord || attachToId).trim();
+        const otherSnow = /^\d{15,22}$/.test(otherDiscord) ? otherDiscord : (/^\d{15,22}$/.test(String(byProvider.id)) ? String(byProvider.id) : '');
+        const targetSnow = /^\d{15,22}$/.test(targetDiscord) ? targetDiscord : '';
+        if (otherSnow && targetSnow && otherSnow !== targetSnow) throw providerTakenError();
+        await migrateUserId(db, byProvider.id, attachToId);
     }
     const existing = (attachToId && db.users[attachToId]) || byProvider || null;
     const now = Date.now();
@@ -591,24 +597,22 @@ async function persistPanelUserId(siteUserId, panelUserId) {
 async function attachPanelFromSite(res, persisted, provider, profile, options = {}) {
     const required = Boolean(options.required);
     try {
-        const panel = await requestPanelSession({
-            provider,
-            userId: persisted.dbId || undefined,
-            profile: {
-                id: String(profile.id || persisted.id),
-                name: persisted.username,
-                login: profile.username || persisted.username,
-                email: persisted.email || profile.email || '',
-                avatarUrl: persisted.avatar
-            }
+        const payload = panelAttachPayload(persisted, provider, {
+            id: String(profile.id || persisted.id),
+            username: profile.username || persisted.username,
+            email: persisted.email || profile.email || '',
+            avatar: persisted.avatar || profile.avatar
         });
+        const panel = await requestPanelSession(payload);
         if (!panel?.token) throw new Error('Panel session missing');
         persisted.dbId = panel.userId;
         res.cookie('synkrone_session', panel.token, panelCookieOptions(isProdCookie()));
         await rememberIdentity({
             siteUserId: persisted.id,
             panelUserId: panel.userId,
-            discordId: provider === 'discord' ? String(profile.id || persisted.id) : (panel.discordId || ''),
+            discordId: provider === 'discord'
+                ? String(profile.id || persisted.id)
+                : String(panel.discordId || persisted.providers?.discord || (/^\d{15,22}$/.test(String(persisted.id || '')) ? persisted.id : '') || ''),
             email: persisted.email || profile.email || ''
         });
         await persistPanelUserId(persisted.id, panel.userId).catch(() => undefined);
@@ -1013,6 +1017,13 @@ app.post('/api/internal/session-bridge', async (req, res) => {
     const profile = req.body?.profile || {};
     if (!profile.id) return res.status(400).json({ error: 'missing_profile' });
     try {
+        const panelUserId = String(req.body?.userId || '').trim();
+        let attachToId = null;
+        if (panelUserId) {
+            const db = await readUsersDb();
+            const byDbId = Object.values(db.users || {}).find((u) => u && String(u.dbId || '') === panelUserId);
+            if (byDbId?.id) attachToId = String(byDbId.id);
+        }
         let persisted = null;
         if (provider === 'discord') {
             persisted = await upsertUserFromDiscordAuth({
@@ -1020,7 +1031,7 @@ app.post('/api/internal/session-bridge', async (req, res) => {
                 username: profile.login || profile.name,
                 global_name: profile.name,
                 avatar: null
-            }, false, null);
+            }, false, attachToId);
             if (persisted && profile.avatarUrl) persisted.avatar = String(profile.avatarUrl);
         } else if (provider === 'github' || provider === 'google') {
             persisted = await upsertUserFromOAuth(provider, {
@@ -1028,15 +1039,20 @@ app.post('/api/internal/session-bridge', async (req, res) => {
                 username: profile.login || profile.name,
                 avatar: profile.avatarUrl,
                 email: profile.email
-            }, null);
+            }, attachToId);
         } else {
             return res.status(400).json({ error: 'unknown_provider' });
         }
         if (!persisted) return res.status(400).json({ error: 'user_failed' });
+        if (panelUserId) {
+            persisted.dbId = panelUserId;
+            await persistPanelUserId(persisted.id, panelUserId).catch(() => undefined);
+        }
         const sid = await issueSiteSession(sessionFromPersisted(persisted));
         await rememberIdentity({
             siteUserId: persisted.id,
-            discordId: provider === 'discord' ? String(profile.id) : '',
+            panelUserId: panelUserId || persisted.dbId || '',
+            discordId: provider === 'discord' ? String(profile.id) : String(persisted.providers?.discord || ''),
             email: persisted.email || profile.email || ''
         });
         return res.json({ ok: true, sid, siteUserId: persisted.id });

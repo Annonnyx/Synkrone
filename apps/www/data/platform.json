@@ -6,8 +6,8 @@
   "maxMemoryMb": 8192,
   "maxStorageMb": 51200,
   "limits": {
-    "discord": { "cpuMillicores": 2000, "memoryMb": 2048, "storageMb": 10240 },
+    "discord": { "cpuMillicores": 1000, "memoryMb": 2048, "storageMb": 10240 },
     "minecraft": { "cpuMillicores": 4000, "memoryMb": 8192, "storageMb": 51200 },
-    "web": { "cpuMillicores": 2000, "memoryMb": 4096, "storageMb": 20480 }
+    "web": { "cpuMillicores": 1000, "memoryMb": 4096, "storageMb": 20480 }
   }
 }

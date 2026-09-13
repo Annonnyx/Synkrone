@@ -23,6 +23,7 @@ type Ctx = { params: Promise<{ provider: string }> };
 async function bridgeSiteSession(
   provider: string,
   profile: { id: string; name?: string; login?: string | null; email?: string | null; avatarUrl?: string | null },
+  panelUserId?: string,
 ) {
   const origin = publicSiteOriginFromEnv() || "http://127.0.0.1:3668";
   const key = String(process.env.PLATFORM_SECRET_KEY || "").trim();
@@ -34,7 +35,7 @@ async function bridgeSiteSession(
         authorization: `Bearer ${key}`,
         "content-type": "application/json",
       },
-      body: JSON.stringify({ provider, profile }),
+      body: JSON.stringify({ provider, profile, userId: panelUserId }),
     });
     if (!res.ok) return;
     const data = (await res.json()) as { sid?: string };
@@ -106,8 +107,8 @@ export async function GET(req: NextRequest, ctx: Ctx) {
       intent,
       currentUserId: current?.id,
     });
-    if (!current) await createSession(result.userId);
-    await bridgeSiteSession(provider, profile);
+    if (!current || current.id !== result.userId) await createSession(result.userId);
+    await bridgeSiteSession(provider, profile, result.userId);
     await audit({
       userId: result.userId,
       action: intent === "link" ? `oauth.link.${provider}` : `oauth.login.${provider}`,

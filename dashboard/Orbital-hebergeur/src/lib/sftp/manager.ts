@@ -2,22 +2,25 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { services, sftpCredentials, users } from "@/db/schema";
-import { encryptSecret, verifyPassword } from "@/lib/crypto";
+import { services, sftpCredentials } from "@/db/schema";
+import { decryptSecret, encryptSecret } from "@/lib/crypto";
 import { dataRoot, type ServiceType } from "@/lib/paths";
-import { sha512Crypt } from "@/lib/sha512crypt";
 import { sftpUserConfLine } from "@/lib/sftp/format";
+import {
+  generateSftpSecret,
+  isPerServiceSftpSecret,
+  sftpPasswordMatches,
+} from "@/lib/sftp/password";
+import { sha512Crypt } from "@/lib/sha512crypt";
 
 /**
- * SFTPManager — issues per-service SFTP accounts.
+ * SFTPManager — issues a dedicated password per service (OAuth users have none).
  *
- * Authentication is the Orbital account password (scrypt on `users.password_hash`).
- * The account password is never stored in plaintext. On login / password change we
- * materialise a Unix SHA-512 crypt into `${DATA_ROOT}/sftp/owner-crypt.json`, then
- * render `${DATA_ROOT}/sftp/users.conf` for the `sftp` gateway (atmoz/sftp).
- * Each account is chrooted to a single service volume (§45).
+ * The plaintext is stored encrypted on `sftp_credentials.password_enc` and shown
+ * once at issue/rotate. `sync()` renders `${DATA_ROOT}/sftp/users.conf` for the
+ * atmoz/sftp gateway from glibc SHA-512 crypt hashes (never the account password).
  */
-const ACCOUNT_MARKER = "account";
+type ServiceCryptMap = Record<string, string>;
 
 export function publicSftpEndpoint() {
   const host = String(process.env.SFTP_HOST || "").trim() || "sftp.localhost";
@@ -28,19 +31,17 @@ export function publicSftpEndpoint() {
   };
 }
 
-type OwnerCryptMap = Record<string, string>;
-
-function ownerCryptFile(): string {
-  return path.join(dataRoot(), "sftp", "owner-crypt.json");
+function serviceCryptFile(): string {
+  return path.join(dataRoot(), "sftp", "service-crypt.json");
 }
 
-async function readOwnerCrypts(): Promise<OwnerCryptMap> {
+async function readServiceCrypts(): Promise<ServiceCryptMap> {
   try {
-    const parsed: unknown = JSON.parse(await fs.readFile(ownerCryptFile(), "utf8"));
+    const parsed: unknown = JSON.parse(await fs.readFile(serviceCryptFile(), "utf8"));
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
-    const out: OwnerCryptMap = {};
-    for (const [userId, value] of Object.entries(parsed as Record<string, unknown>)) {
-      if (typeof value === "string" && value.startsWith("$6$")) out[userId] = value;
+    const out: ServiceCryptMap = {};
+    for (const [serviceId, value] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof value === "string" && value.startsWith("$6$")) out[serviceId] = value;
     }
     return out;
   } catch {
@@ -48,11 +49,30 @@ async function readOwnerCrypts(): Promise<OwnerCryptMap> {
   }
 }
 
-async function writeOwnerCrypts(map: OwnerCryptMap): Promise<void> {
-  const file = ownerCryptFile();
+async function writeServiceCrypts(map: ServiceCryptMap): Promise<void> {
+  const file = serviceCryptFile();
   await fs.mkdir(path.dirname(file), { recursive: true });
   await fs.writeFile(file, `${JSON.stringify(map)}\n`, { mode: 0o600 });
   await fs.chmod(file, 0o600);
+}
+
+async function rememberCrypt(serviceId: string, crypt: string): Promise<void> {
+  const map = await readServiceCrypts();
+  map[serviceId] = crypt;
+  await writeServiceCrypts(map);
+}
+
+async function cryptForRow(
+  serviceId: string,
+  passwordEnc: string,
+  cache: ServiceCryptMap,
+): Promise<string | null> {
+  if (cache[serviceId]) return cache[serviceId];
+  const plain = decryptSecret(passwordEnc);
+  if (!isPerServiceSftpSecret(plain)) return null;
+  const crypt = sha512Crypt(plain as string);
+  cache[serviceId] = crypt;
+  return crypt;
 }
 
 export const SFTPManager = {
@@ -65,63 +85,85 @@ export const SFTPManager = {
       .replace(/[^a-z0-9_]/gi, "")
       .toLowerCase();
     const chroot = `/data/${type}/${serviceId}`;
+    const { password, crypt } = generateSftpSecret();
     await db.delete(sftpCredentials).where(eq(sftpCredentials.serviceId, serviceId));
     const endpoint = publicSftpEndpoint();
     await db.insert(sftpCredentials).values({
       serviceId,
       username,
-      passwordEnc: encryptSecret(ACCOUNT_MARKER),
+      passwordEnc: encryptSecret(password),
       host: endpoint.host,
       port: endpoint.port,
       chroot,
     });
+    await rememberCrypt(serviceId, crypt);
     await this.sync();
-    return { username, chroot, auth: "account" as const };
+    return { username, chroot, auth: "service" as const, password };
   },
 
-  /** Called when the owner types their account password (login, register, change). */
-  async applyOwnerPassword(userId: string, password: string): Promise<void> {
-    const map = await readOwnerCrypts();
-    map[userId] = sha512Crypt(password);
-    await writeOwnerCrypts(map);
+  async setEnabled(serviceId: string, enabled: boolean): Promise<void> {
+    await db.update(sftpCredentials).set({ enabled }).where(eq(sftpCredentials.serviceId, serviceId));
     await this.sync();
   },
 
   /** Rewrites the gateway account file from the database (source of truth). */
   async sync(): Promise<void> {
-    const crypts = await readOwnerCrypts();
+    const crypts = await readServiceCrypts();
+    let dirty = false;
     const rows = await db
       .select({
+        serviceId: sftpCredentials.serviceId,
         username: sftpCredentials.username,
         chroot: sftpCredentials.chroot,
         enabled: sftpCredentials.enabled,
-        ownerId: services.ownerId,
+        passwordEnc: sftpCredentials.passwordEnc,
       })
       .from(sftpCredentials)
       .innerJoin(services, eq(services.id, sftpCredentials.serviceId));
-    const lines = rows
-      .filter((r) => r.enabled)
-      .map((r) => sftpUserConfLine(r.username, r.chroot, crypts[r.ownerId]));
+    const lines: string[] = [];
+    for (const r of rows) {
+      if (!r.enabled) continue;
+      const had = Boolean(crypts[r.serviceId]);
+      const crypt = await cryptForRow(r.serviceId, r.passwordEnc, crypts);
+      if (!crypt) continue;
+      if (!had) dirty = true;
+      lines.push(sftpUserConfLine(r.username, r.chroot, crypt));
+    }
+    if (dirty) await writeServiceCrypts(crypts);
     const file = this.accountFile();
     await fs.mkdir(path.dirname(file), { recursive: true });
-    await fs.writeFile(file, `${lines.join("\n")}\n`, { mode: 0o600 });
+    await fs.writeFile(file, `${lines.join("\n")}${lines.length ? "\n" : ""}`, { mode: 0o600 });
     await fs.chmod(file, 0o600);
   },
 
-  /** True if `password` is the Orbital login of the service owner. */
+  async hasUsablePassword(serviceId: string): Promise<boolean> {
+    const [row] = await db
+      .select({ passwordEnc: sftpCredentials.passwordEnc })
+      .from(sftpCredentials)
+      .where(eq(sftpCredentials.serviceId, serviceId))
+      .limit(1);
+    if (!row) return false;
+    return isPerServiceSftpSecret(decryptSecret(row.passwordEnc));
+  },
+
+  /** True if `password` is this service's SFTP secret — never the account password. */
   async authenticate(username: string, password: string): Promise<boolean> {
     const [row] = await db
       .select({
-        passwordHash: users.passwordHash,
+        serviceId: sftpCredentials.serviceId,
+        passwordEnc: sftpCredentials.passwordEnc,
         enabled: sftpCredentials.enabled,
       })
       .from(sftpCredentials)
-      .innerJoin(services, eq(services.id, sftpCredentials.serviceId))
-      .innerJoin(users, eq(users.id, services.ownerId))
       .where(eq(sftpCredentials.username, username))
       .limit(1);
     if (!row?.enabled) return false;
-    return verifyPassword(password, row.passwordHash);
+    const ok = sftpPasswordMatches(decryptSecret(row.passwordEnc), password);
+    if (ok) {
+      const { touchOwnerActivity } = await import("@/lib/services/lifecycle");
+      await touchOwnerActivity(row.serviceId).catch(() => undefined);
+    }
+    return ok;
   },
 
   async rotate(serviceId: string) {
@@ -131,7 +173,13 @@ export const SFTPManager = {
       .where(eq(sftpCredentials.serviceId, serviceId))
       .limit(1);
     if (!row) throw new Error("No SFTP account for this service");
+    const { password, crypt } = generateSftpSecret();
+    await db
+      .update(sftpCredentials)
+      .set({ passwordEnc: encryptSecret(password), enabled: true })
+      .where(eq(sftpCredentials.id, row.id));
+    await rememberCrypt(serviceId, crypt);
     await this.sync();
-    return { username: row.username, auth: "account" as const };
+    return { username: row.username, auth: "service" as const, password };
   },
 };

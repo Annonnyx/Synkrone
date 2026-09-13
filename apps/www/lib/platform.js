@@ -7,6 +7,8 @@ const DATA_PATH = path.join(__dirname, '..', 'data', 'platform.json');
 
 const DISCOUNT_TARGETS = new Set(['all', 'discord', 'minecraft', 'web', 'ram', 'cpu', 'storage']);
 
+const TYPE_CPU_HARD_CAP = { discord: 1000, web: 1000, minecraft: 4000 };
+
 const DEFAULTS = {
     discordEnabled: true,
     minecraftEnabled: true,
@@ -15,9 +17,9 @@ const DEFAULTS = {
     maxMemoryMb: 8192,
     maxStorageMb: 51200,
     limits: {
-        discord: { cpuMillicores: 2000, memoryMb: 2048, storageMb: 10240 },
+        discord: { cpuMillicores: 1000, memoryMb: 2048, storageMb: 10240 },
         minecraft: { cpuMillicores: 4000, memoryMb: 8192, storageMb: 51200 },
-        web: { cpuMillicores: 2000, memoryMb: 4096, storageMb: 20480 }
+        web: { cpuMillicores: 1000, memoryMb: 4096, storageMb: 20480 }
     },
     discounts: []
 };
@@ -88,7 +90,12 @@ function normalize(raw) {
         const row = limitsIn[type] && typeof limitsIn[type] === 'object' ? limitsIn[type] : {};
         const fallback = DEFAULTS.limits[type];
         out.limits[type] = {
-            cpuMillicores: asInt(row.cpuMillicores, fallback.cpuMillicores, 100, out.maxCpuMillicores),
+            cpuMillicores: asInt(
+                row.cpuMillicores,
+                fallback.cpuMillicores,
+                100,
+                Math.min(out.maxCpuMillicores, TYPE_CPU_HARD_CAP[type] || out.maxCpuMillicores)
+            ),
             memoryMb: asInt(row.memoryMb, fallback.memoryMb, 64, out.maxMemoryMb),
             storageMb: asInt(row.storageMb, fallback.storageMb, 512, out.maxStorageMb)
         };

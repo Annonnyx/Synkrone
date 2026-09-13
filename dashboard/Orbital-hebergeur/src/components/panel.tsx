@@ -47,7 +47,7 @@ const LIVE_STATES = new Set(["RUNNING", "STARTING", "RESTARTING"]);
 
 function badgeVariant(state: string): string {
   if (state === "RUNNING") return "badge-success";
-  if (state === "STARTING" || state === "RESTARTING" || state === "STOPPING" || state === "CREATING")
+  if (state === "STARTING" || state === "RESTARTING" || state === "STOPPING" || state === "CREATING" || state === "SUSPENDED")
     return "badge-warning";
   if (state === "CRASHED" || state === "ERROR" || state === "DELETING") return "badge-danger";
   return "";

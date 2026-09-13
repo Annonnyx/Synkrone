@@ -48,6 +48,10 @@ import { DatabaseManager } from "@/lib/database/manager";
 import { SFTPManager, publicSftpEndpoint } from "@/lib/sftp/manager";
 import { dnsRecordsFor, normalizeHostname } from "@/lib/domains/public";
 import { syncTraefikConfig } from "@/lib/domains/traefik";
+import { touchOwnerActivity, clearSuspension } from "@/lib/services/lifecycle";
+import { assertServiceWriteFits, refreshStorageOverflow } from "@/lib/services/storage-enforce";
+import { STORAGE_QUOTA_ERROR } from "@/lib/services/storage-quota";
+import { isPerServiceSftpSecret } from "@/lib/sftp/password";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -201,7 +205,17 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           .select()
           .from(sftpCredentials)
           .where(eq(sftpCredentials.serviceId, id));
-        return { sftp: row ? { ...row, passwordEnc: undefined, ...publicSftpEndpoint() } : null };
+        const plain = row ? decryptSecret(row.passwordEnc) : null;
+        return {
+          sftp: row
+            ? {
+                ...row,
+                passwordEnc: undefined,
+                hasPassword: isPerServiceSftpSecret(plain),
+                ...publicSftpEndpoint(),
+              }
+            : null,
+        };
       }
       case "backups":
         return {
@@ -379,18 +393,34 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     rateLimit(`svc:${user.id}:${action}`, 180);
 
     switch (action) {
+      case "activity": {
+        await touchOwnerActivity(id);
+        return { ok: true };
+      }
+      case "resume":
       case "start":
       case "stop":
       case "restart":
       case "kill": {
-        await provider[action](id);
-        await audit({ userId: user.id, serviceId: id, action: `service.${action}` });
+        if (action === "start" || action === "resume" || action === "restart") {
+          if (svc.storageOverflowAt) throw new HttpError(403, STORAGE_QUOTA_ERROR);
+        }
+        if (action === "start" || action === "resume") {
+          if (svc.suspendedAt || svc.state === "SUSPENDED") await clearSuspension(id);
+        }
+        const op = (action === "resume" ? "start" : action) as "start" | "stop" | "restart" | "kill";
+        await provider[op](id);
+        await touchOwnerActivity(id);
+        await audit({ userId: user.id, serviceId: id, action: `service.${op}` });
         return { ok: true, status: await provider.status(id) };
       }
       case "recreate": {
+        if (svc.storageOverflowAt) throw new HttpError(403, STORAGE_QUOTA_ERROR);
+        if (svc.suspendedAt || svc.state === "SUSPENDED") await clearSuspension(id);
         await provider.remove(id);
         const created = await provider.create(toRecord(svc));
         await provider.start(id);
+        await touchOwnerActivity(id);
         await audit({ userId: user.id, serviceId: id, action: "service.recreate" });
         return { ok: true, container: created.containerId };
       }
@@ -398,6 +428,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         const { command } = await body<{ command: string }>(req);
         if (!command?.trim()) return fail("command is required");
         const output = await provider.sendCommand(id, command.trim());
+        await touchOwnerActivity(id);
         await audit({ userId: user.id, serviceId: id, action: "service.command", detail: command });
         return { output };
       }
@@ -413,7 +444,9 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           const dest = path.posix.join(dir, path.basename(file.name));
           await assertCommandSourceAccess(user.id, svc, [dir, dest]);
           const buffer = Buffer.from(await file.arrayBuffer());
+          await assertServiceWriteFits(svc, buffer.length);
           await fsm.write(dest, buffer);
+          await touchOwnerActivity(id);
           await audit({ userId: user.id, serviceId: id, action: "files.upload", detail: file.name });
           return { ok: true, name: file.name, size: file.size };
         }
@@ -429,30 +462,39 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           case "write":
             if (!payload.path) return fail("path is required");
             await assertCommandSourceAccess(user.id, svc, [payload.path]);
+            await assertServiceWriteFits(svc, Buffer.byteLength(payload.content ?? "", "utf8"));
             await fsm.write(payload.path, payload.content ?? "");
+            await touchOwnerActivity(id);
             await audit({ userId: user.id, serviceId: id, action: "files.write", detail: payload.path });
             return { ok: true };
           case "mkdir":
             if (!payload.path) return fail("path is required");
             await assertCommandSourceAccess(user.id, svc, [payload.path]);
+            await assertServiceWriteFits(svc, 4096);
             await fsm.mkdir(payload.path);
+            await touchOwnerActivity(id);
             return { ok: true };
           case "rename":
             if (!payload.from || !payload.to) return fail("from and to are required");
             await assertCommandSourceAccess(user.id, svc, [payload.from, payload.to]);
             await fsm.rename(payload.from, payload.to);
+            await touchOwnerActivity(id);
             return { ok: true };
           case "copy":
             if (!payload.from || !payload.to) return fail("from and to are required");
             await assertCommandSourceAccess(user.id, svc, [payload.from, payload.to]);
+            await assertServiceWriteFits(svc, await fsm.sizeOf(payload.from));
             await fsm.copy(payload.from, payload.to);
+            await touchOwnerActivity(id);
             return { ok: true };
           case "unzip":
             if (!payload.path) return fail("path is required");
             await assertCommandSourceAccess(user.id, svc, [payload.path, payload.destination ?? "/"], {
               tree: true,
             });
+            await assertServiceWriteFits(svc, await fsm.sizeOf(payload.path));
             await fsm.unzip(payload.path, payload.destination ?? "/");
+            await touchOwnerActivity(id);
             return { ok: true };
           default:
             return fail(`Unknown file operation: ${payload.op}`);
@@ -738,6 +780,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         if (!file.name.endsWith(".jar")) return fail("Only .jar files are accepted");
         const dir = kind === "plugin" ? "plugins" : "mods";
         const buffer = Buffer.from(await file.arrayBuffer());
+        await assertServiceWriteFits(svc, buffer.length);
         await fsFor(svc).write(`${dir}/${path.basename(file.name)}`, buffer);
         const [row] = await db
           .insert(minecraftAddons)
@@ -754,7 +797,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       }
       case "sftp": {
         const creds = await SFTPManager.rotate(id);
-        await audit({ userId: user.id, serviceId: id, action: "sftp.sync" });
+        await touchOwnerActivity(id);
+        await audit({ userId: user.id, serviceId: id, action: "sftp.rotate" });
         return creds;
       }
       case "database": {
@@ -849,6 +893,7 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
         if (!target) return fail("path is required");
         await assertCommandSourceAccess(user.id, svc, [target], { tree: true });
         await fsFor(svc).remove(target);
+        await refreshStorageOverflow(svc).catch(() => undefined);
         await audit({ userId: user.id, serviceId: id, action: "files.delete", detail: target });
         return { ok: true };
       }

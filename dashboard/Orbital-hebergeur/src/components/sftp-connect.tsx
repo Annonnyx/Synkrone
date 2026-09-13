@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Copy, Eye, EyeOff, HardDrive } from "lucide-react";
+import { Copy, HardDrive } from "lucide-react";
 import { useT } from "@/lib/i18n";
-
-export const SFTP_PASSWORD_HREF = "/dashboard/account/profile#password";
 
 function CopyField({
   label,
@@ -58,38 +55,25 @@ export function SftpHowTo() {
   );
 }
 
-export function SftpPasswordHint() {
+export function SftpPasswordActions({
+  hasPassword,
+  busy,
+  onRegenerate,
+}: {
+  hasPassword: boolean;
+  busy?: boolean;
+  onRegenerate: () => void;
+}) {
   const t = useT();
-  const [value, setValue] = useState("");
-  const [reveal, setReveal] = useState(false);
   return (
     <div>
-      <div className="label mb-1">{t("sftp.password")}</div>
-      <div className="flex gap-2">
-        <input
-          className="input font-mono"
-          type={reveal ? "text" : "password"}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder={t("sftp.passwordPlaceholder")}
-          autoComplete="off"
-          spellCheck={false}
-        />
-        <button
-          type="button"
-          className="btn shrink-0"
-          onClick={() => setReveal(!reveal)}
-          title={reveal ? t("common.close") : t("common.view")}
-        >
-          {reveal ? <EyeOff size={14} /> : <Eye size={14} />}
-        </button>
-      </div>
-      <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--muted)]">
-        {t("sftp.passwordHelp")}{" "}
-        <Link href={SFTP_PASSWORD_HREF} className="text-[var(--accent)] hover:underline">
-          {t("sftp.changePassword")}
-        </Link>
-      </p>
+      <p className="text-[11px] leading-relaxed text-[var(--muted)]">{t("sftp.passwordHelp")}</p>
+      {!hasPassword && (
+        <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--warning)]">{t("service.sftpNoPassword")}</p>
+      )}
+      <button className="btn mt-3" type="button" disabled={busy} onClick={onRegenerate}>
+        {t("sftp.changePassword")}
+      </button>
     </div>
   );
 }

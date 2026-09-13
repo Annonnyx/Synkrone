@@ -239,9 +239,15 @@ export abstract class BaseRuntimeProvider implements RuntimeProvider {
       if (svc && svc.state !== state && svc.state !== "DELETING") {
         // A stop we initiated ends with a non-zero exit (SIGTERM/SIGKILL). That is
         // not a crash — leave the service STOPPED instead of flipping to CRASHED.
+        if (svc?.state === "SUSPENDED" && !s.Running && !s.Restarting) {
+          return { state: "SUSPENDED", dockerStatus: s.Status, exitCode: s.ExitCode };
+        }
         if (
           state === "CRASHED" &&
-          (svc.state === "STOPPING" || svc.state === "STOPPED" || svc.state === "RESTARTING")
+          (svc.state === "STOPPING" ||
+            svc.state === "STOPPED" ||
+            svc.state === "SUSPENDED" ||
+            svc.state === "RESTARTING")
         ) {
           // docker stop/restart ends with SIGTERM (143) or SIGKILL (137).
           if (svc.state === "RESTARTING") {
@@ -299,6 +305,21 @@ export abstract class BaseRuntimeProvider implements RuntimeProvider {
     const svc = (
       await db.select().from(services).where(eq(services.id, serviceId)).limit(1)
     )[0];
+    if (svc) {
+      void import("@/lib/services/storage-enforce")
+        .then(async ({ refreshStorageOverflow }) => {
+          const over = await refreshStorageOverflow(svc, diskMb);
+          if (over && svc.state === "RUNNING") {
+            await this.stop(serviceId).catch(() => undefined);
+            const { STORAGE_QUOTA_ERROR } = await import("@/lib/services/storage-quota");
+            await db
+              .update(services)
+              .set({ lastError: STORAGE_QUOTA_ERROR, updatedAt: new Date() })
+              .where(eq(services.id, serviceId));
+          }
+        })
+        .catch(() => undefined);
+    }
     const base: ResourceStats = {
       cpuPercent: 0,
       memoryMb: 0,
