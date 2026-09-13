@@ -293,6 +293,9 @@ function readStatsFrames(id: string, count: number, timeoutMs: number): Promise<
     const finish = (err?: Error) => {
       if (settled) return;
       settled = true;
+      clearTimeout(timer);
+      if (buf.trim()) samples.push(...parseStatFrames(buf));
+      buf = "";
       req.destroy();
       if (err && samples.length === 0) reject(err);
       else resolve(samples);
@@ -316,24 +319,13 @@ function readStatsFrames(id: string, count: number, timeoutMs: number): Promise<
         buf = buf.slice(lastNl + 1);
         samples.push(...parseStatFrames(complete));
         if (samples.some((frame) => cpuSampleReady(frame)) || samples.length >= count) {
-          clearTimeout(timer);
           finish();
         }
       });
-      res.on("end", () => {
-        clearTimeout(timer);
-        if (buf.trim()) samples.push(...parseStatFrames(buf));
-        finish();
-      });
-      res.on("error", (err) => {
-        clearTimeout(timer);
-        finish(err);
-      });
+      res.on("end", () => finish());
+      res.on("error", (err) => finish(err));
     });
-    req.on("error", (err) => {
-      clearTimeout(timer);
-      finish(new DockerUnavailableError(err.message));
-    });
+    req.on("error", (err) => finish(new DockerUnavailableError(err.message)));
     req.end();
   });
 }
@@ -511,25 +503,34 @@ export const docker = {
       /* one-shot fallback below */
     }
     if (!frames.length) {
-      const first = await json<DockerStats>({
+      frames.push(await json<DockerStats>({
+        path: `/containers/${id}/stats?stream=false`,
+        timeoutMs: 15_000,
+      }));
+    }
+    let latest = frames[frames.length - 1];
+    const previous = lastCpuByContainer.get(id);
+    if (!cpuSampleReady(latest) && !previous && frames.length < 2) {
+      await new Promise((resolve) => setTimeout(resolve, 700));
+      const extra = await json<DockerStats>({
         path: `/containers/${id}/stats?stream=false`,
         timeoutMs: 15_000,
       });
-      frames.push(first);
-      if (!cpuSampleReady(first) && !lastCpuByContainer.has(id)) {
-        await new Promise((resolve) => setTimeout(resolve, 700));
-        frames.push(await json<DockerStats>({
-          path: `/containers/${id}/stats?stream=false`,
-          timeoutMs: 15_000,
-        }));
-      }
+      frames.push(extra);
+      latest = extra;
     }
-    const latest = frames[frames.length - 1];
-    const previous = lastCpuByContainer.get(id);
     lastCpuByContainer.set(id, latest);
-    if (cpuSampleReady(latest)) return latest;
-    if (previous) return mergeCpuSamples(previous, latest);
-    if (frames.length >= 2) return mergeCpuSamples(frames[0], latest);
+    if (previous) {
+      const merged = mergeCpuSamples(previous, latest);
+      if (cpuSampleReady(merged)) return merged;
+    }
+    if (cpuSampleReady(latest) && (wallDeltaNs(latest) > 0 || (!latest.read && !latest.preread))) {
+      return latest;
+    }
+    if (frames.length >= 2) {
+      const merged = mergeCpuSamples(frames[0], latest);
+      if (cpuSampleReady(merged)) return merged;
+    }
     return latest;
   },
 
@@ -646,23 +647,41 @@ export function clearCpuSampleCache() {
 export function resolveCachedCpuSample(id: string, latest: DockerStats): DockerStats {
   const previous = lastCpuByContainer.get(id);
   lastCpuByContainer.set(id, latest);
-  if (cpuSampleReady(latest)) return latest;
-  if (previous) return mergeCpuSamples(previous, latest);
+  if (previous) {
+    const merged = mergeCpuSamples(previous, latest);
+    if (cpuSampleReady(merged)) return merged;
+  }
+  if (cpuSampleReady(latest) && (wallDeltaNs(latest) > 0 || (!latest.read && !latest.preread))) {
+    return latest;
+  }
   return latest;
 }
 
+/** Go's zero time (`0001-01-01…`) parses as a real date and must not be used as preread. */
+const MIN_STATS_TIME_MS = Date.UTC(2000, 0, 1);
+const MIN_WALL_MS = 200;
+const MAX_WALL_MS = 120_000;
+
 function readTimeMs(value?: string): number {
-  if (!value) return 0;
+  if (!value || value.startsWith("0001-")) return 0;
   const ms = Date.parse(value);
-  return Number.isFinite(ms) ? ms : 0;
+  if (!Number.isFinite(ms) || ms < MIN_STATS_TIME_MS) return 0;
+  return ms;
 }
 
 /** Nanoseconds between two Docker/Podman `read` timestamps. */
 export function wallDeltaNs(stats: DockerStats): number {
   const end = readTimeMs(stats.read);
   const start = readTimeMs(stats.preread);
-  if (end > start) return (end - start) * 1_000_000;
-  return 0;
+  if (end <= start) return 0;
+  const elapsedMs = end - start;
+  if (elapsedMs < MIN_WALL_MS || elapsedMs > MAX_WALL_MS) return 0;
+  return elapsedMs * 1_000_000;
+}
+
+function prereadIsSentinel(value?: string): boolean {
+  if (!value) return false;
+  return value.startsWith("0001-") || readTimeMs(value) === 0;
 }
 
 export function cpuSampleReady(stats: DockerStats): boolean {
@@ -670,15 +689,21 @@ export function cpuSampleReady(stats: DockerStats): boolean {
   if (preTotal <= 0) return false;
   const cpuDelta = (stats.cpu_stats?.cpu_usage?.total_usage ?? 0) - preTotal;
   if (cpuDelta <= 0) return false;
+  if (wallDeltaNs(stats) > 0) return true;
+  // Podman fills precpu from a previous tick but leaves preread at Go's zero
+  // time. That sample is not usable: wall-clock would be ~10^11 seconds and
+  // the Docker ncpus formula would inflate by the host core count.
+  if (prereadIsSentinel(stats.preread)) return false;
+  // Timestamps exist but the window is too short or too long.
+  if (readTimeMs(stats.read) > 0 && readTimeMs(stats.preread) > 0) return false;
   const preSys = stats.precpu_stats?.system_cpu_usage ?? 0;
   const systemDelta = (stats.cpu_stats?.system_cpu_usage ?? 0) - preSys;
-  if (systemDelta > 0) return true;
-  return wallDeltaNs(stats) > 0;
+  return systemDelta > 0;
 }
 
 /** Podman often answers stream=false with an empty precpu block. Reuse the previous sample. */
 export function mergeCpuSamples(previous: DockerStats, next: DockerStats): DockerStats {
-  if (cpuSampleReady(next)) return next;
+  if (cpuSampleReady(next) && (wallDeltaNs(next) > 0 || (!next.read && !next.preread))) return next;
   return {
     ...next,
     preread: previous.read || next.preread,
@@ -697,6 +722,8 @@ export function computeCpuPercent(stats: DockerStats): number {
   if (cpuDelta <= 0) return 0;
   const elapsedNs = wallDeltaNs(stats);
   if (elapsedNs > 0) return (cpuDelta / elapsedNs) * 100;
+  if (prereadIsSentinel(stats.preread)) return 0;
+  if (readTimeMs(stats.read) > 0 && readTimeMs(stats.preread) > 0) return 0;
   const systemDelta =
     (stats.cpu_stats?.system_cpu_usage ?? 0) - (stats.precpu_stats?.system_cpu_usage ?? 0);
   if (systemDelta <= 0) return 0;

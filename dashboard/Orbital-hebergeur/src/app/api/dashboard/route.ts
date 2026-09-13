@@ -95,6 +95,9 @@ export async function GET() {
         failing: 0,
       },
     );
+    if (totals.cpuMillicores > 0) {
+      totals.cpuPercent = Math.round((totals.cpuPercent * 1000 * 10) / totals.cpuMillicores) / 10;
+    }
 
     return {
       services: enriched,

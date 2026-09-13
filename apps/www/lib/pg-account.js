@@ -305,28 +305,81 @@ function providersOf(user) {
     return providers;
 }
 
+function oauthProviderLinks(user) {
+    const providers = providersOf(user);
+    const links = [];
+    if (providers.discord) links.push(['discord', String(providers.discord)]);
+    if (providers.github) links.push(['github', String(providers.github)]);
+    if (providers.google) links.push(['google', String(providers.google)]);
+    return links;
+}
+
+async function linkOAuthAccount(client, userId, provider, providerId, meta = {}) {
+    const id = String(providerId || '').trim();
+    if (!provider || !id) return false;
+    const taken = await findUserIdByOAuth(client, provider, id);
+    if (taken && taken !== userId) return false;
+    if (taken === userId) return true;
+    const existing = await client.query(
+        `SELECT id, provider_account_id FROM oauth_accounts WHERE user_id = $1 AND provider = $2 LIMIT 1`,
+        [userId, provider]
+    );
+    if (existing.rows[0]) {
+        if (existing.rows[0].provider_account_id !== id) {
+            await client.query(
+                `UPDATE oauth_accounts
+                 SET provider_account_id = $2, provider_login = COALESCE($3, provider_login),
+                     email = COALESCE($4, email), avatar_url = COALESCE($5, avatar_url), updated_at = NOW()
+                 WHERE id = $1`,
+                [
+                    existing.rows[0].id,
+                    id,
+                    meta.name ? String(meta.name) : null,
+                    meta.email ? String(meta.email) : null,
+                    meta.avatarUrl || null
+                ]
+            );
+        }
+        return true;
+    }
+    await client.query(
+        `INSERT INTO oauth_accounts (
+            id, user_id, provider, provider_account_id, provider_login, email, avatar_url, created_at, updated_at
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+         ON CONFLICT (provider, provider_account_id) DO NOTHING`,
+        [
+            crypto.randomUUID(),
+            userId,
+            provider,
+            id,
+            meta.name ? String(meta.name) : null,
+            meta.email ? String(meta.email) : null,
+            meta.avatarUrl || null
+        ]
+    );
+    return true;
+}
+
 async function ensureUserFromSite(client, user) {
+    const admin = Boolean(user.isTeamOwner) || String(user.role || '').toLowerCase() === 'admin';
+    const order = oauthProviderLinks(user);
+    let userId = null;
     if (user?.dbId) {
         const exists = await client.query(`SELECT id FROM users WHERE id = $1 LIMIT 1`, [user.dbId]);
-        if (exists.rows[0]) return user.dbId;
+        if (exists.rows[0]) userId = user.dbId;
     }
-    const providers = providersOf(user);
-    const admin = Boolean(user.isTeamOwner) || String(user.role || '').toLowerCase() === 'admin';
-    const order = [];
-    if (providers.discord) order.push(['discord', providers.discord]);
-    if (providers.github) order.push(['github', providers.github]);
-    if (providers.google) order.push(['google', providers.google]);
-    let userId = null;
-    for (const [provider, providerId] of order) {
-        userId = await upsertOAuthUser(client, {
-            provider,
-            providerId,
-            name: user.username || user.name,
-            email: user.email,
-            avatarUrl: user.avatar,
-            admin
-        });
-        break;
+    if (!userId) {
+        for (const [provider, providerId] of order) {
+            userId = await upsertOAuthUser(client, {
+                provider,
+                providerId,
+                name: user.username || user.name,
+                email: user.email,
+                avatarUrl: user.avatar,
+                admin
+            });
+            break;
+        }
     }
     if (!userId) userId = await findUserIdByPublicId(client, user.id);
     if (!userId && order.length) {
@@ -345,26 +398,12 @@ async function ensureUserFromSite(client, user) {
             admin
         });
     }
-    for (const [provider, providerId] of order.slice(1)) {
-        const taken = await findUserIdByOAuth(client, provider, providerId);
-        if (taken && taken !== userId) continue;
-        if (!taken) {
-            await client.query(
-                `INSERT INTO oauth_accounts (
-                    id, user_id, provider, provider_account_id, provider_login, email, avatar_url, created_at, updated_at
-                 ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-                 ON CONFLICT (provider, provider_account_id) DO NOTHING`,
-                [
-                    crypto.randomUUID(),
-                    userId,
-                    provider,
-                    String(providerId),
-                    String(user.username || ''),
-                    String(user.email || '') || null,
-                    user.avatar || null
-                ]
-            );
-        }
+    for (const [provider, providerId] of order) {
+        await linkOAuthAccount(client, userId, provider, providerId, {
+            name: user.username || user.name,
+            email: user.email,
+            avatarUrl: user.avatar
+        });
     }
     return userId;
 }
@@ -594,7 +633,15 @@ async function findDiscordId(client, userId) {
          WHERE user_id = $1 AND provider = 'discord' LIMIT 1`,
         [userId]
     );
-    return row.rows[0]?.provider_account_id || null;
+    if (row.rows[0]?.provider_account_id) return row.rows[0].provider_account_id;
+    const profile = await client.query(
+        `SELECT public_id FROM site_profiles WHERE user_id = $1 LIMIT 1`,
+        [userId]
+    );
+    const publicId = String(profile.rows[0]?.public_id || '').trim();
+    if (!/^\d{15,22}$/.test(publicId)) return null;
+    await linkOAuthAccount(client, userId, 'discord', publicId);
+    return publicId;
 }
 
 async function mutateWallet(publicId, fn) {
@@ -965,5 +1012,7 @@ module.exports = {
     snapshotWallets,
     mergeWalletState,
     pickPlan,
+    oauthProviderLinks,
+    SCHEMA_SQL,
     GRADE_ORDER
 };

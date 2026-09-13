@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
     requireInternalAdmin(req);
     const body = (await req.json()) as {
       provider?: string;
+      userId?: string;
       profile?: { id?: string; name?: string; login?: string; email?: string; avatarUrl?: string };
     };
     const provider = String(body.provider || "");
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
     }
     const identity = await ensurePanelIdentity({
       provider,
+      currentUserId: body.userId,
       profile: {
         id: String(profile.id),
         name: String(profile.name || profile.login || provider),

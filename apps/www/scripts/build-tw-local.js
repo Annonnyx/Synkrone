@@ -318,49 +318,52 @@ function rule(cls) {
     return '';
 }
 
+function retarget(inner, className, suffix = '') {
+    if (!inner) return '';
+    const brace = inner.indexOf('{');
+    if (brace < 0) return inner;
+    return `${escapeClass(className)}${suffix}${inner.slice(brace)}`;
+}
+
+function mediaWrap(minWidth, inner) {
+    return inner ? `@media(min-width:${minWidth}){${inner}}` : '';
+}
+
 function wrapVariant(cls) {
-    if (cls.startsWith('sm:')) {
-        const inner = rule(cls.slice(3));
-        return inner ? `@media(min-width:640px){${inner}}` : '';
-    }
-    if (cls.startsWith('md:')) {
-        const inner = rule(cls.slice(3));
-        return inner ? `@media(min-width:768px){${inner}}` : '';
-    }
-    if (cls.startsWith('lg:')) {
-        const inner = rule(cls.slice(3));
-        return inner ? `@media(min-width:1024px){${inner}}` : '';
-    }
-    if (cls.startsWith('hover:')) {
-        const inner = rule(cls.slice(6));
-        return inner.replace(/^(\.\S+)\{/, '$1:hover{');
-    }
-    if (cls.startsWith('focus:')) {
-        const inner = rule(cls.slice(6));
-        return inner.replace(/^(\.\S+)\{/, '$1:focus{');
-    }
+    if (cls.startsWith('sm:')) return mediaWrap('640px', retarget(rule(cls.slice(3)), cls));
+    if (cls.startsWith('md:')) return mediaWrap('768px', retarget(rule(cls.slice(3)), cls));
+    if (cls.startsWith('lg:')) return mediaWrap('1024px', retarget(rule(cls.slice(3)), cls));
+    if (cls.startsWith('hover:')) return retarget(rule(cls.slice(6)), cls, ':hover');
+    if (cls.startsWith('focus:')) return retarget(rule(cls.slice(6)), cls, ':focus');
     if (cls.startsWith('group-hover:')) {
         const inner = rule(cls.slice(12));
-        return inner.replace(/^(\.\S+)\{/, '.group:hover $1{');
+        if (!inner) return '';
+        const brace = inner.indexOf('{');
+        return `.group:hover ${escapeClass(cls)}${inner.slice(brace)}`;
     }
     if (cls.startsWith('peer-checked:after:')) {
         const inner = rule(cls.slice(19));
-        return inner.replace(/^(\.\S+)\{/, '.peer:checked~.peer-after, .peer:checked::after{');
+        if (!inner) return '';
+        const brace = inner.indexOf('{');
+        return `.peer:checked~.peer-after, .peer:checked::after${inner.slice(brace)}`;
     }
     if (cls.startsWith('peer-checked:')) {
         const inner = rule(cls.slice(13));
-        return inner.replace(/^(\.\S+)\{/, '.peer:checked{');
+        if (!inner) return '';
+        const brace = inner.indexOf('{');
+        return `.peer:checked + ${escapeClass(cls)}, .peer:checked${inner.slice(brace)}`;
     }
     if (cls.startsWith('peer-focus:')) {
         const inner = rule(cls.slice(11));
-        return inner.replace(/^(\.\S+)\{/, '.peer:focus{');
+        if (!inner) return '';
+        const brace = inner.indexOf('{');
+        return `.peer:focus + ${escapeClass(cls)}, .peer:focus${inner.slice(brace)}`;
     }
     if (cls.startsWith('after:')) {
         if (cls === "after:content-['']") return `${escapeClass(cls)},.after\\:content-\\[\\'\\'\\]::after{content:''}`;
-        const inner = rule(cls.slice(6));
-        return inner.replace(/^(\.\S+)\{/, '$1::after{');
+        return retarget(rule(cls.slice(6)), cls, '::after');
     }
-    return css;
+    return '';
 }
 
 function build() {
@@ -381,6 +384,7 @@ function build() {
             : rule(cls);
         if (css) blocks.push(css);
     }
+    blocks.push('.w-screen{width:100%;max-width:100%}');
     fs.writeFileSync(OUT, `/* generated — do not edit by hand. node apps/www/scripts/build-tw-local.js */\n${blocks.join('\n')}\n`);
     console.log(`tw-local.css: ${classes.size} classes, ${fs.statSync(OUT).size} bytes`);
 }

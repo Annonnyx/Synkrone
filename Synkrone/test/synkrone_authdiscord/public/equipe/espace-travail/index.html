@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone | Espace de travail collaboratif</title>
     
-    <link rel="stylesheet" href="/assets/tw-local.css">
+    <link rel="stylesheet" href="/assets/tw-local.css?v=2">
     <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="/assets/mosaique.css">
     <script src="/assets/mosaique.js" defer></script>
@@ -28,9 +28,9 @@
         .writing-vertical { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); }
     </style>
     <link rel="stylesheet" href="/design/synkrone.css">
-    <link rel="stylesheet" href="/assets/equipe.css">
+    <link rel="stylesheet" href="/assets/equipe.css?v=2">
 </head>
-<body class="equipe-da mosaic-bg h-screen w-screen flex flex-col relative text-sm bg-base">
+<body class="equipe-da mosaic-bg h-screen w-full flex flex-col relative text-sm bg-base">
     <div id="app-root" class="h-full w-full flex flex-col relative z-0"></div>
     
     <div id="toast-container" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
@@ -316,7 +316,7 @@
             const sortedProjects = [...appState.projects].sort((a, b) => b.createdAt - a.createdAt);
             return `
                 <div class="flex-1 overflow-y-auto p-6 lg:p-12 fade-in">
-                    <div class="max-w-6xl mx-auto">
+                    <div class="equipe-sheet max-w-6xl mx-auto">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                             <div>
                                 <h1 class="text-3xl font-bold text-white">Espace de travail</h1>
@@ -327,7 +327,7 @@
                             </button>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="equipe-project-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             ${sortedProjects.map(p => {
                                 return `
                                 <div class="glass-panel p-6 rounded-xl border border-border hover:border-gray-400 transition cursor-pointer flex flex-col h-full group" onclick="window.selectProject('${p.id}')">
@@ -371,7 +371,7 @@
 
             return `
                 <div class="flex-1 overflow-y-auto p-6 lg:p-12 fade-in">
-                    <div class="max-w-4xl mx-auto">
+                    <div class="equipe-sheet max-w-4xl mx-auto">
                         <button onclick="appState.view = 'projects'; appState.currentProjectId = null; window.updateURL(); render();" class="text-gray-400 hover:text-white mb-6 flex items-center gap-2 transition">
                             <i class="fa-solid fa-arrow-left"></i> Retour aux projets
                         </button>
@@ -433,7 +433,7 @@
                         </div>
                     </div>
                     <!-- Navigation Tabs -->
-                    <div class="hidden md:flex bg-base rounded-lg p-1 border border-border">
+                    <div class="equipe-view-tabs hidden md:flex bg-base rounded-lg p-1 border border-border">
                         ${renderTabBtn('kanban', 'Kanban', 'fa-table-columns')}
                         ${renderTabBtn('brainstorm', 'Brainstorm', 'fa-lightbulb')}
                         ${renderTabBtn('repartition', 'Répartition', 'fa-users')}
@@ -446,7 +446,7 @@
                     </div>
                 </header>
                 <!-- Mobile Tabs -->
-                <div class="md:hidden flex bg-panel border-b border-border p-2 overflow-x-auto gap-2 shrink-0">
+                <div class="equipe-view-tabs-mobile md:hidden flex bg-panel border-b border-border p-2 overflow-x-auto gap-2 shrink-0">
                     ${renderTabBtn('kanban', 'Kanban', 'fa-table-columns')}
                     ${renderTabBtn('brainstorm', 'Brainstorm', 'fa-lightbulb')}
                     ${renderTabBtn('repartition', 'Répartition', 'fa-users')}
@@ -778,7 +778,7 @@
             const project = appState.projects.find(p => p.id === appState.currentProjectId);
             return `
             <div class="absolute inset-0 p-6 overflow-y-auto fade-in">
-                <div class="max-w-4xl mx-auto space-y-6">
+                <div class="equipe-sheet max-w-4xl mx-auto space-y-6">
                     <div class="glass-panel p-6 rounded-xl border border-border">
                         <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-users text-gray-300"></i> Équipe du Projet</h2>
                         <div class="overflow-x-auto">
@@ -829,7 +829,7 @@
             const vPolls = appState.polls.filter(p => p.versionId === appState.currentVersionId).reverse();
             return `
             <div class="absolute inset-0 p-6 overflow-y-auto fade-in">
-                <div class="max-w-3xl mx-auto">
+                <div class="equipe-sheet max-w-3xl mx-auto">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-square-poll-vertical text-gray-300 mr-2"></i> Sondages</h2>
                         <button onclick="window.openCreatePollModal()" class="bg-accent hover:bg-accentHover text-white px-4 py-2 rounded-lg font-medium transition shadow-lg text-sm flex items-center gap-2 border border-border">

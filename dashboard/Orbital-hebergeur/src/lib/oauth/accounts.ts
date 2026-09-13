@@ -1,8 +1,20 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { oauthAccounts, users } from "@/db/schema";
+import { ensureAccountSchema } from "@/db/ensure-schema";
+import { oauthAccounts, siteProfiles, users } from "@/db/schema";
 import { HttpError } from "@/lib/auth";
 import { decryptSecret, encryptSecret } from "@/lib/crypto";
+import { synkroneRepoRoot } from "@/lib/repo-root";
+import {
+  discordIdFromIdentityRow,
+  discordIdFromPublicId,
+  discordIdFromSiteUser,
+  isDiscordSnowflake,
+  isPanelUserId,
+  planPanelIdentityLink,
+} from "./identity-link";
 import { getProviderConfig, refreshProviderToken } from "./providers";
 import type { OAuthIntent, OAuthProfile, OAuthProvider, OAuthTokens, ProviderStatus } from "./types";
 import { OAUTH_PROVIDERS } from "./types";
@@ -16,8 +28,67 @@ export function oauthPlaceholderEmail(provider: OAuthProvider, providerUserId: s
 }
 
 export async function discordIdForUser(userId: string): Promise<string | null> {
-  const row = await getOAuthAccount(userId, "discord");
-  return row?.providerAccountId ?? null;
+  try {
+    const row = await getOAuthAccount(userId, "discord");
+    if (row?.providerAccountId) return row.providerAccountId;
+  } catch {
+    /* oauth_accounts should already exist */
+  }
+  try {
+    await ensureAccountSchema();
+    const [profile] = await db
+      .select({ publicId: siteProfiles.publicId })
+      .from(siteProfiles)
+      .where(eq(siteProfiles.userId, userId))
+      .limit(1);
+    const snowflake = discordIdFromPublicId(profile?.publicId);
+    if (snowflake) {
+      await backfillDiscordOAuth(userId, snowflake).catch(() => undefined);
+      return snowflake;
+    }
+  } catch {
+    /* site_profiles missing or empty */
+  }
+  const legacy = await discordIdFromLegacyFiles(userId);
+  if (!legacy) return null;
+  await rememberDiscordLink(userId, {
+    id: legacy,
+    name: legacy,
+    login: legacy,
+    email: null,
+    emailVerified: false,
+    avatarUrl: null,
+  }).catch(() => undefined);
+  return legacy;
+}
+
+async function discordIdFromLegacyFiles(userId: string): Promise<string | null> {
+  const root = synkroneRepoRoot();
+  try {
+    const map = JSON.parse(
+      await readFile(path.join(root, "Synkrone/test/synkrone_authdiscord/data/identity-map.json"), "utf8"),
+    ) as {
+      byPanelId?: Record<string, { discordId?: string; siteUserId?: string }>;
+    };
+    const fromMap = discordIdFromIdentityRow(map.byPanelId?.[userId]);
+    if (fromMap) return fromMap;
+  } catch {
+    /* optional file */
+  }
+  try {
+    const raw = JSON.parse(
+      await readFile(path.join(root, "Synkrone/test/synkrone_authdiscord/data/users.json"), "utf8"),
+    ) as {
+      users?: Record<string, { id?: string; dbId?: string; providers?: { discord?: string } }>;
+    };
+    for (const user of Object.values(raw.users || {})) {
+      const found = discordIdFromSiteUser(userId, user);
+      if (found) return found;
+    }
+  } catch {
+    /* optional file */
+  }
+  return null;
 }
 
 export async function ensurePanelIdentity(input: {
@@ -30,6 +101,7 @@ export async function ensurePanelIdentity(input: {
     avatarUrl?: string | null;
     emailVerified?: boolean;
   };
+  currentUserId?: string | null;
 }): Promise<{ userId: string; created: boolean; discordId: string | null }> {
   const profile: OAuthProfile = {
     id: String(input.profile.id),
@@ -39,20 +111,47 @@ export async function ensurePanelIdentity(input: {
     emailVerified: Boolean(input.profile.emailVerified),
     avatarUrl: input.profile.avatarUrl || null,
   };
-  const result = await completeOAuthLogin({
-    provider: input.provider,
-    profile,
-    tokens: { accessToken: "" },
-    intent: "login",
+  const [byProvider] = await db
+    .select({ userId: oauthAccounts.userId })
+    .from(oauthAccounts)
+    .where(
+      and(eq(oauthAccounts.provider, input.provider), eq(oauthAccounts.providerAccountId, profile.id)),
+    )
+    .limit(1);
+  const currentUserId = isPanelUserId(input.currentUserId) ? String(input.currentUserId).trim() : null;
+  let plan = planPanelIdentityLink({
+    existingOauthUserId: byProvider?.userId,
+    currentUserId,
   });
+  if (plan.action === "link") {
+    const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.id, plan.userId)).limit(1);
+    if (!existing) plan = { action: "create" };
+  }
+  const result =
+    plan.action === "link"
+      ? await completeOAuthLogin({
+          provider: input.provider,
+          profile,
+          tokens: { accessToken: "" },
+          intent: "link",
+          currentUserId: plan.userId,
+        })
+      : await completeOAuthLogin({
+          provider: input.provider,
+          profile,
+          tokens: { accessToken: "" },
+          intent: "login",
+        });
   const discordId =
-    input.provider === "discord" ? profile.id : await discordIdForUser(result.userId);
+    input.provider === "discord" && isDiscordSnowflake(profile.id)
+      ? profile.id
+      : await discordIdForUser(result.userId);
   return { ...result, discordId };
 }
 
 export async function userIdForDiscordAccount(discordUserId: string): Promise<string | null> {
   const id = String(discordUserId || "").trim();
-  if (!/^\d{15,22}$/.test(id)) return null;
+  if (!isDiscordSnowflake(id)) return null;
   const [account] = await db
     .select({ userId: oauthAccounts.userId })
     .from(oauthAccounts)
@@ -124,13 +223,13 @@ export async function completeOAuthLogin(input: {
     }
     await upsertOAuthAccount(currentUserId, provider, profile, tokens);
     await maybeFillProfile(currentUserId, profile);
-    return { userId: currentUserId, created: false };
+    return finishOAuthLogin(currentUserId, false, provider, profile);
   }
 
   if (byProvider) {
     await upsertOAuthAccount(byProvider.userId, provider, profile, tokens);
     await maybeFillProfile(byProvider.userId, profile);
-    return { userId: byProvider.userId, created: false };
+    return finishOAuthLogin(byProvider.userId, false, provider, profile);
   }
 
   const email = profile.email?.toLowerCase() ?? null;
@@ -139,7 +238,7 @@ export async function completeOAuthLogin(input: {
     if (existing) {
       await upsertOAuthAccount(existing.id, provider, profile, tokens);
       await maybeFillProfile(existing.id, profile);
-      return { userId: existing.id, created: false };
+      return finishOAuthLogin(existing.id, false, provider, profile);
     }
   }
 
@@ -153,7 +252,82 @@ export async function completeOAuthLogin(input: {
     })
     .returning({ id: users.id });
   await upsertOAuthAccount(created.id, provider, profile, tokens);
-  return { userId: created.id, created: true };
+  return finishOAuthLogin(created.id, true, provider, profile);
+}
+
+async function finishOAuthLogin(
+  userId: string,
+  created: boolean,
+  provider: OAuthProvider,
+  profile: OAuthProfile,
+) {
+  if (provider === "discord" && isDiscordSnowflake(profile.id)) {
+    await rememberDiscordLink(userId, profile);
+  }
+  return { userId, created };
+}
+
+async function rememberDiscordLink(userId: string, profile: OAuthProfile) {
+  const snowflake = discordIdFromPublicId(profile.id);
+  if (!snowflake) return;
+  try {
+    await upsertOAuthAccount(userId, "discord", profile, { accessToken: "" });
+  } catch {
+    /* unique conflict — still record the site profile when possible */
+  }
+  try {
+    await ensureAccountSchema();
+    const [existing] = await db
+      .select({ publicId: siteProfiles.publicId })
+      .from(siteProfiles)
+      .where(eq(siteProfiles.userId, userId))
+      .limit(1);
+    if (existing) {
+      if (existing.publicId === snowflake) return;
+      if (isDiscordSnowflake(existing.publicId) && existing.publicId !== snowflake) return;
+      await db
+        .update(siteProfiles)
+        .set({ publicId: snowflake, updatedAt: new Date() })
+        .where(eq(siteProfiles.userId, userId));
+      return;
+    }
+    await db
+      .insert(siteProfiles)
+      .values({
+        userId,
+        publicId: snowflake,
+        role: "Krobi",
+        isTeamOwner: false,
+        profile: {},
+      })
+      .onConflictDoNothing({ target: siteProfiles.userId });
+  } catch {
+    /* table missing or public_id taken — Discord oauth is the source of truth */
+  }
+}
+
+async function backfillDiscordOAuth(userId: string, snowflake: string) {
+  const [taken] = await db
+    .select({ userId: oauthAccounts.userId })
+    .from(oauthAccounts)
+    .where(and(eq(oauthAccounts.provider, "discord"), eq(oauthAccounts.providerAccountId, snowflake)))
+    .limit(1);
+  if (taken && taken.userId !== userId) return;
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user) return;
+  await upsertOAuthAccount(
+    userId,
+    "discord",
+    {
+      id: snowflake,
+      name: user.name,
+      login: user.name,
+      email: user.email?.endsWith("@oauth.synkrone.local") ? null : user.email,
+      emailVerified: false,
+      avatarUrl: user.avatarUrl,
+    },
+    { accessToken: "" },
+  );
 }
 
 async function upsertOAuthAccount(

@@ -930,6 +930,7 @@ html[data-theme="dark"] .sub-nav-tab.active {
 .sub-nav {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     width: 100%;
     height: auto;
@@ -1311,6 +1312,7 @@ button.tab-btn.active {
     .sub-nav {
         padding: 6px 10px;
         min-height: 44px;
+        justify-content: center;
     }
 
     .app-container > footer,

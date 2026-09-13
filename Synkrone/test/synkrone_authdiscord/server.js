@@ -572,11 +572,23 @@ function isProdCookie() {
     return process.env.NODE_ENV === 'production';
 }
 
+async function persistPanelUserId(siteUserId, panelUserId) {
+    const siteId = String(siteUserId || '').trim();
+    const panelId = String(panelUserId || '').trim();
+    if (!siteId || !panelId) return;
+    const db = await readUsersDb();
+    const user = db.users[siteId];
+    if (!user || String(user.dbId || '') === panelId) return;
+    user.dbId = panelId;
+    await writeUsersDb(db);
+}
+
 async function attachPanelFromSite(res, persisted, provider, profile, options = {}) {
     const required = Boolean(options.required);
     try {
         const panel = await requestPanelSession({
             provider,
+            userId: persisted.dbId || undefined,
             profile: {
                 id: String(profile.id || persisted.id),
                 name: persisted.username,
@@ -594,6 +606,7 @@ async function attachPanelFromSite(res, persisted, provider, profile, options = 
             discordId: provider === 'discord' ? String(profile.id || persisted.id) : (panel.discordId || ''),
             email: persisted.email || profile.email || ''
         });
+        await persistPanelUserId(persisted.id, panel.userId).catch(() => undefined);
         if (provider === 'discord' && panel.userId && kronesApi?.migrateWallet) {
             await kronesApi.migrateWallet(`panel:${panel.userId}`, String(profile.id || persisted.id)).catch(() => undefined);
         }

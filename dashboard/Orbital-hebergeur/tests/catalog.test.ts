@@ -42,6 +42,14 @@ test("hosting cost follows the published formulas", () => {
   assert.ok(hostingCost("web", { memoryMb: 512, cpuMillicores: 1000, storageMb: 5120 }) >= 50);
 });
 
+test("hosting CPU cost is millicores/1000 times the CPU coefficient", () => {
+  const noCpu = hostingCost("minecraft", { memoryMb: 1024, cpuMillicores: 0, storageMb: 10240 });
+  const oneCore = hostingCost("minecraft", { memoryMb: 1024, cpuMillicores: 1000, storageMb: 10240 });
+  const halfCore = hostingCost("minecraft", { memoryMb: 1024, cpuMillicores: 500, storageMb: 10240 });
+  assert.equal(oneCore - noCpu, 25);
+  assert.equal(halfCore - noCpu, 13);
+});
+
 test("panel URLs stay under /hebergement", () => {
   assert.equal(PANEL_BASE_PATH, "/hebergement");
   assert.equal(withPanelBase("/api/krones"), "/hebergement/api/krones");

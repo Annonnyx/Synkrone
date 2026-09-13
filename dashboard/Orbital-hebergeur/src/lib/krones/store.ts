@@ -2,8 +2,10 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { desc, eq } from "drizzle-orm";
 import { db, pool } from "@/db";
+import { ensureAccountSchema } from "@/db/ensure-schema";
 import { walletLedger, wallets } from "@/db/schema";
 import { discordIdForUser } from "@/lib/oauth/accounts";
+import { isDiscordSnowflake } from "@/lib/oauth/identity-link";
 import { synkroneRepoRoot } from "@/lib/repo-root";
 import { DISCORD_COEFF, MC_COEFF, WEB_COEFF, hostingCost } from "./pricing";
 import {
@@ -43,10 +45,6 @@ type CatalogStore = {
 
 const JOIN_BONUS = 100;
 const JOIN_BONUS_REASON = "discord:join";
-
-function isDiscordSnowflake(id: string) {
-  return /^\d{15,22}$/.test(id);
-}
 
 async function isGuildMember(discordId: string) {
   const token = String(process.env.DISCORD_BOT_TOKEN || "").trim();
@@ -134,6 +132,7 @@ async function trimLedger(client: { query: (sql: string, params?: unknown[]) => 
 }
 
 async function ensureWalletRow(userId: string) {
+  await ensureAccountSchema();
   await db
     .insert(wallets)
     .values({ userId, balance: 0, plan: "Aucun" })
@@ -167,6 +166,7 @@ export async function walletAccountId(userId: string): Promise<string> {
 }
 
 export async function getWallet(userId: string) {
+  await ensureAccountSchema();
   const privilege = await resolveKronesPrivilege(userId);
   const discordId = await discordIdForUser(userId);
   await ensureWalletRow(userId);

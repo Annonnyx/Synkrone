@@ -226,3 +226,38 @@ body.equipe-da #contextMenu {
     color: var(--sk-text, #1b211e);
     border-radius: 6px;
 }
+
+/* Sheets and project cards: center in the iframe, like Admin. */
+body.equipe-da .equipe-sheet {
+    width: 100%;
+    max-width: 72rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.equipe-da .equipe-project-grid {
+    display: grid;
+    width: 100%;
+    gap: 1.5rem;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 22rem));
+}
+
+/* Workspace tabs: centered group, not the leftover left-aligned mobile strip. */
+body.equipe-da .equipe-view-tabs {
+    display: none;
+}
+body.equipe-da .equipe-view-tabs-mobile {
+    display: flex;
+    justify-content: center;
+}
+@media (min-width: 768px) {
+    body.equipe-da .equipe-view-tabs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    body.equipe-da .equipe-view-tabs-mobile {
+        display: none !important;
+    }
+}

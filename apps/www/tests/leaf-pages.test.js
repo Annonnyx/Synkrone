@@ -158,6 +158,14 @@ test('tw-local w-screen is a width, not a height', () => {
     assert.doesNotMatch(match[0], /100vh/);
 });
 
+test('tw-local keeps responsive prefixes on the generated selectors', () => {
+    const css = fs.readFileSync(path.join(PUBLIC_DIR, 'assets', 'tw-local.css'), 'utf8');
+    assert.match(css, /@media\(min-width:768px\)\{\.md\\:flex\{display:flex\}/);
+    assert.match(css, /@media\(min-width:768px\)\{\.md\\:hidden\{display:none\}/);
+    assert.doesNotMatch(css, /@media\(min-width:768px\)\{\.flex\{display:flex\}/);
+    assert.doesNotMatch(css, /@media\(min-width:768px\)\{\.hidden\{display:none\}/);
+});
+
 test('login is oauth-only and not a hosting-account split', () => {
     const html = fs.readFileSync(path.join(PUBLIC_DIR, 'login.html'), 'utf8');
     assert.doesNotMatch(html, /compte hébergement/i);

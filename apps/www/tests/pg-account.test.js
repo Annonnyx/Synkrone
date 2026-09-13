@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { mergeWalletState, pickPlan } = require('../lib/pg-account');
+const { mergeWalletState, pickPlan, oauthProviderLinks, SCHEMA_SQL } = require('../lib/pg-account');
 
 test('wallet merge keeps the higher balance instead of summing duplicates', () => {
     const merged = mergeWalletState(
@@ -18,4 +18,19 @@ test('wallet merge keeps the higher balance instead of summing duplicates', () =
 test('higher grade wins when merging plans', () => {
     assert.equal(pickPlan('Kronium', 'Kronix'), 'Kronix');
     assert.equal(pickPlan('Aucun', 'Synkral'), 'Synkral');
+});
+
+test('a Discord snowflake still yields an oauth link when the panel UUID already exists', () => {
+    const links = oauthProviderLinks({
+        id: '1368235294192570520',
+        dbId: '70f4f7f6-df0a-4d0c-99f2-1a1c97fd1f68',
+        username: 'Onyx'
+    });
+    assert.deepEqual(links[0], ['discord', '1368235294192570520']);
+});
+
+test('site schema SQL creates the same account tables as the panel', () => {
+    assert.match(SCHEMA_SQL, /CREATE TABLE IF NOT EXISTS site_profiles/);
+    assert.match(SCHEMA_SQL, /CREATE TABLE IF NOT EXISTS wallets/);
+    assert.match(SCHEMA_SQL, /CREATE TABLE IF NOT EXISTS wallet_ledger/);
 });

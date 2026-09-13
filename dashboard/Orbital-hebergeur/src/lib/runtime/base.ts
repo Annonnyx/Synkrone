@@ -2,7 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { consoleLines, containers, envVars, metricSamples, services } from "@/db/schema";
 import { ContainerManager, type ContainerSpec } from "@/lib/docker/adapter";
-import { computeCpuPercent, DockerUnavailableError } from "@/lib/docker/engine";
+import { computeCpuPercent, cpuSampleReady, DockerUnavailableError } from "@/lib/docker/engine";
 import { decryptSecret } from "@/lib/crypto";
 import { FilesystemManager } from "@/lib/filesystem/manager";
 import { MOUNT_POINT, serviceVolume, type ServiceType } from "@/lib/paths";
@@ -318,7 +318,7 @@ export abstract class BaseRuntimeProvider implements RuntimeProvider {
       const inspect = await ContainerManager.inspect(row.dockerContainerId);
       const started = Date.parse(inspect.State.StartedAt);
       const stats: ResourceStats = {
-        cpuPercent: Math.round(computeCpuPercent(raw) * 10) / 10,
+        cpuPercent: cpuSampleReady(raw) ? Math.round(computeCpuPercent(raw) * 10) / 10 : 0,
         memoryMb: Math.round(((raw.memory_stats?.usage ?? 0) / (1024 * 1024)) * 10) / 10,
         memoryLimitMb: Math.round((raw.memory_stats?.limit ?? 0) / (1024 * 1024)),
         networkRxKb: Math.round(nets.reduce((a, n) => a + (n.rx_bytes ?? 0), 0) / 1024),
