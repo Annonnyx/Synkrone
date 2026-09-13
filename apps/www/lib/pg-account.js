@@ -996,6 +996,60 @@ async function importLegacy(client, { users, wallets, joinBonus, identity }) {
     }
 }
 
+async function countSiteAccounts() {
+    if (!isConfigured()) return 0;
+    try {
+        await ensureReady();
+        return withClient(async (client) => {
+            let profiles = 0;
+            let users = 0;
+            try {
+                const row = await client.query('SELECT COUNT(*)::int AS n FROM site_profiles');
+                profiles = Number(row.rows[0]?.n) || 0;
+            } catch {
+                profiles = 0;
+            }
+            try {
+                const row = await client.query('SELECT COUNT(*)::int AS n FROM users');
+                users = Number(row.rows[0]?.n) || 0;
+            } catch {
+                users = 0;
+            }
+            return Math.max(profiles, users);
+        });
+    } catch {
+        return 0;
+    }
+}
+
+function hostingFromServiceRows(rows) {
+    const hosting = { discord: 0, minecraft: 0, web: 0, total: 0, running: 0 };
+    for (const row of rows || []) {
+        const n = Number(row.n) || 0;
+        hosting.total += n;
+        if (row.type === 'discord' || row.type === 'minecraft' || row.type === 'web') {
+            hosting[row.type] += n;
+        }
+        if (String(row.state || '') === 'RUNNING') hosting.running += n;
+    }
+    return hosting;
+}
+
+async function countHostingServices() {
+    if (!isConfigured()) return null;
+    try {
+        await ensureReady();
+        return withClient(async (client) => {
+            const rows = await client.query(
+                `SELECT type, state, COUNT(*)::int AS n FROM services GROUP BY type, state`
+            );
+            return hostingFromServiceRows(rows.rows);
+        });
+    } catch {
+        return null;
+    }
+}
+
 module.exports = {
     isConfigured,
     databaseUrl,
@@ -1014,5 +1068,8 @@ module.exports = {
     pickPlan,
     oauthProviderLinks,
     SCHEMA_SQL,
-    GRADE_ORDER
+    GRADE_ORDER,
+    countSiteAccounts,
+    countHostingServices,
+    hostingFromServiceRows
 };

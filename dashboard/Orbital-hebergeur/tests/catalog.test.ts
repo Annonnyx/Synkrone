@@ -54,8 +54,18 @@ test("panel URLs stay under /hebergement", () => {
   assert.equal(PANEL_BASE_PATH, "/hebergement");
   assert.equal(withPanelBase("/api/krones"), "/hebergement/api/krones");
   assert.equal(withPanelBase("/hebergement/login"), "/hebergement/login");
-  const prev = process.env.SYNKRONE_PANEL_ORIGIN;
+  const prev = {
+    SYNKRONE_PANEL_ORIGIN: process.env.SYNKRONE_PANEL_ORIGIN,
+    PUBLIC_ORIGIN: process.env.PUBLIC_ORIGIN,
+    PUBLIC_SITE_ORIGIN: process.env.PUBLIC_SITE_ORIGIN,
+    ORBITAL_PUBLIC_ORIGIN: process.env.ORBITAL_PUBLIC_ORIGIN,
+    NODE_ENV: process.env.NODE_ENV,
+  };
   try {
+    delete process.env.PUBLIC_ORIGIN;
+    delete process.env.PUBLIC_SITE_ORIGIN;
+    delete process.env.ORBITAL_PUBLIC_ORIGIN;
+    process.env.NODE_ENV = "development";
     process.env.SYNKRONE_PANEL_ORIGIN = "http://127.0.0.1:3668/hebergement";
     assert.equal(publicOrigin(), "http://127.0.0.1:3668/hebergement");
     assert.equal(panelUrl(publicOrigin(), "/login").href, "http://127.0.0.1:3668/hebergement/login");
@@ -64,7 +74,10 @@ test("panel URLs stay under /hebergement", () => {
       "/hebergement/api/auth/oauth/discord/callback",
     );
   } finally {
-    if (prev === undefined) delete process.env.SYNKRONE_PANEL_ORIGIN;
-    else process.env.SYNKRONE_PANEL_ORIGIN = prev;
+    for (const [key, value] of Object.entries(prev)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
   }
 });
+

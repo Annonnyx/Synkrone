@@ -2,7 +2,7 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const http = require('node:http');
+const pgAccount = require('./pg-account');
 
 const STARTED_AT = Date.now();
 const DATA_PATH = path.join(__dirname, '..', 'data', 'uptime.json');
@@ -26,6 +26,28 @@ function defaultStore() {
     return { lastBeat: null, days: {} };
 }
 
+function emptyHosting() {
+    return { discord: 0, minecraft: 0, web: 0, total: 0, running: 0 };
+}
+
+function mergeHosting(...sources) {
+    const out = emptyHosting();
+    for (const src of sources) {
+        if (!src || typeof src !== 'object') continue;
+        const candidate = {
+            discord: Number(src.discord) || 0,
+            minecraft: Number(src.minecraft) || 0,
+            web: Number(src.web) || 0,
+            total: Number(src.total) || 0,
+            running: Number(src.running) || 0
+        };
+        if (candidate.total > out.total || (candidate.total === out.total && candidate.running > out.running)) {
+            Object.assign(out, candidate);
+        }
+    }
+    return out;
+}
+
 async function readStore() {
     try {
         const raw = await fs.readFile(DATA_PATH, 'utf8');
@@ -35,8 +57,7 @@ async function readStore() {
             lastBeat: Number(parsed.lastBeat) || null,
             days: parsed.days && typeof parsed.days === 'object' ? parsed.days : {}
         };
-    } catch (err) {
-        if (err.code !== 'ENOENT') throw err;
+    } catch {
         return defaultStore();
     }
 }
@@ -79,7 +100,11 @@ async function beat() {
     }
     store.lastBeat = now;
     pruneDays(store.days);
-    await persistStore(store);
+    try {
+        await persistStore(store);
+    } catch {
+        /* in-memory beat still usable if data/ is not writable */
+    }
     return store;
 }
 
@@ -132,31 +157,27 @@ async function countApprovedBots() {
     }
 }
 
-function fetchPanelStatus() {
-    const port = Number(process.env.SYNKRONE_PANEL_PORT || 3000);
-    return new Promise((resolve) => {
-        const req = http.get({
-            hostname: '127.0.0.1',
-            port,
-            path: '/hebergement/api/status/public',
-            timeout: 1500
-        }, (res) => {
-            let raw = '';
-            res.on('data', (chunk) => { raw += chunk; });
-            res.on('end', () => {
-                try {
-                    resolve(JSON.parse(raw));
-                } catch {
-                    resolve(null);
-                }
-            });
+async function fetchJson(url, timeoutMs = 2000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+        const res = await fetch(url, {
+            signal: ctrl.signal,
+            headers: { accept: 'application/json' }
         });
-        req.on('timeout', () => {
-            req.destroy();
-            resolve(null);
-        });
-        req.on('error', () => resolve(null));
-    });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data && typeof data === 'object' ? data : null;
+    } catch {
+        return null;
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+async function fetchPanelStatus() {
+    const panelPort = Number(process.env.SYNKRONE_PANEL_PORT || 3000);
+    return fetchJson(`http://127.0.0.1:${panelPort}/hebergement/api/status/public`);
 }
 
 function formatUptime(seconds) {
@@ -170,16 +191,23 @@ function formatUptime(seconds) {
     return `${s} s`;
 }
 
+async function countAccounts() {
+    const fromPg = await pgAccount.countSiteAccounts().catch(() => 0);
+    const fromJson = await countJsonMap('users.json', 'users');
+    return Math.max(Number(fromPg) || 0, fromJson);
+}
+
 async function collect() {
     const store = await beat();
     const window = summarize(store);
-    const [accounts, bump, catalog, panel] = await Promise.all([
-        countJsonMap('users.json', 'users'),
+    const [accounts, bump, catalog, panel, pgHosting] = await Promise.all([
+        countAccounts(),
         countJsonMap('bump.json', 'servers'),
         countApprovedBots(),
-        fetchPanelStatus()
+        fetchPanelStatus(),
+        pgAccount.countHostingServices().catch(() => null)
     ]);
-    const hosting = panel?.hosting || { discord: 0, minecraft: 0, web: 0, total: 0, running: 0 };
+    const hosting = mergeHosting(pgHosting, panel?.hosting);
     return {
         ok: true,
         at: Date.now(),
@@ -240,4 +268,12 @@ function mountStatus(app) {
     });
 }
 
-module.exports = { mountStatus, collect };
+module.exports = {
+    mountStatus,
+    collect,
+    summarize,
+    mergeHosting,
+    emptyHosting,
+    formatUptime,
+    hostingFromServiceRows: pgAccount.hostingFromServiceRows
+};

@@ -1,5 +1,5 @@
-import { PANEL_BASE_PATH } from "@/lib/panel-base";
 import type { OAuthIntent, OAuthProvider, OAuthProfile, OAuthTokens } from "./types";
+import { oauthRedirectUri as buildOAuthRedirectUri, publicPanelOrigin } from "./public-origin";
 import { codeChallenge } from "./state";
 
 export type ProviderConfig = {
@@ -8,25 +8,8 @@ export type ProviderConfig = {
   clientSecret: string;
 };
 
-function withPanelOrigin(origin: string): string {
-  const clean = origin.replace(/\/$/, "");
-  if (clean.endsWith(PANEL_BASE_PATH)) return clean;
-  try {
-    const url = new URL(clean);
-    if (url.pathname && url.pathname !== "/") return clean;
-  } catch {
-    /* keep appending */
-  }
-  return `${clean}${PANEL_BASE_PATH}`;
-}
-
 export function publicOrigin(reqOrigin?: string | null): string {
-  const fromEnv = (process.env.SYNKRONE_PANEL_ORIGIN || process.env.ORBITAL_PUBLIC_ORIGIN)
-    ?.trim()
-    .replace(/\/$/, "");
-  if (fromEnv) return withPanelOrigin(fromEnv);
-  if (reqOrigin) return withPanelOrigin(reqOrigin);
-  return `http://127.0.0.1:3668${PANEL_BASE_PATH}`;
+  return publicPanelOrigin(reqOrigin);
 }
 
 export function panelUrl(origin: string, path: string): URL {
@@ -36,7 +19,7 @@ export function panelUrl(origin: string, path: string): URL {
 }
 
 export function oauthRedirectUri(provider: OAuthProvider, origin?: string | null): string {
-  return `${publicOrigin(origin)}/api/auth/oauth/${provider}/callback`;
+  return buildOAuthRedirectUri(provider, origin);
 }
 
 function envPair(primaryId: string, primarySecret: string, fallbackId: string, fallbackSecret: string) {

@@ -4,6 +4,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawn, spawnSync } = require('node:child_process');
+const { panelPublicOrigin: panelPublicOriginFromEnv } = require('./oauth-origin');
 
 const REPO_ROOT = path.join(__dirname, '..', '..', '..');
 const PANEL_DIR = path.join(REPO_ROOT, 'dashboard', 'Orbital-hebergeur');
@@ -32,13 +33,7 @@ const STARTING_HTML = `<!DOCTYPE html>
 </html>`;
 
 function panelPublicOrigin(publicPort) {
-    const fromEnv = String(process.env.SYNKRONE_PANEL_ORIGIN || process.env.ORBITAL_PUBLIC_ORIGIN || '')
-        .trim()
-        .replace(/\/$/, '');
-    if (fromEnv) {
-        return fromEnv.endsWith(PANEL_PREFIX) ? fromEnv : `${fromEnv}${PANEL_PREFIX}`;
-    }
-    return `http://127.0.0.1:${publicPort}${PANEL_PREFIX}`;
+    return panelPublicOriginFromEnv(publicPort);
 }
 
 function nextBin() {

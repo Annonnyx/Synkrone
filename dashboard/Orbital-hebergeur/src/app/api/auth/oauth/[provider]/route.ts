@@ -4,6 +4,7 @@ import { fail, rateLimit, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { getCurrentUser, requireUser } from "@/lib/auth";
 import { unlinkOAuthAccount } from "@/lib/oauth/accounts";
+import { originFromRequest } from "@/lib/oauth/public-origin";
 import { authorizationUrl, getProviderConfig, panelUrl } from "@/lib/oauth/providers";
 import { createOAuthState, OAUTH_STATE_COOKIE, sanitizeReturnTo } from "@/lib/oauth/state";
 import { isOAuthProvider, type OAuthIntent } from "@/lib/oauth/types";
@@ -20,7 +21,7 @@ function cookieSecure() {
 function errorRedirect(req: NextRequest, intent: OAuthIntent, code: string) {
   const dest =
     intent === "link" ? "/dashboard/account/profile" : "/login";
-  const url = panelUrl(req.nextUrl.origin, dest);
+  const url = panelUrl(originFromRequest(req), dest);
   url.searchParams.set("oauth_error", code);
   return NextResponse.redirect(url);
 }
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   const url = authorizationUrl({
     provider,
     config,
-    origin: req.nextUrl.origin,
+    origin: originFromRequest(req),
     nonce: started.nonce,
     verifier: started.verifier,
     intent,

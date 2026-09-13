@@ -11,6 +11,7 @@ import {
   panelUrl,
   publicOrigin,
 } from "@/lib/oauth/providers";
+import { originFromRequest } from "@/lib/oauth/public-origin";
 import { OAUTH_STATE_COOKIE, sanitizeReturnTo, verifyOAuthState } from "@/lib/oauth/state";
 import { isOAuthProvider } from "@/lib/oauth/types";
 
@@ -59,7 +60,7 @@ function redirectWith(origin: string, path: string, params: Record<string, strin
 
 export async function GET(req: NextRequest, ctx: Ctx) {
   const { provider } = await ctx.params;
-  const origin = publicOrigin(req.nextUrl.origin);
+  const origin = publicOrigin(originFromRequest(req));
   const store = await cookies();
   const signed = store.get(OAUTH_STATE_COOKIE)?.value;
   store.delete(OAUTH_STATE_COOKIE);
@@ -95,7 +96,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
       config,
       code,
       verifier: payload.cv,
-      origin: req.nextUrl.origin,
+      origin: originFromRequest(req),
     });
     const profile = await fetchProviderProfile(provider, tokens.accessToken);
     const result = await completeOAuthLogin({

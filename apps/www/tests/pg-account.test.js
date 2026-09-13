@@ -20,6 +20,18 @@ test('higher grade wins when merging plans', () => {
     assert.equal(pickPlan('Aucun', 'Synkral'), 'Synkral');
 });
 
+test('hosting aggregation counts RUNNING services without inventing types', () => {
+    const { hostingFromServiceRows } = require('../lib/pg-account');
+    const hosting = hostingFromServiceRows([
+        { type: 'discord', state: 'RUNNING', n: 2 },
+        { type: 'minecraft', state: 'STOPPED', n: 1 }
+    ]);
+    assert.equal(hosting.discord, 2);
+    assert.equal(hosting.minecraft, 1);
+    assert.equal(hosting.total, 3);
+    assert.equal(hosting.running, 2);
+});
+
 test('a Discord snowflake still yields an oauth link when the panel UUID already exists', () => {
     const links = oauthProviderLinks({
         id: '1368235294192570520',

@@ -162,16 +162,20 @@ mountPanelFallbacks(app);
 mountPublic(app, { skipBodyParser: true, skipSession: true });
 
 function logOAuthRedirects(port) {
-    const site = String(process.env.PUBLIC_ORIGIN || `http://127.0.0.1:${port}`).replace(/\/$/, '');
-    const panel = panelPublicOrigin(port);
+    const {
+        discordRedirectUri,
+        githubRedirectUri,
+        googleRedirectUri,
+        panelOAuthRedirectUri
+    } = require('./lib/oauth-origin');
     console.log('  OAuth site');
-    console.log(`    Discord     ${process.env.DISCORD_REDIRECT_URI || `${site}/auth/discord/callback`}`);
-    console.log(`    GitHub      ${process.env.GITHUB_REDIRECT_URI || `${site}/auth/github/callback`}`);
-    console.log(`    Google      ${process.env.GOOGLE_REDIRECT_URI || `${site}/auth/google/callback`}`);
+    console.log(`    Discord     ${discordRedirectUri()}`);
+    console.log(`    GitHub      ${githubRedirectUri()}`);
+    console.log(`    Google      ${googleRedirectUri()}`);
     console.log('  OAuth panel');
-    console.log(`    Discord     ${panel}/api/auth/oauth/discord/callback`);
-    console.log(`    GitHub      ${panel}/api/auth/oauth/github/callback`);
-    console.log(`    Google      ${panel}/api/auth/oauth/google/callback`);
+    console.log(`    Discord     ${panelOAuthRedirectUri('discord', port)}`);
+    console.log(`    GitHub      ${panelOAuthRedirectUri('github', port)}`);
+    console.log(`    Google      ${panelOAuthRedirectUri('google', port)}`);
 }
 
 const panelChild = spawnPanel({ publicPort: PORT });

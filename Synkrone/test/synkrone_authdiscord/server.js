@@ -22,6 +22,11 @@ const {
     panelBridgeFromSiteUser
 } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'identity-bridge'));
 const { mountTemoignages, addOptInQuote } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'temoignages'));
+const {
+    discordRedirectUri,
+    githubRedirectUri,
+    googleRedirectUri
+} = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'oauth-origin'));
 
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
@@ -696,7 +701,6 @@ function isDiscordOAuthConfigured() {
     return Boolean(
         String(process.env.DISCORD_CLIENT_ID || '').trim()
         && String(process.env.DISCORD_CLIENT_SECRET || '').trim()
-        && String(process.env.DISCORD_REDIRECT_URI || '').trim()
     );
 }
 
@@ -712,22 +716,6 @@ function isGoogleOAuthConfigured() {
         String(process.env.GOOGLE_CLIENT_ID || '').trim()
         && String(process.env.GOOGLE_CLIENT_SECRET || '').trim()
     );
-}
-
-function publicSiteOrigin(req) {
-    const fromEnv = String(process.env.PUBLIC_ORIGIN || '').trim().replace(/\/$/, '');
-    if (fromEnv) return fromEnv;
-    const host = req?.get?.('host');
-    if (host) return `${req.protocol || 'http'}://${host}`;
-    return 'http://127.0.0.1:3668';
-}
-
-function githubRedirectUri(req) {
-    return String(process.env.GITHUB_REDIRECT_URI || '').trim() || `${publicSiteOrigin(req)}/auth/github/callback`;
-}
-
-function googleRedirectUri(req) {
-    return String(process.env.GOOGLE_REDIRECT_URI || '').trim() || `${publicSiteOrigin(req)}/auth/google/callback`;
 }
 
 function oauthFailRedirect(req, err) {
@@ -873,7 +861,7 @@ async function resolveAdminAccessForSessionUser(user) {
 app.get('/auth/discord', (req, res) => {
     if (!isDiscordOAuthConfigured()) return res.redirect(safeReturnTo(req.query.returnTo) || '/login');
     rememberReturnTo(req);
-    const discordUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify`;
+    const discordUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(discordRedirectUri(req))}&response_type=code&scope=identify`;
     res.redirect(discordUrl);
 });
 
@@ -884,7 +872,7 @@ app.get('/auth/discord/callback', async (req, res) => {
     try {
         const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
             client_id: process.env.DISCORD_CLIENT_ID, client_secret: process.env.DISCORD_CLIENT_SECRET,
-            grant_type: 'authorization_code', code: code, redirect_uri: process.env.DISCORD_REDIRECT_URI
+            grant_type: 'authorization_code', code: code, redirect_uri: discordRedirectUri(req)
         }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
         
         const userResponse = await axios.get('https://discord.com/api/users/@me', { headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` } });
