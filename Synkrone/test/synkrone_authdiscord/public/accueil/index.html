@@ -375,7 +375,7 @@
                 <a class="plate" id="login-link" href="/login?returnTo=/accueil" target="_top">
                     <div class="plate-meta"><span>Compte</span><span>Login</span></div>
                     <h3>Se connecter</h3>
-                    <p>Discord, Google, GitHub ou e-mail. Même porte pour Krônes et le panel.</p>
+                    <p>Discord, Google ou GitHub. Un seul compte pour Krônes et l’hébergement.</p>
                     <span class="go">Ouvrir la connexion</span>
                 </a>
                 <a class="plate" href="/hebergement" target="_top">
@@ -602,6 +602,10 @@
 
         function bindReveal() {
             const pane = document.getElementById('content-root');
+            if (pane && typeof window.playLeafReveal === 'function') {
+                window.playLeafReveal(pane);
+                return;
+            }
             if (pane && typeof window.restartLeafReveal === 'function') {
                 window.restartLeafReveal(pane);
                 return;

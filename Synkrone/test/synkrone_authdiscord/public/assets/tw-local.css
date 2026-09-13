@@ -361,7 +361,7 @@
 .w-\[900px\]{width:900px}
 .w-fit{width:fit-content}
 .w-full{width:100%}
-.w-screen{width:100vh}
+.w-screen{width:100%;max-width:100%}
 .whitespace-nowrap{white-space:nowrap}
 .whitespace-pre-wrap{white-space:pre-wrap}
 .z-0{z-index:0}

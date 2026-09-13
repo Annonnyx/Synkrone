@@ -98,13 +98,16 @@ function parseColor(token) {
     return null;
 }
 
-function space(token) {
+function space(token, axis) {
     if (SPACE[token] != null) return SPACE[token];
     if (token.startsWith('[') && token.endsWith(']')) return token.slice(1, -1);
     if (token === 'px') return '1px';
     if (token === 'auto') return 'auto';
     if (token === 'full') return '100%';
-    if (token === 'screen') return '100vh';
+    if (token === 'screen') {
+        if (axis === 'w' || axis === 'min-w' || axis === 'max-w') return '100%';
+        return '100vh';
+    }
     if (token === 'fit') return 'fit-content';
     if (/^\d+\/\d+$/.test(token)) {
         const [a, b] = token.split('/').map(Number);
@@ -248,7 +251,7 @@ function rule(cls) {
         return v ? `${sel}{margin-left:-${v}}` : '';
     }
     if ((m = cls.match(/^(w|h|min-w|min-h|max-w|max-h)-(\S+)$/))) {
-        const v = space(m[2]) || ({
+        const v = space(m[2], m[1]) || ({
             xs: '20rem', sm: '24rem', md: '28rem', lg: '32rem',
             xl: '36rem', '2xl': '42rem', '3xl': '48rem', '4xl': '56rem',
             '5xl': '64rem', '6xl': '72rem', none: 'none'

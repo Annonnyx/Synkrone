@@ -503,7 +503,7 @@
             bump: 'Listing public des serveurs Discord de la communauté Synkrone.',
             me: 'Profils publics Me : se retrouver, visites, likes, mise en avant.',
             minecraft: 'Cantale, serveur Java 1.21 à trois vies, et trois modpacks à télécharger.',
-            login: 'Une seule connexion Synkrone : Discord, Google, GitHub ou e-mail pour le site et le panel.',
+            login: 'Une seule connexion Synkrone : Discord, Google ou GitHub pour le site et l’hébergement.',
             cgu: 'Conditions générales d’utilisation de Synkrone : compte, Krônes, rangs, données et modération.',
             cgv: 'Conditions générales de vente des packs de Krônes : prix TTC, délivrance, rétractation et médiation.',
             contact: 'Ticket Discord pour un bug, un paiement ou la modération. Compte lié et présence sur le serveur Synkrone requis.',
@@ -615,6 +615,15 @@
                 };
             }
             
+            const workspacePrefix = '/equipe/espace-travail';
+            if (currentPath === workspacePrefix || currentPath.startsWith(`${workspacePrefix}/`)) {
+                return {
+                    mainSection: 'equipe',
+                    subTab: 'espace-travail',
+                    canonical: currentPath
+                };
+            }
+
             const cloudPrefix = '/equipe/cloud/';
             if (currentPath.startsWith(cloudPrefix)) {
                 const cloudPath = currentPath.slice(cloudPrefix.length);
@@ -702,6 +711,8 @@
         }
 
         const leafCache = new Map();
+        let navGen = 0;
+        let contentLoadGen = 0;
 
         function leafCacheKey(path) {
             return String(path || '').split('?')[0];
@@ -762,6 +773,7 @@
             root.scrollTop = 0;
             requestAnimationFrame(() => restartLeafReveal(root));
         }
+        window.playLeafReveal = playLeafReveal;
 
         function restoreLeaf(root, path, cached) {
             applyLeafHead(cached.head);
@@ -878,30 +890,33 @@
             });
         }
 
-        async function loadLeaf(path) {
+        async function loadLeaf(path, gen = contentLoadGen) {
             const root = document.getElementById('content-root');
             if (!root || !path) return;
             const key = leafCacheKey(path);
             showLeafPane();
-            if (root.dataset.leaf === path && hasLeafContent(root, path)) {
+            if (leafCacheKey(root.dataset.leaf) === key && hasLeafContent(root, key)) {
                 if (root.dataset.visited === '1') playLeafReveal(root);
                 root.dataset.visited = '1';
                 return;
             }
-            if (root.dataset.leaf && root.dataset.leaf !== path) snapshotLeaf(root);
+            if (root.dataset.leaf && leafCacheKey(root.dataset.leaf) !== key) snapshotLeaf(root);
             const cached = leafCache.get(key);
             if (cached && String(cached.html || '').trim()) {
+                if (gen !== contentLoadGen) return;
                 restoreLeaf(root, path, cached);
                 root.dataset.visited = '1';
                 return;
             }
             const res = await fetch(path, { credentials: 'same-origin', cache: 'no-store' });
+            if (gen !== contentLoadGen) return;
             if (!res.ok) {
                 root.innerHTML = '<p style="padding:24px">Page indisponible.</p>';
                 root.dataset.leaf = '';
                 return;
             }
             const parts = leafDocumentParts(await res.text(), path);
+            if (gen !== contentLoadGen) return;
             if (!String(parts.body || '').trim()) {
                 const onHome = ['/', '/accueil'].includes(normalizePath(window.location.pathname));
                 if (isAccueilLeaf(path) && onHome) {
@@ -924,14 +939,16 @@
             });
             replayLeafScripts(root);
             root.dataset.visited = '1';
+            playLeafReveal(root);
         }
 
         function loadContent(path) {
+            const gen = ++contentLoadGen;
             if (isIsolatedAppPath(path)) {
                 setFrameSrc(path);
                 return Promise.resolve();
             }
-            return loadLeaf(path);
+            return loadLeaf(path, gen);
         }
 
         function setActiveMainTab(mainSection) {
@@ -995,6 +1012,7 @@
         }
 
         async function navigateToMainSection(mainSection, options = {}) {
+            const gen = ++navGen;
             const { subTab = null, updateUrl = true, replaceHistory = false, botsTab = null, modpackTab = null, cloudPath = null, profileTab = null, search = undefined } = options;
             const section = APP_STRUCTURE[mainSection];
             if (!section) return;
@@ -1013,6 +1031,7 @@
             setActiveMainTab(mainSection);
             document.body.classList.toggle('is-home', mainSection === 'accueil');
             await loadSectionMenu(mainSection);
+            if (gen !== navGen) return;
             if (!section.pages) {
                 let leafPath = section.page;
                 if (mainSection === 'me' && profileTab) {
@@ -1020,6 +1039,7 @@
                 }
                 const query = leafSearch(mainSection, search);
                 await loadContent(withSearch(leafPath, query));
+                if (gen !== navGen) return;
                 if (updateUrl) {
                     const leafRoute = (mainSection === 'me' && profileTab)
                         ? profileTab
@@ -1045,6 +1065,7 @@
             }
 
             await loadContent(framePath);
+            if (gen !== navGen) return;
             
             if (updateUrl) {
                 const sectionRoutes = section.routes || {};
@@ -1271,6 +1292,14 @@
                 if (!rawTab) return;
                 const targetPath = `/minecraft/modpack/${rawTab}`;
                 syncBrowserPath(targetPath, Boolean(payload.replaceHistory));
+            });
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) return;
+                const payload = event.data;
+                if (!payload || payload.type !== 'synkrone:workspace-route') return;
+                const rawPath = typeof payload.path === 'string' ? payload.path.trim() : '';
+                if (!rawPath.startsWith('/equipe/espace-travail')) return;
+                syncBrowserPath(rawPath, Boolean(payload.replaceHistory));
             });
             window.addEventListener('message', (event) => {
                 if (event.origin !== window.location.origin) return;

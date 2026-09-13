@@ -1,5 +1,11 @@
 /* Équipe — pierre, aligné sur la DA. Couvre Espace de travail et Cloud. */
 
+html, body.equipe-da {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+}
+
 body.equipe-da {
     background: var(--sk-bg, #eef0ea) !important;
     color: var(--sk-text, #1b211e) !important;

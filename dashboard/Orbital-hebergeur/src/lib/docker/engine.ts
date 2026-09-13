@@ -220,6 +220,8 @@ export type ContainerInspect = {
  * report.
  */
 export type DockerStats = {
+  read?: string;
+  preread?: string;
   cpu_stats?: {
     cpu_usage?: { total_usage?: number; percpu_usage?: number[] };
     system_cpu_usage?: number;
@@ -262,6 +264,78 @@ export function engineCapabilities(): Promise<EngineCapabilities> {
     }
   })();
   return capabilities;
+}
+
+export function parseStatFrames(text: string): DockerStats[] {
+  const out: DockerStats[] = [];
+  for (const line of String(text || "").split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    try {
+      out.push(JSON.parse(trimmed) as DockerStats);
+    } catch {
+      /* incomplete NDJSON frame */
+    }
+  }
+  return out;
+}
+
+function readStatsFrames(id: string, count: number, timeoutMs: number): Promise<DockerStats[]> {
+  return new Promise((resolve, reject) => {
+    const req = http.request({
+      socketPath: DOCKER_SOCKET,
+      path: `/${API_VERSION}/containers/${encodeURIComponent(id)}/stats?stream=true`,
+      method: "GET",
+    });
+    let buf = "";
+    const samples: DockerStats[] = [];
+    let settled = false;
+    const finish = (err?: Error) => {
+      if (settled) return;
+      settled = true;
+      req.destroy();
+      if (err && samples.length === 0) reject(err);
+      else resolve(samples);
+    };
+    const timer = setTimeout(() => finish(), timeoutMs);
+    req.on("response", (res) => {
+      if ((res.statusCode ?? 0) >= 400) {
+        const chunks: Buffer[] = [];
+        res.on("data", (c: Buffer) => chunks.push(c));
+        res.on("end", () =>
+          finish(new DockerApiError(res.statusCode ?? 0, apiMessage(Buffer.concat(chunks).toString("utf8")))),
+        );
+        return;
+      }
+      res.setEncoding("utf8");
+      res.on("data", (chunk: string) => {
+        buf += chunk;
+        const lastNl = buf.lastIndexOf("\n");
+        if (lastNl < 0) return;
+        const complete = buf.slice(0, lastNl + 1);
+        buf = buf.slice(lastNl + 1);
+        samples.push(...parseStatFrames(complete));
+        if (samples.some((frame) => cpuSampleReady(frame)) || samples.length >= count) {
+          clearTimeout(timer);
+          finish();
+        }
+      });
+      res.on("end", () => {
+        clearTimeout(timer);
+        if (buf.trim()) samples.push(...parseStatFrames(buf));
+        finish();
+      });
+      res.on("error", (err) => {
+        clearTimeout(timer);
+        finish(err);
+      });
+    });
+    req.on("error", (err) => {
+      clearTimeout(timer);
+      finish(new DockerUnavailableError(err.message));
+    });
+    req.end();
+  });
 }
 
 export type ExecResult = DemuxedOutput & { exitCode: number | null };
@@ -430,17 +504,33 @@ export const docker = {
   inspect: (id: string) => json<ContainerInspect>({ path: `/containers/${id}/json` }),
 
   async statsOnce(id: string): Promise<DockerStats> {
-    const first = await json<DockerStats>({
-      path: `/containers/${id}/stats?stream=false`,
-      timeoutMs: 15_000,
-    });
-    if (cpuSampleReady(first)) return first;
-    await new Promise((resolve) => setTimeout(resolve, 350));
-    const second = await json<DockerStats>({
-      path: `/containers/${id}/stats?stream=false`,
-      timeoutMs: 15_000,
-    });
-    return mergeCpuSamples(first, second);
+    const frames: DockerStats[] = [];
+    try {
+      frames.push(...(await readStatsFrames(id, 2, 3_000)));
+    } catch {
+      /* one-shot fallback below */
+    }
+    if (!frames.length) {
+      const first = await json<DockerStats>({
+        path: `/containers/${id}/stats?stream=false`,
+        timeoutMs: 15_000,
+      });
+      frames.push(first);
+      if (!cpuSampleReady(first) && !lastCpuByContainer.has(id)) {
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        frames.push(await json<DockerStats>({
+          path: `/containers/${id}/stats?stream=false`,
+          timeoutMs: 15_000,
+        }));
+      }
+    }
+    const latest = frames[frames.length - 1];
+    const previous = lastCpuByContainer.get(id);
+    lastCpuByContainer.set(id, latest);
+    if (cpuSampleReady(latest)) return latest;
+    if (previous) return mergeCpuSamples(previous, latest);
+    if (frames.length >= 2) return mergeCpuSamples(frames[0], latest);
+    return latest;
   },
 
   async logs(id: string, tail = 200): Promise<string> {
@@ -547,14 +637,43 @@ export const docker = {
   },
 };
 
+const lastCpuByContainer = new Map<string, DockerStats>();
+
+export function clearCpuSampleCache() {
+  lastCpuByContainer.clear();
+}
+
+export function resolveCachedCpuSample(id: string, latest: DockerStats): DockerStats {
+  const previous = lastCpuByContainer.get(id);
+  lastCpuByContainer.set(id, latest);
+  if (cpuSampleReady(latest)) return latest;
+  if (previous) return mergeCpuSamples(previous, latest);
+  return latest;
+}
+
+function readTimeMs(value?: string): number {
+  if (!value) return 0;
+  const ms = Date.parse(value);
+  return Number.isFinite(ms) ? ms : 0;
+}
+
+/** Nanoseconds between two Docker/Podman `read` timestamps. */
+export function wallDeltaNs(stats: DockerStats): number {
+  const end = readTimeMs(stats.read);
+  const start = readTimeMs(stats.preread);
+  if (end > start) return (end - start) * 1_000_000;
+  return 0;
+}
+
 export function cpuSampleReady(stats: DockerStats): boolean {
+  const preTotal = stats.precpu_stats?.cpu_usage?.total_usage ?? 0;
+  if (preTotal <= 0) return false;
+  const cpuDelta = (stats.cpu_stats?.cpu_usage?.total_usage ?? 0) - preTotal;
+  if (cpuDelta <= 0) return false;
   const preSys = stats.precpu_stats?.system_cpu_usage ?? 0;
-  if (preSys <= 0) return false;
-  const cpuDelta =
-    (stats.cpu_stats?.cpu_usage?.total_usage ?? 0) -
-    (stats.precpu_stats?.cpu_usage?.total_usage ?? 0);
   const systemDelta = (stats.cpu_stats?.system_cpu_usage ?? 0) - preSys;
-  return cpuDelta > 0 && systemDelta > 0;
+  if (systemDelta > 0) return true;
+  return wallDeltaNs(stats) > 0;
 }
 
 /** Podman often answers stream=false with an empty precpu block. Reuse the previous sample. */
@@ -562,6 +681,7 @@ export function mergeCpuSamples(previous: DockerStats, next: DockerStats): Docke
   if (cpuSampleReady(next)) return next;
   return {
     ...next,
+    preread: previous.read || next.preread,
     precpu_stats: {
       cpu_usage: { total_usage: previous.cpu_stats?.cpu_usage?.total_usage ?? 0 },
       system_cpu_usage: previous.cpu_stats?.system_cpu_usage ?? 0,
@@ -569,14 +689,17 @@ export function mergeCpuSamples(previous: DockerStats, next: DockerStats): Docke
   };
 }
 
-/** Docker's formula: 100 = one core fully used. */
+/** 100 = one core fully used. Prefer wall time: Podman's online_cpus is the host, not the quota. */
 export function computeCpuPercent(stats: DockerStats): number {
   const cpuDelta =
     (stats.cpu_stats?.cpu_usage?.total_usage ?? 0) -
     (stats.precpu_stats?.cpu_usage?.total_usage ?? 0);
+  if (cpuDelta <= 0) return 0;
+  const elapsedNs = wallDeltaNs(stats);
+  if (elapsedNs > 0) return (cpuDelta / elapsedNs) * 100;
   const systemDelta =
     (stats.cpu_stats?.system_cpu_usage ?? 0) - (stats.precpu_stats?.system_cpu_usage ?? 0);
-  if (cpuDelta <= 0 || systemDelta <= 0) return 0;
+  if (systemDelta <= 0) return 0;
   const cpus =
     stats.cpu_stats?.online_cpus ?? stats.cpu_stats?.cpu_usage?.percpu_usage?.length ?? 1;
   return (cpuDelta / systemDelta) * cpus * 100;

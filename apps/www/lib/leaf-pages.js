@@ -14,7 +14,7 @@ const PAGE_DESCRIPTIONS = {
     '/cgu': 'Conditions générales d’utilisation de Synkrone : compte, Krônes, rangs, données et modération.',
     '/cgv': 'Conditions générales de vente des packs de Krônes : prix TTC, délivrance, rétractation et médiation.',
     '/krones': 'Portefeuille Krônes : packs, rangs, hébergement et journal des mouvements.',
-    '/login': 'Une seule connexion Synkrone : Discord, Google, GitHub ou e-mail pour le site et le panel.',
+    '/login': 'Une seule connexion Synkrone : Discord, Google ou GitHub pour le site et l’hébergement.',
     '/discord/bots': 'Cinq bots officiels Synkrone : Vax, Arceus, Asuna, Kayaba et Yui. Fiches, préfixes et invitations.',
     '/discord/bots/vax': 'Vax — bot de modération Synkrone : warns, mutes, bans, tickets et journaux.',
     '/discord/bots/arceus': 'Arceus — bot Pokémon Synkrone : capture, combats et collection.',

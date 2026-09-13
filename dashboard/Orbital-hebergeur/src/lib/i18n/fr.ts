@@ -79,8 +79,8 @@ export const fr = {
     title2: "hébergement",
     subtitle: "Hébergement de bots Discord, serveurs Minecraft et applications web.",
     openPanel: "Se connecter au panel",
-    createAccount: "Créer un compte hébergement",
-    siteAccount: "Compte site (Krônes, Bump, Me)",
+    createAccount: "Créer un compte",
+    siteAccount: "Compte Synkrone (site et hébergement)",
     runtimeDiscordTitle: "Bots Discord",
     runtimeDiscordBody:
       "Bots officiels Synkrone ou bot custom à partir des vrais cogs Python.",
@@ -102,7 +102,7 @@ export const fr = {
     register: "Créer le compte",
     noAccount: "Pas encore de compte ? S'inscrire",
     hasAccount: "Déjà inscrit ? Se connecter",
-    oauthNote: "GitHub, Google ou Discord — le mot de passe reste optionnel.",
+    oauthNote: "GitHub, Google ou Discord — un seul compte pour le site et l’hébergement.",
     divider: "ou",
   },
   oauth: {
@@ -117,7 +117,7 @@ export const fr = {
       "{provider} n'est pas configuré : renseignez l'identifiant et le secret client dans les variables d'environnement, puis redémarrez le panneau.",
     linkedAccounts: "Comptes liés",
     linkedAccountsHint:
-      "Liez GitHub, Google ou Discord pour vous connecter plus vite. Discord unifie le solde Krônes avec synkrone.app. GitHub est requis pour importer un dépôt.",
+      "Discord, Google et GitHub sont le même compte Synkrone. Discord aligne le solde Krônes. GitHub est requis pour importer un dépôt.",
     error: {
       denied: "Connexion annulée auprès du fournisseur.",
       state: "La session OAuth a expiré. Réessayez.",

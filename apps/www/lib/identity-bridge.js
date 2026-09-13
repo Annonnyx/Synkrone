@@ -98,6 +98,55 @@ async function issueSiteSession(userPayload) {
     return sid;
 }
 
+function panelBridgeFromSiteUser(user) {
+    if (!user || user.isGuest) return null;
+    const id = String(user.id || '').trim();
+    if (!id || id === 'guest') return null;
+    const providers = user.providers && typeof user.providers === 'object' ? user.providers : {};
+    const discord = /^\d{15,22}$/.test(id) ? id : String(providers.discord || '').trim();
+    if (/^\d{15,22}$/.test(discord)) {
+        return {
+            provider: 'discord',
+            profile: {
+                id: discord,
+                name: user.username,
+                login: user.username,
+                email: user.email || '',
+                avatarUrl: user.avatar
+            }
+        };
+    }
+    let github = String(providers.github || '').trim();
+    if (!github && id.startsWith('github:')) github = id.slice(7);
+    if (github && !github.startsWith('panel-')) {
+        return {
+            provider: 'github',
+            profile: {
+                id: github,
+                name: user.username,
+                login: user.username,
+                email: user.email || '',
+                avatarUrl: user.avatar
+            }
+        };
+    }
+    let google = String(providers.google || '').trim();
+    if (!google && id.startsWith('google:')) google = id.slice(7);
+    if (google && !google.startsWith('panel-')) {
+        return {
+            provider: 'google',
+            profile: {
+                id: google,
+                name: user.username,
+                login: user.username,
+                email: user.email || '',
+                avatarUrl: user.avatar
+            }
+        };
+    }
+    return null;
+}
+
 async function requestPanelSession(payload) {
     return panelAdmin('/session-bridge', {
         method: 'POST',
@@ -112,7 +161,7 @@ function panelCookieOptions(isProd) {
         sameSite: 'lax',
         secure: Boolean(isProd),
         path: '/',
-        maxAge: SESSION_MAX_AGE_MS / 1000
+        maxAge: SESSION_MAX_AGE_MS
     };
 }
 
@@ -122,7 +171,7 @@ function siteCookieOptions(isProd) {
         sameSite: 'lax',
         secure: Boolean(isProd),
         path: '/',
-        maxAge: SESSION_MAX_AGE_MS / 1000
+        maxAge: SESSION_MAX_AGE_MS
     };
 }
 
@@ -132,6 +181,7 @@ module.exports = {
     rememberIdentity,
     identityFor,
     issueSiteSession,
+    panelBridgeFromSiteUser,
     requestPanelSession,
     panelCookieOptions,
     siteCookieOptions,

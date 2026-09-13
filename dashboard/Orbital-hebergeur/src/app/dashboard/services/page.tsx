@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/ui";
 import { Bar, EmptyState, ErrorText, Skeleton, StateBadge, TypeIcon } from "@/components/panel";
 import { useCreationFlags } from "@/lib/use-creation-flags";
 import { firstCreateHref, isCreationEnabled } from "@/lib/services/creation-flags";
+import { cpuPercentOfQuota } from "@/lib/runtime/cpu";
 
 type Service = {
   id: string;
@@ -63,11 +64,11 @@ function ServiceCard({ s }: { s: Service }) {
             <span>{t("dashboard.cpu")}</span>
             <span className="font-mono">
               {s.stats
-                ? `${s.stats.cpuPercent.toFixed(0)}%`
+                ? `${cpuPercentOfQuota(s.stats.cpuPercent, s.cpuLimit).toFixed(0)}%`
                 : `${(s.cpuLimit / 1000).toFixed(1)} ${t("services.cores")}`}
             </span>
           </div>
-          <Bar value={s.stats ? Math.min(100, s.stats.cpuPercent) : 0} max={100} />
+          <Bar value={s.stats ? Math.min(100, cpuPercentOfQuota(s.stats.cpuPercent, s.cpuLimit)) : 0} max={100} />
         </div>
       </div>
     </Link>

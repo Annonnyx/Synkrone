@@ -18,7 +18,8 @@ const {
     rememberIdentity,
     issueSiteSession,
     requireInternalAuth,
-    panelCookieOptions
+    panelCookieOptions,
+    panelBridgeFromSiteUser
 } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'identity-bridge'));
 const { mountTemoignages, addOptInQuote } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'temoignages'));
 
@@ -78,7 +79,7 @@ try {
 }
 
 const { readPlatform, writePlatform } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'platform'));
-const { panelAdmin, panelOrigin, pm2Logs, listTickets } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'admin-ops'));
+const { panelAdmin, pm2Logs, listTickets } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'admin-ops'));
 const {
     COOKIE_NAME,
     createFileSessionStore,
@@ -91,6 +92,15 @@ function safeReturnTo(value) {
     if (raw.length > 1024) return '';
     if (/^\/(auth|logout|api)(\/|$)/i.test(raw)) return '';
     return raw;
+}
+
+function safePanelReturnTo(value) {
+    const raw = safeReturnTo(value);
+    if (!raw) return '';
+    const pathOnly = raw.split('?')[0];
+    if (pathOnly === '/hebergement/login' || pathOnly.startsWith('/hebergement/login/')) return '';
+    if (pathOnly === '/hebergement' || pathOnly.startsWith('/hebergement/')) return raw;
+    return '';
 }
 
 function rememberReturnTo(req) {
@@ -541,7 +551,8 @@ function isProdCookie() {
     return process.env.NODE_ENV === 'production';
 }
 
-async function attachPanelFromSite(res, persisted, provider, profile) {
+async function attachPanelFromSite(res, persisted, provider, profile, options = {}) {
+    const required = Boolean(options.required);
     try {
         const panel = await requestPanelSession({
             provider,
@@ -553,21 +564,44 @@ async function attachPanelFromSite(res, persisted, provider, profile) {
                 avatarUrl: persisted.avatar
             }
         });
-        if (panel?.token) {
-            res.cookie('synkrone_session', panel.token, panelCookieOptions(isProdCookie()));
-            await rememberIdentity({
-                siteUserId: persisted.id,
-                panelUserId: panel.userId,
-                discordId: provider === 'discord' ? String(profile.id || persisted.id) : (panel.discordId || ''),
-                email: persisted.email || profile.email || ''
-            });
-            if (provider === 'discord' && panel.userId && kronesApi?.migrateWallet) {
-                await kronesApi.migrateWallet(`panel:${panel.userId}`, String(profile.id || persisted.id)).catch(() => undefined);
-            }
+        if (!panel?.token) throw new Error('Panel session missing');
+        res.cookie('synkrone_session', panel.token, panelCookieOptions(isProdCookie()));
+        await rememberIdentity({
+            siteUserId: persisted.id,
+            panelUserId: panel.userId,
+            discordId: provider === 'discord' ? String(profile.id || persisted.id) : (panel.discordId || ''),
+            email: persisted.email || profile.email || ''
+        });
+        if (provider === 'discord' && panel.userId && kronesApi?.migrateWallet) {
+            await kronesApi.migrateWallet(`panel:${panel.userId}`, String(profile.id || persisted.id)).catch(() => undefined);
         }
-    } catch {
-        /* panel optional */
+        return true;
+    } catch (err) {
+        if (required) throw err;
+        return false;
     }
+}
+
+async function attachPanelFromSiteUser(res, user, options = {}) {
+    const bridge = panelBridgeFromSiteUser(user);
+    if (!bridge) {
+        const err = new Error('Connectez-vous avec Discord, Google ou GitHub.');
+        err.code = 'NO_OAUTH';
+        throw err;
+    }
+    return attachPanelFromSite(res, user, bridge.provider, {
+        id: bridge.profile.id,
+        username: bridge.profile.login,
+        email: bridge.profile.email,
+        avatar: bridge.profile.avatarUrl
+    }, options);
+}
+
+function panelLoginRedirect(returnTo, oauthError) {
+    const qs = new URLSearchParams({ intent: 'panel' });
+    if (returnTo) qs.set('returnTo', returnTo);
+    if (oauthError) qs.set('oauth_error', oauthError);
+    return `/login?${qs.toString()}`;
 }
 
 async function sendShell(res, pathname) {
@@ -989,46 +1023,39 @@ app.post('/api/internal/session-bridge', async (req, res) => {
     }
 });
 
-app.post('/api/auth/sync-panel', async (req, res) => {
+app.post('/api/auth/attach-panel', async (req, res) => {
+    const user = req.session?.user;
+    if (!user || user.isGuest) {
+        return res.status(401).json({ ok: false, error: 'Connexion requise.' });
+    }
     try {
-        const meRes = await fetch(`${panelOrigin()}/api/auth/me`, {
-            headers: { cookie: String(req.headers.cookie || ''), accept: 'application/json' }
-        });
-        const data = await meRes.json().catch(() => ({}));
-        const panelUser = data.user;
-        if (!panelUser) return res.status(401).json({ ok: false, error: 'Panel non connecté.' });
-        const discordId = String(panelUser.discordId || '').trim();
-        let persisted = null;
-        if (discordId) {
-            persisted = await upsertUserFromDiscordAuth({
-                id: discordId,
-                username: panelUser.name,
-                global_name: panelUser.name,
-                avatar: null
-            }, false, attachTargetId(req));
-        } else {
-            persisted = await upsertUserFromOAuth('google', {
-                id: `panel-${panelUser.id}`,
-                username: panelUser.name,
-                email: panelUser.email,
-                avatar: panelUser.avatarUrl
-            }, attachTargetId(req));
-        }
-        if (!persisted) return res.status(400).json({ ok: false, error: 'Compte site introuvable.' });
-        if (discordId && kronesApi?.migrateWallet) {
-            await kronesApi.migrateWallet(`panel:${panelUser.id}`, discordId).catch(() => undefined);
-        }
-        req.session.user = sessionFromPersisted(persisted);
-        await rememberIdentity({
-            siteUserId: persisted.id,
-            panelUserId: panelUser.id,
-            discordId,
-            email: panelUser.email || persisted.email || ''
-        });
-        return res.json({ ok: true, user: req.session.user });
+        await attachPanelFromSiteUser(res, user, { required: true });
+        return res.json({ ok: true });
     } catch (err) {
-        if (err.code === 'PROVIDER_TAKEN') return res.status(409).json({ ok: false, error: 'PROVIDER_TAKEN' });
-        return res.status(502).json({ ok: false, error: 'Pont panel indisponible.' });
+        const status = err.code === 'NO_OAUTH' ? 400 : 502;
+        return res.status(status).json({
+            ok: false,
+            error: err.code === 'NO_OAUTH'
+                ? 'Connectez-vous avec Discord, Google ou GitHub.'
+                : 'Pont panel indisponible.'
+        });
+    }
+});
+
+app.get('/api/auth/enter-panel', async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const dest = safePanelReturnTo(req.query.returnTo) || '/hebergement/dashboard';
+    const oauthError = String(req.query.oauth_error || '').trim();
+    const user = req.session?.user;
+    if (!user || user.isGuest) {
+        return res.redirect(panelLoginRedirect(dest, oauthError || undefined));
+    }
+    try {
+        await attachPanelFromSiteUser(res, user, { required: true });
+        return res.redirect(dest);
+    } catch (err) {
+        const code = err.code === 'NO_OAUTH' ? 'no_oauth' : 'panel_bridge';
+        return res.redirect(panelLoginRedirect(dest, oauthError || code));
     }
 });
 

@@ -21,6 +21,7 @@ import { Server } from "lucide-react";
 import { PageHeader } from "@/components/ui";
 import { useCreationFlags } from "@/lib/use-creation-flags";
 import { firstCreateHref } from "@/lib/services/creation-flags";
+import { cpuPercentOfQuota } from "@/lib/runtime/cpu";
 
 type DashboardData = {
   services: Array<{
@@ -199,7 +200,7 @@ export default function DashboardPage() {
                         {t("dashboard.memory")} {fmtBytesMb(s.stats?.memoryMb ?? 0)} /{" "}
                         {fmtBytesMb(s.memoryLimitMb)}
                       </span>
-                      <span>CPU {(s.stats?.cpuPercent ?? 0).toFixed(1)}%</span>
+                      <span>CPU {cpuPercentOfQuota(s.stats?.cpuPercent ?? 0, s.cpuLimit).toFixed(1)}%</span>
                     </div>
                     <Bar value={s.stats?.memoryMb ?? 0} max={s.memoryLimitMb} />
                     <div className="truncate font-mono text-[10px]">

@@ -44,6 +44,7 @@ test('frameSrcForPath keeps isolated apps in their own document', () => {
     assert.equal(frameSrcForPath('/discord/bots/vax'), '/discord/bots/vax.html');
     assert.equal(frameSrcForPath('/minecraft/modpack/xenus'), '/minecraft/modpack/index.html?tab=xenus');
     assert.equal(frameSrcForPath('/faq'), null);
+    assert.equal(frameSrcForPath('/equipe/espace-travail/Projet/v1/kanban'), '/equipe/espace-travail/index.html');
 });
 
 test('descriptionForPath is distinct per section', () => {
@@ -147,4 +148,35 @@ test('extractLeafParts drops chrome-breaking CSS and scripts', () => {
     assert.doesNotMatch(parts.headExtras, /100vw/);
     assert.doesNotMatch(parts.headExtras, /font-awesome/);
     assert.doesNotMatch(parts.body, /tailwindcss/);
+});
+
+test('tw-local w-screen is a width, not a height', () => {
+    const css = fs.readFileSync(path.join(PUBLIC_DIR, 'assets', 'tw-local.css'), 'utf8');
+    const match = css.match(/\.w-screen\{[^}]+\}/);
+    assert.ok(match, 'w-screen rule missing');
+    assert.match(match[0], /width:\s*100%/);
+    assert.doesNotMatch(match[0], /100vh/);
+});
+
+test('login is oauth-only and not a hosting-account split', () => {
+    const html = fs.readFileSync(path.join(PUBLIC_DIR, 'login.html'), 'utf8');
+    assert.doesNotMatch(html, /compte hébergement/i);
+    assert.doesNotMatch(html, /panel-form/);
+    assert.doesNotMatch(html, /\/hebergement\/api\/auth\/(login|register)/);
+    assert.doesNotMatch(html, /sync-panel/);
+    assert.match(html, /\/api\/auth\/attach-panel/);
+    const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((row) => row[1]);
+    assert.ok(scripts.length);
+    for (const code of scripts) {
+        assert.doesNotThrow(() => new Function(code));
+    }
+});
+
+test('stats page script parses', () => {
+    const html = fs.readFileSync(path.join(PUBLIC_DIR, 'stats', 'index.html'), 'utf8');
+    const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((row) => row[1]);
+    assert.ok(scripts.length);
+    for (const code of scripts) {
+        assert.doesNotThrow(() => new Function(code));
+    }
 });

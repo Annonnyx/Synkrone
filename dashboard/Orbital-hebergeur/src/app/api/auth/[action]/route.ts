@@ -7,11 +7,8 @@ import { body, fail, ok, rateLimit, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import {
   changePassword,
-  createSession,
   destroySession,
   getCurrentUser,
-  loginUser,
-  registerUser,
   requireUser,
 } from "@/lib/auth";
 
@@ -23,27 +20,8 @@ export async function POST(
 ) {
   const { action } = await ctx.params;
   return route(async () => {
-    const ip = req.headers.get("x-forwarded-for") ?? "local";
-    if (action === "register") {
-      rateLimit(`register:${ip}`, 10);
-      const { email, name, password } = await body<{
-        email: string;
-        name: string;
-        password: string;
-      }>(req);
-      if (!email || !name || !password) return fail("email, name and password are required");
-      const userId = await registerUser(email, name, password);
-      await createSession(userId);
-      await audit({ userId, action: "auth.register" });
-      return ok({ ok: true });
-    }
-    if (action === "login") {
-      rateLimit(`login:${ip}`, 15);
-      const { email, password } = await body<{ email: string; password: string }>(req);
-      const userId = await loginUser(email ?? "", password ?? "");
-      await createSession(userId);
-      await audit({ userId, action: "auth.login" });
-      return ok({ ok: true });
+    if (action === "register" || action === "login") {
+      return fail("Use Discord, Google or GitHub to sign in", 404);
     }
     if (action === "logout") {
       const user = await getCurrentUser();

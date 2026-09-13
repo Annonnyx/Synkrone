@@ -81,8 +81,8 @@ export const en: Dict = {
     title2: "hosting",
     subtitle: "Host Discord bots, Minecraft servers and web apps.",
     openPanel: "Sign in to the panel",
-    createAccount: "Create a hosting account",
-    siteAccount: "Site account (Krônes, Bump, Me)",
+    createAccount: "Create an account",
+    siteAccount: "Synkrone account (site and hosting)",
     runtimeDiscordTitle: "Discord bots",
     runtimeDiscordBody:
       "Official Synkrone bots or a custom bot built from real Python cogs.",
@@ -104,7 +104,7 @@ export const en: Dict = {
     register: "Create account",
     noAccount: "No account yet? Register",
     hasAccount: "Already registered? Sign in",
-    oauthNote: "GitHub, Google or Discord — a password is optional.",
+    oauthNote: "GitHub, Google or Discord — one account for the site and hosting.",
     divider: "or",
   },
   oauth: {
@@ -119,7 +119,7 @@ export const en: Dict = {
       "{provider} is not configured: set the client id and secret in the environment variables, then restart the panel.",
     linkedAccounts: "Linked accounts",
     linkedAccountsHint:
-      "Link GitHub, Google or Discord to sign in faster. Discord unifies the Krônes balance with synkrone.app. GitHub is required to import a repository.",
+      "Discord, Google and GitHub are the same Synkrone account. Discord aligns the Krônes balance. GitHub is required to import a repository.",
     error: {
       denied: "Sign-in was cancelled at the provider.",
       state: "The OAuth session expired. Try again.",

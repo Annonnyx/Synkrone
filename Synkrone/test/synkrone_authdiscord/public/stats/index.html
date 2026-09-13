@@ -126,6 +126,7 @@
     </section>
 
     <script>
+        (function () {
         function fmt(n) {
             return Number(n || 0).toLocaleString('fr-FR');
         }
@@ -133,35 +134,47 @@
         function render(data) {
             const pct = data?.uptime?.pct;
             const pctEl = document.getElementById('st-pct');
-            pctEl.innerHTML = `${Number.isFinite(pct) ? pct.toString().replace('.', ',') : '—'}<small>Uptime 7 jours</small>`;
+            if (pctEl) {
+                pctEl.innerHTML = `${Number.isFinite(pct) ? pct.toString().replace('.', ',') : '—'}<small>Uptime 7 jours</small>`;
+            }
             const bars = document.getElementById('st-bars');
-            const list = Array.isArray(data?.uptime?.bars) ? data.uptime.bars : [];
-            bars.innerHTML = (list.length ? list : Array.from({ length: 7 }, () => ({ pct: 0, date: '' }))).map((bar) => {
-                const h = Math.max(6, Math.round((Number(bar.pct) || 0) * 0.88));
-                const label = bar.date ? bar.date.slice(8) : '';
-                return `<div class="st-bar"><i style="height:${h}px"></i><span>${label}</span></div>`;
-            }).join('');
-            document.getElementById('st-live').textContent = data?.live ? 'En ligne' : 'Hors ligne';
-            document.getElementById('tile-live').classList.toggle('off', !data?.live);
-            document.getElementById('st-proc').textContent = data?.process?.uptimeLabel || '—';
-            document.getElementById('st-docker').textContent = data?.hosting?.docker ? 'OK' : '—';
+            const dayBars = Array.isArray(data?.uptime?.bars) ? data.uptime.bars : [];
+            if (bars) {
+                bars.innerHTML = (dayBars.length ? dayBars : Array.from({ length: 7 }, () => ({ pct: 0, date: '' }))).map((bar) => {
+                    const h = Math.max(6, Math.round((Number(bar.pct) || 0) * 0.88));
+                    const label = bar.date ? bar.date.slice(8) : '';
+                    return `<div class="st-bar"><i style="height:${h}px"></i><span>${label}</span></div>`;
+                }).join('');
+            }
+            const liveEl = document.getElementById('st-live');
+            if (liveEl) liveEl.textContent = data?.live ? 'En ligne' : 'Hors ligne';
+            document.getElementById('tile-live')?.classList.toggle('off', !data?.live);
+            const proc = document.getElementById('st-proc');
+            if (proc) proc.textContent = data?.process?.uptimeLabel || '—';
+            const docker = document.getElementById('st-docker');
+            if (docker) docker.textContent = data?.hosting?.docker ? 'OK' : '—';
             const run = data?.hosting?.running || 0;
             const total = data?.hosting?.total || 0;
-            document.getElementById('st-run').textContent = total ? `${fmt(run)} / ${fmt(total)}` : fmt(run);
-            document.getElementById('st-mc').textContent = fmt(data?.hosting?.minecraft);
-            document.getElementById('st-dc').textContent = fmt(data?.hosting?.discord);
-            document.getElementById('st-web').textContent = fmt(data?.hosting?.web);
-            document.getElementById('st-host').textContent = fmt(total);
-            document.getElementById('st-cat').textContent = fmt(data?.platform?.catalog);
-            document.getElementById('st-bump').textContent = fmt(data?.platform?.bump);
-            document.getElementById('st-acc').textContent = fmt(data?.platform?.accounts);
-            const list = document.getElementById('st-incidents');
-            if (list) {
+            const runEl = document.getElementById('st-run');
+            if (runEl) runEl.textContent = total ? `${fmt(run)} / ${fmt(total)}` : fmt(run);
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            };
+            setText('st-mc', fmt(data?.hosting?.minecraft));
+            setText('st-dc', fmt(data?.hosting?.discord));
+            setText('st-web', fmt(data?.hosting?.web));
+            setText('st-host', fmt(total));
+            setText('st-cat', fmt(data?.platform?.catalog));
+            setText('st-bump', fmt(data?.platform?.bump));
+            setText('st-acc', fmt(data?.platform?.accounts));
+            const incidentsEl = document.getElementById('st-incidents');
+            if (incidentsEl) {
                 if (!data?.live && !Array.isArray(data?.incidents)) {
-                    list.innerHTML = '<li>Statut indisponible.</li>';
+                    incidentsEl.innerHTML = '<li>Statut indisponible.</li>';
                 } else {
                     const incidents = Array.isArray(data?.incidents) ? data.incidents : [];
-                    list.innerHTML = incidents.length
+                    incidentsEl.innerHTML = incidents.length
                         ? incidents.map((row) => `<li>${row.date} — ${row.downMin} min relevées</li>`).join('')
                         : '<li>Aucune coupure mesurée sur 7 jours.</li>';
                 }
@@ -176,6 +189,7 @@
             } catch {
                 render({ live: false, uptime: { pct: null, bars: [] }, hosting: {}, platform: {} });
             }
+        })();
         })();
     </script>
 </body>
