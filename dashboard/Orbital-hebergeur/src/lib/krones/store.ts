@@ -1,7 +1,10 @@
-import { mkdir, open, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { desc, eq } from "drizzle-orm";
+import { db, pool } from "@/db";
+import { walletLedger, wallets } from "@/db/schema";
+import { discordIdForUser } from "@/lib/oauth/accounts";
 import { synkroneRepoRoot } from "@/lib/repo-root";
-import { getOAuthAccount } from "@/lib/oauth/accounts";
 import { DISCORD_COEFF, MC_COEFF, WEB_COEFF, hostingCost } from "./pricing";
 import {
   applyPrivilegePlan,
@@ -13,8 +16,6 @@ import {
 export { DISCORD_COEFF, MC_COEFF, WEB_COEFF, hostingCost };
 
 const LEDGER_CAP = 200;
-const LOCK_STALE_MS = 15_000;
-const LOCK_WAIT_MS = 10_000;
 export const GRADE_ORDER = ["Aucun", "Kronium", "Synkral", "Kronalloy", "Synkronite", "Kronix"];
 
 export type LedgerEntry = {
@@ -32,14 +33,12 @@ export type Wallet = {
   ledger: LedgerEntry[];
 };
 
-type Store = {
-  wallets: Record<string, Wallet>;
+type CatalogStore = {
   packs: Array<{ id: string; label: string; krones: number }>;
   subscriptions: Array<{ id: string; name: string; krones: number; period: string; perk: string }>;
   minecraft: typeof MC_COEFF;
   discord?: typeof DISCORD_COEFF;
   web?: typeof WEB_COEFF;
-  joinBonus?: Record<string, number>;
 };
 
 const JOIN_BONUS = 100;
@@ -64,133 +63,97 @@ async function isGuildMember(discordId: string) {
   }
 }
 
-let writeChain: Promise<unknown> = Promise.resolve();
-
-function withProcessLock<T>(fn: () => Promise<T>): Promise<T> {
-  const run = writeChain.then(fn, fn);
-  writeChain = run.then(
-    () => undefined,
-    () => undefined,
-  );
-  return run;
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 function dataPath() {
   return path.join(synkroneRepoRoot(), "apps/www/data/krones.json");
 }
 
-function lockPath() {
-  return `${dataPath()}.lock`;
-}
-
-async function acquireFileLock() {
-  const file = lockPath();
-  const started = Date.now();
-  while (true) {
-    try {
-      const handle = await open(file, "wx");
-      await handle.writeFile(JSON.stringify({ pid: process.pid, at: Date.now() }));
-      return handle;
-    } catch (err) {
-      if ((err as NodeJS.ErrnoException).code !== "EEXIST") throw err;
-      try {
-        const raw = await readFile(file, "utf8");
-        const meta = JSON.parse(raw) as { at?: number };
-        if (Date.now() - Number(meta.at || 0) > LOCK_STALE_MS) {
-          await unlink(file).catch(() => undefined);
-          continue;
-        }
-      } catch {
-        await unlink(file).catch(() => undefined);
-        continue;
-      }
-      if (Date.now() - started > LOCK_WAIT_MS) throw new Error("Krônes: verrou indisponible.");
-      await sleep(25);
-    }
-  }
-}
-
-async function withFileLock<T>(fn: () => Promise<T>): Promise<T> {
-  return withProcessLock(async () => {
-    const handle = await acquireFileLock();
-    try {
-      return await fn();
-    } finally {
-      await handle.close().catch(() => undefined);
-      await unlink(lockPath()).catch(() => undefined);
-    }
-  });
-}
-
-async function readStore(): Promise<Store> {
+async function readCatalog(): Promise<CatalogStore> {
   try {
     const raw = await readFile(dataPath(), "utf8");
-    const parsed = JSON.parse(raw) as Store;
+    const parsed = JSON.parse(raw) as CatalogStore;
     return {
-      wallets: parsed.wallets && typeof parsed.wallets === "object" ? parsed.wallets : {},
       packs: Array.isArray(parsed.packs) ? parsed.packs : [],
       subscriptions: Array.isArray(parsed.subscriptions) ? parsed.subscriptions : [],
       minecraft: { ...MC_COEFF, ...(parsed.minecraft ?? {}) },
       discord: { ...DISCORD_COEFF, ...(parsed.discord ?? {}) },
       web: { ...WEB_COEFF, ...(parsed.web ?? {}) },
-      joinBonus: parsed.joinBonus && typeof parsed.joinBonus === "object" ? parsed.joinBonus : {},
     };
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
     return {
-      wallets: {},
       packs: [],
       subscriptions: [],
       minecraft: { ...MC_COEFF },
       discord: { ...DISCORD_COEFF },
       web: { ...WEB_COEFF },
-      joinBonus: {},
     };
   }
 }
 
-async function persistStore(store: Store) {
-  const file = dataPath();
-  await mkdir(path.dirname(file), { recursive: true });
-  const tmp = `${file}.${process.pid}.tmp`;
-  await writeFile(tmp, JSON.stringify(store, null, 2), "utf8");
-  await rename(tmp, file);
-}
-
-export async function walletAccountId(userId: string): Promise<string> {
-  const discord = await getOAuthAccount(userId, "discord");
-  if (discord?.providerAccountId) return discord.providerAccountId;
-  return `panel:${userId}`;
-}
-
-function ensureWallet(store: Store, id: string): { wallet: Wallet; created: boolean } {
-  if (store.wallets[id]) return { wallet: store.wallets[id], created: false };
-  store.wallets[id] = { balance: id.startsWith("panel:") ? 2000 : 0, plan: "Aucun", ledger: [] };
-  return { wallet: store.wallets[id], created: true };
-}
-
-function appendLedger(wallet: Wallet, type: "credit" | "debit", amount: number, reason: string) {
-  const entry: LedgerEntry = {
+function appendLedgerLocal(
+  type: "credit" | "debit",
+  amount: number,
+  reason: string,
+  balanceAfter: number,
+): LedgerEntry {
+  return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     type,
     amount,
     reason: String(reason || "").slice(0, 200),
     at: Date.now(),
-    balanceAfter: wallet.balance,
+    balanceAfter,
   };
-  wallet.ledger = [entry, ...(wallet.ledger ?? [])].slice(0, LEDGER_CAP);
 }
 
-function walletView(wallet: Wallet, id: string, privilege: KronesPrivilege) {
+async function loadLedger(userId: string): Promise<LedgerEntry[]> {
+  const rows = await db
+    .select()
+    .from(walletLedger)
+    .where(eq(walletLedger.userId, userId))
+    .orderBy(desc(walletLedger.at))
+    .limit(LEDGER_CAP);
+  return rows.map((row) => ({
+    id: row.id,
+    type: row.type === "debit" ? "debit" : "credit",
+    amount: row.amount,
+    reason: row.reason,
+    at: row.at.getTime(),
+    balanceAfter: row.balanceAfter,
+  }));
+}
+
+async function trimLedger(client: { query: (sql: string, params?: unknown[]) => Promise<unknown> }, userId: string) {
+  await client.query(
+    `DELETE FROM wallet_ledger
+     WHERE user_id = $1 AND id NOT IN (
+       SELECT id FROM wallet_ledger WHERE user_id = $1 ORDER BY at DESC LIMIT $2
+     )`,
+    [userId, LEDGER_CAP],
+  );
+}
+
+async function ensureWalletRow(userId: string) {
+  await db
+    .insert(wallets)
+    .values({ userId, balance: 0, plan: "Aucun" })
+    .onConflictDoNothing({ target: wallets.userId });
+}
+
+function walletView(
+  userId: string,
+  wallet: { balance: number; plan: string },
+  ledger: LedgerEntry[],
+  privilege: KronesPrivilege,
+  discordId: string | null,
+) {
   const unlimited = privilege === "admin";
   return {
-    id,
-    linkedDiscord: !id.startsWith("panel:"),
-    ...wallet,
+    id: discordId || userId,
+    linkedDiscord: Boolean(discordId),
+    balance: wallet.balance,
+    plan: wallet.plan,
+    ledger,
     unlimited,
     privilege,
     shopUrl: "/krones",
@@ -198,38 +161,64 @@ function walletView(wallet: Wallet, id: string, privilege: KronesPrivilege) {
   };
 }
 
+/** Same Postgres user as the site — the panel UUID. */
+export async function walletAccountId(userId: string): Promise<string> {
+  return userId;
+}
+
 export async function getWallet(userId: string) {
   const privilege = await resolveKronesPrivilege(userId);
-  const id = await walletAccountId(userId);
-  let alreadyClaimed = false;
-  try {
-    const peek = await readStore();
-    alreadyClaimed = Boolean(peek.joinBonus && peek.joinBonus[id]);
-  } catch {
-    alreadyClaimed = false;
+  const discordId = await discordIdForUser(userId);
+  await ensureWalletRow(userId);
+  const [row] = await db.select().from(wallets).where(eq(wallets.userId, userId)).limit(1);
+  let plan = row?.plan || "Aucun";
+  let balance = row?.balance ?? 0;
+  let joinBonusAt = row?.joinBonusAt ?? null;
+  const planWallet = { plan };
+  const planChanged = applyPrivilegePlan(planWallet, privilege, GRADE_ORDER);
+  if (planChanged) {
+    plan = planWallet.plan;
+    await db.update(wallets).set({ plan, updatedAt: new Date() }).where(eq(wallets.userId, userId));
   }
-  const canClaim = !alreadyClaimed && isDiscordSnowflake(id) && (await isGuildMember(id));
-  return withFileLock(async () => {
-    const store = await readStore();
-    const { wallet, created } = ensureWallet(store, id);
-    const planChanged = applyPrivilegePlan(wallet, privilege, GRADE_ORDER);
-    let bonusGranted = false;
-    if (canClaim) {
-      if (!store.joinBonus) store.joinBonus = {};
-      if (!store.joinBonus[id]) {
-        store.joinBonus[id] = Date.now();
-        wallet.balance += JOIN_BONUS;
-        appendLedger(wallet, "credit", JOIN_BONUS, JOIN_BONUS_REASON);
-        bonusGranted = true;
+  const canClaim = !joinBonusAt && discordId && (await isGuildMember(discordId));
+  if (canClaim) {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const locked = await client.query<{ balance: number; join_bonus_at: Date | null }>(
+        "SELECT balance, join_bonus_at FROM wallets WHERE user_id = $1 FOR UPDATE",
+        [userId],
+      );
+      const current = locked.rows[0];
+      if (current && !current.join_bonus_at) {
+        balance = Number(current.balance || 0) + JOIN_BONUS;
+        const entry = appendLedgerLocal("credit", JOIN_BONUS, JOIN_BONUS_REASON, balance);
+        await client.query(
+          "UPDATE wallets SET balance = $2, join_bonus_at = NOW(), updated_at = NOW() WHERE user_id = $1",
+          [userId, balance],
+        );
+        await client.query(
+          `INSERT INTO wallet_ledger (id, user_id, type, amount, reason, at, balance_after)
+           VALUES ($1, $2, $3, $4, $5, NOW(), $6)`,
+          [entry.id, userId, entry.type, entry.amount, entry.reason, entry.balanceAfter],
+        );
+        await trimLedger(client, userId);
+        joinBonusAt = new Date();
       }
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
     }
-    if (created || planChanged || bonusGranted) await persistStore(store);
-    return walletView(wallet, id, privilege);
-  });
+  }
+  const ledger = await loadLedger(userId);
+  return walletView(userId, { balance, plan }, ledger, privilege, discordId);
 }
 
 export async function getCatalog() {
-  const store = await readStore();
+  const store = await readCatalog();
   return {
     unit: "Krônes",
     packs: store.packs,
@@ -246,42 +235,86 @@ export function allowOpenCredit() {
 
 export async function creditWallet(userId: string, amount: number, reason: string) {
   if (!Number.isFinite(amount) || amount <= 0) throw new Error("Montant invalide.");
-  return withFileLock(async () => {
-    const store = await readStore();
-    const id = await walletAccountId(userId);
-    const { wallet } = ensureWallet(store, id);
-    wallet.balance += Math.trunc(amount);
-    appendLedger(wallet, "credit", Math.trunc(amount), reason);
-    store.wallets[id] = wallet;
-    await persistStore(store);
-    return wallet;
-  });
+  const parsed = Math.trunc(amount);
+  await ensureWalletRow(userId);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const locked = await client.query<{ balance: number; plan: string }>(
+      "SELECT balance, plan FROM wallets WHERE user_id = $1 FOR UPDATE",
+      [userId],
+    );
+    const current = locked.rows[0] || { balance: 0, plan: "Aucun" };
+    const balance = Number(current.balance || 0) + parsed;
+    const entry = appendLedgerLocal("credit", parsed, reason, balance);
+    await client.query("UPDATE wallets SET balance = $2, updated_at = NOW() WHERE user_id = $1", [
+      userId,
+      balance,
+    ]);
+    await client.query(
+      `INSERT INTO wallet_ledger (id, user_id, type, amount, reason, at, balance_after)
+       VALUES ($1, $2, $3, $4, $5, NOW(), $6)`,
+      [entry.id, userId, entry.type, entry.amount, entry.reason, entry.balanceAfter],
+    );
+    await trimLedger(client, userId);
+    await client.query("COMMIT");
+    return { balance, plan: current.plan, ledger: await loadLedger(userId) };
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function debitWallet(userId: string, amount: number, reason: string) {
   if (!Number.isFinite(amount) || amount <= 0) throw new Error("Montant invalide.");
   const privilege = await resolveKronesPrivilege(userId);
-  return withFileLock(async () => {
-    const store = await readStore();
-    const id = await walletAccountId(userId);
-    const { wallet } = ensureWallet(store, id);
-    applyPrivilegePlan(wallet, privilege, GRADE_ORDER);
+  const parsed = Math.trunc(amount);
+  await ensureWalletRow(userId);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const locked = await client.query<{ balance: number; plan: string }>(
+      "SELECT balance, plan FROM wallets WHERE user_id = $1 FOR UPDATE",
+      [userId],
+    );
+    const current = locked.rows[0] || { balance: 0, plan: "Aucun" };
+    const planWallet = { plan: current.plan };
+    applyPrivilegePlan(planWallet, privilege, GRADE_ORDER);
     if (privilege === "admin") {
-      store.wallets[id] = wallet;
-      await persistStore(store);
-      return wallet;
+      await client.query("UPDATE wallets SET plan = $2, updated_at = NOW() WHERE user_id = $1", [
+        userId,
+        planWallet.plan,
+      ]);
+      await client.query("COMMIT");
+      return { balance: Number(current.balance || 0), plan: planWallet.plan, ledger: await loadLedger(userId) };
     }
-    const cost = Math.trunc(amount);
-    if (wallet.balance < cost) {
-      const err = new Error("Solde insuffisant.");
-      (err as Error & { code?: string; balance?: number }).code = "INSUFFICIENT_KRONES";
-      (err as Error & { balance?: number }).balance = wallet.balance;
+    const balance = Number(current.balance || 0);
+    if (balance < parsed) {
+      const err = new Error("Solde insuffisant.") as Error & { code?: string; balance?: number };
+      err.code = "INSUFFICIENT_KRONES";
+      err.balance = balance;
       throw err;
     }
-    wallet.balance -= cost;
-    appendLedger(wallet, "debit", cost, reason);
-    store.wallets[id] = wallet;
-    await persistStore(store);
-    return wallet;
-  });
+    const next = balance - parsed;
+    const entry = appendLedgerLocal("debit", parsed, reason, next);
+    await client.query(
+      "UPDATE wallets SET balance = $2, plan = $3, updated_at = NOW() WHERE user_id = $1",
+      [userId, next, planWallet.plan],
+    );
+    await client.query(
+      `INSERT INTO wallet_ledger (id, user_id, type, amount, reason, at, balance_after)
+       VALUES ($1, $2, $3, $4, $5, NOW(), $6)`,
+      [entry.id, userId, entry.type, entry.amount, entry.reason, entry.balanceAfter],
+    );
+    await trimLedger(client, userId);
+    await client.query("COMMIT");
+    return { balance: next, plan: planWallet.plan, ledger: await loadLedger(userId) };
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }

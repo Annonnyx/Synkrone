@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { siteProfiles, users } from "@/db/schema";
 import { getOAuthAccount } from "@/lib/oauth/accounts";
 import { synkroneRepoRoot } from "@/lib/repo-root";
 
@@ -48,6 +48,10 @@ async function siteUser(discordId: string | null) {
 export async function resolveKronesPrivilege(userId: string): Promise<KronesPrivilege> {
   const [row] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (row?.role === "admin") return "admin";
+  const [profile] = await db.select().from(siteProfiles).where(eq(siteProfiles.userId, userId)).limit(1);
+  if (profile) {
+    return privilegeFromRecord({ role: profile.role, isTeamOwner: profile.isTeamOwner });
+  }
   const discord = await getOAuthAccount(userId, "discord");
   return privilegeFromRecord(await siteUser(discord?.providerAccountId ?? null));
 }

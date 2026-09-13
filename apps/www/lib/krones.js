@@ -3,6 +3,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { applyHostingDiscount, readPlatform } = require('./platform');
+const pgAccount = require('./pg-account');
 
 const DATA_PATH = path.join(__dirname, '..', 'data', 'krones.json');
 const LOCK_PATH = `${DATA_PATH}.lock`;
@@ -662,8 +663,25 @@ function allowOpenCredit() {
     return process.env.NODE_ENV !== 'production' || process.env.SYNKRONE_KRONES_DEMO === '1';
 }
 
+function usePg() {
+    return pgAccount.isConfigured();
+}
+
+function demoWalletDto() {
+    return walletDto(
+        { balance: DEMO_BALANCE, plan: 'Aucun', ledger: [] },
+        { authenticated: false }
+    );
+}
+
 async function peekWallet(id) {
     const account = String(id || '').trim() || DEMO_ACCOUNT_ID;
+    if (account === DEMO_ACCOUNT_ID) return { id: DEMO_ACCOUNT_ID, ...demoWalletDto() };
+    if (usePg()) {
+        const wallet = await pgAccount.peekWallet(account);
+        if (!wallet) return { id: account, balance: 0, plan: 'Aucun', ledger: [], authenticated: true };
+        return wallet;
+    }
     return withFileLock(async () => {
         const store = await readStore();
         const { wallet, created } = ensureWalletInStore(store, account, await seedFor(account));
@@ -681,6 +699,7 @@ async function migrateWallet(fromId, toId) {
     const from = String(fromId || '').trim();
     const to = String(toId || '').trim();
     if (!from || !to || from === to) return;
+    if (usePg()) return pgAccount.migrateWallet(from, to);
     return withFileLock(async () => {
         const store = await readStore();
         const source = store.wallets[from];
@@ -696,6 +715,7 @@ async function migrateWallet(fromId, toId) {
 }
 
 async function snapshotWallets() {
+    if (usePg()) return pgAccount.snapshotWallets();
     return withFileLock(async () => {
         const store = await readStore();
         const out = {};
@@ -712,6 +732,7 @@ async function creditAccount(id, amount, reason) {
         return { ok: false, error: 'Montant invalide.' };
     }
     const account = String(id || '').trim() || DEMO_ACCOUNT_ID;
+    if (usePg() && account !== DEMO_ACCOUNT_ID) return pgAccount.creditAccount(account, parsed, reason);
     return withFileLock(async () => {
         const store = await readStore();
         const { wallet } = ensureWalletInStore(store, account, await seedFor(account));
@@ -730,6 +751,7 @@ async function debitAccount(id, amount, reason) {
         return { ok: false, error: 'Montant invalide.' };
     }
     const account = String(id || '').trim() || DEMO_ACCOUNT_ID;
+    if (usePg() && account !== DEMO_ACCOUNT_ID) return pgAccount.debitAccount(account, parsed, reason);
     return withFileLock(async () => {
         const store = await readStore();
         const seed = await seedFor(account);
@@ -760,6 +782,7 @@ async function setAccountBalance(id, balance, reason) {
     if (!account || account === DEMO_ACCOUNT_ID) {
         return { ok: false, error: 'Compte invalide.' };
     }
+    if (usePg()) return pgAccount.setAccountBalance(account, parsed, reason);
     return withFileLock(async () => {
         const store = await readStore();
         const { wallet } = ensureWalletInStore(store, account, await seedFor(account));
@@ -806,10 +829,11 @@ async function claimJoinBonus(id) {
     if (!isDiscordSnowflake(account) || account === DEMO_ACCOUNT_ID) {
         return { ok: false, claimed: false, reason: 'invalid' };
     }
+    const member = await isGuildMember(account);
+    if (usePg()) return pgAccount.claimJoinBonus(account, member);
     if (await alreadyClaimedJoinBonus(account)) {
         return { ok: true, claimed: false, reason: 'already' };
     }
-    const member = await isGuildMember(account);
     if (!member) return { ok: false, claimed: false, reason: 'not-member' };
     return withFileLock(async () => {
         const store = await readStore();
@@ -832,6 +856,7 @@ async function setAccountPlan(id, plan) {
     const next = GRADE_ORDER.includes(String(plan || '')) ? String(plan) : 'Aucun';
     const account = String(id || '').trim();
     if (!account) return { ok: false, error: 'Compte invalide.' };
+    if (usePg()) return pgAccount.setAccountPlan(account, next);
     return withFileLock(async () => {
         const store = await readStore();
         const { wallet } = ensureWalletInStore(store, account, await seedFor(account));
@@ -852,6 +877,14 @@ function mountKrones(app) {
 
     app.get('/api/krones', async (req, res) => {
         try {
+            if (usePg()) {
+                const account = await sessionAccount(req);
+                if (!account) return res.json({ id: DEMO_ACCOUNT_ID, ...demoWalletDto() });
+                const wallet = await peekWallet(account.id);
+                applySession(req, wallet);
+                void claimJoinBonus(account.id).catch(() => undefined);
+                return res.json(wallet);
+            }
             const dto = await withFileLock(async () => {
                 const store = await readStore();
                 const { id, wallet, created, privilege } = await ensureWallet(store, req);

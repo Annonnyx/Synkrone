@@ -80,6 +80,7 @@ try {
 
 const { readPlatform, writePlatform } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'platform'));
 const { panelAdmin, pm2Logs, listTickets } = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'admin-ops'));
+const pgAccount = require(path.join(__dirname, '..', '..', '..', 'apps', 'www', 'lib', 'pg-account'));
 const {
     COOKIE_NAME,
     createFileSessionStore,
@@ -327,6 +328,13 @@ function normalizePm2Process(pmProcess) {
 }
 
 async function readUsersDb() {
+    if (pgAccount.isConfigured()) {
+        try {
+            return await pgAccount.loadSiteUsers();
+        } catch (err) {
+            console.error('[account] lecture postgres:', err.message);
+        }
+    }
     await ensureDbFile(USERS_DB_PATH, { users: {} });
     try {
         const raw = await fs.readFile(USERS_DB_PATH, 'utf8');
@@ -339,6 +347,14 @@ async function readUsersDb() {
 }
 
 async function writeUsersDb(db) {
+    if (pgAccount.isConfigured()) {
+        try {
+            await pgAccount.saveSiteUsers(db.users);
+            return;
+        } catch (err) {
+            console.error('[account] écriture postgres:', err.message);
+        }
+    }
     await fs.writeFile(USERS_DB_PATH, JSON.stringify(db, null, 2), 'utf8');
 }
 
@@ -363,7 +379,9 @@ function normalizeStoredUser(user, userId) {
     }
     
     return {
-        id: safeId, username: String(user?.username || `Utilisateur ${safeId.slice(-4) || safeId}`),
+        id: safeId,
+        dbId: String(user?.dbId || ''),
+        username: String(user?.username || `Utilisateur ${safeId.slice(-4) || safeId}`),
         avatar: String(user?.avatar || '/assets/images/logo.jpg'), role: safeRole, grade: safeGrade, krone: safeKrone,
         isTeamOwner: safeOwner, isGuest: false, createdAt: Number(user?.createdAt) || now,
         updatedAt: Number(user?.updatedAt) || now, lastSeenAt: Number(user?.lastSeenAt) || now, lastLoginAt: Number(user?.lastLoginAt) || now,
@@ -433,6 +451,7 @@ function attachTargetId(req) {
 function sessionFromPersisted(persisted) {
     return {
         id: persisted.id,
+        dbId: persisted.dbId || '',
         username: persisted.username,
         avatar: persisted.avatar,
         role: persisted.role,
@@ -493,6 +512,7 @@ async function upsertUserFromDiscordAuth(discordUser, isTeamOwner, attachToId) {
     const nextUser = {
         ...(existing || {}),
         id: discordId,
+        dbId: String(existing?.dbId || ''),
         username: String(discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${discordId.slice(-4)}`),
         name: String(existing?.name || discordUser?.global_name || discordUser?.username || existing?.username || `Utilisateur ${discordId.slice(-4)}`),
         avatar: discordUser?.avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${discordUser.avatar}.png` : String(existing?.avatar || '/assets/images/logo.jpg'),
@@ -528,6 +548,7 @@ async function upsertUserFromOAuth(provider, profile, attachToId) {
     const nextUser = {
         ...(existing || {}),
         id,
+        dbId: String(existing?.dbId || ''),
         username: String(existing?.username || profile.username || `Utilisateur ${providerId.slice(-4)}`),
         avatar: String(existing?.avatar || profile.avatar || '/assets/images/logo.jpg'),
         email: String(profile.email || existing?.email || '').trim().toLowerCase(),
@@ -565,6 +586,7 @@ async function attachPanelFromSite(res, persisted, provider, profile, options = 
             }
         });
         if (!panel?.token) throw new Error('Panel session missing');
+        persisted.dbId = panel.userId;
         res.cookie('synkrone_session', panel.token, panelCookieOptions(isProdCookie()));
         await rememberIdentity({
             siteUserId: persisted.id,

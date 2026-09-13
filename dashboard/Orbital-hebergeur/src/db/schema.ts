@@ -457,6 +457,54 @@ export const consoleLines = pgTable(
   (t) => [index("console_service_idx").on(t.serviceId)],
 );
 
+/* ------------------------------------------------------------------ */
+/* Site profile + Krônes (one account with the panel)                  */
+/* ------------------------------------------------------------------ */
+
+export const siteProfiles = pgTable(
+  "site_profiles",
+  {
+    userId: text("user_id")
+      .primaryKey()
+      .references(() => users.id, { onDelete: "cascade" }),
+    publicId: text("public_id").notNull(),
+    role: text("role").notNull().default("Krobi"),
+    isTeamOwner: boolean("is_team_owner").notNull().default(false),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
+    lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    profile: jsonb("profile").$type<Record<string, unknown>>().notNull().default({}),
+  },
+  (t) => [uniqueIndex("site_profiles_public_id_uq").on(t.publicId)],
+);
+
+export const wallets = pgTable("wallets", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  balance: integer("balance").notNull().default(0),
+  plan: text("plan").notNull().default("Aucun"),
+  joinBonusAt: timestamp("join_bonus_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const walletLedger = pgTable(
+  "wallet_ledger",
+  {
+    id: id(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(), // credit | debit
+    amount: integer("amount").notNull(),
+    reason: text("reason").notNull().default(""),
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+    balanceAfter: integer("balance_after").notNull(),
+  },
+  (t) => [index("wallet_ledger_user_at_idx").on(t.userId, t.at)],
+);
+
 export const metricSamples = pgTable(
   "metric_samples",
   {
