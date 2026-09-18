@@ -23,6 +23,7 @@
             <span id="kr-plan">Plan · —</span>
         </div>
         <p class="kr-note" id="kr-auth-note"></p>
+        <p class="status-line" id="kr-shop-disabled" hidden style="background:#3a1d1d;border:1px solid #a8462f;border-radius:10px;padding:10px 14px;margin-top:10px;"></p>
         <p class="status-line" id="kr-status"></p>
     </section>
 
@@ -202,6 +203,26 @@
             return catalog.billing?.loginUrl || '/login?returnTo=/krones';
         }
 
+        function shopDisabled() {
+            return Boolean(catalog.billing?.shopDisabled);
+        }
+
+        function shopMessage() {
+            return catalog.billing?.shopMessage || 'Achat de Krônes momentanément suspendu.';
+        }
+
+        function renderShopBanner() {
+            const el = document.getElementById('kr-shop-disabled');
+            if (!el) return;
+            if (shopDisabled()) {
+                el.hidden = false;
+                el.textContent = shopMessage();
+            } else {
+                el.hidden = true;
+                el.textContent = '';
+            }
+        }
+
         function computeMcMonthly({ ramGb = 0, cpu = 0, storageGb = 0, db = false } = {}) {
             return 80 + Number(ramGb) * 40 + Number(cpu) * 25 + Math.ceil(Number(storageGb) / 10) * 15 + (db ? 60 : 0);
         }
@@ -278,15 +299,21 @@
             if (!row) return;
             const packs = catalog.packs || [];
             const authed = Boolean(wallet.authenticated || catalog.billing?.authenticated);
+            const disabled = shopDisabled();
             row.innerHTML = packs.map((pack) => `
-                <button type="button" class="offer" data-pack="${escapeHtml(pack.id)}">
+                <button type="button" class="offer" data-pack="${escapeHtml(pack.id)}" ${disabled ? 'disabled title="Vente suspendue"' : ''}>
                     <span class="offer-k">${formatKrones(pack.krones)} ₭</span>
                     <span class="offer-e">${escapeHtml(pack.label || 'Pack')}</span>
                     <span class="offer-r">${formatEuro(pack.eurCents)} TTC</span>
+                    ${disabled ? '<span class="muted">Suspendu</span>' : ''}
                 </button>
             `).join('');
             row.querySelectorAll('[data-pack]').forEach((btn) => {
                 btn.onclick = () => {
+                    if (disabled) {
+                        setStatus(shopMessage());
+                        return;
+                    }
                     if (!authed) {
                         window.top.location.href = loginUrl();
                         return;
@@ -326,6 +353,7 @@
         function renderGrades() {
             const list = document.getElementById('grade-list');
             if (!list) return;
+            const suspended = shopDisabled();
             const current = GRADE_COSTS[wallet.plan] !== undefined ? wallet.plan : 'Aucun';
             const currentCost = GRADE_COSTS[current] || 0;
             const currentIndex = GRADE_ORDER_INDEX(current);
@@ -351,7 +379,7 @@
                     : String(sub.perk || '').split('·').map((item) => item.trim()).filter(Boolean);
                 const klass = ['grade-card', isCurrent ? 'is-current' : ''].filter(Boolean).join(' ');
                 const disableBuy = isCurrent || included || (wallet.authenticated && !can);
-                const showEuro = !isCurrent && !included;
+                const showEuro = !isCurrent && !included && !suspended;
                 return `
                     <article class="${klass}" data-grade="${escapeHtml(sub.name)}">
                         <p class="grade-tag">${escapeHtml(sub.tagline || '')} · achat unique</p>
@@ -447,6 +475,10 @@
         }
 
         function openCheckout(packId) {
+            if (shopDisabled()) {
+                setStatus(shopMessage());
+                return;
+            }
             const pack = (catalog.packs || []).find((item) => item.id === packId);
             if (!pack) return;
             checkoutPack = { kind: 'pack', packId: pack.id, ...pack };
@@ -463,6 +495,10 @@
         }
 
         function openGradeCheckout(name) {
+            if (shopDisabled()) {
+                setStatus(shopMessage());
+                return;
+            }
             const sub = (catalog.subscriptions || []).find((item) => item.name === name);
             if (!sub) return;
             const current = (catalog.subscriptions || []).find((item) => item.name === wallet.plan);
@@ -531,6 +567,10 @@
 
         async function submitCheckout() {
             const status = document.getElementById('kr-checkout-status');
+            if (shopDisabled()) {
+                status.textContent = shopMessage();
+                return;
+            }
             if (!document.getElementById('consent-age').checked
                 || !document.getElementById('consent-cgv').checked
                 || !document.getElementById('consent-waiver').checked) {
@@ -629,6 +669,7 @@
             renderCompare();
             renderGrades();
             renderMcQuote();
+            renderShopBanner();
             const sellerEl = document.getElementById('kr-seller');
             if (sellerEl) {
                 const seller = catalog.billing?.seller || {};

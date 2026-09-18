@@ -80,6 +80,18 @@ function isProduction() {
     return process.env.NODE_ENV === 'production';
 }
 
+// Kill-switch urgence : faux SIRET / nom / IBAN affichés en prod.
+// Vente suspendue tant que les vraies valeurs vendeur ne sont pas fournies.
+// Pour réactiver : passer SHOP_SUSPENDED à false ET renseigner
+// SYNKRONE_SELLER_* + SYNKRONE_SHOP_DISABLED=0 côté VPS.
+const SHOP_SUSPENDED = true;
+const SHOP_SUSPENDED_MESSAGE = 'Achat de Krônes momentanément suspendu : nos coordonnées de virement sont en cours de mise à jour. Réessayez plus tard.';
+
+function shopDisabled() {
+    if (SHOP_SUSPENDED) return true;
+    return env('SYNKRONE_SHOP_DISABLED') === '1';
+}
+
 function simulateAllowed() {
     if (env('SYNKRONE_PAY_DEMO') === '1') return true;
     return !isProduction();
@@ -190,6 +202,8 @@ function publicSeller(seller) {
 }
 
 function paymentMethods(seller) {
+    // Vente suspendue : aucun moyen affiché, donc aucun IBAN/SIRET exposé.
+    if (shopDisabled()) return [];
     const methods = [
         {
             id: 'sepa',
@@ -213,6 +227,12 @@ function paymentMethods(seller) {
 
 function billingPublicDto(account) {
     const seller = sellerRecord();
+    const disabled = shopDisabled();
+    // Quand la vente est suspendue, on masque les coordonnées vendeur
+    // (faux SIRET/IBAN en prod) au lieu de les exposer au public.
+    const safeSeller = disabled
+        ? { ...publicSeller(seller), siret: null, hasIban: false }
+        : publicSeller(seller);
     return {
         authenticated: Boolean(account),
         loginUrl: '/login?returnTo=/krones',
@@ -221,9 +241,11 @@ function billingPublicDto(account) {
         vatLabel: `${Math.round(vatRate() * 100)} %`,
         country: 'FR',
         simulateAllowed: simulateAllowed(),
-        sellerReady: sellerReady(seller),
+        sellerReady: disabled ? false : sellerReady(seller),
         production: isProduction(),
-        seller: publicSeller(seller),
+        shopDisabled: disabled,
+        shopMessage: disabled ? SHOP_SUSPENDED_MESSAGE : null,
+        seller: safeSeller,
         methods: paymentMethods(seller),
         legal: {
             cguUrl: '/cgu',
@@ -260,7 +282,7 @@ function orderDto(order, { includeTransfer = false } = {}) {
         cancelledAt: order.cancelledAt || null,
         seller: publicSeller(seller)
     };
-    if (includeTransfer && order.method === 'sepa' && seller.iban && (order.status === 'awaiting_transfer' || order.status === 'awaiting_payment')) {
+    if (includeTransfer && !shopDisabled() && order.method === 'sepa' && seller.iban && (order.status === 'awaiting_transfer' || order.status === 'awaiting_payment')) {
         dto.transfer = {
             iban: seller.iban,
             bic: seller.bic || null,
@@ -407,6 +429,9 @@ function mountBilling(app, deps) {
     });
 
     app.post('/api/krones/checkout', async (req, res) => {
+        if (shopDisabled()) {
+            return res.status(503).json({ error: SHOP_SUSPENDED_MESSAGE, shopDisabled: true });
+        }
         const account = await sessionAccount(req);
         if (!account) {
             return res.status(401).json({ error: 'Un compte est obligatoire pour acheter.', loginUrl: '/login?returnTo=/krones' });
@@ -513,6 +538,9 @@ function mountBilling(app, deps) {
     });
 
     app.post('/api/krones/orders/:id/pay', async (req, res) => {
+        if (shopDisabled()) {
+            return res.status(503).json({ error: SHOP_SUSPENDED_MESSAGE, shopDisabled: true });
+        }
         const account = await sessionAccount(req);
         if (!account) return res.status(401).json({ error: 'Connectez-vous.', loginUrl: '/login?returnTo=/krones' });
         const method = String(req.body?.method || '').trim();
@@ -666,6 +694,8 @@ function mountBilling(app, deps) {
 module.exports = {
     mountBilling,
     billingPublicDto,
+    shopDisabled,
+    SHOP_SUSPENDED_MESSAGE,
     vatRate,
     splitVat,
     DATA_PATH
