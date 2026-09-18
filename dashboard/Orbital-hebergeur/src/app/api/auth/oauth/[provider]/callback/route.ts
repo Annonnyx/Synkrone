@@ -27,7 +27,10 @@ async function bridgeSiteSession(
 ) {
   const origin = publicSiteOriginFromEnv() || "http://127.0.0.1:3668";
   const key = String(process.env.PLATFORM_SECRET_KEY || "").trim();
-  if (key.length < 16) return;
+  if (key.length < 16) {
+    console.warn("[oauth] session bridge skipped: PLATFORM_SECRET_KEY missing or too short — site will stay logged out");
+    return;
+  }
   try {
     const res = await fetch(`${origin}/api/internal/session-bridge`, {
       method: "POST",
@@ -41,6 +44,10 @@ async function bridgeSiteSession(
     const data = (await res.json()) as { sid?: string };
     if (!data.sid) return;
     const store = await cookies();
+    // `data.sid` arrive déjà signé par le site (format express-session
+    // `s:<sid>.<mac>`) : le poser tel quel, sans le transformer, sinon le
+    // site rejette le cookie et reste déconnecté. Nom synchronisé avec
+    // COOKIE_NAME côté site (apps/www/lib/session-store.js).
     store.set("synkrone.sid", data.sid, {
       httpOnly: true,
       sameSite: "lax",

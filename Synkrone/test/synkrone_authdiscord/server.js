@@ -1048,6 +1048,8 @@ app.post('/api/internal/session-bridge', async (req, res) => {
             persisted.dbId = panelUserId;
             await persistPanelUserId(persisted.id, panelUserId).catch(() => undefined);
         }
+        // `sid` est déjà la valeur de cookie signée (format express-session
+        // `s:<sid>.<mac>`) : le panel la pose telle quelle dans `synkrone.sid`.
         const sid = await issueSiteSession(sessionFromPersisted(persisted));
         await rememberIdentity({
             siteUserId: persisted.id,
@@ -1217,10 +1219,36 @@ app.get('/api/profiles', async (req, res) => {
     return res.json({ ok: true, profiles });
 });
 
+function readCookieValue(header, name) {
+    const parts = String(header || '').split(';');
+    for (const part of parts) {
+        const eq = part.indexOf('=');
+        if (eq <= 0) continue;
+        if (part.slice(0, eq).trim() !== name) continue;
+        try {
+            return decodeURIComponent(part.slice(eq + 1).trim());
+        } catch {
+            return part.slice(eq + 1).trim();
+        }
+    }
+    return '';
+}
+
 app.get('/logout', (req, res) => {
     const dest = safeReturnTo(req.query.returnTo) || '/';
-    res.clearCookie('synkrone_session', { path: '/' });
-    req.session.destroy(() => res.redirect(dest));
+    // Déconnexion symétrique : révoquer aussi la session panel côté serveur
+    // (le cookie seul ne suffit pas, le token resterait valide en base).
+    const panelToken = readCookieValue(req.headers.cookie, 'synkrone_session');
+    const finish = () => {
+        res.clearCookie('synkrone_session', { path: '/' });
+        req.session.destroy(() => res.redirect(dest));
+    };
+    if (!panelToken) return finish();
+    panelAdmin('/session-revoke', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: panelToken })
+    }).then(finish, finish);
 });
 
 // --- CLOUD ---

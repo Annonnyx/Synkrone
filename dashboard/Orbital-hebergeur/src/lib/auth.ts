@@ -6,6 +6,10 @@ import { apiKeys, sessions, users } from "@/db/schema";
 import { hashPassword, randomToken, sha256, verifyPassword } from "@/lib/crypto";
 export const SESSION_COOKIE = "synkrone_session";
 const LEGACY_SESSION_COOKIE = "orbital_session";
+// Cookie de session du site principal (apps/www/lib/session-store.js).
+// Le panel le pose via le pont OAuth et doit le retirer au logout,
+// sinon l'utilisateur reste connecté sur le site après un logout panel.
+export const SITE_SESSION_COOKIE = "synkrone.sid";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 21;
 
 export type SessionUser = {
@@ -56,6 +60,8 @@ export async function destroySession(): Promise<void> {
   }
   store.delete(SESSION_COOKIE);
   store.delete(LEGACY_SESSION_COOKIE);
+  // Déconnexion symétrique : quitter le panel déconnecte aussi du site.
+  store.delete(SITE_SESSION_COOKIE);
 }
 
 export async function getCurrentUser(): Promise<SessionUser | null> {

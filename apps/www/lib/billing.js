@@ -231,7 +231,7 @@ function billingPublicDto(account) {
     // Quand la vente est suspendue, on masque les coordonnées vendeur
     // (faux SIRET/IBAN en prod) au lieu de les exposer au public.
     const safeSeller = disabled
-        ? { ...publicSeller(seller), siret: null, hasIban: false }
+        ? { ...publicSeller(seller), legalForm: null, address: null, siret: null, hasIban: false }
         : publicSeller(seller);
     return {
         authenticated: Boolean(account),

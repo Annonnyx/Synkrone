@@ -23,6 +23,28 @@ function platformSecret() {
     return String(readPanelEnvValue('PLATFORM_SECRET_KEY') || process.env.PLATFORM_SECRET_KEY || '').trim();
 }
 
+/** Secret effectif d'express-session (même expression que les middlewares site). */
+function siteSessionSecret() {
+    return String(process.env.SESSION_SECRET || 'synkrone_secret');
+}
+
+/**
+ * Signe un sid brut au format express-session / cookie-signature :
+ * `s:<sid>.<hmac-sha256-base64-sans-padding>`.
+ * Le panel pose cette valeur telle quelle dans le cookie `synkrone.sid`
+ * (voir bridgeSiteSession côté panel) : sans signature, express-session
+ * rejette le cookie et le site reste déconnecté alors que le panel est ouvert.
+ */
+function signSiteSid(sid) {
+    const raw = String(sid || '');
+    if (!raw || raw.startsWith('s:')) return raw;
+    const mac = crypto.createHmac('sha256', siteSessionSecret())
+        .update(raw)
+        .digest('base64')
+        .replace(/=+$/, '');
+    return `s:${raw}.${mac}`;
+}
+
 function requireInternalAuth(req) {
     const expected = platformSecret();
     const auth = String(req.headers.authorization || '');
@@ -108,7 +130,10 @@ async function issueSiteSession(userPayload) {
     await new Promise((resolve, reject) => {
         store.set(sid, sess, (err) => (err ? reject(err) : resolve()));
     });
-    return sid;
+    // Retourne la valeur de cookie prête à poser (signée). Le fichier de
+    // session reste indexé par le sid brut ; la signature sert uniquement
+    // à passer la vérification d'express-session côté site.
+    return signSiteSid(sid);
 }
 
 function isPanelUserId(value) {
@@ -237,6 +262,8 @@ module.exports = {
     rememberIdentity,
     identityFor,
     issueSiteSession,
+    signSiteSid,
+    siteSessionSecret,
     panelBridgeFromSiteUser,
     panelAttachPayload,
     requestPanelSession,
