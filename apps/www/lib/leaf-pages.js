@@ -38,6 +38,63 @@ const PAGE_DESCRIPTIONS = {
     '/serveur': 'Configurer un serveur où un bot officiel Synkrone est présent.'
 };
 
+const PAGE_TITLES = {
+    '/': 'Synkrone — Accueil',
+    '/accueil': 'Synkrone — Accueil',
+    '/faq': 'Synkrone — FAQ',
+    '/stats': 'Synkrone — Statut',
+    '/contact': 'Synkrone — Contact',
+    '/cgu': 'Synkrone — CGU',
+    '/cgv': 'Synkrone — CGV',
+    '/krones': 'Synkrone — Krônes',
+    '/login': 'Connexion — Synkrone',
+    '/discord': 'Synkrone — Bots',
+    '/discord/bots': 'Synkrone — Bots',
+    '/discord/bots/vax': 'Synkrone — Vax',
+    '/discord/bots/arceus': 'Synkrone — Arceus',
+    '/discord/bots/asuna': 'Synkrone — Asuna',
+    '/discord/bots/kayaba': 'Synkrone — Kayaba',
+    '/discord/bots/yui': 'Synkrone — Yui',
+    '/discord/bots/bot': 'Synkrone — Créer un bot',
+    '/discord/publicbot': 'Synkrone — Catalogue',
+    '/discord/dashbot': 'Synkrone — Dashbot',
+    '/discord/commandes': 'Synkrone — Commandes',
+    '/discord/bump': 'Synkrone — Bump',
+    '/discord/me': 'Synkrone — Me',
+    '/minecraft': 'Synkrone — Minecraft',
+    '/minecraft/serveur': 'Synkrone — Cantale',
+    '/minecraft/modpack': 'Synkrone — Modpacks',
+    '/minecraft/modpack/accueil': 'Synkrone — Modpacks',
+    '/minecraft/modpack/xenus': 'Synkrone — Xenus',
+    '/minecraft/modpack/thefrenchbaguette': 'Synkrone — The French Baguette',
+    '/minecraft/modpack/vanipack': 'Synkrone — Vanipack',
+    '/compte': 'Synkrone — Compte',
+    '/serveur': 'Synkrone — Serveur'
+};
+
+const DEFAULT_IMAGE = `${SITE_ORIGIN}/logo/Synk_2B9348.png`;
+
+const PAGE_IMAGES = {
+    '/discord/bots/vax': `${SITE_ORIGIN}/assets/images/vax.png`,
+    '/discord/bots/arceus': `${SITE_ORIGIN}/assets/images/arceus.png`,
+    '/discord/bots/asuna': `${SITE_ORIGIN}/assets/images/asuna.png`,
+    '/discord/bots/kayaba': `${SITE_ORIGIN}/assets/images/kayaba.png`,
+    '/discord/bots/yui': `${SITE_ORIGIN}/assets/images/yui.png`,
+    '/minecraft/serveur': `${SITE_ORIGIN}/assets/images/minecraft.png`,
+    '/minecraft': `${SITE_ORIGIN}/assets/images/minecraft.png`,
+    '/minecraft/modpack': `${SITE_ORIGIN}/assets/images/minecraft.png`,
+    '/minecraft/modpack/accueil': `${SITE_ORIGIN}/assets/images/minecraft.png`,
+    '/minecraft/modpack/xenus': `${SITE_ORIGIN}/assets/images/minecraft.png`,
+    '/minecraft/modpack/thefrenchbaguette': `${SITE_ORIGIN}/assets/images/minecraft.png`,
+    '/minecraft/modpack/vanipack': `${SITE_ORIGIN}/assets/images/minecraft.png`,
+    '/discord/bump': `${SITE_ORIGIN}/assets/images/discord.png`,
+    '/discord/me': `${SITE_ORIGIN}/assets/images/discord.png`,
+    '/discord/publicbot': `${SITE_ORIGIN}/assets/images/discord.png`,
+    '/discord/dashbot': `${SITE_ORIGIN}/assets/images/discord.png`,
+    '/discord/commandes': `${SITE_ORIGIN}/assets/images/discord.png`,
+    '/discord/bots': `${SITE_ORIGIN}/assets/images/discord.png`,
+    '/discord': `${SITE_ORIGIN}/assets/images/discord.png`
+};
 const LEAF_BY_PATH = {
     '/': '/accueil/index.html',
     '/accueil': '/accueil/index.html',
@@ -129,6 +186,57 @@ function descriptionForPath(pathname) {
     return PAGE_DESCRIPTIONS[current] || PAGE_DESCRIPTIONS['/'];
 }
 
+function titleForPath(pathname) {
+    const current = normalizePath(pathname);
+    return PAGE_TITLES[current] || PAGE_TITLES['/'];
+}
+
+function imageForPath(pathname) {
+    const current = normalizePath(pathname);
+    return PAGE_IMAGES[current] || DEFAULT_IMAGE;
+}
+
+function escapeJsonLd(value) {
+    return String(value || '').replace(/</g, '\\u003c');
+}
+
+function jsonLdForPath(pathname) {
+    const current = normalizePath(pathname);
+    const title = escapeJsonLd(titleForPath(current));
+    const description = escapeJsonLd(descriptionForPath(current));
+    const url = SITE_ORIGIN + (current === '/' ? '/' : current);
+    const image = imageForPath(current);
+    const base = {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: title,
+        description,
+        url,
+        image,
+        isPartOf: { '@type': 'WebSite', name: 'Synkrone', url: `${SITE_ORIGIN}/` }
+    };
+    if (current.startsWith('/discord/bots/')) {
+        const slug = current.slice('/discord/bots/'.length);
+        const names = { vax: 'Vax', arceus: 'Arceus', asuna: 'Asuna', kayaba: 'Kayaba', yui: 'Yui', bot: 'Créer un bot' };
+        base['@type'] = 'SoftwareApplication';
+        base.applicationCategory = 'CommunicationApplication';
+        base.operatingSystem = 'Discord';
+        base.offers = { '@type': 'Offer', price: '0', priceCurrency: 'EUR' };
+        if (names[slug]) base.name = `Synkrone — ${names[slug]}`;
+    }
+    if (current === '/faq') {
+        return {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            name: title,
+            description,
+            url,
+            image
+        };
+    }
+    return base;
+}
+
 function extractTagInner(html, tag) {
     const match = String(html || '').match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i'));
     return match ? match[1] : '';
@@ -174,13 +282,16 @@ function extractLeafParts(html) {
     };
 }
 
-function applyMeta(shell, { title, description, pathname }) {
-    const url = SITE_ORIGIN + (normalizePath(pathname) === '/' ? '/' : normalizePath(pathname));
+function applyMeta(shell, { title, description, pathname, image }) {
+    const current = normalizePath(pathname);
+    const url = SITE_ORIGIN + (current === '/' ? '/' : current);
+    const resolvedTitle = title || titleForPath(current);
+    const resolvedImage = image || imageForPath(current);
     let html = shell;
-    if (title) {
-        html = html.replace(/<title>[^<]*<\/title>/i, `<title>${title}</title>`);
-        html = html.replace(/property="og:title" content="[^"]*"/, `property="og:title" content="${title}"`);
-        html = html.replace(/name="twitter:title" content="[^"]*"/, `name="twitter:title" content="${title}"`);
+    if (resolvedTitle) {
+        html = html.replace(/<title>[^<]*<\/title>/i, `<title>${resolvedTitle}</title>`);
+        html = html.replace(/property="og:title" content="[^"]*"/, `property="og:title" content="${resolvedTitle}"`);
+        html = html.replace(/name="twitter:title" content="[^"]*"/, `name="twitter:title" content="${resolvedTitle}"`);
     }
     if (description) {
         html = html.replace(/name="description" content="[^"]*"/, `name="description" content="${description}"`);
@@ -189,6 +300,19 @@ function applyMeta(shell, { title, description, pathname }) {
     }
     html = html.replace(/property="og:url" content="[^"]*"/, `property="og:url" content="${url}"`);
     html = html.replace(/rel="canonical" href="[^"]*"/, `rel="canonical" href="${url}"`);
+    if (resolvedImage) {
+        html = html.replace(/property="og:image" content="[^"]*"/, `property="og:image" content="${resolvedImage}"`);
+        html = html.replace(/property="og:image:secure_url" content="[^"]*"/, `property="og:image:secure_url" content="${resolvedImage}"`);
+        html = html.replace(/name="twitter:image" content="[^"]*"/, `name="twitter:image" content="${resolvedImage}"`);
+        html = html.replace(/property="og:image:alt" content="[^"]*"/, `property="og:image:alt" content="${resolvedTitle}"`);
+        html = html.replace(/name="twitter:image:alt" content="[^"]*"/, `name="twitter:image:alt" content="${resolvedTitle}"`);
+    }
+    const extra = `<script type="application/ld+json" data-leaf-jsonld="1">${JSON.stringify(jsonLdForPath(current))}</script>`;
+    if (html.includes('data-leaf-jsonld="1"')) {
+        html = html.replace(/<script type="application\/ld\+json" data-leaf-jsonld="1">[\s\S]*?<\/script>/, extra);
+    } else if (html.includes('</head>')) {
+        html = html.replace('</head>', `${extra}\n</head>`);
+    }
     return html;
 }
 
@@ -209,22 +333,24 @@ async function renderShell({ shellPath, publicDir, pathname }) {
     const leafRel = leafForPath(pathname);
     const frameSrc = frameSrcForPath(pathname);
     const description = descriptionForPath(pathname);
+    const title = titleForPath(pathname);
+    const image = imageForPath(pathname);
     if (frameSrc) {
-        return applyFrameShell(applyMeta(shell, { title: '', description, pathname }), frameSrc);
+        return applyFrameShell(applyMeta(shell, { title, description, pathname, image }), frameSrc);
     }
     if (!leafRel) {
-        return applyMeta(shell, { title: '', description, pathname });
+        return applyMeta(shell, { title, description, pathname, image });
     }
     let leafHtml = '';
     try {
         leafHtml = await fs.readFile(path.join(publicDir, leafRel.replace(/^\//, '')), 'utf8');
     } catch {
-        return applyMeta(shell, { title: '', description, pathname });
+        return applyMeta(shell, { title, description, pathname, image });
     }
     const parts = extractLeafParts(leafHtml);
-    const title = parts.title || '';
+    const leafTitle = parts.title || title;
     const desc = parts.description || description;
-    let html = applyMeta(shell, { title, description: desc, pathname });
+    let html = applyMeta(shell, { title: leafTitle, description: desc, pathname, image });
     const markedHead = parts.headExtras.replace(/<(link|style)\b[^>]*>/gi, (tag) => {
         const attr = /accueil\.css/i.test(tag) ? 'shared' : '1';
         return tag.replace(/<(link|style)\b/i, `<$1 data-leaf-asset="${attr}"`);
@@ -239,12 +365,18 @@ async function renderShell({ shellPath, publicDir, pathname }) {
 
 module.exports = {
     PAGE_DESCRIPTIONS,
+    PAGE_TITLES,
+    PAGE_IMAGES,
+    DEFAULT_IMAGE,
     LEAF_BY_PATH,
     FRAME_BY_PATH,
     leafForPath,
     frameSrcForPath,
     isFramePath,
     descriptionForPath,
+    titleForPath,
+    imageForPath,
+    jsonLdForPath,
     extractLeafParts,
     styleLeaksToChrome,
     renderShell,

@@ -648,12 +648,52 @@ function panelLoginRedirect(returnTo, oauthError) {
     return `/login?${qs.toString()}`;
 }
 
+function escapeMeta(value) {
+    return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function applyProfileMeta(html, profile) {
+    const name = String(profile?.name || profile?.username || 'Profil').slice(0, 80);
+    const subtitle = String(profile?.subtitle || 'Profil public Synkrone').slice(0, 160);
+    const title = `${name} — Synkrone Me`;
+    let image = 'https://synkrone.app/assets/images/discord.png';
+    const avatar = String(profile?.avatar || '');
+    if (/^https?:\/\//i.test(avatar)) image = avatar;
+    else if (avatar.startsWith('/')) image = `https://synkrone.app${avatar}`;
+    let next = html;
+    next = next.replace(/<title>[^<]*<\/title>/i, `<title>${escapeMeta(title)}</title>`);
+    next = next.replace(/name="description" content="[^"]*"/, `name="description" content="${escapeMeta(subtitle)}"`);
+    next = next.replace(/property="og:title" content="[^"]*"/, `property="og:title" content="${escapeMeta(title)}"`);
+    next = next.replace(/property="og:description" content="[^"]*"/, `property="og:description" content="${escapeMeta(subtitle)}"`);
+    next = next.replace(/name="twitter:title" content="[^"]*"/, `name="twitter:title" content="${escapeMeta(title)}"`);
+    next = next.replace(/name="twitter:description" content="[^"]*"/, `name="twitter:description" content="${escapeMeta(subtitle)}"`);
+    next = next.replace(/property="og:image" content="[^"]*"/, `property="og:image" content="${escapeMeta(image)}"`);
+    next = next.replace(/property="og:image:secure_url" content="[^"]*"/, `property="og:image:secure_url" content="${escapeMeta(image)}"`);
+    next = next.replace(/name="twitter:image" content="[^"]*"/, `name="twitter:image" content="${escapeMeta(image)}"`);
+    return next;
+}
+
 async function sendShell(res, pathname) {
-    const html = await renderShell({
+    let html = await renderShell({
         shellPath: path.join(__dirname, 'public', 'index.html'),
         publicDir: path.join(__dirname, 'public'),
         pathname
     });
+    try {
+        const clean = String(pathname || '/').split('?')[0];
+        const single = clean.replace(/^\//, '');
+        if (single && !single.includes('/') && !isReservedPublicPath(`/${single}`)) {
+            const db = await readUsersDb();
+            const wanted = single.toLowerCase();
+            const match = Object.values(db.users || {}).find((u) => String(u?.customUrl || '').toLowerCase() === wanted);
+            if (match) {
+                const full = normalizeStoredUser(match, match.id);
+                if (full && full.privacy === 'public') html = applyProfileMeta(html, full);
+            }
+        }
+    } catch {
+        /* generic meta */
+    }
     res.set('Cache-Control', 'no-store');
     res.type('html').send(html);
 }

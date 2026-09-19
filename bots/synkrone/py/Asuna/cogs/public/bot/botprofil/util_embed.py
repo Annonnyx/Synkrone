@@ -20,7 +20,7 @@ except ImportError:
 except Exception:
     # Fallback si le fuseau horaire n'est pas trouvé
     FRENCH_TIMEZONE = timezone.utc
-DEFAULT_COLOR = 0x2b2d31
+DEFAULT_COLOR = 0x3F6B52  # mousse (DA Synkrone)
 DEV_STATS_DB_PATH = Path(__file__).parent / "../../../owner/commands/devmenu/dev_stats.db"
 DEFAULT_SYNKRONE_URL = "https://synkrone.app/#asuna"
 
@@ -196,7 +196,27 @@ class EmbedManager:
             )
             embed.set_thumbnail(url=avatar_url)
         else:
+            avatar_url = None
             embed.set_author(name=f"Profil de {bot_user.name}")
+        # Standard Synkrone : footer + timestamp si le gestionnaire custom n'en a pas mis
+        try:
+            if not embed.footer or not embed.footer.text:
+                embed.set_footer(
+                    text=f"{bot_user.name} • synkrone.app • /help",
+                    icon_url=avatar_url,
+                )
+        except Exception:
+            pass
+        try:
+            if not embed.timestamp:
+                embed.timestamp = datetime.now(FRENCH_TIMEZONE)
+        except Exception:
+            pass
+        try:
+            if not getattr(embed, 'url', None):
+                embed.url = 'https://synkrone.app/discord/bots'
+        except Exception:
+            pass
 
         # Description avec les informations
         last_restart = discord.utils.format_dt(self.bot.start_time, style="R")
@@ -325,7 +345,26 @@ class EmbedManager:
                 )
                 embed.set_thumbnail(url=avatar_url)
             else:
+                avatar_url = None
                 embed.set_author(name=f"Profil de {bot_user.name}")
+            try:
+                if not embed.footer or not embed.footer.text:
+                    embed.set_footer(
+                        text=f"{bot_user.name} • synkrone.app • /help",
+                        icon_url=avatar_url,
+                    )
+            except Exception:
+                pass
+            try:
+                if not embed.timestamp:
+                    embed.timestamp = datetime.now(FRENCH_TIMEZONE)
+            except Exception:
+                pass
+            try:
+                if not getattr(embed, 'url', None):
+                    embed.url = 'https://synkrone.app/discord/bots'
+            except Exception:
+                pass
 
             unique_owners = self._compute_unique_owners_count()
             last_restart = discord.utils.format_dt(self.bot.start_time, 'R')
@@ -382,7 +421,7 @@ class EmbedManager:
             embed = discord.Embed(
                 title="Erreur",
                 description="Impossible de charger les statistiques.",
-                color=0xff0000
+                color=0xA8462F  # brique (DA Synkrone)
             )
             return embed, None, None
     

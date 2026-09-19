@@ -5,22 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synkrone.app</title>
     <meta name="description" content="Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.">
+    <meta name="theme-color" content="#1b211e">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta property="og:site_name" content="Synkrone">
     <meta property="og:title" content="Synkrone.app">
     <meta property="og:description" content="Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://synkrone.app/">
     <meta property="og:image" content="https://synkrone.app/logo/Synk_2B9348.png">
+    <meta property="og:image:secure_url" content="https://synkrone.app/logo/Synk_2B9348.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Synkrone — hébergement bots Discord, Minecraft et sites">
     <meta property="og:locale" content="fr_FR">
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@Synkrone">
     <meta name="twitter:title" content="Synkrone.app">
     <meta name="twitter:description" content="Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.">
+    <meta name="twitter:image" content="https://synkrone.app/logo/Synk_2B9348.png">
+    <meta name="twitter:image:alt" content="Synkrone — hébergement bots Discord, Minecraft et sites">
     <link rel="canonical" href="https://synkrone.app/">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@graph": [
             { "@type": "WebSite", "name": "Synkrone", "url": "https://synkrone.app/" },
-            { "@type": "Organization", "name": "Synkrone", "url": "https://synkrone.app/" }
+            {
+                "@type": "Organization",
+                "name": "Synkrone",
+                "url": "https://synkrone.app/",
+                "logo": "https://synkrone.app/logo/Synk_2B9348.png",
+                "description": "Hébergement de bots Discord, serveurs Minecraft et sites. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et Krônes.",
+                "sameAs": ["https://discord.gg/p768u2Pgp3"]
+            }
         ]
     }
     </script>
@@ -529,6 +546,30 @@
             yui: 'Synkrone — Yui',
             bot: 'Synkrone — Créer un bot'
         };
+        const PAGE_IMAGES = {
+            accueil: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            discord: SITE_ORIGIN + '/assets/images/discord.png',
+            bump: SITE_ORIGIN + '/assets/images/discord.png',
+            me: SITE_ORIGIN + '/assets/images/discord.png',
+            minecraft: SITE_ORIGIN + '/assets/images/minecraft.png',
+            login: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            cgu: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            cgv: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            contact: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            faq: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            krones: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            stats: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            compte: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            serveur: SITE_ORIGIN + '/logo/Synk_2B9348.png'
+        };
+        const BOT_IMAGES = {
+            vax: SITE_ORIGIN + '/assets/images/vax.png',
+            arceus: SITE_ORIGIN + '/assets/images/arceus.png',
+            asuna: SITE_ORIGIN + '/assets/images/asuna.png',
+            kayaba: SITE_ORIGIN + '/assets/images/kayaba.png',
+            yui: SITE_ORIGIN + '/assets/images/yui.png',
+            bot: SITE_ORIGIN + '/assets/images/discord.png'
+        };
 
         function applyPageSeo(mainSection, options = {}) {
             let title = PAGE_TITLES[mainSection] || 'Synkrone.app';
@@ -542,6 +583,12 @@
             if (mainSection === 'discord' && options.botsTab && BOT_DESCRIPTIONS[options.botsTab]) {
                 description = BOT_DESCRIPTIONS[options.botsTab];
             }
+            let image = PAGE_IMAGES[mainSection] || PAGE_IMAGES.accueil;
+            if (mainSection === 'discord' && options.botsTab && BOT_IMAGES[options.botsTab]) {
+                image = BOT_IMAGES[options.botsTab];
+            } else if (mainSection === 'minecraft') {
+                image = PAGE_IMAGES.minecraft;
+            }
             const path = normalizePath(window.location.pathname);
             const url = SITE_ORIGIN + (path === '/' ? '/' : path);
             const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -551,6 +598,11 @@
             const desc = document.querySelector('meta[name="description"]');
             const ogDesc = document.querySelector('meta[property="og:description"]');
             const twDesc = document.querySelector('meta[name="twitter:description"]');
+            const ogImage = document.querySelector('meta[property="og:image"]');
+            const ogImageSecure = document.querySelector('meta[property="og:image:secure_url"]');
+            const twImage = document.querySelector('meta[name="twitter:image"]');
+            const ogImageAlt = document.querySelector('meta[property="og:image:alt"]');
+            const twImageAlt = document.querySelector('meta[name="twitter:image:alt"]');
             if (ogTitle) ogTitle.setAttribute('content', title);
             if (twTitle) twTitle.setAttribute('content', title);
             if (ogUrl) ogUrl.setAttribute('content', url);
@@ -558,6 +610,11 @@
             if (desc) desc.setAttribute('content', description);
             if (ogDesc) ogDesc.setAttribute('content', description);
             if (twDesc) twDesc.setAttribute('content', description);
+            if (ogImage) ogImage.setAttribute('content', image);
+            if (ogImageSecure) ogImageSecure.setAttribute('content', image);
+            if (twImage) twImage.setAttribute('content', image);
+            if (ogImageAlt) ogImageAlt.setAttribute('content', title);
+            if (twImageAlt) twImageAlt.setAttribute('content', title);
         }
 
         function normalizePath(pathname) {

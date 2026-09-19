@@ -39,8 +39,8 @@ class EmbedConfigManager:
         "data_embed_type"
     )
     GLOBAL_FILE = "global_config.json"
-    DEFAULT_COLOR = 0x660099
-    DEFAULT_FOOTER = "{bot_nom} - /help pour découvrir mes commandes."
+    DEFAULT_COLOR = 0x3F6B52  # mousse (DA Synkrone)
+    DEFAULT_FOOTER = "{bot_nom} • synkrone.app • /help"
 
     def __init__(self):
         if not os.path.exists(self.DATA_DIR):
