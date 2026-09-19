@@ -351,7 +351,7 @@
                         <button type="button" class="time-btn ${currentHomeTime === 'total' ? 'active' : ''}" onclick="setHomeTime('total')">Total</button>
                     </div>`;
             } else {
-                extra = `<input type="search" id="tabSearchInput" class="form-control" style="width:220px" placeholder="Pseudo ou mot-clé" oninput="filterAllTab(this.value)">`;
+                extra = `<input type="search" id="tabSearchInput" class="form-control" style="width:220px" placeholder="Ex : pseudo, jeu, dev…" aria-label="Filtrer les profils" oninput="filterAllTab(this.value)">`;
             }
 
             if (controls) controls.innerHTML = extra + viewSwitch;
@@ -594,7 +594,7 @@
                         <p class="me-hint">Réservez synkrone.app/votre-nom — 200 Kr, une fois.</p>
                         <div class="form-group" style="flex-direction:row;align-items:center;gap:10px;margin-top:10px">
                             <span class="me-hint">synkrone.app/</span>
-                            <input type="text" id="editCustomUrl" class="form-control" value="${esc(MonProfil.customUrl || '')}" placeholder="mon-nom" ${MonProfil.customUrl ? 'disabled' : ''}>
+                            <input type="text" id="editCustomUrl" class="form-control" value="${esc(MonProfil.customUrl || '')}" placeholder="Ex : votre-nom — minuscules et tirets" ${MonProfil.customUrl ? 'disabled' : ''}>
                             ${MonProfil.customUrl
                                 ? '<span class="me-hint">Réservée</span>'
                                 : '<button type="button" class="btn btn-outline" onclick="buyCustomUrl()">Réserver</button>'}
@@ -808,9 +808,9 @@
                     <select class="form-control" style="width:140px" onchange="updateLinkData(${index}, 'reseau', this.value); renderEdit();">
                         ${NETWORKS.map((item) => `<option value="${item.id}" ${link.reseau === item.id ? 'selected' : ''}>${item.label}</option>`).join('')}
                     </select>
-                    <input type="text" class="form-control" style="flex:1;min-width:120px" placeholder="Nom" value="${esc(link.display_name || link.titre || '')}" oninput="updateLinkData(${index}, 'display_name', this.value); updateLinkData(${index}, 'titre', this.value)">
-                    <input type="text" class="form-control" style="flex:1;min-width:120px" placeholder="Sous-titre" value="${esc(link.sousTitre || '')}" oninput="updateLinkData(${index}, 'sousTitre', this.value)">
-                    <input type="text" class="form-control" style="flex:1.4;min-width:150px" placeholder="https://…" value="${esc(link.valeur || '')}" oninput="updateLinkData(${index}, 'valeur', this.value)">
+                    <input type="text" class="form-control" style="flex:1;min-width:120px" placeholder="Ex : Ma chaîne" aria-label="Nom du lien" value="${esc(link.display_name || link.titre || '')}" oninput="updateLinkData(${index}, 'display_name', this.value); updateLinkData(${index}, 'titre', this.value)">
+                    <input type="text" class="form-control" style="flex:1;min-width:120px" placeholder="Ex : clips et actus" aria-label="Sous-titre du lien" value="${esc(link.sousTitre || '')}" oninput="updateLinkData(${index}, 'sousTitre', this.value)">
+                    <input type="text" class="form-control" style="flex:1.4;min-width:150px" placeholder="Ex : https://… (URL complète)" aria-label="URL du lien" value="${esc(link.valeur || '')}" oninput="updateLinkData(${index}, 'valeur', this.value)">
                     <select class="form-control" style="width:100px" onchange="updateLinkData(${index}, 'type', this.value)">
                         <option value="url" ${link.type === 'url' ? 'selected' : ''}>Lien</option>
                         <option value="copy" ${link.type === 'copy' ? 'selected' : ''}>Copie</option>

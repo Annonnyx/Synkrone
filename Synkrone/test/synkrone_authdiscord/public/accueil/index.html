@@ -32,12 +32,13 @@
         </div>
         <div class="hero-copy">
             <h1>Synkrone</h1>
-            <p class="lede">Hébergement de bots Discord, serveurs Minecraft et sites — le panel pour créer et piloter. Cinq bots officiels, listing Bump, profils Me, serveur Cantale et modpacks. Un panel, un solde Krônes.</p>
+            <p class="lede">Créez un bot Discord, un serveur Minecraft ou un site en 60 secondes. Un panel, un solde Krônes, sans carte à chaque relance.</p>
             <div class="cta">
-                <a class="btn btn-red" id="hero-panel" href="/hebergement" target="_top">Ouvrir le panel</a>
+                <a class="btn btn-red" id="hero-panel" href="/hebergement" target="_top">Créer mon service</a>
                 <a class="btn" href="/discord/bots" onclick="goSection(event, 'discord')">Voir les bots</a>
             </div>
-            <a class="scroll-hint" href="#hebergement">Voir l'hébergement</a>
+            <p class="coords"><span>5 bots officiels</span><span>Cantale Java 1.21</span><span>Bump et Me</span></p>
+            <a class="scroll-hint" href="#hebergement">Voir comment ça marche</a>
         </div>
     </section>
 
@@ -46,10 +47,28 @@
             <div class="band-head reveal">
                 <p class="sect-id">01 — Hébergement</p>
                 <div>
-                    <h2>Vos services, sur Synkrone.</h2>
-                    <p>Un atelier pour créer, allumer et suivre bots, Minecraft et sites — payé en Krônes, sans carte à chaque relance.</p>
+                    <h2>En ligne en 60 secondes.</h2>
+                    <p>Bot Discord, serveur Minecraft ou site : créez, allumez et pilotez depuis le panel — payé en Krônes, sans carte à chaque relance.</p>
                 </div>
             </div>
+            <ol class="how reveal">
+                <li>
+                    <strong>Créez votre service</strong>
+                    Bot, Minecraft ou site depuis le panel, en quelques clics.
+                </li>
+                <li>
+                    <strong>Payez en Krônes</strong>
+                    Un seul solde pour l'hébergement, les packs et les mises en avant.
+                </li>
+                <li>
+                    <strong>Lancé en 60 secondes</strong>
+                    Console, fichiers et domaine prêts dès la création.
+                </li>
+                <li>
+                    <strong>Pilotez à tout moment</strong>
+                    Arrêt, relance et suivi depuis le même endroit.
+                </li>
+            </ol>
             <div class="prose reveal">
                 <p>Le panel est l’atelier : vous y créez un bot Discord, un serveur Minecraft ou un site, puis vous le pilotez (console, fichiers, domaine, arrêt, relance).</p>
                 <p>Une connexion ouvre le site (Krônes, Bump, Me) et le panel (créer un service) quand Discord est le même des deux côtés. Ici, rien n’est débité en carte : le temps machine se paie en Krônes.</p>
@@ -368,8 +387,35 @@
                 <p class="sect-id">09 — Aide</p>
                 <div>
                     <h2>FAQ et contact.</h2>
-                    <p>Les réponses d’abord, un ticket ensuite. Le bouton Se connecter (en haut) ouvre le compte unique.</p>
+                    <p>Les réponses d'abord, un ticket ensuite. Le bouton Se connecter (en haut) ouvre le compte unique.</p>
                 </div>
+            </div>
+            <div class="faq reveal">
+                <details class="faq-item">
+                    <summary>Comment créer un bot, un serveur ou un site ?</summary>
+                    <p>Ouvrez le panel, créez le service et pilotez-le (console, fichiers, domaine, arrêt, relance). Le temps machine se paie en Krônes, sans carte à chaque relance.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>À quoi servent les Krônes ?</summary>
+                    <p>Les Krônes (₭) paient l'hébergement, les packs de commandes, les grades et les mises en avant Bump et Me. Le bouton en haut à droite ouvre le portefeuille.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Y a-t-il un engagement ?</summary>
+                    <p>Non. Les rangs (Kronium, Synkral, Kronalloy, Synkronite, Kronix) sont un achat unique : pour monter, vous ne payez que la différence. À 150 ₭ = 1 €.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Quel bot officiel pour mon serveur ?</summary>
+                    <p>Vax pour la modération, Arceus pour Pokémon, Asuna pour les jeux, Kayaba pour le combat, Yui pour l'architecture. Chaque fiche liste les commandes et le préfixe.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Comment apparaître sur Bump ?</summary>
+                    <p>Connectez-vous, invitez au moins un bot officiel sur votre serveur, puis ouvrez Mes serveurs dans Bump pour publier, bumper et mettre en avant.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Comment contacter le support ?</summary>
+                    <p>Page Contact : ticket Discord si vous êtes connecté et présent sur le serveur Synkrone. Sinon, rejoignez d'abord le Discord indiqué sur la page.</p>
+                </details>
+            </div>
             </div>
             <div class="plates cols-2 reveal" style="margin-bottom:16px">
                 <a class="plate" id="login-link" href="/login?returnTo=/accueil" target="_top">
@@ -611,6 +657,11 @@
                 return;
             }
             const nodes = document.querySelectorAll('.reveal');
+            document.querySelectorAll('.band-inner').forEach((inner) => {
+                inner.querySelectorAll('.reveal').forEach((node, index) => {
+                    node.style.setProperty('--i', Math.min(index, 5));
+                });
+            });
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 nodes.forEach((n) => n.classList.add('in'));
                 return;
@@ -678,27 +729,52 @@
                     const el = document.getElementById(id);
                     if (el) el.textContent = value;
                 };
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const countUp = (id, target, format) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (reduceMotion || !Number.isFinite(target)) {
+                        set(id, format(target));
+                        return;
+                    }
+                    const start = performance.now();
+                    const duration = 800;
+                    const tick = (now) => {
+                        const progress = Math.min((now - start) / duration, 1);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        set(id, format(target * eased));
+                        if (progress < 1) requestAnimationFrame(tick);
+                    };
+                    requestAnimationFrame(tick);
+                };
+                const fmtInt = (v) => String(Math.round(v));
+                const fmtPct = (v) => `${String((Math.round(v * 10) / 10)).replace('.', ',')} %`;
                 const showChip = (chipId, on) => {
                     const el = document.getElementById(chipId);
                     if (el) el.hidden = !on;
                 };
                 const pct = data?.uptime?.pct;
-                set('hs-up', Number.isFinite(pct) ? `${String(pct).replace('.', ',')} %` : '—');
+                if (Number.isFinite(pct)) countUp('hs-up', pct, fmtPct);
+                else set('hs-up', '—');
                 const run = data?.hosting?.running || 0;
                 const total = data?.hosting?.total || 0;
-                set('hs-run', total ? `${run} / ${total}` : String(run));
+                if (total) {
+                    countUp('hs-run', run, (v) => `${Math.round(v)} / ${total}`);
+                } else {
+                    set('hs-run', String(run));
+                }
                 const mc = Number(data?.hosting?.minecraft || 0);
                 const dc = Number(data?.hosting?.discord || 0);
                 const web = Number(data?.hosting?.web || 0);
                 const cat = Number(data?.platform?.catalog || 0);
                 const bump = Number(data?.platform?.bump || 0);
                 const acc = Number(data?.platform?.accounts || 0);
-                set('hs-mc', String(mc));
-                set('hs-dc', String(dc));
-                set('hs-web', String(web));
-                set('hs-cat', String(cat));
-                set('hs-bump', String(bump));
-                set('hs-acc', String(acc));
+                countUp('hs-mc', mc, fmtInt);
+                countUp('hs-dc', dc, fmtInt);
+                countUp('hs-web', web, fmtInt);
+                countUp('hs-cat', cat, fmtInt);
+                countUp('hs-bump', bump, fmtInt);
+                countUp('hs-acc', acc, fmtInt);
                 showChip('chip-mc', mc > 0);
                 showChip('chip-dc', dc > 0);
                 showChip('chip-web', web > 0);

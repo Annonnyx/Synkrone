@@ -183,7 +183,7 @@
                         </div>
                         <div style="flex: 1; max-width: 400px; width: 100%; position:relative;">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
-                            <input type="text" id="searchInput" value="${currentSearch}" placeholder="Recherche (Nom, tag, description...)" class="form-control" style="padding-left: 36px;">
+                            <input type="text" id="searchInput" value="${currentSearch}" placeholder="Ex : Vax, modération, économie…" aria-label="Rechercher un bot par nom, tag ou description" class="form-control" style="padding-left: 36px;">
                         </div>
                     </div>
                 `;
@@ -384,11 +384,11 @@
                         <div style="display:flex; gap:16px; flex-wrap:wrap;">
                             <div class="form-group" style="flex:1; min-width:200px;">
                                 <label>ID Client Discord</label>
-                                <input type="text" id="formBotId" value="${isEdit ? botToEdit.id : ''}" class="form-control" ${isEdit ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : 'placeholder="ex: 1234567890123"'} required>
+                                <input type="text" id="formBotId" value="${isEdit ? botToEdit.id : ''}" class="form-control" ${isEdit ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : 'placeholder="Ex : 1367891720871874560 (clic droit sur le bot > Copier identifiant)"'} required>
                             </div>
                             <div class="form-group" style="width:150px;">
                                 <label>Préfixe</label>
-                                <input type="text" id="formBotPrefix" value="${isEdit ? botToEdit.prefix : ''}" class="form-control" placeholder="ex: !" style="text-align:center;" required>
+                                <input type="text" id="formBotPrefix" value="${isEdit ? botToEdit.prefix : ''}" class="form-control" placeholder="Ex : ! — un seul caractère" style="text-align:center;" required>
                             </div>
                         </div>
 
@@ -396,29 +396,29 @@
                             <label>Lien personnalisé (Optionnel)</label>
                             <div style="display:flex;">
                                 <span style="background:rgba(0,0,0,0.5); border:1px solid var(--tw-colors-sysBorder); border-right:none; padding:10px 14px; border-radius:8px 0 0 8px; color:var(--tw-colors-textDim); font-size:14px;">synkrone.app/bot/</span>
-                                <input type="text" id="formBotUrl" value="${isEdit ? (botToEdit.customUrl || botToEdit.id) : ''}" class="form-control" style="border-radius: 0 8px 8px 0;" placeholder="mon-bot">
+                                <input type="text" id="formBotUrl" value="${isEdit ? (botToEdit.customUrl || botToEdit.id) : ''}" class="form-control" style="border-radius: 0 8px 8px 0;" placeholder="Ex : mon-bot — minuscules et tirets">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label>Mots-clés / Catégories (Séparés par des virgules)</label>
-                            <input type="text" id="formBotTags" value="${tagsValue}" class="form-control" placeholder="Modération, Musique, Économie, Fun...">
+                            <input type="text" id="formBotTags" value="${tagsValue}" class="form-control" placeholder="Ex : Modération, Musique, Économie — séparés par des virgules">
                         </div>
                         
                         <div class="form-group">
                             <label>Description courte (Card)</label>
-                            <textarea id="formBotDesc" class="form-control" placeholder="150 caractères max..." style="min-height: 80px; resize: vertical;" maxlength="150" required>${isEdit ? botToEdit.description : ''}</textarea>
+                            <textarea id="formBotDesc" class="form-control" placeholder="Ex : Bot modération FR : warns, tickets et logs en une commande… (150 max)" style="min-height: 80px; resize: vertical;" maxlength="150" required>${isEdit ? botToEdit.description : ''}</textarea>
                         </div>
 
                         <div class="form-group">
                             <label>Présentation détaillée (Page Profil)</label>
-                            <textarea id="formBotLongDesc" class="form-control" placeholder="Toutes les fonctionnalités, commandes, etc..." style="min-height: 150px; resize: vertical;">${isEdit ? (botToEdit.longDescription || '') : ''}</textarea>
+                            <textarea id="formBotLongDesc" class="form-control" placeholder="Ex : Ce que fait le bot, ses commandes phares, comment l'installer…" style="min-height: 150px; resize: vertical;">${isEdit ? (botToEdit.longDescription || '') : ''}</textarea>
                         </div>
 
                         ${isEdit ? `
                         <div class="form-group">
                             <label>Lien Bannière URL</label>
-                            <input type="text" id="formBotBanner" value="${(botToEdit.banner && !botToEdit.banner.includes('placehold.co')) ? botToEdit.banner : ''}" class="form-control" placeholder="https://...">
+                            <input type="text" id="formBotBanner" value="${(botToEdit.banner && !botToEdit.banner.includes('placehold.co')) ? botToEdit.banner : ''}" class="form-control" placeholder="Ex : https://i.imgur.com/… (bannière 1200×630)">
                         </div>
                         ` : ''}
 

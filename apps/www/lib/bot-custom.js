@@ -108,7 +108,7 @@ const GOODBYE_DEFAULT = {
     content_message: '{user.mention} nous a quitté.\nNous sommes désormais {guild.count}.',
     enabled: false
 };
-const EMBED_DEFAULT = { color: 0x660099, footer: '', author: '', thumbnail: '', image: '' };
+const EMBED_DEFAULT = { color: 0x3F6B52, footer: '', author: '', thumbnail: '', image: '' };
 
 function asBool(value, fallback) {
     if (value === true || value === false) return value;
@@ -182,7 +182,7 @@ function defaultConfig() {
             displayName: '',
             activityType: 'playing',
             activityText: '',
-            embedColor: '#660099',
+            embedColor: '#3F6B52',
             embedFooter: '',
             embedThumbnail: ''
         },

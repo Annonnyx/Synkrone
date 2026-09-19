@@ -1623,3 +1623,109 @@ body.home-mosaic {
     color: var(--mousse-fonce);
 }
 
+/* ——— FAQ accueil (même composant que /faq, mêmes tokens) ——— */
+
+.faq {
+    display: grid;
+    gap: 12px;
+    margin: 0 0 28px;
+    max-width: 68ch;
+}
+
+details.faq-item {
+    background: var(--hall-elev);
+    border: 1px solid var(--hall-line);
+    border-radius: 6px;
+    padding: 16px 18px;
+}
+
+details.faq-item summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    list-style: none;
+}
+
+details.faq-item summary::-webkit-details-marker { display: none; }
+details.faq-item summary::after {
+    content: "+";
+    float: right;
+    font-family: var(--mono);
+    color: var(--ardoise);
+    font-weight: 400;
+}
+details.faq-item[open] summary::after { content: "–"; }
+details.faq-item p {
+    margin: 12px 0 0;
+    color: var(--hall-mute);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* ——— Entrée hero + stagger des reveals (mêmes durées que .reveal) ——— */
+
+@keyframes heroRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+.hero-copy h1,
+.hero-copy .lede,
+.hero-copy .cta,
+.hero-copy .coords,
+.hero-copy .scroll-hint {
+    animation: heroRise 0.7s ease both;
+}
+
+.hero-copy .lede { animation-delay: 0.08s; }
+.hero-copy .cta { animation-delay: 0.16s; }
+.hero-copy .coords { animation-delay: 0.24s; }
+.hero-copy .scroll-hint { animation-delay: 0.32s; }
+
+.reveal {
+    transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* Flèche CTA façon HiveCloud, currentColor uniquement */
+
+.hero .cta .btn-red::after {
+    content: "→";
+    display: inline-block;
+    transition: transform 0.18s ease;
+}
+
+.hero .cta .btn-red:hover::after {
+    transform: translateX(4px);
+}
+
+/* ——— Mobile : garder un logo discret au lieu d'un hero vide ——— */
+
+@media (max-width: 720px) {
+    .cabinets {
+        display: none;
+    }
+
+    .hero-logo {
+        display: block;
+        position: absolute;
+        right: 6%;
+        top: 14%;
+        width: 96px;
+        opacity: 0.5;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-copy h1,
+    .hero-copy .lede,
+    .hero-copy .cta,
+    .hero-copy .coords,
+    .hero-copy .scroll-hint {
+        animation: none;
+    }
+
+    .hero .cta .btn-red::after {
+        transition: none;
+    }
+}
+

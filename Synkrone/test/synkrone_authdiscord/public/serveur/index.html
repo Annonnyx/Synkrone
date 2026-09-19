@@ -187,8 +187,8 @@
         function colorRow(id, value, presets, locked) {
             const chips = (presets || []).map((hex) => `<button type="button" class="srv-swatch" data-color-for="${esc(id)}" data-color="${esc(hex)}" style="background:${esc(hex)}" title="${esc(hex)}"></button>`).join('');
             return `<div class="srv-colors">
-                <input id="${id}-picker" type="color" value="${esc(value || '#660099')}" ${locked ? 'disabled' : ''}>
-                <input id="${id}" class="sk-input" value="${esc(value || '')}" placeholder="#660099" ${locked ? 'disabled' : ''}>
+                <input id="${id}-picker" type="color" value="${esc(value || '#3F6B52')}" ${locked ? 'disabled' : ''}>
+                <input id="${id}" class="sk-input" value="${esc(value || '')}" placeholder="#3F6B52 — mousse" ${locked ? 'disabled' : ''}>
                 ${chips}
             </div>`;
         }
@@ -276,7 +276,7 @@
         function paint() {
             const preview = document.getElementById('preview');
             if (!preview) return;
-            const color = val('embed-color') || state.resolved?.identity?.embedColor || '#660099';
+            const color = val('embed-color') || state.resolved?.identity?.embedColor || '#3F6B52';
             const titleText = val('txt-welcome-title') || 'Bienvenue sur {guild}';
             const desc = val('txt-welcome-desc') || val('txt-welcome') || '';
             const foot = val('embed-footer') || '';
@@ -327,7 +327,7 @@
                     <p>Glissez une image ou cliquez pour choisir</p>
                     <p class="hint">PNG, JPEG, WebP ou GIF · 2 Mo max</p>
                 </div>
-                <input id="embed-logo" class="sk-input" value="${esc(logo)}" placeholder="Ou une URL https://…" ${locked ? 'disabled' : ''}>
+                <input id="embed-logo" class="sk-input" value="${esc(logo)}" placeholder="Ex : https://… (logo PNG carré, 512×512)" ${locked ? 'disabled' : ''}>
                 <p class="srv-note" id="logo-status"></p>
             </div>`;
         }
@@ -541,7 +541,7 @@
                                 </div>
                             </div>
                             ${field('display-name', 'Nom affiché sur ce serveur', `<input id="display-name" class="sk-input" maxlength="32" value="${esc(c.identity.displayName)}" ${L('identity.displayName') ? 'disabled' : ''}>`, L('identity.displayName'))}
-                            ${field('embed-avatar', 'Avatar sur ce serveur (URL)', `<input id="embed-avatar" class="sk-input" value="${esc(c.identity.avatarUrl)}" placeholder="https://…" ${L('identity.avatarUrl') ? 'disabled' : ''}>`, L('identity.avatarUrl'))}
+                            ${field('embed-avatar', 'Avatar sur ce serveur (URL)', `<input id="embed-avatar" class="sk-input" value="${esc(c.identity.avatarUrl)}" placeholder="Ex : https://… (avatar PNG carré)" ${L('identity.avatarUrl') ? 'disabled' : ''}>`, L('identity.avatarUrl'))}
                             ${field('embed-color', 'Couleur principale', colorRow('embed-color', c.identity.embedColor || data.resolved.identity.embedColor, cat.colorPresets, L('identity.embedColor')), L('identity.embedColor'))}
                             <div class="srv-row cols-2">
                                 ${field('color-success', 'Succès', colorRow('color-success', c.identity.colors.success || data.resolved.identity.colors.success, cat.colorPresets, L('identity.colors.success')), L('identity.colors.success'))}
@@ -562,7 +562,7 @@
                             ${field('ch-goodbye', 'Salon d’au revoir', `<select id="ch-goodbye" ${L('channels.goodbye') ? 'disabled' : ''}>${options(channels, c.channels.goodbye)}</select>`, L('channels.goodbye'))}
                             ${field('ch-logs', 'Salon des journaux', `<select id="ch-logs" ${L('channels.logs') ? 'disabled' : ''}>${options(channels, c.channels.logs)}</select>`, L('channels.logs'))}
                             ${field('ch-tickets', 'Salon tickets', `<select id="ch-tickets" ${L('channels.tickets') ? 'disabled' : ''}>${options(channels, c.channels.tickets)}</select>`, L('channels.tickets'))}
-                            ${field('ch-category', 'Catégorie des salons créés', `<input id="ch-category" class="sk-input" value="${esc(c.channels.category)}" placeholder="ID de catégorie" ${L('channels.category') ? 'disabled' : ''}>`, L('channels.category'))}
+                            ${field('ch-category', 'Catégorie des salons créés', `<input id="ch-category" class="sk-input" value="${esc(c.channels.category)}" placeholder="Ex : 123456789012345678 (clic droit > Copier l'identifiant)" ${L('channels.category') ? 'disabled' : ''}>`, L('channels.category'))}
                             ${field('role-mute', 'Rôle mute', `<select id="role-mute" ${L('roles.mute') ? 'disabled' : ''}>${options(roles, c.roles.mute)}</select>`, L('roles.mute'))}
                             ${(cat.modules || []).map((mod) => field('auto-' + mod.id, `Nom auto · ${mod.label}`, `<input id="auto-${mod.id}" class="sk-input" value="${esc(c.channels.autoNames[mod.id] || '')}" ${L('channels.autoNames') ? 'disabled' : ''}>`, L('channels.autoNames'))).join('')}
                         </div>
