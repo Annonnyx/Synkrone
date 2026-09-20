@@ -526,6 +526,25 @@ async function finishOAuthLogin(
   return { userId, created };
 }
 
+async function siteRoleForDiscord(snowflake: string): Promise<{ role: string; isTeamOwner: boolean } | null> {
+  try {
+    const raw = JSON.parse(
+      await readFile(
+        path.join(synkroneRepoRoot(), "Synkrone/test/synkrone_authdiscord/data/users.json"),
+        "utf8",
+      ),
+    ) as { users?: Record<string, { role?: string; isTeamOwner?: boolean }> };
+    const row = raw.users?.[snowflake];
+    if (!row || typeof row !== "object") return null;
+    return {
+      role: String(row.role || "Krobi"),
+      isTeamOwner: Boolean(row.isTeamOwner),
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function rememberDiscordLink(userId: string, profile: OAuthProfile) {
   const snowflake = discordIdFromPublicId(profile.id);
   if (!snowflake) return;
@@ -550,13 +569,16 @@ async function rememberDiscordLink(userId: string, profile: OAuthProfile) {
         .where(eq(siteProfiles.userId, userId));
       return;
     }
+    // Seed from the site users.json so a site Admin is not shadowed by a
+    // default "Krobi" row (which used to hide unlimited Krônes in the panel).
+    const site = await siteRoleForDiscord(snowflake);
     await db
       .insert(siteProfiles)
       .values({
         userId,
         publicId: snowflake,
-        role: "Krobi",
-        isTeamOwner: false,
+        role: site?.role ?? "Krobi",
+        isTeamOwner: site?.isTeamOwner ?? false,
         profile: {},
       })
       .onConflictDoNothing({ target: siteProfiles.userId });

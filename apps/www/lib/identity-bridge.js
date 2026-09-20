@@ -161,6 +161,10 @@ function panelAttachPayload(user, linkingProvider, linkingProfile = {}) {
         email: user?.email || linkingProfile.email || '',
         avatarUrl: user?.avatar || linkingProfile.avatar || undefined
     };
+    // Forward the site staff role so the panel can grant unlimited Krônes
+    // even when it cannot read the site users.json (Docker).
+    const siteRole = String(user?.role || '');
+    const siteIsTeamOwner = Boolean(user?.isTeamOwner);
     const discord = discordIdFromSiteUser(user);
     if (discord && provider && provider !== 'discord') {
         return {
@@ -173,10 +177,12 @@ function panelAttachPayload(user, linkingProvider, linkingProfile = {}) {
                 email: user?.email || profile.email || '',
                 avatarUrl: user?.avatar || profile.avatarUrl
             },
-            link: { provider, profile }
+            link: { provider, profile },
+            siteRole,
+            siteIsTeamOwner
         };
     }
-    return { provider, userId, profile };
+    return { provider, userId, profile, siteRole, siteIsTeamOwner };
 }
 
 function panelBridgeFromSiteUser(user) {

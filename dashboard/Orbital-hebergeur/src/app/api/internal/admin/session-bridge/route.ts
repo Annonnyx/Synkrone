@@ -1,6 +1,11 @@
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/db";
+import { ensureAccountSchema } from "@/db/ensure-schema";
+import { siteProfiles, users } from "@/db/schema";
 import { HttpError, issueSessionToken } from "@/lib/auth";
 import { requireInternalAdmin } from "@/lib/internal-admin";
+import { privilegeFromRecord } from "@/lib/krones/roles";
 import { ensurePanelIdentity } from "@/lib/oauth/accounts";
 import { isOAuthProvider } from "@/lib/oauth/types";
 
@@ -18,6 +23,8 @@ export async function POST(req: NextRequest) {
         provider?: string;
         profile?: { id?: string; name?: string; login?: string; email?: string; avatarUrl?: string };
       };
+      siteRole?: string;
+      siteIsTeamOwner?: boolean;
     };
     const provider = String(body.provider || "");
     if (!isOAuthProvider(provider)) {
@@ -38,6 +45,44 @@ export async function POST(req: NextRequest) {
         avatarUrl: profile.avatarUrl ? String(profile.avatarUrl) : undefined,
       },
     });
+    // The site forwards its staff role: apply it so a site Admin keeps
+    // unlimited Krônes in the panel even without access to users.json.
+    const sitePriv = privilegeFromRecord({
+      role: typeof body.siteRole === "string" ? body.siteRole : undefined,
+      isTeamOwner: body.siteIsTeamOwner === true,
+    });
+    if (sitePriv) {
+      try {
+        await ensureAccountSchema();
+        if (sitePriv === "admin") {
+          const [row] = await db.select().from(users).where(eq(users.id, identity.userId)).limit(1);
+          if (row && String(row.role || "").toLowerCase() !== "admin") {
+            await db.update(users).set({ role: "admin" }).where(eq(users.id, identity.userId));
+          }
+        }
+        const [profile] = await db
+          .select()
+          .from(siteProfiles)
+          .where(eq(siteProfiles.userId, identity.userId))
+          .limit(1);
+        if (profile) {
+          const current = privilegeFromRecord({ role: profile.role, isTeamOwner: profile.isTeamOwner });
+          const rank = (p: string | null) => (p === "admin" ? 2 : p === "dev" ? 1 : 0);
+          if (rank(sitePriv) > rank(current)) {
+            await db
+              .update(siteProfiles)
+              .set({
+                role: typeof body.siteRole === "string" && body.siteRole ? body.siteRole : profile.role,
+                isTeamOwner: body.siteIsTeamOwner === true ? true : profile.isTeamOwner,
+                updatedAt: new Date(),
+              })
+              .where(eq(siteProfiles.userId, identity.userId));
+          }
+        }
+      } catch {
+        /* role sync is best-effort */
+      }
+    }
     const link = body.link;
     const linkProvider = String(link?.provider || "");
     if (link?.profile?.id && isOAuthProvider(linkProvider)) {

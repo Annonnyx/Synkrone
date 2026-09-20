@@ -600,6 +600,15 @@ async function ensureUserFromSite(client, user) {
             admin
         });
     }
+    // The site users.json is the source of truth for staff: a site Admin must
+    // stay admin in the panel even when the panel row already existed as "user".
+    if (admin && userId) {
+        try {
+            await client.query(`UPDATE users SET role = 'admin' WHERE id = $1 AND role <> 'admin'`, [userId]);
+        } catch {
+            /* promotion is best-effort */
+        }
+    }
     const unique = [...new Set(candidates.filter(Boolean))];
     for (const other of unique) {
         if (other !== userId) await mergeDuplicateUsers(client, other, userId);
@@ -823,7 +832,15 @@ async function peekWallet(publicId, extra = {}) {
             `SELECT public_id, role, is_team_owner FROM site_profiles WHERE user_id = $1 LIMIT 1`,
             [userId]
         );
-        const privilege = privilegeFromProfile(profile.rows[0], extra.privilege);
+        let privilege = privilegeFromProfile(profile.rows[0], extra.privilege);
+        if (privilege !== 'admin') {
+            try {
+                const userRow = await client.query(`SELECT role FROM users WHERE id = $1 LIMIT 1`, [userId]);
+                if (String(userRow.rows[0]?.role || '').trim().toLowerCase() === 'admin') privilege = 'admin';
+            } catch {
+                /* users role lookup is best-effort */
+            }
+        }
         if (privilege === 'dev') {
             const current = GRADE_ORDER.indexOf(String(row.rows[0].plan || 'Aucun'));
             const mid = GRADE_ORDER.indexOf('Synkral');
@@ -933,7 +950,15 @@ async function debitAccount(publicId, amount, reason, privilege) {
             `SELECT public_id, role, is_team_owner FROM site_profiles WHERE user_id = $1 LIMIT 1`,
             [userId]
         );
-        const priv = privilege || privilegeFromProfile(profile.rows[0]);
+        let priv = privilege || privilegeFromProfile(profile.rows[0]);
+        if (priv !== 'admin') {
+            try {
+                const userRow = await client.query(`SELECT role FROM users WHERE id = $1 LIMIT 1`, [userId]);
+                if (String(userRow.rows[0]?.role || '').trim().toLowerCase() === 'admin') priv = 'admin';
+            } catch {
+                /* users role lookup is best-effort */
+            }
+        }
         if (priv !== 'admin') {
             const balance = Math.max(0, Math.trunc(Number(wallet.balance) || 0));
             if (balance < parsed) {
