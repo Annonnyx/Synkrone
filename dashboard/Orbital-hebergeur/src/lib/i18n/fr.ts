@@ -343,6 +343,18 @@ export const fr = {
     dnsRecommended: "conseillé",
     dnsPlaceholder: "Renseignez ORBITAL_PUBLIC_HOST / ORBITAL_PUBLIC_IP pour afficher la vraie cible.",
     dnsApexHint: "Un domaine apex (exemple.com) accepte rarement un CNAME : préférez A ou AAAA.",
+    connectTitle: "Connexion au serveur",
+    connectJava: "Adresse Java",
+    connectBedrock: "Adresse Bedrock",
+    connectNoHost:
+      "Aucune adresse publique configurée : connectez-vous en IP:port directe en attendant (demandez l'IP au support).",
+    connectDnsTitle: "Jouer avec votre nom de domaine",
+    connectDnsIntro:
+      "Si vous possédez un vrai nom de domaine (par exemple exemple.com), créez un enregistrement DNS pour obtenir une adresse propre comme play.exemple.com :",
+    connectDnsStep1: "Chez votre registrar (OVH, Cloudflare, Gandi…), ouvrez la zone DNS de exemple.com.",
+    connectDnsStep2: "Ajoutez un enregistrement A : hôte « play », valeur l'IP du serveur, TTL 300.",
+    connectDnsStep3: "Attendez la propagation (quelques minutes), puis connectez-vous sur play.exemple.com:port.",
+    connectDnsNote: "Enregistrements générés pour {host} — remplacez par votre domaine.",
     removeDomain: "Retirer",
     domainKindDefault: "suggéré",
     domainKindCustom: "personnalisé",

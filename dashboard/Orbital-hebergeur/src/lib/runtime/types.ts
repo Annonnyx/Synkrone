@@ -71,6 +71,8 @@ export type ServiceRecord = {
 export interface RuntimeProvider {
   readonly type: ServiceType;
   scaffold(service: ServiceRecord): Promise<void>;
+  /** Align the volume ownership on the container user (skipped for root runtimes). */
+  ensureVolumeOwnership?(service: ServiceRecord): Promise<{ owner: string; changed: boolean }>;
   /** Write prefix / slash / env files without recopying the bot tree. */
   syncPlatformRuntime?(service: ServiceRecord): Promise<void>;
   create(service: ServiceRecord): Promise<{ containerId: string; image: string }>;

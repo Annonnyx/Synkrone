@@ -83,6 +83,23 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
         .select()
         .from(minecraftAddons)
         .where(eq(minecraftAddons.serviceId, id));
+      // Direct-connect address + DNS example (e.g. play.exemple.com) for the overview tab.
+      const { publicDnsTargets, dnsRecordsFor, publicBaseDomain } = await import(
+        "@/lib/domains/public"
+      );
+      const targets = publicDnsTargets();
+      const base = publicBaseDomain();
+      const host = targets.cname ?? targets.ipv4 ?? null;
+      const javaPort = mc?.javaPort ?? 25565;
+      const dnsHost = `play.${base.domain}`;
+      detail.connection = {
+        host,
+        javaPort,
+        bedrockPort: mc?.bedrockEnabled ? (mc.bedrockPort ?? null) : null,
+        javaAddress: host ? `${host}:${javaPort}` : null,
+        dnsHost,
+        records: dnsRecordsFor(dnsHost),
+      };
     }
     if (svc.type === "web") {
       const [web] = await db.select().from(webProjects).where(eq(webProjects.serviceId, id));

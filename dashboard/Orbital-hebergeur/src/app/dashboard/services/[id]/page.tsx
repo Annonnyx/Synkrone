@@ -19,6 +19,7 @@ import { IntentPicker, PrivilegedPortalChecklist } from "@/components/discord-in
 import { isPrivilegedIntent, mergeIntentsForModules } from "@/lib/discord/intents";
 import { COMMAND_CATALOG, customCategories, flavorFromModules, officialBot } from "@/lib/discord/catalog";
 import { SoftwarePicker, VersionPicker } from "@/components/mc-runtime";
+import { MinecraftConnect, type McConnection } from "@/components/mc-connect";
 import { MinecraftProperties } from "@/components/mc-properties";
 import { Addons } from "@/components/mods";
 import { DomainRecords } from "@/components/domain-records";
@@ -73,6 +74,7 @@ type Detail = {
     eulaAccepted: boolean;
     properties: Record<string, string>;
   } | null;
+  connection?: McConnection | null;
   addons?: Array<{ id: string; kind: string; name: string; fileName: string; enabled: boolean; sizeBytes: number }>;
   web?: {
     template: string;
@@ -484,6 +486,9 @@ function ServiceDetail() {
             </button>
           </div>
         </div>
+      )}
+      {tab === "overview" && svc.type === "minecraft" && data.minecraft && data.connection && (
+        <MinecraftConnect connection={data.connection} />
       )}
 
       {tab === "console" && (

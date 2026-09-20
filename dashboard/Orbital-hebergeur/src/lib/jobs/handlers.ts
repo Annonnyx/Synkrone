@@ -45,6 +45,20 @@ export function provisionService(jobId: string, serviceId: string, autoStart: bo
 
     await r.step("Writing service files", async () => {
       await provider.scaffold(record);
+      try {
+        const ownership = await provider.ensureVolumeOwnership?.(record);
+        if (ownership?.changed) {
+          await appendConsole(serviceId, `Volume ownership set to ${ownership.owner}`);
+        }
+      } catch (err) {
+        // Non-root dev environments cannot chown: warn and continue, the
+        // container may still work (e.g. Docker Desktop file sharing).
+        await appendConsole(
+          serviceId,
+          `Volume ownership could not be set (${(err as Error).message}) — container writes may be denied`,
+          "stderr",
+        );
+      }
       await appendConsole(serviceId, "Service files written to the volume");
     });
 

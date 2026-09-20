@@ -16,6 +16,7 @@ import type {
 } from "./types";
 import { crashReasonFromLogs, isConfigFatalLogs } from "./crash";
 import { mergeContainerEnv } from "./env";
+import { chownVolumeRoot, parseVolumeOwner } from "./ownership";
 
 export { crashReasonFromLogs } from "./crash";
 
@@ -70,6 +71,20 @@ export abstract class BaseRuntimeProvider implements RuntimeProvider {
 
   fs(serviceId: string) {
     return new FilesystemManager(this.type, serviceId);
+  }
+
+  /**
+   * Hand the volume to the container user (minecraft/node 1000:1000, static
+   * web 101:101). Must run after scaffold (which writes as the panel user)
+   * and before the container starts. Root runtimes (discord 0:0) are skipped.
+   * Throws when the chown fails so the caller can warn instead of hiding it.
+   */
+  async ensureVolumeOwnership(service: ServiceRecord): Promise<{ owner: string; changed: boolean }> {
+    const user = (await this.template(service)).user ?? "1000:1000";
+    const owner = parseVolumeOwner(user);
+    if (!owner) return { owner: user, changed: false };
+    await chownVolumeRoot(serviceVolume(this.type, service.id), owner);
+    return { owner: `${owner.uid}:${owner.gid}`, changed: true };
   }
 
   protected containerName(service: ServiceRecord): string {

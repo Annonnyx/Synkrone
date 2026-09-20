@@ -345,6 +345,18 @@ export const en: Dict = {
     dnsRecommended: "recommended",
     dnsPlaceholder: "Set ORBITAL_PUBLIC_HOST / ORBITAL_PUBLIC_IP to show the real target.",
     dnsApexHint: "An apex domain (example.com) rarely accepts a CNAME: prefer A or AAAA.",
+    connectTitle: "Server connection",
+    connectJava: "Java address",
+    connectBedrock: "Bedrock address",
+    connectNoHost:
+      "No public address configured: use a direct IP:port for now (ask support for the IP).",
+    connectDnsTitle: "Play with your own domain name",
+    connectDnsIntro:
+      "If you own a real domain name (e.g. example.com), create a DNS record to get a clean address like play.example.com:",
+    connectDnsStep1: "At your registrar (OVH, Cloudflare, Gandi…), open the DNS zone for example.com.",
+    connectDnsStep2: 'Add an A record: host "play", value the server IP, TTL 300.',
+    connectDnsStep3: "Wait for propagation (a few minutes), then connect to play.example.com:port.",
+    connectDnsNote: "Records generated for {host} — replace with your own domain.",
     removeDomain: "Remove",
     domainKindDefault: "suggested",
     domainKindCustom: "custom",
