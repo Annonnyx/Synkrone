@@ -33,13 +33,14 @@ import { firstCreateHref } from "@/lib/services/creation-flags";
 
 export function Logo({ size = 22 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" fill="var(--bg)" />
-      <path
-        fill="var(--accent)"
-        d="M8 6h10.2c4.1 0 6.8 2.4 6.8 6.1 0 2.5-1.3 4.4-3.5 5.3L26 26h-5.4l-4.3-8.1H13V26H8V6zm5 4.1v5.6h4.6c1.9 0 3-1 3-2.8s-1.1-2.8-3-2.8H13z"
-      />
-    </svg>
+    <img
+      src="/logo/Synk_2B9348.png"
+      alt="Synkrone"
+      width={size}
+      height={size}
+      draggable={false}
+      style={{ borderRadius: 6, objectFit: "contain", background: "var(--panel-2)" }}
+    />
   );
 }
 
@@ -403,7 +404,7 @@ export function DashboardShell({
         <Sidebar user={user} open={open} onNavigate={() => setOpen(false)} />
       </Suspense>
       <div className="scroll min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl px-4 py-4 md:px-6 md:py-6">{children}</div>
+        <div className="mx-auto w-full max-w-[1600px] px-4 py-4 md:px-6 md:py-6 xl:px-8">{children}</div>
       </div>
     </div>
   );

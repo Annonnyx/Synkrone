@@ -1780,12 +1780,12 @@ app.get('/sitemap.xml', (_req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'sitemap.xml'));
 });
 
-app.get(['/faq', '/faq/', '/krones', '/krones/', '/cgv', '/cgv/', '/stats', '/stats/', '/login', '/login/', '/compte', '/compte/', '/serveur', '/serveur/'], (req, res) => {
+app.get(['/faq', '/faq/', '/krones', '/krones/', '/cgv', '/cgv/', '/cookies', '/cookies/', '/stats', '/stats/', '/login', '/login/', '/compte', '/compte/', '/serveur', '/serveur/'], (req, res) => {
     return sendShell(res, req.path);
 });
 
 // -- ROUTES SHELL --
-const SHELL_ROUTES = new Set(['/', '/accueil', '/login', '/discord', '/discord/bots', '/discord/publicbot', '/discord/dashbot', '/discord/commandes', '/discord/me', '/discord/bump', '/minecraft', '/minecraft/serveur', '/minecraft/modpack', '/admin', '/admin/utilisateur', '/admin/annonce', '/admin/pm2', '/admin/plateforme', '/admin/services', '/admin/tickets', '/equipe', '/equipe/espace-travail', '/equipe/cloud', '/cgu', '/cgv', '/contact', '/faq', '/krones', '/stats', '/compte', '/serveur']);
+const SHELL_ROUTES = new Set(['/', '/accueil', '/login', '/discord', '/discord/bots', '/discord/publicbot', '/discord/dashbot', '/discord/commandes', '/discord/me', '/discord/bump', '/minecraft', '/minecraft/serveur', '/minecraft/modpack', '/admin', '/admin/utilisateur', '/admin/annonce', '/admin/pm2', '/admin/plateforme', '/admin/services', '/admin/tickets', '/equipe', '/equipe/espace-travail', '/equipe/cloud', '/cgu', '/cgv', '/cookies', '/contact', '/faq', '/krones', '/stats', '/compte', '/serveur']);
 const SHELL_PREFIXES = ['/discord/bots/', '/minecraft/modpack/', '/equipe/espace-travail/', '/equipe/cloud/'];
 
 app.get(/^\/(.*)$/i, async (req, res, next) => {

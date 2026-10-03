@@ -63,6 +63,25 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
         }
       }
       const plain = decryptSecret(bot?.tokenEnc);
+      let botUsername: string | null = null;
+      let botAvatarUrl: string | null = null;
+      if (plain) {
+        try {
+          const res = await fetch("https://discord.com/api/v10/users/@me", {
+            headers: { Authorization: `Bot ${plain}` },
+            signal: AbortSignal.timeout(4000),
+          });
+          if (res.ok) {
+            const me = (await res.json()) as { id?: string; username?: string; avatar?: string | null };
+            if (typeof me?.username === "string" && me.username) botUsername = me.username;
+            if (typeof me?.id === "string" && typeof me?.avatar === "string" && me.avatar) {
+              botAvatarUrl = `https://cdn.discordapp.com/avatars/${me.id}/${me.avatar}.png?size=128`;
+            }
+          }
+        } catch {
+          /* token invalide ou Discord injoignable : l’identité reste vide */
+        }
+      }
       detail.discord = bot
         ? {
             ...bot,
@@ -70,6 +89,8 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
             tokenEnc: undefined,
             hasToken: Boolean(plain),
             tokenUnreadable: isLockedSecret(bot.tokenEnc),
+            botUsername,
+            botAvatarUrl,
           }
         : null;
     }

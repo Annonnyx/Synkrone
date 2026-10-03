@@ -90,6 +90,39 @@
 }
         button.badge-krone:hover,
         .btn-krones:hover { border-color: var(--ambre); background: var(--ambre-clair); }
+        .cookie-banner {
+            position: fixed;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            z-index: 60;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 16px;
+            padding: 12px 16px;
+            background: var(--sk-surface);
+            color: var(--sk-text);
+            border: 1px solid var(--sk-border-strong);
+            border-radius: var(--sk-radius-lg);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+            font-size: 13px;
+        }
+        .cookie-banner p { margin: 0; flex: 1 1 240px; }
+        .cookie-banner a { color: var(--sk-accent); }
+        .cookie-banner-actions { display: flex; gap: 8px; }
+        .btn-cookie {
+            min-height: 36px;
+            padding: 8px 16px;
+            border-radius: var(--sk-radius);
+            border: 1px solid var(--sk-border-strong);
+            background: transparent;
+            color: var(--sk-text);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-cookie.primary { background: var(--sk-accent); border-color: transparent; color: #fff; }
     </style>
 </head>
 <body>
@@ -97,7 +130,7 @@
         <div class="chrome" id="app-chrome">
             <header id="app-header"></header>
             <div id="menu-container">
-                <button type="button" class="sk-nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="menu-tabs">Menu</button>
+                <button type="button" class="sk-nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="menu-tabs"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>Menu</button>
                 <nav id="app-nav" aria-label="Navigation">
                     <div class="nav-tabs" id="menu-tabs">
                         <button type="button" class="nav-tab active" data-target="accueil">Accueil</button>
@@ -106,6 +139,7 @@
                         <button type="button" class="nav-tab" data-target="discord">Bots</button>
                         <button type="button" class="nav-tab" data-target="minecraft">Minecraft</button>
                         <button type="button" class="nav-tab" data-target="bump">Bump</button>
+                        <button type="button" class="nav-tab" data-target="annonces">Annonces</button>
                         <button type="button" class="nav-tab" data-target="me">Me</button>
                         <button type="button" class="nav-tab hidden" data-target="admin">Admin</button>
                         <button type="button" class="nav-tab hidden" data-target="equipe">Équipe</button>
@@ -130,10 +164,66 @@
                 <a href="/cgv" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('cgv', { updateUrl: true });">CGV</a>
                 <a href="/faq" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('faq', { updateUrl: true });">FAQ</a>
                 <a href="/contact" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('contact', { updateUrl: true });">Contact</a>
+                <a href="/cookies" class="footer-link" onclick="event.preventDefault(); navigateToMainSection('cookies', { updateUrl: true });">Cookies</a>
                 <a href="https://discord.gg/p768u2Pgp3" class="footer-link" id="footer-discord" target="_blank" rel="noopener noreferrer">Discord</a>
             </div>
             <p class="footer-legal" id="footer-legal">Identité du vendeur affichée à la commande dès qu’elle est renseignée.</p>
         </footer>
+        <div id="cookie-banner" class="cookie-banner hidden" role="dialog" aria-live="polite" aria-label="Bandeau cookies">
+            <p>Nous n’utilisons que des cookies strictement nécessaires (connexion, thème, langue, ce choix). <a href="/cookies" id="cookie-banner-more">En savoir plus</a></p>
+            <div class="cookie-banner-actions">
+                <button type="button" class="btn-cookie" data-cookie-choice="refused">Refuser</button>
+                <button type="button" class="btn-cookie primary" data-cookie-choice="accepted">Accepter</button>
+            </div>
+        </div>
+        <script>
+        (function () {
+            var KEY = 'synkrone_cookies';
+            function readChoice() {
+                try {
+                    var m = document.cookie.match(/(?:^|; )synkrone_cookies=(accepted|refused)(?:;|$)/);
+                    if (m) return m[1];
+                    return localStorage.getItem(KEY);
+                } catch (e) { return null; }
+            }
+            function saveChoice(value) {
+                try { localStorage.setItem(KEY, value); } catch (e) {}
+                try { document.cookie = KEY + '=' + value + ';max-age=31536000;path=/;samesite=lax'; } catch (e) {}
+                var banner = document.getElementById('cookie-banner');
+                if (banner) banner.classList.add('hidden');
+            }
+            window.resetCookieConsent = function () {
+                try { localStorage.removeItem(KEY); } catch (e) {}
+                try { document.cookie = KEY + '=;max-age=0;path=/;samesite=lax'; } catch (e) {}
+                var banner = document.getElementById('cookie-banner');
+                if (banner) banner.classList.remove('hidden');
+            };
+            function bind() {
+                var banner = document.getElementById('cookie-banner');
+                if (!banner) return;
+                if (!readChoice()) banner.classList.remove('hidden');
+                var buttons = banner.querySelectorAll('[data-cookie-choice]');
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].addEventListener('click', function () {
+                        saveChoice(this.getAttribute('data-cookie-choice') || 'accepted');
+                    });
+                }
+                var more = document.getElementById('cookie-banner-more');
+                if (more) more.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    try {
+                        if (typeof window.navigateToMainSection === 'function') {
+                            window.navigateToMainSection('cookies', { updateUrl: true });
+                            return;
+                        }
+                    } catch (err) {}
+                    window.location.href = '/cookies';
+                });
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+            else bind();
+        })();
+        </script>
     </div>
     
     <script>
@@ -247,12 +337,11 @@
         }
         function themeToggleHtml() {
             const theme = window.synkroneTheme ? synkroneTheme.read() : 'light';
+            const isDark = theme === 'dark';
+            const next = isDark ? 'light' : 'dark';
             const sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 3v1.5M12 19.5V21M4.5 12H3M21 12h-1.5M6.2 6.2l1.1 1.1M16.7 16.7l1.1 1.1M6.2 17.8l1.1-1.1M16.7 7.3l1.1-1.1"></path></svg>';
             const moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15.5A8.5 8.5 0 1 1 8.5 4 7 7 0 0 0 20 15.5z"></path></svg>';
-            return `<div class="theme-toggle" role="group" aria-label="Thème">
-                <button type="button" class="theme-opt" data-theme-set="light" title="Clair" aria-pressed="${theme === 'light'}" onclick="setSiteTheme('light')">${sun}<span>Clair</span></button>
-                <button type="button" class="theme-opt" data-theme-set="dark" title="Sombre" aria-pressed="${theme === 'dark'}" onclick="setSiteTheme('dark')">${moon}<span>Sombre</span></button>
-            </div>`;
+            return `<button type="button" class="theme-single" title="${isDark ? 'Passer en clair' : 'Passer en sombre'}" aria-label="${isDark ? 'Passer en thème clair' : 'Passer en thème sombre'}" onclick="setSiteTheme('${next}')">${isDark ? sun : moon}</button>`;
         }
         function setSiteTheme(theme) {
             if (!window.synkroneTheme) return;
@@ -272,13 +361,6 @@
             if (!store.internal) return '';
             return `<nav class="sk-app-nav" aria-label="Hub">
                 <a href="/hub">Hub</a>
-            </nav>`;
-        }
-        function internalNavHtml() {
-            if (typeof canAccessEquipe === 'function' && !canAccessEquipe()) return '';
-            return `<nav class="sk-app-nav" aria-label="Outils internes">
-                <a href="/ui/">ui</a>
-                <a href="/sharing/">sharing</a>
             </nav>`;
         }
         async function loadMenu() {
@@ -469,6 +551,10 @@
                 route: '/cgv',
                 page: '/cgv.html'
             },
+            cookies: {
+                route: '/cookies',
+                page: '/cookies.html'
+            },
             contact: {
                 route: '/contact',
                 page: '/contact.html'
@@ -507,6 +593,7 @@
             equipe: 'Synkrone — Équipe',
             cgu: 'Synkrone — CGU',
             cgv: 'Synkrone — CGV',
+            cookies: 'Synkrone — Cookies',
             contact: 'Synkrone — Contact',
             faq: 'Synkrone — FAQ',
             krones: 'Synkrone — Krônes',
@@ -523,6 +610,7 @@
             login: 'Une seule connexion Synkrone : Discord, Google ou GitHub pour le site et l’hébergement.',
             cgu: 'Conditions générales d’utilisation de Synkrone : compte, Krônes, rangs, données et modération.',
             cgv: 'Conditions générales de vente des packs de Krônes : prix TTC, délivrance, rétractation et médiation.',
+            cookies: 'Politique cookies de Synkrone : cookies strictement nécessaires, pas de publicité ni de traçage.',
             contact: 'Ticket Discord pour un bug, un paiement ou la modération. Compte lié et présence sur le serveur Synkrone requis.',
             faq: 'Réponses courtes : compte, panel, Krônes, bots officiels, Bump, Cantale et support.',
             krones: 'Portefeuille Krônes : packs, rangs, hébergement et journal des mouvements.',
@@ -555,6 +643,7 @@
             login: SITE_ORIGIN + '/logo/Synk_2B9348.png',
             cgu: SITE_ORIGIN + '/logo/Synk_2B9348.png',
             cgv: SITE_ORIGIN + '/logo/Synk_2B9348.png',
+            cookies: SITE_ORIGIN + '/logo/Synk_2B9348.png',
             contact: SITE_ORIGIN + '/logo/Synk_2B9348.png',
             faq: SITE_ORIGIN + '/logo/Synk_2B9348.png',
             krones: SITE_ORIGIN + '/logo/Synk_2B9348.png',
@@ -1168,6 +1257,13 @@
                     if (!mainSection) return;
                     e.preventDefault();
                     closeMobileNav();
+                    if (mainSection === 'annonces') {
+                        await navigateToMainSection('accueil', { updateUrl: true });
+                        setActiveMainTab('annonces');
+                        const journal = document.querySelector('#journal');
+                        if (journal) journal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        return;
+                    }
                     await navigateToMainSection(mainSection, { updateUrl: true });
                 });
             });
@@ -1189,7 +1285,6 @@
                             <span class="brand-title">Synkrone</span><span class="brand-tld">.app</span>
                         </button>
                         ${publicToolsHtml()}
-                        ${internalNavHtml()}
                     </div>
                     <div class="header-bottom">
                         <div class="header-user">
@@ -1211,13 +1306,12 @@
                             <span class="brand-title">Synkrone</span><span class="brand-tld">.app</span>
                         </button>
                         ${publicToolsHtml()}
-                        ${internalNavHtml()}
                     </div>
                     <div class="header-bottom">
                         <div class="header-user">
                             
-                            <button class="btn-roulette" onclick="openRouletteModal()" title="Roulette">
-                                Roulette
+                            <button class="btn-roulette btn-roulette-icon" onclick="openRouletteModal()" title="Roulette" aria-label="Roulette">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"></circle><path d="M12 3.5v6M12 14.5v6M3.5 12h6M14.5 12h6M6 6l4.2 4.2M13.8 13.8L18 18M18 6l-4.2 4.2M10.2 13.8L6 18"></path></svg>
                             </button>
                             
                             <button type="button" class="user-account-link" onclick="navigateToMainSection('compte', { updateUrl: true })" title="Compte">

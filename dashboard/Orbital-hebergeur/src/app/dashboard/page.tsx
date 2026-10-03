@@ -20,6 +20,7 @@ import {
 import { Server } from "lucide-react";
 import { PageHeader } from "@/components/ui";
 import { useCreationFlags } from "@/lib/use-creation-flags";
+import { auditActionLabel } from "@/lib/audit-label";
 import { firstCreateHref } from "@/lib/services/creation-flags";
 import { cpuPercentOfQuota } from "@/lib/runtime/cpu";
 
@@ -55,12 +56,12 @@ type DashboardData = {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 md:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton key={i} className="h-20" />
         ))}
       </div>
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {Array.from({ length: 3 }).map((_, i) => (
           <Skeleton key={i} className="h-32" />
         ))}
@@ -119,7 +120,7 @@ export default function DashboardPage() {
 
       {data && (
         <>
-          <div className="grid gap-3 md:grid-cols-5">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <Stat
               label={t("dashboard.services")}
               value={String(data.services.length)}
@@ -180,7 +181,7 @@ export default function DashboardPage() {
             {t("dashboard.projects")}
           </h2>
           {data.services.length > 0 ? (
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {data.services.map((s) => (
                 <Link
                   key={s.id}
@@ -217,13 +218,6 @@ export default function DashboardPage() {
               icon={Server}
               title={t("dashboard.noServices")}
               hint={createHref ? t("dashboard.noServicesHint") : t("services.creationClosed")}
-              action={
-                createHref ? (
-                  <Link href={createHref} className="btn btn-primary">
-                    <Plus size={14} /> {t("dashboard.createFirst")}
-                  </Link>
-                ) : undefined
-              }
             />
           )}
 
@@ -234,7 +228,9 @@ export default function DashboardPage() {
             {data.activity.map((a) => (
               <div key={a.id} className="flex justify-between gap-4 px-4 py-2">
                 <span className="min-w-0 truncate">
-                  <span className="font-mono text-[var(--accent)]">{a.action}</span>{" "}
+                  <span className="font-medium text-[var(--text)]" title={a.action}>
+                    {auditActionLabel(a.action, locale)}
+                  </span>{" "}
                   <span className="text-[var(--muted)]">{a.detail}</span>
                 </span>
                 <span className="shrink-0 text-[var(--muted)]">

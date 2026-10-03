@@ -110,17 +110,17 @@ function List() {
           type ? undefined : (
             <div className="flex flex-wrap gap-2">
               {isCreationEnabled(flags, "discord") && (
-                <Link href="/dashboard/new/discord" className="btn">
+                <Link href="/dashboard/new/discord" className="btn btn-primary">
                   <Plus size={14} /> {t("services.newDiscord")}
                 </Link>
               )}
               {isCreationEnabled(flags, "minecraft") && (
-                <Link href="/dashboard/new/minecraft" className="btn">
+                <Link href="/dashboard/new/minecraft" className="btn btn-primary">
                   <Plus size={14} /> {t("services.newMinecraft")}
                 </Link>
               )}
               {isCreationEnabled(flags, "web") && (
-                <Link href="/dashboard/new/web" className="btn">
+                <Link href="/dashboard/new/web" className="btn btn-primary">
                   <Plus size={14} /> {t("services.newWeb")}
                 </Link>
               )}
@@ -132,7 +132,7 @@ function List() {
       <ErrorText error={error} />
 
       {!services && !error && (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-32" />
           ))}
@@ -170,20 +170,11 @@ function List() {
       )}
 
       {services && filtered.length > 0 && (
-        <>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {filtered.map((s) => (
-              <ServiceCard key={s.id} s={s} />
-            ))}
-          </div>
-          {createHref && (
-            <div className="mt-6">
-              <Link href={createHref} className="btn btn-primary">
-                <Plus size={14} /> {createLabel}
-              </Link>
-            </div>
-          )}
-        </>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          {filtered.map((s) => (
+            <ServiceCard key={s.id} s={s} />
+          ))}
+        </div>
       )}
     </div>
   );

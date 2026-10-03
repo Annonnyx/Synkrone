@@ -136,7 +136,6 @@ export default function CreateServicePage() {
   const [token, setToken] = useState("");
   const [applicationId, setApplicationId] = useState("");
   const [prefix, setPrefix] = useState("!");
-  const [botSource, setBotSource] = useState<"catalog" | "ticket">("catalog");
   const [supportInvite, setSupportInvite] = useState("https://discord.gg/p768u2Pgp3");
   const [modules, setModules] = useState<string[]>(["moderation", "public"]);
   const [commands, setCommands] = useState<string[]>(["ban", "kick", "ping", CONFIG_COMMAND]);
@@ -156,15 +155,13 @@ export default function CreateServicePage() {
 
   const STEPS = useMemo(() => {
     if (type === "discord") {
-      return botSource === "ticket"
-        ? ["botSource"]
-        : ["botSource", "general", "commands", "discord", "resources", "review"];
+      return ["general", "commands", "discord", "resources", "review"];
     }
     if (type === "minecraft") {
       return ["basic", "software", "version", "resources", "network", "properties", "review"];
     }
     return ["basic", "template", "source", "build", "resources", "environment", "review"];
-  }, [type, botSource]);
+  }, [type]);
 
   const stepLabel = (id: string) => t(`create.step${id[0].toUpperCase()}${id.slice(1)}`);
 
@@ -485,38 +482,6 @@ export default function CreateServicePage() {
             )}
           </div>
         );
-      case "discord:botSource":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm leading-relaxed text-[var(--muted)]">{t("create.botSourceIntro")}</p>
-            <div className="grid gap-2 md:grid-cols-2">
-              <button
-                type="button"
-                className="panel panel-hover p-4 text-left"
-                style={{ borderColor: botSource === "catalog" ? "var(--accent)" : "var(--line)" }}
-                onClick={() => setBotSource("catalog")}
-              >
-                <div className="font-semibold">{t("create.botSourceCatalog")}</div>
-                <div className="mt-1 text-sm text-[var(--muted)]">{t("create.botSourceCatalogHint")}</div>
-              </button>
-              <button
-                type="button"
-                className="panel panel-hover p-4 text-left"
-                style={{ borderColor: botSource === "ticket" ? "var(--accent)" : "var(--line)" }}
-                onClick={() => setBotSource("ticket")}
-              >
-                <div className="font-semibold">{t("create.botSourceTicket")}</div>
-                <div className="mt-1 text-sm text-[var(--muted)]">{t("create.botSourceTicketHint")}</div>
-              </button>
-            </div>
-            {botSource === "ticket" && (
-              <a href={supportInvite} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                {t("create.openTickets")}
-              </a>
-            )}
-          </div>
-        );
-      case "discord:modules":
       case "discord:commands": {
         const q = cmdQuery.trim().toLowerCase();
         return (
@@ -565,6 +530,12 @@ export default function CreateServicePage() {
               <p className="text-sm text-[var(--muted)]">{t("create.enableModuleFirst")}</p>
             )}
             <p className="text-sm text-[var(--muted)]">{t("create.configAlways")}</p>
+            <p className="hint">
+              {t("create.ticketHint")}{" "}
+              <a href={supportInvite} target="_blank" rel="noopener noreferrer" className="underline">
+                {t("create.openTickets")}
+              </a>
+            </p>
           </div>
         );
       }
@@ -891,7 +862,7 @@ export default function CreateServicePage() {
 
   if (platform && !isCreationEnabled(platform, type)) {
     return (
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto w-full max-w-5xl">
         <PageHeader title={t("create.title", { type: t(`nav.${type}`) })} subtitle={t("create.disabledHint")} />
         <ErrorText error={t("create.disabled", { label: t(`nav.${type}`) })} />
       </div>
@@ -899,7 +870,7 @@ export default function CreateServicePage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto w-full max-w-5xl">
       <PageHeader title={t("create.title", { type: t(`nav.${type}`) })} subtitle={t("create.costHint")} />
       <div className="mb-4 flex flex-wrap gap-2">
         {CREATE_TYPES.filter((kind) => isCreationEnabled(platform, kind)).map((kind) => (
@@ -945,11 +916,7 @@ export default function CreateServicePage() {
             {t("krones.shop")}
           </a>
         )}
-        {type === "discord" && botSource === "ticket" ? (
-          <a href={supportInvite} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-            {t("create.openTickets")}
-          </a>
-        ) : step < STEPS.length - 1 ? (
+        {step < STEPS.length - 1 ? (
           <button className="btn btn-primary" onClick={() => setStep(step + 1)}>
             {t("create.next")} <ChevronRight size={14} />
           </button>

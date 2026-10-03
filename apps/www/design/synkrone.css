@@ -1344,3 +1344,30 @@ button.tab-btn.active {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Standardisation header : roulette et theme en symboles seuls (bandeau cookies + UI) */
+.btn-roulette-icon { padding: 0; width: 36px; justify-content: center; }
+.btn-roulette-icon svg { width: 18px; height: 18px; flex-shrink: 0; }
+.theme-single {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    min-height: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--sk-border);
+    border-radius: var(--sk-radius);
+    background: var(--sk-surface-2);
+    color: var(--sk-text-muted);
+    cursor: pointer;
+}
+.theme-single:hover { color: var(--sk-text); }
+.theme-single svg { width: 16px; height: 16px; }
+.sk-nav-toggle svg { flex-shrink: 0; }
+@media (max-width: 860px) {
+    .btn-roulette { display: inline-flex; }
+    .header-user { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; min-width: 0; }
+    #menu-container { min-width: 0; }
+    .header-top { overflow: hidden; }
+}

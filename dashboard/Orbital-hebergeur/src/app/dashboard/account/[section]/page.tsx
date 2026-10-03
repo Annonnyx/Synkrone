@@ -8,6 +8,7 @@ import { usePoll } from "@/lib/use-poll";
 import { useToast } from "@/components/toast";
 import { EmptyState, ErrorText, SecretBanner } from "@/components/panel";
 import { PageHeader } from "@/components/ui";
+import { auditActionLabel } from "@/lib/audit-label";
 import { OAuthButtons, oauthErrorMessage } from "@/components/oauth-buttons";
 import type { OAuthProvider, ProviderStatus } from "@/lib/oauth/types";
 import { KeyRound, ScrollText } from "lucide-react";
@@ -162,7 +163,9 @@ function AccountPageInner() {
           {logs.map((l) => (
             <div key={l.id} className="flex justify-between gap-3 px-4 py-2">
               <span className="min-w-0">
-                <span className="font-mono text-[var(--accent)]">{l.action}</span>{" "}
+                <span className="font-medium text-[var(--text)]" title={l.action}>
+                  {auditActionLabel(l.action, locale)}
+                </span>{" "}
                 <span className="text-[var(--muted)]">{l.detail}</span>
               </span>
               <span className="shrink-0 text-[var(--muted)]">

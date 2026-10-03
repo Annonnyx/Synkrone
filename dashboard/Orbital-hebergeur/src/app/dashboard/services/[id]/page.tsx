@@ -63,6 +63,8 @@ type Detail = {
     tokenUnreadable?: boolean;
     tokenFingerprint: string | null;
     applicationId: string | null;
+    botUsername: string | null;
+    botAvatarUrl: string | null;
     commands: Array<{ name: string; module: string; enabled: boolean; cooldown: number; description: string }>;
   } | null;
   minecraft?: {
@@ -186,6 +188,10 @@ function ServiceDetail() {
     };
   }, [id]);
 
+  useEffect(() => {
+    if (tab === "token" || tab === "config") setTab("identite");
+  }, [tab]);
+
   const SUCCESS: Record<string, string> = {
     start: t("service.started"),
     stop: t("service.stopped"),
@@ -222,6 +228,22 @@ function ServiceDetail() {
     }
   };
 
+  const saveBotCommands = async (payload: { prefix: string; slashCommands: boolean }) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await api(`/api/services/${id}/discord`, {
+        json: { op: "config", ...payload },
+      });
+      toast.success(t("service.botCommandsSaved"));
+      await load();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   if (!data) {
     return (
       <div>
@@ -241,14 +263,14 @@ function ServiceDetail() {
   const tabs = [
     "overview",
     "console",
-    "files",
-    ...(svc.type === "discord" ? ["token", "modules", "commands", "config"] : []),
+    ...(svc.type === "discord" ? [] : ["files"]),
+    ...(svc.type === "discord" ? ["identite", "modules", "commands"] : []),
     ...(svc.type === "minecraft" ? ["version", "properties", "addons"] : []),
     ...(svc.type === "web" ? ["deployments", "domains"] : []),
     "environment",
     "backups",
     "database",
-    "sftp",
+    ...(svc.type === "discord" ? [] : ["sftp"]),
     "settings",
   ];
 
@@ -256,7 +278,7 @@ function ServiceDetail() {
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <TypeIcon type={svc.type} size={20} />
-        <h1 className="text-2xl font-bold">{svc.name}</h1>
+        <h1 className="min-w-0 break-words text-2xl font-bold">{svc.name}</h1>
         <StateBadge state={svc.state} />
         <div className="ml-auto flex flex-wrap gap-2">
           {svc.type === "discord" && data.discord?.applicationId && (
@@ -335,8 +357,8 @@ function ServiceDetail() {
       </div>
 
       {tab === "overview" && (
-        <div className="grid gap-4 lg:grid-cols-3">
-          <div className="panel p-4 lg:col-span-2">
+        <div className="grid gap-4 lg:grid-cols-5">
+          <div className="panel p-4 lg:col-span-3">
             <div className="label">{t("service.resources")}</div>
             <div className="mt-3 space-y-3 text-xs">
               <div>
@@ -389,28 +411,27 @@ function ServiceDetail() {
                 </div>
               )}
             </div>
+            <button
+              className="btn mt-4 w-full justify-center"
+              onClick={() => {
+                setTab("console");
+                window.history.replaceState(
+                  window.history.state,
+                  "",
+                  `/dashboard/services/${id}?tab=console#console`,
+                );
+              }}
+            >
+              {t("service.openConsole")}
+            </button>
           </div>
 
           <div className="panel p-4 text-xs">
             <div className="label">{t("service.container")}</div>
-            <div className="mt-3 space-y-1 font-mono text-[11px] text-[var(--muted)]">
-              <div>
-                {t("service.name")}: {data.container?.containerName ?? "—"}
-              </div>
-              <div>
-                {t("service.id")}: {data.container?.dockerContainerId?.slice(0, 12) ?? "—"}
-              </div>
-              <div>
-                {t("service.image")}: {data.container?.image ?? "—"}
-              </div>
-              <div>
-                {t("service.network")}: {data.container?.network ?? "—"}
-              </div>
-              <div>
-                {t("service.restartPolicy")}: {svc.restartPolicy}
-              </div>
-              <div>
-                {t("service.volume")}: /data/{svc.type}/{svc.id}
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[var(--muted)]">{t("service.status")}</span>
+                <StateBadge state={svc.state} />
               </div>
             </div>
             {svc.type === "minecraft" && data.minecraft && (
@@ -458,7 +479,8 @@ function ServiceDetail() {
               </div>
             )}
             {svc.type === "discord" && data.discord && (
-              <div className="mt-3 space-y-1 text-[11px]">
+              <div className="mt-3 space-y-2 text-[11px]">
+                <BotIdentity discord={data.discord} />
                 <div>
                   {t("service.prefix")}: {data.discord.prefix}
                 </div>
@@ -503,27 +525,35 @@ function ServiceDetail() {
       )}
       {tab === "files" && <FileManager serviceId={id} />}
 
-      {tab === "token" && data.discord && (
-        <DiscordTokenPanel
-          hasToken={data.discord.hasToken}
-          tokenUnreadable={data.discord.tokenUnreadable}
-          fingerprint={data.discord.tokenFingerprint}
-          applicationId={data.discord.applicationId}
-          onSubmit={async ({ token: value, applicationId }) => {
-            const res = await api(`/api/services/${id}/discord`, {
-              json: { op: "token", token: value, applicationId },
-            });
-            await load();
-            return res;
-          }}
-          onApplicationId={async (value) => {
-            const res = await api(`/api/services/${id}/discord`, {
-              json: { op: "config", applicationId: value },
-            });
-            await load();
-            return res;
-          }}
-        />
+      {tab === "identite" && data.discord && (
+        <div className="space-y-4">
+          <div className="panel p-4">
+            <BotIdentity discord={data.discord} />
+          </div>
+          <DiscordTokenPanel
+            hasToken={data.discord.hasToken}
+            tokenUnreadable={data.discord.tokenUnreadable}
+            fingerprint={data.discord.tokenFingerprint}
+            applicationId={data.discord.applicationId}
+            onSubmit={async ({ token: value, applicationId }) => {
+              const res = await api(`/api/services/${id}/discord`, {
+                json: { op: "token", token: value, applicationId },
+              });
+              await load();
+              return res;
+            }}
+            onApplicationId={async (value) => {
+              const res = await api(`/api/services/${id}/discord`, {
+                json: { op: "config", applicationId: value },
+              });
+              await load();
+              return res;
+            }}
+          />
+          <DiscordRuntimeSettings prefix={data.discord.prefix} busy={busy} onSave={saveBotCommands} />
+          <DiscordDefaultConfig serviceId={id} />
+          <DiscordGuildConfig serviceId={id} />
+        </div>
       )}
 
       {tab === "modules" && data.discord && (
@@ -545,13 +575,6 @@ function ServiceDetail() {
           }
         />
       )}
-      {tab === "config" && data.discord && (
-        <div className="space-y-4">
-          <DiscordDefaultConfig serviceId={id} />
-          <DiscordGuildConfig serviceId={id} />
-        </div>
-      )}
-
       {tab === "version" && data.minecraft && (
         <MinecraftRuntime
           software={data.minecraft.software}
@@ -811,23 +834,7 @@ function ServiceDetail() {
       {tab === "settings" && (
         <Settings
           service={svc}
-          discord={data.discord}
           busy={busy}
-          onSaveBotCommands={async (payload) => {
-            setBusy(true);
-            setError(null);
-            try {
-              await api(`/api/services/${id}/discord`, {
-                json: { op: "config", ...payload },
-              });
-              toast.success(t("service.botCommandsSaved"));
-              await load();
-            } catch (err) {
-              setError((err as Error).message);
-            } finally {
-              setBusy(false);
-            }
-          }}
           onSave={async (patch) => {
             setBusy(true);
             try {
@@ -1063,6 +1070,27 @@ function MinecraftRuntime({
 
 const PREFIX_PRESETS = ["!", "?", ".", "$", "-"];
 
+function BotIdentity({ discord }: { discord: NonNullable<Detail["discord"]> }) {
+  const t = useT();
+  if (!discord.hasToken) return null;
+  if (!discord.botUsername && !discord.botAvatarUrl) {
+    return <p className="hint">{t("service.noBotIdentity")}</p>;
+  }
+  return (
+    <div className="flex items-center gap-3">
+      {discord.botAvatarUrl && (
+        <img src={discord.botAvatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
+      )}
+      <div className="min-w-0">
+        <div className="label">{t("service.botName")}</div>
+        <div className="truncate text-sm font-semibold text-[var(--text)]">
+          {discord.botUsername ?? "—"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DiscordRuntimeSettings({
   prefix,
   busy,
@@ -1126,16 +1154,12 @@ function DiscordRuntimeSettings({
 
 function Settings({
   service,
-  discord,
   busy,
-  onSaveBotCommands,
   onSave,
   onDelete,
 }: {
   service: Detail["service"];
-  discord?: Detail["discord"];
   busy: boolean;
-  onSaveBotCommands: (payload: { prefix: string; slashCommands: boolean }) => void;
   onSave: (patch: Record<string, unknown>) => void;
   onDelete: (payload: { name: string; confirmDiskGone: boolean }) => void;
 }) {
@@ -1149,13 +1173,6 @@ function Settings({
 
   return (
     <div className="space-y-4">
-      {discord && (
-        <DiscordRuntimeSettings
-          prefix={discord.prefix}
-          busy={busy}
-          onSave={onSaveBotCommands}
-        />
-      )}
       <div className="panel space-y-3 p-4">
         <div>
           <div className="label mb-1">{t("common.name")}</div>

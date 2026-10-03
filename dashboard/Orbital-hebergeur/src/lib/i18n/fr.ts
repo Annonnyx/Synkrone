@@ -212,6 +212,97 @@ export const fr = {
     auditHint: "Actions du compte, du plus récent au plus ancien.",
     profileHint: "Identité, comptes liés et mot de passe de connexion.",
   },
+  audit: {
+    service: {
+      start: "Démarrage du service",
+      stop: "Arrêt du service",
+      restart: "Redémarrage du service",
+      kill: "Arrêt forcé du service",
+      recreate: "Conteneur recréé",
+      command: "Commande console envoyée",
+      update: "Service mis à jour",
+      delete: "Service supprimé",
+      create: {
+        discord: "Bot Discord créé",
+        minecraft: "Serveur Minecraft créé",
+        web: "Projet web créé",
+      },
+    },
+    files: {
+      upload: "Fichier téléversé",
+      write: "Fichier modifié",
+      delete: "Fichier supprimé",
+    },
+    env: {
+      set: "Variable d’environnement définie",
+    },
+    database: {
+      create: "Base de données créée",
+      delete: "Base de données supprimée",
+      reset_password: "Mot de passe de la base régénéré",
+    },
+    backup: {
+      create: "Sauvegarde créée",
+      restore: "Sauvegarde restaurée",
+    },
+    domain: {
+      add: "Domaine ajouté",
+      remove: "Domaine retiré",
+    },
+    discord: {
+      config: "Configuration Discord enregistrée",
+      token: {
+        rotate: "Token Discord remplacé",
+        clear: "Token Discord supprimé",
+      },
+    },
+    minecraft: {
+      runtime: "Runtime Minecraft modifié",
+      properties: "Propriétés du serveur modifiées",
+      plugin: {
+        install: "Plugin installé",
+        upload: "Plugin téléversé",
+      },
+      mod: {
+        install: "Mod installé",
+        upload: "Mod téléversé",
+      },
+    },
+    web: {
+      deploy: "Déploiement lancé",
+    },
+    sftp: {
+      rotate: "Mot de passe SFTP régénéré",
+    },
+    apikey: {
+      create: "Clé API créée",
+      revoke: "Clé API révoquée",
+    },
+    auth: {
+      logout: "Déconnexion",
+      password_change: "Mot de passe modifié",
+    },
+    oauth: {
+      link: {
+        github: "Compte GitHub lié",
+        google: "Compte Google lié",
+        discord: "Compte Discord lié",
+      },
+      login: {
+        github: "Connexion via GitHub",
+        google: "Connexion via Google",
+        discord: "Connexion via Discord",
+      },
+      unlink: {
+        github: "Compte GitHub délié",
+        google: "Compte Google délié",
+        discord: "Compte Discord délié",
+      },
+    },
+    github: {
+      webhook: "Déploiement via webhook GitHub",
+    },
+  },
   infra: {
     databases: "Bases de données",
     sftp: "SFTP",
@@ -287,7 +378,11 @@ export const fr = {
     kill: "Forcer l'arrêt",
     loading: "Chargement du service…",
     resources: "Ressources",
-    container: "Conteneur",
+    container: "Service",
+    status: "État",
+    openConsole: "Ouvrir la console",
+    botName: "Nom du bot",
+    noBotIdentity: "Token enregistré mais identité Discord illisible — recollez le token.",
     cpu: "CPU",
     ram: "Mémoire",
     storage: "Stockage (volume)",
@@ -493,6 +588,7 @@ export const fr = {
     overview: "Vue d'ensemble",
     console: "Console",
     files: "Fichiers",
+    identite: "Identité",
     token: "Token",
     modules: "Modules",
     commands: "Commandes",
@@ -590,9 +686,8 @@ export const fr = {
     botSourceIntro: "Le bot est toujours personnalisé. Choisissez comment le composer.",
     botSourceCatalog: "Commandes du catalogue",
     botSourceCatalogHint: "Composer le bot avec les modules et commandes déjà disponibles.",
-    botSourceTicket: "Commandes sur mesure",
-    botSourceTicketHint: "Besoin d’une commande qui n’existe pas encore ? Ouvrez un ticket sur le Discord.",
     openTickets: "Ouvrir un ticket Discord",
+    ticketHint: "Besoin d’une commande qui n’existe pas encore ? Demandez-la sur le Discord, elle rejoindra le catalogue.",
     stepGeneral: "Général",
     stepDiscord: "Discord",
     stepModules: "Modules",

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script src="/assets/theme-boot.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synkrone — Politique cookies</title>
+    <meta name="description" content="Politique cookies de Synkrone : cookies strictement nécessaires, pas de publicité ni de traçage, et comment modifier votre choix.">
+    <link rel="icon" type="image/jpeg" href="/assets/images/logo.jpg">
+    <link rel="stylesheet" href="/assets/accueil.css">
+    <style>
+        .band { padding-top: 40px; border-top: 0; }
+        .legal h2 {
+            margin: 32px 0 10px;
+            font-family: var(--serif);
+            font-size: 1.35rem;
+        }
+        .legal h2:first-of-type { margin-top: 0; }
+        .legal p, .legal li {
+            color: var(--hall-mute);
+            max-width: 68ch;
+            font-size: 0.98rem;
+            line-height: 1.65;
+        }
+        .legal ul { padding-left: 1.2rem; }
+        .legal li { margin: 6px 0; }
+        .legal table {
+            width: 100%;
+            max-width: 68ch;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.92rem;
+        }
+        .legal th, .legal td {
+            text-align: left;
+            padding: 8px 10px;
+            border: 1px solid var(--hall-line);
+            color: var(--hall-mute);
+        }
+        .legal-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 28px;
+        }
+    </style>
+</head>
+<body>
+    <section class="band">
+        <div class="band-inner legal">
+            <div class="band-head">
+                <p class="sect-id">Confidentialité</p>
+                <div>
+                    <h2>Politique cookies</h2>
+                    <p>Synkrone n’utilise que des cookies strictement nécessaires au fonctionnement du site. Pas de publicité, pas de revente de données, pas de traçage entre sites.</p>
+                </div>
+            </div>
+
+            <h2 id="liste">1. Cookies déposés</h2>
+            <table>
+                <tr><th>Nom</th><th>Rôle</th><th>Durée</th></tr>
+                <tr><td>Session de connexion</td><td>Vous garder connecté (site et panel d’hébergement).</td><td>Session / 3 semaines</td></tr>
+                <tr><td>synkrone_theme</td><td>Mémoriser votre thème clair ou sombre.</td><td>1 an</td></tr>
+                <tr><td>synkrone_cookies</td><td>Mémoriser votre choix sur ce bandeau.</td><td>1 an</td></tr>
+                <tr><td>synkrone_locale</td><td>Mémoriser votre langue (panel d’hébergement).</td><td>1 an</td></tr>
+            </table>
+
+            <h2 id="tiers">2. Services tiers</h2>
+            <ul>
+                <li>Les feuilles de style (Tailwind, Font Awesome) sont chargées depuis des CDN : elles ne déposent pas de cookies et ne suivent pas votre navigation.</li>
+                <li>La connexion via Discord, Google ou GitHub passe par le fournisseur choisi, soumis à sa propre politique de confidentialité.</li>
+            </ul>
+
+            <h2 id="choix">3. Modifier votre choix</h2>
+            <p>Refuser le bandeau ne bloque pas l’accès au site : seuls les cookies indispensables à la connexion et à l’affichage restent utilisés. Vous pouvez changer d’avis à tout moment :</p>
+            <div class="legal-nav">
+                <button class="btn" type="button" onclick="resetCookieConsent()">Modifier mon choix cookies</button>
+            </div>
+
+            <h2 id="droits">4. Vos droits</h2>
+            <p>Accès, rectification, effacement de vos données : ouvrez un ticket sur le serveur Discord de support, comme indiqué dans les <a href="/cgu">CGU</a>.</p>
+
+            <div class="legal-nav">
+                <a class="btn" href="/cgu" onclick="goPage(event, 'cgu')">CGU</a>
+                <a class="btn" href="/cgv" onclick="goPage(event, 'cgv')">CGV</a>
+                <a class="btn" href="/faq" onclick="goPage(event, 'faq')">FAQ</a>
+                <a class="btn btn-red" href="/contact" onclick="goPage(event, 'contact')">Contact</a>
+            </div>
+        </div>
+    </section>
+    <script>
+        function goPage(event, section) {
+            if (event) event.preventDefault();
+            try {
+                if (typeof window.navigateToMainSection === 'function') {
+                    window.navigateToMainSection(section, { updateUrl: true });
+                    return;
+                }
+                if (window.parent && window.parent !== window && typeof window.parent.navigateToMainSection === 'function') {
+                    window.parent.navigateToMainSection(section, { updateUrl: true });
+                    return;
+                }
+            } catch { /* fall through */ }
+            window.location.href = '/' + section;
+        }
+        function resetCookieConsent() {
+            try {
+                if (typeof window.resetCookieConsent === 'function' && window.resetCookieConsent !== resetCookieConsent) {
+                    window.resetCookieConsent();
+                    return;
+                }
+                if (window.parent && window.parent !== window && typeof window.parent.resetCookieConsent === 'function') {
+                    window.parent.resetCookieConsent();
+                    return;
+                }
+            } catch { /* fall through */ }
+            try {
+                localStorage.removeItem('synkrone_cookies');
+                document.cookie = 'synkrone_cookies=;max-age=0;path=/;samesite=lax';
+            } catch { /* stockage indisponible */ }
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

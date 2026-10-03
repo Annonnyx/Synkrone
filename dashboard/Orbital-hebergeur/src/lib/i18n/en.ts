@@ -214,6 +214,97 @@ export const en: Dict = {
     auditHint: "Account actions, newest first.",
     profileHint: "Identity, linked accounts and sign-in password.",
   },
+  audit: {
+    service: {
+      start: "Service started",
+      stop: "Service stopped",
+      restart: "Service restarted",
+      kill: "Service force-stopped",
+      recreate: "Container recreated",
+      command: "Console command sent",
+      update: "Service updated",
+      delete: "Service deleted",
+      create: {
+        discord: "Discord bot created",
+        minecraft: "Minecraft server created",
+        web: "Web project created",
+      },
+    },
+    files: {
+      upload: "File uploaded",
+      write: "File edited",
+      delete: "File deleted",
+    },
+    env: {
+      set: "Environment variable set",
+    },
+    database: {
+      create: "Database created",
+      delete: "Database deleted",
+      reset_password: "Database password reset",
+    },
+    backup: {
+      create: "Backup created",
+      restore: "Backup restored",
+    },
+    domain: {
+      add: "Domain added",
+      remove: "Domain removed",
+    },
+    discord: {
+      config: "Discord config saved",
+      token: {
+        rotate: "Discord token replaced",
+        clear: "Discord token removed",
+      },
+    },
+    minecraft: {
+      runtime: "Minecraft runtime changed",
+      properties: "Server properties edited",
+      plugin: {
+        install: "Plugin installed",
+        upload: "Plugin uploaded",
+      },
+      mod: {
+        install: "Mod installed",
+        upload: "Mod uploaded",
+      },
+    },
+    web: {
+      deploy: "Deployment started",
+    },
+    sftp: {
+      rotate: "SFTP password regenerated",
+    },
+    apikey: {
+      create: "API key created",
+      revoke: "API key revoked",
+    },
+    auth: {
+      logout: "Signed out",
+      password_change: "Password changed",
+    },
+    oauth: {
+      link: {
+        github: "GitHub account linked",
+        google: "Google account linked",
+        discord: "Discord account linked",
+      },
+      login: {
+        github: "Signed in with GitHub",
+        google: "Signed in with Google",
+        discord: "Signed in with Discord",
+      },
+      unlink: {
+        github: "GitHub account unlinked",
+        google: "Google account unlinked",
+        discord: "Discord account unlinked",
+      },
+    },
+    github: {
+      webhook: "Deployed via GitHub webhook",
+    },
+  },
   infra: {
     databases: "Databases",
     sftp: "SFTP",
@@ -289,7 +380,11 @@ export const en: Dict = {
     kill: "Kill",
     loading: "Loading service…",
     resources: "Resources",
-    container: "Container",
+    container: "Service",
+    status: "Status",
+    openConsole: "Open console",
+    botName: "Bot name",
+    noBotIdentity: "Token stored but Discord identity unreadable — paste the token again.",
     cpu: "CPU",
     ram: "Memory",
     storage: "Storage (volume)",
@@ -495,6 +590,7 @@ export const en: Dict = {
     overview: "Overview",
     console: "Console",
     files: "Files",
+    identite: "Identity",
     token: "Token",
     modules: "Modules",
     commands: "Commands",
@@ -591,9 +687,8 @@ export const en: Dict = {
     botSourceIntro: "The bot is always custom. Choose how to compose it.",
     botSourceCatalog: "Catalog commands",
     botSourceCatalogHint: "Build the bot from the modules and commands already available.",
-    botSourceTicket: "Custom commands",
-    botSourceTicketHint: "Need a command that does not exist yet? Open a ticket on Discord.",
     openTickets: "Open a Discord ticket",
+    ticketHint: "Need a command that does not exist yet? Ask for it on Discord and it will join the catalog.",
     stepGeneral: "General",
     stepDiscord: "Discord",
     stepModules: "Modules",
