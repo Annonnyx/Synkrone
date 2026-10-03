@@ -191,17 +191,31 @@
                 try { document.cookie = KEY + '=' + value + ';max-age=31536000;path=/;samesite=lax'; } catch (e) {}
                 var banner = document.getElementById('cookie-banner');
                 if (banner) banner.classList.add('hidden');
+                reserveSpace();
+            }
+            function reserveSpace() {
+                var banner = document.getElementById('cookie-banner');
+                var container = document.querySelector('.app-container');
+                if (!container) return;
+                if (banner && !banner.classList.contains('hidden')) {
+                    container.style.paddingBottom = (banner.offsetHeight + 12) + 'px';
+                } else {
+                    container.style.paddingBottom = '';
+                }
             }
             window.resetCookieConsent = function () {
                 try { localStorage.removeItem(KEY); } catch (e) {}
                 try { document.cookie = KEY + '=;max-age=0;path=/;samesite=lax'; } catch (e) {}
                 var banner = document.getElementById('cookie-banner');
                 if (banner) banner.classList.remove('hidden');
+                reserveSpace();
             };
             function bind() {
                 var banner = document.getElementById('cookie-banner');
                 if (!banner) return;
                 if (!readChoice()) banner.classList.remove('hidden');
+                reserveSpace();
+                window.addEventListener('resize', reserveSpace);
                 var buttons = banner.querySelectorAll('[data-cookie-choice]');
                 for (var i = 0; i < buttons.length; i++) {
                     buttons[i].addEventListener('click', function () {
