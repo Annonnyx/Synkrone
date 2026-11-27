@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AlertTriangle, Plus, RefreshCw } from "lucide-react";
 import { api, fmtBytesMb } from "@/lib/client";
 import { explainError } from "@/lib/errors";
@@ -23,6 +23,8 @@ import { useCreationFlags } from "@/lib/use-creation-flags";
 import { auditActionLabel } from "@/lib/audit-label";
 import { firstCreateHref } from "@/lib/services/creation-flags";
 import { cpuPercentOfQuota } from "@/lib/runtime/cpu";
+import { Chart } from "@/components/chart";
+import type { EChartsOption } from "@/lib/echarts";
 
 type DashboardData = {
   services: Array<{
@@ -94,6 +96,29 @@ export default function DashboardPage() {
 
   usePoll(load, 10000);
 
+  const quotaOption: EChartsOption | null = useMemo(() => {
+    if (!data) return null;
+    const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dark = typeof document !== "undefined" && document.documentElement.dataset.theme === "dark";
+    const bar = dark ? "#6b9d7e" : "#3f6b52";
+    const muted = dark ? "#8fa096" : "#5c6a66";
+    const line = dark ? "#333e38" : "#5c6a661f";
+    const cpuPct = Math.min(100, Math.max(0, data.totals.cpuPercent || 0));
+    const ramPct = data.totals.memoryLimitMb > 0 ? Math.min(100, (data.totals.memoryUsedMb / data.totals.memoryLimitMb) * 100) : 0;
+    const diskPct = data.totals.storageLimitMb > 0 ? Math.min(100, (data.totals.diskMb / data.totals.storageLimitMb) * 100) : 0;
+    return {
+      backgroundColor: "transparent",
+      animation: !reduce,
+      grid: { left: 8, right: 24, top: 8, bottom: 8, containLabel: true },
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+      xAxis: { type: "value", max: 100, axisLabel: { color: muted, formatter: "{value} %" }, splitLine: { lineStyle: { color: line } } },
+      yAxis: { type: "category", inverse: true, data: ["CPU", "RAM", "Disque"], axisLabel: { color: muted }, axisTick: { show: false }, axisLine: { show: false } },
+      series: [{ type: "bar", data: [cpuPct, ramPct, diskPct], barMaxWidth: 18, itemStyle: { color: bar, borderRadius: [0, 2, 2, 0] }, label: { show: true, position: "right", color: muted, formatter: "{c} %" } }],
+      aria: { enabled: true, label: { description: "Quotas utilisés : CPU, RAM et disque." } },
+      textStyle: { fontFamily: '"IBM Plex Sans", system-ui, sans-serif' },
+    };
+  }, [data]);
+
   return (
     <div>
       <PageHeader
@@ -147,6 +172,13 @@ export default function DashboardPage() {
             />
           </div>
 
+          {quotaOption && (
+            <div className="panel mt-4 p-4">
+              <h2 className="mb-2 text-sm font-semibold">{t("dashboard.quotas")}</h2>
+              <Chart option={quotaOption} height={140} ariaLabel="Quotas CPU, RAM et disque" />
+            </div>
+          )}
+
           {data.alerts.length > 0 && (
             <div className="mt-4 space-y-2">
               {data.alerts.map((a) => {
@@ -156,8 +188,8 @@ export default function DashboardPage() {
                     key={a.serviceId}
                     className="flex items-center justify-between rounded-xl border px-4 py-3 text-xs"
                     style={{
-                      borderColor: "rgba(168, 70, 47, 0.45)",
-                      background: "rgba(168, 70, 47, 0.14)",
+                      borderColor: "var(--brique)",
+                      background: "var(--brique-clair)",
                     }}
                     role="alert"
                   >

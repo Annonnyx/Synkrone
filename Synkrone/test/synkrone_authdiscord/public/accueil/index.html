@@ -22,6 +22,7 @@
             <div class="scene-fade"></div>
             <div class="grid-plane"></div>
             <div class="grid-glow"></div>
+            <svg class="bus" aria-hidden="true" viewBox="0 0 400 120" preserveAspectRatio="none" focusable="false"><path class="bus-path" d="M10 100 C 120 40, 280 40, 390 90" fill="none" stroke="var(--ambre)" stroke-width="2" stroke-linecap="round"/></svg>
             <div class="cabinets">
                 <div class="cabinet c1"></div>
                 <div class="cabinet c2"></div>
@@ -729,23 +730,14 @@
                     const el = document.getElementById(id);
                     if (el) el.textContent = value;
                 };
-                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 const countUp = (id, target, format) => {
                     const el = document.getElementById(id);
                     if (!el) return;
-                    if (reduceMotion || !Number.isFinite(target)) {
-                        set(id, format(target));
+                    if (!Number.isFinite(target)) {
+                        set(id, '—');
                         return;
                     }
-                    const start = performance.now();
-                    const duration = 800;
-                    const tick = (now) => {
-                        const progress = Math.min((now - start) / duration, 1);
-                        const eased = 1 - Math.pow(1 - progress, 3);
-                        set(id, format(target * eased));
-                        if (progress < 1) requestAnimationFrame(tick);
-                    };
-                    requestAnimationFrame(tick);
+                    set(id, format(target));
                 };
                 const fmtInt = (v) => String(Math.round(v));
                 const fmtPct = (v) => `${String((Math.round(v * 10) / 10)).replace('.', ',')} %`;

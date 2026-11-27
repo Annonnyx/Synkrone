@@ -125,6 +125,7 @@
         </div>
     </section>
 
+    <script src="/assets/status-chart.js"></script>
     <script>
         (function () {
         function fmt(n) {
@@ -140,11 +141,15 @@
             const bars = document.getElementById('st-bars');
             const dayBars = Array.isArray(data?.uptime?.bars) ? data.uptime.bars : [];
             if (bars) {
-                bars.innerHTML = (dayBars.length ? dayBars : Array.from({ length: 7 }, () => ({ pct: 0, date: '' }))).map((bar) => {
-                    const h = Math.max(6, Math.round((Number(bar.pct) || 0) * 0.88));
-                    const label = bar.date ? bar.date.slice(8) : '';
-                    return `<div class="st-bar"><i style="height:${h}px"></i><span>${label}</span></div>`;
-                }).join('');
+                if (window.synkroneStatusChart) {
+                    window.synkroneStatusChart.render(dayBars.length ? dayBars : Array.from({ length: 7 }, () => ({ pct: 0, date: '' })));
+                } else {
+                    bars.innerHTML = (dayBars.length ? dayBars : Array.from({ length: 7 }, () => ({ pct: 0, date: '' }))).map((bar) => {
+                        const h = Math.max(6, Math.round((Number(bar.pct) || 0) * 0.88));
+                        const label = bar.date ? bar.date.slice(5) : '';
+                        return `<div class="st-bar"><i style="height:${h}px"></i><span>${label}</span></div>`;
+                    }).join('');
+                }
             }
             const liveEl = document.getElementById('st-live');
             if (liveEl) liveEl.textContent = data?.live ? 'En ligne' : 'Hors ligne';

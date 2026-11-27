@@ -1,10 +1,10 @@
 {
   "name": "synkrone",
   "private": true,
-  "description": "synkrone.app — site public + panel d'hébergement (un process)",
+  "description": "synkrone.app \u2014 site public + panel d'h\u00e9bergement (un process)",
   "scripts": {
     "dev": "node apps/www/server.js",
-    "build": "npm run build --prefix dashboard/Orbital-hebergeur",
+    "build": "npm run build --prefix apps/www && npm run build --prefix dashboard/Orbital-hebergeur",
     "start": "NODE_ENV=production node apps/www/server.js"
   }
 }

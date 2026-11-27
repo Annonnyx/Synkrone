@@ -319,6 +319,29 @@ function applyMeta(shell, { title, description, pathname, image }) {
     return html;
 }
 
+const STORY_PATHS = new Set(['/', '/accueil', '/discord', '/discord/bots', '/minecraft', '/minecraft/serveur']);
+
+function shellAttrsForPath(pathname) {
+    const current = normalizePath(pathname);
+    if (frameSrcForPath(current) || !leafForPath(current)) {
+        return { scroll: 'stage', motion: 'off' };
+    }
+    return { scroll: 'doc', motion: STORY_PATHS.has(current) ? 'story' : 'off' };
+}
+
+function applyShellAttrs(html, pathname) {
+    const { scroll, motion } = shellAttrsForPath(pathname);
+    return String(html || '').replace(
+        /<html\b([^>]*)>/i,
+        (tag, attrs) => {
+            const clean = String(attrs || '')
+                .replace(/\s*data-scroll="[^"]*"/gi, '')
+                .replace(/\s*data-motion="[^"]*"/gi, '');
+            return `<html${clean} data-scroll="${scroll}" data-motion="${motion}">`;
+        }
+    );
+}
+
 function applyFrameShell(html, frameSrc) {
     let next = html.replace(
         /<div id="content-root"[^>]*>[\s\S]*?<\/div>\s*<!--LEAF_BODY-->/,
@@ -339,21 +362,21 @@ async function renderShell({ shellPath, publicDir, pathname }) {
     const title = titleForPath(pathname);
     const image = imageForPath(pathname);
     if (frameSrc) {
-        return applyFrameShell(applyMeta(shell, { title, description, pathname, image }), frameSrc);
+        return applyShellAttrs(applyFrameShell(applyMeta(shell, { title, description, pathname, image }), frameSrc), pathname);
     }
     if (!leafRel) {
-        return applyMeta(shell, { title, description, pathname, image });
+        return applyShellAttrs(applyMeta(shell, { title, description, pathname, image }), pathname);
     }
     let leafHtml = '';
     try {
         leafHtml = await fs.readFile(path.join(publicDir, leafRel.replace(/^\//, '')), 'utf8');
     } catch {
-        return applyMeta(shell, { title, description, pathname, image });
+        return applyShellAttrs(applyMeta(shell, { title, description, pathname, image }), pathname);
     }
     const parts = extractLeafParts(leafHtml);
     const leafTitle = parts.title || title;
     const desc = parts.description || description;
-    let html = applyMeta(shell, { title: leafTitle, description: desc, pathname, image });
+    let html = applyShellAttrs(applyMeta(shell, { title: leafTitle, description: desc, pathname, image }), pathname);
     const markedHead = parts.headExtras.replace(/<(link|style)\b[^>]*>/gi, (tag) => {
         const attr = /accueil\.css/i.test(tag) ? 'shared' : '1';
         return tag.replace(/<(link|style)\b/i, `<$1 data-leaf-asset="${attr}"`);
@@ -382,6 +405,8 @@ module.exports = {
     jsonLdForPath,
     extractLeafParts,
     styleLeaksToChrome,
+    shellAttrsForPath,
+    applyShellAttrs,
     renderShell,
     SITE_ORIGIN
 };

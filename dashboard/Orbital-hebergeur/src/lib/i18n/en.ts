@@ -156,6 +156,7 @@ export const en: Dict = {
     projects: "Projects",
     viewLogs: "View logs",
     cpuAllocated: "CPU allocated",
+    quotas: "Quotas",
     cores: "cores",
     inUse: "{pct}% in use",
     storageLimit: "limit {limit}",

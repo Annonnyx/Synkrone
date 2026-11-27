@@ -154,6 +154,7 @@ export const fr = {
     projects: "Projets",
     viewLogs: "Voir les logs",
     cpuAllocated: "CPU alloué",
+    quotas: "Quotas",
     cores: "cœurs",
     inUse: "{pct}% utilisé",
     storageLimit: "limite {limit}",

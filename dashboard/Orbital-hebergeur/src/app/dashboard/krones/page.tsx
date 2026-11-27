@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/client";
 import { useI18n, useT } from "@/lib/i18n";
@@ -8,6 +8,8 @@ import { usePoll } from "@/lib/use-poll";
 import { ErrorText } from "@/components/panel";
 import { PageHeader } from "@/components/ui";
 import { Table, Td, Th } from "@/components/ui/table";
+import { Chart } from "@/components/chart";
+import type { EChartsOption } from "@/lib/echarts";
 
 type Wallet = {
   balance: number;
@@ -36,6 +38,27 @@ export default function KronesPage() {
 
   usePoll(load, 15000);
 
+  const ledgerOption: EChartsOption | null = useMemo(() => {
+    const rows = (wallet?.ledger ?? []).slice().sort((a, b) => a.at - b.at);
+    if (rows.length < 2) return null;
+    const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dark = typeof document !== "undefined" && document.documentElement.dataset.theme === "dark";
+    const line = dark ? "#6b9d7e" : "#3f6b52";
+    const muted = dark ? "#8fa096" : "#5c6a66";
+    const gridLine = dark ? "#333e38" : "#5c6a661f";
+    return {
+      backgroundColor: "transparent",
+      animation: !reduce,
+      grid: { left: 8, right: 8, top: 16, bottom: 8, containLabel: true },
+      tooltip: { trigger: "axis" },
+      xAxis: { type: "time", axisLabel: { color: muted, formatter: (v: number) => new Date(v).toLocaleDateString() }, splitLine: { lineStyle: { color: gridLine } } },
+      yAxis: { type: "value", axisLabel: { color: muted }, splitLine: { lineStyle: { color: gridLine } } },
+      series: [{ type: "line", data: rows.map((r) => [r.at, r.balanceAfter]), smooth: true, showSymbol: false, lineStyle: { color: line, width: 2 }, itemStyle: { color: line } }],
+      aria: { enabled: true, label: { description: "Solde Krônes après chaque mouvement." } },
+      textStyle: { fontFamily: '"IBM Plex Sans", system-ui, sans-serif' },
+    };
+  }, [wallet]);
+
   const loc = locale === "en" ? "en-GB" : "fr-FR";
 
   return (
@@ -46,9 +69,9 @@ export default function KronesPage() {
         <div
           className="mb-4 rounded-lg border px-3 py-3 text-sm"
           style={{
-            borderColor: "rgba(184, 130, 61, 0.45)",
-            background: "rgba(184, 130, 61, 0.14)",
-            color: "#e3b675",
+            borderColor: "var(--ambre)",
+            background: "var(--ambre-clair)",
+            color: "var(--sk-text)",
           }}
         >
           <p>{t("krones.lowBalance")}</p>
@@ -95,6 +118,11 @@ export default function KronesPage() {
         </a>
       </div>
 
+      {ledgerOption && (
+        <div className="panel mb-4 p-4">
+          <Chart option={ledgerOption} height={180} ariaLabel="Solde Krônes dans le temps" />
+        </div>
+      )}
       <h2 className="mb-3 text-sm font-semibold">{t("krones.ledger")}</h2>
       <div className="panel p-0">
         <Table>

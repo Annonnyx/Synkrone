@@ -21,6 +21,7 @@
     function apply(theme) {
         var next = theme === "dark" ? "dark" : "light";
         document.documentElement.setAttribute("data-theme", next);
+        document.documentElement.classList.toggle("dark", next === "dark");
         document.documentElement.style.colorScheme = next;
         return next;
     }
@@ -48,6 +49,7 @@
             if (!doc || !doc.documentElement) return;
             var theme = read();
             doc.documentElement.setAttribute("data-theme", theme);
+            doc.documentElement.classList.toggle("dark", theme === "dark");
             doc.documentElement.style.colorScheme = theme;
         } catch (err) {
             /* cross-origin or not ready */

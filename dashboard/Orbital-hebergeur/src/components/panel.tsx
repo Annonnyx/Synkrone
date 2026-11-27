@@ -200,9 +200,9 @@ export function LowBalanceBanner() {
     <div
       className="rounded-lg border px-3 py-2 text-xs"
       style={{
-        borderColor: "rgba(184, 130, 61, 0.45)",
-        background: "rgba(184, 130, 61, 0.14)",
-        color: "#e3b675",
+        borderColor: "var(--ambre)",
+        background: "var(--ambre-clair)",
+        color: "var(--sk-text)",
       }}
       role="status"
     >
@@ -419,8 +419,8 @@ export function EngineBanner() {
     <div
       className="mb-4 rounded-xl border px-4 py-3 text-xs"
       style={{
-        borderColor: "rgba(168, 70, 47, 0.45)",
-        background: "rgba(168, 70, 47, 0.14)",
+        borderColor: "var(--brique)",
+        background: "var(--brique-clair)",
         color: "var(--danger)",
       }}
       role="alert"
@@ -473,8 +473,8 @@ export function ErrorText({ error }: { error: string | null }) {
     <div
       className="rounded-lg border px-3 py-2 text-xs"
       style={{
-        borderColor: "rgba(168, 70, 47, 0.45)",
-        background: "rgba(168, 70, 47, 0.14)",
+        borderColor: "var(--brique)",
+        background: "var(--brique-clair)",
         color: "var(--danger)",
       }}
       role="alert"
@@ -509,8 +509,8 @@ export function SecretBanner({
     <div
       className="mb-3 rounded-lg border px-3 py-2"
       style={{
-        borderColor: "rgba(63, 107, 82, 0.45)",
-        background: "rgba(63, 107, 82, 0.16)",
+        borderColor: "var(--sk-accent)",
+        background: "var(--sk-accent-soft)",
       }}
       role="status"
     >

@@ -1241,6 +1241,68 @@ button.tab-btn.active {
     body.hide-brand-mobile #app-header .header-top { display: flex; }
 }
 
+
+/* ——— Modes de scroll (refonte) ——— */
+html[data-scroll="stage"], html[data-scroll="stage"] body {
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+}
+html[data-scroll="doc"], html[data-scroll="doc"] body {
+    height: auto;
+    overflow: visible;
+}
+html[data-scroll="doc"] .app-container {
+    height: auto;
+    min-height: 100dvh;
+}
+html[data-scroll="doc"] .app-container > main {
+    overflow: visible;
+    flex: none;
+}
+html[data-scroll="doc"] .content-stage {
+    height: auto;
+    flex: none;
+    min-height: 0;
+}
+html[data-scroll="doc"] .content-stage > .content-frame {
+    position: static;
+    height: auto;
+    overflow: visible;
+}
+html[data-scroll="doc"] .content-frame {
+    height: auto;
+    overflow: visible;
+}
+html[data-scroll="doc"] .chrome {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+html[data-scroll="stage"] .chrome {
+    position: relative;
+}
+/* Lenis (lenis/dist/lenis.css) — uniquement en mode story */
+html[data-motion="story"].lenis, html[data-motion="story"].lenis body {
+    height: auto;
+}
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+    pointer-events: none;
+}
+/* En mode story, GSAP possède l'opacité/transform des reveals */
+html[data-motion="story"] .reveal {
+    transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

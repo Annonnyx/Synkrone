@@ -123,7 +123,7 @@ a {
 
 :focus-visible {
     outline: 2px solid var(--hall-red);
-    outline-offset: 3px;
+    outline-offset: 2px;
 }
 
 ::selection {
@@ -220,7 +220,7 @@ a {
 .hero h1 {
     margin: 0;
     font-family: var(--serif);
-    font-size: clamp(3.05rem, 8.6vw, 7.4rem);
+    font-size: clamp(3.25rem, 8vw, 6.5rem);
     font-weight: 700;
     letter-spacing: -0.01em;
     line-height: 1.05;
@@ -1526,6 +1526,39 @@ body.modal-open {
 
     .offer-row {
         grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+/* ——— Bus ambre (Allumage) ——— */
+.bus {
+    position: absolute;
+    right: 4%;
+    top: 28%;
+    width: min(340px, 42vw);
+    height: 120px;
+    z-index: 2;
+    pointer-events: none;
+    overflow: visible;
+}
+/* En mode story, GSAP possède le h1 : pas d'animation CSS sur le hero */
+html[data-motion="story"] .hero-copy h1,
+html[data-motion="story"] .hero-copy .lede,
+html[data-motion="story"] .hero-copy .cta,
+html[data-motion="story"] .hero-copy .coords,
+html[data-motion="story"] .hero-copy .scroll-hint {
+    animation: none;
+}
+/* Armoires : cachées en story (anime.js les monte), visibles sinon */
+html[data-motion="story"] .cabinet {
+    opacity: 0;
+}
+html[data-motion="story"] .bus-path {
+    stroke-dasharray: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    html[data-motion="story"] .cabinet {
+        opacity: 1;
     }
 }
 
