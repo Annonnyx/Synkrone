@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-scroll="doc" data-motion="story">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,6 +54,7 @@
                 }
             } catch (e) {}
             document.documentElement.setAttribute('data-theme', t);
+            document.documentElement.classList.toggle('dark', t === 'dark');
             document.documentElement.style.colorScheme = t;
         })();
     </script>
@@ -65,8 +66,14 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"></noscript>
     <link rel="stylesheet" href="/design/synkrone.css?v=equipe-tabs">
     <style>
-        html, body { width: 100%; max-width: 100%; height: 100%; height: 100dvh; overflow: hidden; background: var(--sk-bg); color: var(--sk-text); }
-        .content-stage {
+        html, body { width: 100%; max-width: 100%; background: var(--sk-bg); color: var(--sk-text); }
+        /* data-scroll="stage" : scène viewport (iframes, outils) — cadre en absolute, document figé. */
+        html[data-scroll="stage"], html[data-scroll="stage"] body {
+            height: 100%;
+            height: 100dvh;
+            overflow: hidden;
+        }
+        html[data-scroll="stage"] .content-stage {
             position: relative;
             flex: 1 1 0;
             min-height: 0;
@@ -74,7 +81,7 @@
             width: 100%;
             max-width: 100%;
         }
-        .content-stage > .content-frame {
+        html[data-scroll="stage"] .content-stage > .content-frame {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -82,6 +89,22 @@
             max-width: 100%;
             min-height: 0;
         }
+        /* data-scroll="doc" : flux document, header sticky, footer dans le flux (voir synkrone.css). */
+        html[data-scroll="doc"] .content-stage {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            min-height: 0;
+        }
+        html[data-scroll="doc"] .content-stage > .content-frame {
+            position: static;
+            inset: auto;
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            min-height: 0;
+        }
+        html[data-scroll="doc"] iframe.content-frame { height: 100%; }
         .header-login-row {
     display: flex;
     flex-wrap: wrap;
@@ -126,6 +149,7 @@
     </style>
 </head>
 <body>
+    <a class="sk-skip-link" href="#content-root">Aller au contenu</a>
     <div class="app-container">
         <div class="chrome" id="app-chrome">
             <header id="app-header"></header>
@@ -150,7 +174,7 @@
         <main>
             <div id="section-menu-container"></div>
             <div class="content-stage">
-            <div id="content-root" class="content-frame" data-leaf=""></div><!--LEAF_BODY-->
+            <div id="content-root" class="content-frame" tabindex="-1" data-leaf=""></div><!--LEAF_BODY-->
             <iframe id="content-frame" class="content-frame hidden" title="Contenu de la section" src="about:blank"></iframe>
             </div>
         </main>
@@ -905,6 +929,15 @@
             const pane = root || document.getElementById('content-root');
             if (!pane) return;
             const nodes = pane.querySelectorAll('.reveal');
+            // Mode story : GSAP possède .bot-card / .plate / .project, le CSS de .reveal ne doit pas se battre.
+            if (document.documentElement.getAttribute('data-motion') === 'story') {
+                nodes.forEach((node) => node.classList.add('in'));
+                if (pane._revealIo) {
+                    pane._revealIo.disconnect();
+                    pane._revealIo = null;
+                }
+                return;
+            }
             if (pane._revealIo) {
                 pane._revealIo.disconnect();
                 pane._revealIo = null;
@@ -1102,8 +1135,33 @@
             playLeafReveal(root);
         }
 
+        const STORY_PATHS = ['/', '/accueil', '/discord', '/discord/bots', '/minecraft', '/minecraft/serveur'];
+
+        function normalizeLeafRoute(path) {
+            const key = leafCacheKey(path).replace(/\/index\.html$/, '').replace(/\.html$/, '');
+            if (key === '/accueil') return '/';
+            return key || '/';
+        }
+
+        // Miroir client de shellAttrsForPath (apps/www/lib/leaf-pages.js).
+        function scrollAttrsForPath(path) {
+            if (isIsolatedAppPath(path)) return { scroll: 'stage', motion: 'off' };
+            const route = normalizeLeafRoute(path);
+            return { scroll: 'doc', motion: STORY_PATHS.includes(route) ? 'story' : 'off' };
+        }
+
+        function applyScrollMode(path) {
+            const attrs = scrollAttrsForPath(path);
+            const root = document.documentElement;
+            if (root.getAttribute('data-scroll') !== attrs.scroll) root.setAttribute('data-scroll', attrs.scroll);
+            if (root.getAttribute('data-motion') !== attrs.motion) root.setAttribute('data-motion', attrs.motion);
+            // stop() tourne avant chaque échange de feuille : SplitText.revert() précède snapshotLeaf.
+            if (window.synkroneMotion) window.synkroneMotion.sync(normalizeLeafRoute(path));
+        }
+
         function loadContent(path) {
             const gen = ++contentLoadGen;
+            applyScrollMode(path);
             if (isIsolatedAppPath(path)) {
                 setFrameSrc(path);
                 return Promise.resolve();
@@ -1513,4 +1571,5 @@
         </div>
     </div>
 </body>
+    <script src="/assets/synkrone-motion.js" defer></script>
 </html>

@@ -20,6 +20,7 @@ import {
 import { Server } from "lucide-react";
 import { PageHeader } from "@/components/ui";
 import { useCreationFlags } from "@/lib/use-creation-flags";
+import { QuotaBarsChart } from "@/components/charts";
 import { auditActionLabel } from "@/lib/audit-label";
 import { firstCreateHref } from "@/lib/services/creation-flags";
 import { cpuPercentOfQuota } from "@/lib/runtime/cpu";
@@ -145,6 +146,38 @@ export default function DashboardPage() {
               value={`${(data.totals.rxKb / 1024).toFixed(1)} MB rx`}
               sub={`${(data.totals.txKb / 1024).toFixed(1)} MB tx`}
             />
+          </div>
+
+          <div className="panel mt-3 p-4">
+            <div className="label mb-2">{t("dashboard.quotasTitle")}</div>
+            <QuotaBarsChart
+              quotas={[
+                {
+                  name: "CPU",
+                  percent: data.totals.cpuPercent,
+                  detail: `${(data.totals.cpuMillicores / 1000).toFixed(1)} ${t("dashboard.cores")}`,
+                },
+                {
+                  name: "RAM",
+                  percent: data.totals.memoryLimitMb
+                    ? (data.totals.memoryUsedMb / data.totals.memoryLimitMb) * 100
+                    : 0,
+                  detail: `${fmtBytesMb(data.totals.memoryUsedMb)} / ${fmtBytesMb(data.totals.memoryLimitMb)}`,
+                },
+                {
+                  name: "Disque",
+                  percent: data.totals.storageLimitMb
+                    ? (data.totals.diskMb / data.totals.storageLimitMb) * 100
+                    : 0,
+                  detail: `${fmtBytesMb(data.totals.diskMb)} / ${fmtBytesMb(data.totals.storageLimitMb)}`,
+                },
+              ]}
+              labels={{
+                title: t("dashboard.quotasTitle"),
+                description: t("dashboard.quotasDescription"),
+              }}
+            />
+            <p className="hint mt-2">{t("dashboard.quotasDescription")}</p>
           </div>
 
           {data.alerts.length > 0 && (

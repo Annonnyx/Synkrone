@@ -8,6 +8,7 @@ import { usePoll } from "@/lib/use-poll";
 import { ErrorText } from "@/components/panel";
 import { PageHeader } from "@/components/ui";
 import { Table, Td, Th } from "@/components/ui/table";
+import { LedgerLineChart } from "@/components/charts";
 
 type Wallet = {
   balance: number;
@@ -96,6 +97,18 @@ export default function KronesPage() {
       </div>
 
       <h2 className="mb-3 text-sm font-semibold">{t("krones.ledger")}</h2>
+      {(wallet?.ledger ?? []).length >= 2 && (
+        <div className="panel mb-4 p-4">
+          <LedgerLineChart
+            rows={(wallet?.ledger ?? []).slice(0, 30).map((row) => ({ at: row.at, balanceAfter: row.balanceAfter }))}
+            labels={{
+              description: t("krones.ledgerDescription"),
+              seriesName: t("krones.balance"),
+            }}
+          />
+          <p className="hint mt-2">{t("krones.ledgerDescription")}</p>
+        </div>
+      )}
       <div className="panel p-0">
         <Table>
           <thead>

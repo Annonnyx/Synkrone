@@ -147,6 +147,16 @@ const FRAME_BY_PATH = {
 
 const BOT_FRAME_SLUGS = new Set(['vax', 'arceus', 'asuna', 'kayaba', 'yui', 'bot']);
 
+// Pages récit : lissage du document (Lenis) + reveals batch. Tout le reste est un outil en scroll natif.
+const STORY_PATHS = new Set(['/', '/accueil', '/discord', '/discord/bots', '/minecraft', '/minecraft/serveur']);
+
+function shellAttrsForPath(pathname) {
+    const current = normalizePath(pathname);
+    if (frameSrcForPath(current)) return { scroll: 'stage', motion: 'off' };
+    if (!leafForPath(current)) return { scroll: 'stage', motion: 'off' };
+    return { scroll: 'doc', motion: STORY_PATHS.has(current) ? 'story' : 'off' };
+}
+
 function normalizePath(pathname) {
     let value = String(pathname || '/');
     if (value.length > 1 && value.endsWith('/')) value = value.slice(0, -1);
@@ -331,6 +341,18 @@ function applyFrameShell(html, frameSrc) {
     return next;
 }
 
+function applyShellAttrs(html, attrs) {
+    const { scroll, motion } = attrs || shellAttrsForPath('/');
+    let next = String(html || '');
+    if (/<html\b[^>]*\bdata-scroll=["']/.test(next)) {
+        next = next
+            .replace(/\sdata-scroll=["'][^"']*["']/, ` data-scroll="${scroll}"`)
+            .replace(/\sdata-motion=["'][^"']*["']/, ` data-motion="${motion}"`);
+        return next;
+    }
+    return next.replace(/<html\b([^>]*)>/i, `<html$1 data-scroll="${scroll}" data-motion="${motion}">`);
+}
+
 async function renderShell({ shellPath, publicDir, pathname }) {
     const shell = await fs.readFile(shellPath, 'utf8');
     const leafRel = leafForPath(pathname);
@@ -338,11 +360,12 @@ async function renderShell({ shellPath, publicDir, pathname }) {
     const description = descriptionForPath(pathname);
     const title = titleForPath(pathname);
     const image = imageForPath(pathname);
+    const attrs = shellAttrsForPath(pathname);
     if (frameSrc) {
-        return applyFrameShell(applyMeta(shell, { title, description, pathname, image }), frameSrc);
+        return applyShellAttrs(applyFrameShell(applyMeta(shell, { title, description, pathname, image }), frameSrc), attrs);
     }
     if (!leafRel) {
-        return applyMeta(shell, { title, description, pathname, image });
+        return applyShellAttrs(applyMeta(shell, { title, description, pathname, image }), attrs);
     }
     let leafHtml = '';
     try {
@@ -363,7 +386,7 @@ async function renderShell({ shellPath, publicDir, pathname }) {
         /<div id="content-root"[^>]*>[\s\S]*?<\/div>\s*<!--LEAF_BODY-->/,
         `<div id="content-root" class="content-frame" data-leaf="${leafRel}">${parts.body}</div><!--LEAF_BODY-->`
     );
-    return html;
+    return applyShellAttrs(html, attrs);
 }
 
 module.exports = {
@@ -383,5 +406,7 @@ module.exports = {
     extractLeafParts,
     styleLeaksToChrome,
     renderShell,
+    shellAttrsForPath,
+    STORY_PATHS,
     SITE_ORIGIN
 };

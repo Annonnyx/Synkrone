@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* class="dark" posée en même temps que data-theme="dark", depuis le même cookie. */
+@custom-variant dark (&:is(.dark *));
+
 :root {
   color-scheme: light;
   --pierre: #eef0ea;
@@ -68,8 +71,12 @@ html[data-theme="dark"] {
   --sk-text: #eef0ea;
   --sk-text-muted: #8fa096;
   --sk-text-faint: #6d7c76;
-  --sk-accent-soft: rgba(63, 107, 82, 0.35);
-  --sk-accent-ring: rgba(63, 107, 82, 0.7);
+  --sk-accent: #6b9d7e;
+  --sk-accent-hover: #9ecfb0;
+  --sk-accent-soft: rgba(107, 157, 126, 0.35);
+  --sk-accent-ring: rgba(107, 157, 126, 0.7);
+  --mousse: #6b9d7e;
+  --mousse-fonce: #9ecfb0;
   --sk-success: #9ad1af;
   --sk-warning: #e3b675;
   --sk-danger: #c56a55;
@@ -392,4 +399,58 @@ html[data-theme="dark"] .login-panel {
   .page-title {
     font-size: 1.25rem;
   }
+}
+
+/* ——— Alias shadcn mappés sur les alias hex existants (pas d'oklch) ——— */
+:root {
+  --background: var(--sk-bg);
+  --foreground: var(--sk-text);
+  --card: var(--sk-surface);
+  --card-foreground: var(--sk-text);
+  --popover: var(--sk-surface);
+  --popover-foreground: var(--sk-text);
+  --primary: var(--sk-accent);
+  --primary-foreground: #ffffff;
+  --secondary: var(--sk-surface-2);
+  --secondary-foreground: var(--sk-text);
+  --muted-fg: var(--sk-text-muted);
+  --destructive: var(--sk-danger);
+  --border: var(--sk-border-strong);
+  --input: var(--sk-border-strong);
+}
+html[data-theme="dark"] {
+  --background: #1b211e;
+  --foreground: #eef0ea;
+  --card: #232b27;
+  --card-foreground: #eef0ea;
+  --popover: #232b27;
+  --popover-foreground: #eef0ea;
+  --primary: var(--sk-accent);
+  --primary-foreground: #10201a;
+  --secondary: #2a332e;
+  --secondary-foreground: #eef0ea;
+  --muted-fg: #8fa096;
+  --destructive: #c56a55;
+  --border: #3d4a44;
+  --input: #3d4a44;
+}
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--panel-2);
+  --color-muted-foreground: var(--muted-fg);
+  --color-accent: var(--sk-accent-soft);
+  --color-accent-foreground: var(--sk-text);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }

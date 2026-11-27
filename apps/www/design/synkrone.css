@@ -1371,3 +1371,122 @@ button.tab-btn.active {
     #menu-container { min-width: 0; }
     .header-top { overflow: hidden; }
 }
+
+/* ————————————————————————————————————————————————————————————————————————
+   Refonte visuelle — système commun (docs/plans/refonte-visuelle.md §1, §5)
+   Vitrine HTML servi par Express. Un nœud, un moteur :
+     - bus SVG + armoires  : anime.js v4 (assets/motion.js, createDrawable)
+     - h1 de l'accueil     : GSAP SplitText (masque de lignes)
+     - scroll des pages récit : Lenis piloté par gsap.ticker
+     - .bot-card / .plate / .project : ScrollTrigger.batch
+   Tout le reste est un outil : scroll natif, mouvement limité à l'état.
+   ———————————————————————————————————————————————————————————————————————— */
+
+/* Lien d'évitement (clavier) */
+.sk-skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 80;
+    padding: 10px 16px;
+    background: var(--sk-accent);
+    color: #fff;
+    font-size: var(--sk-fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0 0 var(--sk-radius) var(--sk-radius);
+}
+.sk-skip-link:focus,
+.sk-skip-link:focus-visible { left: 0; outline-offset: 0; }
+
+/* Focus : anneau mousse 2 px, décalage 2 px */
+:focus-visible { outline: 2px solid var(--sk-accent); outline-offset: 2px; }
+#content-root:focus { outline: none; }
+#content-root[tabindex="-1"]:focus-visible { outline: none; }
+
+/* ——— data-scroll="doc" : flux document, header sticky, footer dans le flux ——— */
+html[data-scroll="doc"] .app-container {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+html[data-scroll="doc"] .app-container > main {
+    flex: 1 0 auto;
+    overflow: visible;
+    min-height: 0;
+}
+html[data-scroll="doc"] .content-frame { overflow: visible; height: auto; }
+html[data-scroll="doc"] #app-chrome {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--sk-bg);
+    box-shadow: 0 1px 0 var(--sk-border);
+}
+html[data-scroll="doc"] #section-menu-container { position: sticky; top: var(--sk-header-h); z-index: 35; }
+html[data-scroll="doc"] #section-menu-container:empty { display: none; }
+
+/* ——— data-motion="story" : le CSS de .reveal ne se bat plus avec GSAP ——— */
+html[data-motion="story"] .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+}
+html[data-motion="story"] .hero-copy h1 { animation: none; }
+
+/* État armé : posé par assets/synkrone-motion.js juste avant l'Allumage, retiré
+   dès la fin de la timeline. Sans JS, en reduced-motion ou hors page récit, tout
+   reste visible et lisible au premier paint. */
+html.sk-armed .hero-copy h1 { opacity: 0; }
+html.sk-armed .hero .cabinet { opacity: 0; }
+html.sk-armed .hero .grid-plane { opacity: 0.4; }
+
+/* Bus ambre du rack (décoratif : aria-hidden, pointer-events none) */
+.sk-bus {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 6%;
+    width: 100%;
+    height: 62%;
+    z-index: 3;
+    pointer-events: none;
+    color: var(--ambre);
+    opacity: 0.85;
+}
+.sk-bus-line { stroke: var(--ambre); }
+.sk-bus-node { fill: var(--ambre); }
+html[data-theme="dark"] .sk-bus { color: var(--ambre-clair); opacity: 0.75; }
+html[data-theme="dark"] .sk-bus-line { stroke: #e3b675; }
+html[data-theme="dark"] .sk-bus-node { fill: #e3b675; }
+@media (max-width: 720px) { .sk-bus { display: none; } }
+
+/* Lenis : classes posées par lenis/dist/lenis.css (assets/motion.css) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ——— Gabarit de bandes partagé (accueil, bots, Cantale, Krônes, Bump, Me) ——— */
+.band { position: relative; padding: clamp(64px, 10vh, 112px) var(--pad, 24px); border-top: 1px solid var(--hall-line, var(--sk-border)); }
+.band-inner { max-width: 1720px; margin: 0 auto; }
+.band-head { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 24px; margin-bottom: 36px; align-items: end; }
+.band-head h2 { margin: 0; font-family: var(--sk-serif); font-size: clamp(2rem, 4vw, 3.15rem); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; color: var(--hall-ink, var(--sk-text)); }
+.band-head p { margin: 8px 0 0; max-width: 62ch; color: var(--hall-mute, var(--sk-text-muted)); font-size: 16px; line-height: 1.55; }
+.sect-id { margin: 0; padding-top: 8px; font-family: var(--sk-mono); font-size: 14px; letter-spacing: 0.02em; color: var(--hall-faint, var(--sk-text-faint)); border-top: 1px solid var(--hall-line, var(--sk-border)); }
+@media (max-width: 860px) { .band-head { grid-template-columns: 1fr; gap: 10px; } }
+
+/* Statut : graphe ECharts (les barres CSS restent le repli sans JS) */
+.st-chart { width: 100%; height: 220px; }
+.st-uptime { align-items: stretch; }
+.st-uptime .st-chart { margin-top: 18px; }
+
+/* ——— Reduced motion : aucun tween, bus déjà tracé, contenu en place ——— */
+@media (prefers-reduced-motion: reduce) {
+    html[data-motion="story"] .reveal { opacity: 1; transform: none; transition: none; }
+    html.sk-armed .hero-copy h1,
+    html.sk-armed .hero .cabinet { opacity: 1; }
+    html.sk-armed .hero .grid-plane { opacity: 1; }
+    .sk-bus { opacity: 0.85; }
+    .hero-copy h1, .hero-copy .lede, .hero-copy .cta, .hero-copy .coords, .hero-copy .scroll-hint { animation: none; }
+    .sk-bus .sk-bus-line, .sk-bus .sk-bus-node { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; opacity: 1 !important; }
+}

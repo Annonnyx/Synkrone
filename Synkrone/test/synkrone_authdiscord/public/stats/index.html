@@ -19,6 +19,8 @@
                 <div class="st-pct" id="st-pct">—<small>Uptime 7 jours</small></div>
             </div>
             <div class="st-bars" id="st-bars" aria-hidden="true"></div>
+            <div class="st-chart" id="st-chart" role="img"
+                 aria-label="Uptime mesuré sur 7 jours, pourcentage par jour, de 0 à 100. Les tuiles texte ci-dessous reprennent les mêmes mesures."></div>
         </div>
     </section>
 
@@ -185,7 +187,10 @@
             try {
                 const res = await fetch('/api/status');
                 if (!res.ok) throw new Error('status');
-                render(await res.json());
+                const payload = await res.json();
+                render(payload);
+                window.__skStatusData = payload;
+                document.dispatchEvent(new CustomEvent('synkrone:status'));
             } catch {
                 render({ live: false, uptime: { pct: null, bars: [] }, hosting: {}, platform: {} });
             }

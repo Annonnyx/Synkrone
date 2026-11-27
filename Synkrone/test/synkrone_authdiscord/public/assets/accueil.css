@@ -220,7 +220,7 @@ a {
 .hero h1 {
     margin: 0;
     font-family: var(--serif);
-    font-size: clamp(3.05rem, 8.6vw, 7.4rem);
+    font-size: clamp(3.25rem, 8vw, 6.5rem);
     font-weight: 700;
     letter-spacing: -0.01em;
     line-height: 1.05;
