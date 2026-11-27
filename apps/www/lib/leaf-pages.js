@@ -146,6 +146,21 @@ const FRAME_BY_PATH = {
 };
 
 const BOT_FRAME_SLUGS = new Set(['vax', 'arceus', 'asuna', 'kayaba', 'yui', 'bot']);
+const STORY_PATHS = new Set(['/', '/accueil', '/discord', '/discord/bots', '/minecraft', '/minecraft/serveur']);
+
+function shellAttrsForPath(pathname) {
+    const current = normalizePath(pathname);
+    if (frameSrcForPath(current) || !leafForPath(current)) return { scroll: 'stage', motion: 'off' };
+    return { scroll: 'doc', motion: STORY_PATHS.has(current) ? 'story' : 'off' };
+}
+
+function applyShellAttrs(html, pathname) {
+    const attrs = shellAttrsForPath(pathname);
+    return html.replace(
+        '<html lang="fr">',
+        `<html lang="fr" data-scroll="${attrs.scroll}" data-motion="${attrs.motion}">`
+    );
+}
 
 function normalizePath(pathname) {
     let value = String(pathname || '/');
@@ -332,7 +347,7 @@ function applyFrameShell(html, frameSrc) {
 }
 
 async function renderShell({ shellPath, publicDir, pathname }) {
-    const shell = await fs.readFile(shellPath, 'utf8');
+    const shell = applyShellAttrs(await fs.readFile(shellPath, 'utf8'), pathname);
     const leafRel = leafForPath(pathname);
     const frameSrc = frameSrcForPath(pathname);
     const description = descriptionForPath(pathname);

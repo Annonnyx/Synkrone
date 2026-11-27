@@ -68,12 +68,16 @@ html[data-theme="dark"] {
   --sk-text: #eef0ea;
   --sk-text-muted: #8fa096;
   --sk-text-faint: #6d7c76;
-  --sk-accent-soft: rgba(63, 107, 82, 0.35);
-  --sk-accent-ring: rgba(63, 107, 82, 0.7);
+  --sk-accent: #6b9d7e;
+  --sk-accent-hover: #9ecfb0;
+  --sk-accent-soft: rgba(107, 157, 126, 0.32);
+  --sk-accent-ring: rgba(107, 157, 126, 0.7);
   --sk-success: #9ad1af;
   --sk-warning: #e3b675;
   --sk-danger: #c56a55;
   --sk-info: #8fa096;
+  --ambre-clair: rgba(184, 130, 61, 0.22);
+  --brique-clair: rgba(168, 70, 47, 0.22);
 }
 
 html,
@@ -322,6 +326,37 @@ html[data-theme="dark"] .login-panel {
 .toast-success { border-left: 3px solid var(--success); }
 .toast-error { border-left: 3px solid var(--danger); }
 .toast-info { border-left: 3px solid var(--info); }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast, .spinner { animation: none; }
+}
+
+@theme inline {
+  --radius-xs: 4px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --color-background: var(--sk-bg);
+  --color-foreground: var(--sk-text);
+  --color-card: var(--sk-surface);
+  --color-card-foreground: var(--sk-text);
+  --color-popover: var(--sk-surface);
+  --color-popover-foreground: var(--sk-text);
+  --color-primary: var(--sk-accent);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--sk-surface-2);
+  --color-secondary-foreground: var(--sk-text);
+  --color-muted: var(--sk-surface-2);
+  --color-muted-foreground: var(--sk-text-muted);
+  --color-accent: var(--sk-accent-soft);
+  --color-accent-foreground: var(--sk-text);
+  --color-destructive: var(--sk-danger);
+  --color-border: var(--sk-border);
+  --color-input: var(--sk-border-strong);
+  --color-ring: var(--sk-accent);
+}
 
 .console {
   background: #161c19;

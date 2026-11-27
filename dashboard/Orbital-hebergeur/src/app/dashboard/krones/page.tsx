@@ -8,6 +8,7 @@ import { usePoll } from "@/lib/use-poll";
 import { ErrorText } from "@/components/panel";
 import { PageHeader } from "@/components/ui";
 import { Table, Td, Th } from "@/components/ui/table";
+import { LedgerChart } from "@/components/charts";
 
 type Wallet = {
   balance: number;
@@ -44,11 +45,12 @@ export default function KronesPage() {
       <ErrorText error={error} />
       {wallet?.lowBalance && !wallet.unlimited && (
         <div
-          className="mb-4 rounded-lg border px-3 py-3 text-sm"
+          className="mb-4 border px-3 py-3 text-sm"
           style={{
-            borderColor: "rgba(184, 130, 61, 0.45)",
-            background: "rgba(184, 130, 61, 0.14)",
-            color: "#e3b675",
+            borderRadius: 4,
+            borderColor: "var(--ambre)",
+            background: "var(--ambre-clair)",
+            color: "var(--text)",
           }}
         >
           <p>{t("krones.lowBalance")}</p>
@@ -86,6 +88,10 @@ export default function KronesPage() {
           </a>
         </div>
       </div>
+
+      {wallet && wallet.ledger.length > 1 && (
+        <LedgerChart rows={wallet.ledger} label={t("krones.ledger")} locale={locale} />
+      )}
 
       <div className="mb-6">
         <h2 className="mb-3 text-sm font-semibold">{t("krones.packs")}</h2>
