@@ -19,6 +19,7 @@ import {
 } from "@/components/panel";
 import { Server } from "lucide-react";
 import { PageHeader } from "@/components/ui";
+import { QuotaChart } from "@/components/charts";
 import { useCreationFlags } from "@/lib/use-creation-flags";
 import { auditActionLabel } from "@/lib/audit-label";
 import { firstCreateHref } from "@/lib/services/creation-flags";
@@ -146,6 +147,24 @@ export default function DashboardPage() {
               sub={`${(data.totals.txKb / 1024).toFixed(1)} MB tx`}
             />
           </div>
+          <QuotaChart
+            cpu={data.totals.cpuPercent}
+            memory={
+              data.totals.memoryLimitMb > 0
+                ? (data.totals.memoryUsedMb / data.totals.memoryLimitMb) * 100
+                : 0
+            }
+            disk={
+              data.totals.storageLimitMb > 0
+                ? (data.totals.diskMb / data.totals.storageLimitMb) * 100
+                : 0
+            }
+            labels={{
+              cpu: t("dashboard.cpuAllocated"),
+              memory: t("dashboard.memory"),
+              disk: t("dashboard.storage"),
+            }}
+          />
 
           {data.alerts.length > 0 && (
             <div className="mt-4 space-y-2">
@@ -154,14 +173,16 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={a.serviceId}
-                    className="flex items-center justify-between rounded-xl border px-4 py-3 text-xs"
+                    className="flex items-center justify-between border px-4 py-3 text-xs"
                     style={{
-                      borderColor: "rgba(168, 70, 47, 0.45)",
-                      background: "rgba(168, 70, 47, 0.14)",
+                      borderRadius: 4,
+                      borderColor: "var(--sk-danger)",
+                      background: "var(--brique-clair)",
+                      color: "var(--text)",
                     }}
                     role="alert"
                   >
-                    <span className="flex items-center gap-2 text-[#e8a090]">
+                    <span className="flex items-center gap-2">
                       <AlertTriangle size={14} className="shrink-0" />
                       <span>
                         <b>{a.name}</b> — {explained.title}

@@ -57,7 +57,7 @@
         .link-edit-item { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px; background: #eef0ea; border-radius: 6px; }
         .color-picker-wrap { display: flex; align-items: center; gap: 8px; }
         .color-picker { width: 32px; height: 32px; border: 0; background: none; padding: 0; }
-        .rank-badge { font-size: 11px; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
+        .rank-badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
         .modal-overlay { position: fixed; inset: 0; z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-box { background: #fff; border: 1px solid #5c6a661f; border-radius: 6px; padding: 24px; width: 90%; max-width: 400px; text-align: center; }
@@ -66,7 +66,7 @@
             border: 1px solid #5c6a661f; background: #fff; color: #5c6a66; cursor: pointer;
             font: inherit; font-weight: 600;
         }
-        .like-btn-mini { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; padding: 0; border-radius: 50%; z-index: 2; }
+        .like-btn-mini { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; padding: 0; border-radius: 4px; z-index: 2; }
         .like-main-btn { padding: 8px 12px; border-radius: 4px; }
         .like-btn-mini:hover, .like-main-btn:hover { color: #a8462f; border-color: #a8462f; }
         .like-heart { width: 16px; height: 16px; display: block; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
@@ -74,6 +74,19 @@
         .liked .like-heart { fill: currentColor; }
         .user-list-item .like-btn-mini { position: relative; top: auto; right: auto; }
         .filter-bar { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+
+        html[data-theme="dark"] body { background: #1b211e; color: #eef0ea; }
+        html[data-theme="dark"] .user-card,
+        html[data-theme="dark"] .user-list-item,
+        html[data-theme="dark"] .modal-box,
+        html[data-theme="dark"] .view-btn,
+        html[data-theme="dark"] .time-btn,
+        html[data-theme="dark"] .like-btn-mini,
+        html[data-theme="dark"] .like-main-btn { background: #232b27; color: #eef0ea; border-color: #333e38; }
+        html[data-theme="dark"] .tab-btn { color: #8fa096; }
+        html[data-theme="dark"] .tab-btn.active { background: rgba(107, 157, 126, 0.28); color: #eef0ea; }
+        html[data-theme="dark"] .view-btn.active,
+        html[data-theme="dark"] .time-btn.active { background: rgba(107, 157, 126, 0.28); color: #eef0ea; border-color: #6b9d7e; }
     </style>
 </head>
 <body class="mosaic-bg">

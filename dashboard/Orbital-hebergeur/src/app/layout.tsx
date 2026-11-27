@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang={locale}
       data-theme={theme}
       style={{ colorScheme: theme }}
-      className={`${sans.variable} ${serif.variable} ${mono.variable}`}
+      className={`${theme === "dark" ? "dark" : ""} ${sans.variable} ${serif.variable} ${mono.variable}`}
     >
       <body className="min-h-screen antialiased">
         <ThemeProvider initialTheme={theme}>

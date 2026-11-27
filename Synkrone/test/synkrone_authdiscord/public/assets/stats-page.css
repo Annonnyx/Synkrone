@@ -48,11 +48,9 @@
 }
 
 .st-bars {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 8px;
-    align-items: end;
-    min-height: 88px;
+    display: block;
+    height: 160px;
+    min-height: 160px;
 }
 
 .st-bar {

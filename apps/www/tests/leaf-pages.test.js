@@ -84,6 +84,7 @@ test('renderShell injects accueil inside the leaf pane', async () => {
     const pane = html.slice(start, end);
     assert.match(pane, /<h1>Synkrone<\/h1>/);
     assert.match(pane, /class="hero"/);
+    assert.match(html, /<html lang="fr" data-scroll="doc" data-motion="story">/);
 });
 
 test('renderShell does not inject isolated app CSS into the chrome', async () => {
@@ -92,6 +93,7 @@ test('renderShell does not inject isolated app CSS into the chrome', async () =>
         publicDir: PUBLIC_DIR,
         pathname: '/discord/bump'
     });
+    assert.match(html, /<html lang="fr" data-scroll="stage" data-motion="off">/);
     assert.match(html, /id="content-frame"[^>]*src="\/discord\/bump\/index\.html"/);
     assert.doesNotMatch(html, /width:\s*100vw/);
     assert.doesNotMatch(html, /cdn\.tailwindcss\.com/);

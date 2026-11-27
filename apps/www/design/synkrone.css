@@ -165,6 +165,11 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+:focus-visible {
+    outline: 2px solid var(--sk-accent);
+    outline-offset: 2px;
+}
+
 h1, h2, h3 {
     font-family: var(--sk-serif);
     font-weight: 700;
@@ -977,6 +982,42 @@ html[data-theme="dark"] .sub-nav-tab.active {
     inset: 0;
     width: 100%;
     height: 100%;
+}
+
+html[data-scroll="doc"],
+html[data-scroll="doc"] body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: auto;
+}
+
+html[data-scroll="doc"] .app-container {
+    height: auto;
+    min-height: 100dvh;
+}
+
+html[data-scroll="doc"] .chrome {
+    position: sticky;
+    top: 0;
+}
+
+html[data-scroll="doc"] .app-container > main {
+    overflow: visible;
+    flex: none;
+}
+
+html[data-scroll="doc"] .content-stage {
+    height: auto;
+    flex: none;
+}
+
+html[data-scroll="doc"] .content-stage > .content-frame {
+    position: relative;
+    inset: auto;
+    height: auto;
+    overflow: visible;
 }
 
 iframe.content-frame {

@@ -198,11 +198,12 @@ export function LowBalanceBanner() {
   if (!wallet || wallet.unlimited || !wallet.lowBalance) return null;
   return (
     <div
-      className="rounded-lg border px-3 py-2 text-xs"
+      className="border px-3 py-2 text-xs"
       style={{
-        borderColor: "rgba(184, 130, 61, 0.45)",
-        background: "rgba(184, 130, 61, 0.14)",
-        color: "#e3b675",
+        borderRadius: 4,
+        borderColor: "var(--ambre)",
+        background: "var(--ambre-clair)",
+        color: "var(--text)",
       }}
       role="status"
     >
@@ -417,11 +418,12 @@ export function EngineBanner() {
   if (!engine || engine.reachable) return null;
   return (
     <div
-      className="mb-4 rounded-xl border px-4 py-3 text-xs"
+      className="mb-4 border px-4 py-3 text-xs"
       style={{
-        borderColor: "rgba(168, 70, 47, 0.45)",
-        background: "rgba(168, 70, 47, 0.14)",
-        color: "var(--danger)",
+        borderRadius: 4,
+        borderColor: "var(--sk-danger)",
+        background: "var(--brique-clair)",
+        color: "var(--text)",
       }}
       role="alert"
     >
@@ -454,7 +456,7 @@ export function Bar({ value, max }: { value: number; max: number }) {
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-sm bg-[var(--panel-3)]">
       <div
-        className="h-full rounded-sm transition-[width] duration-500"
+        className="h-full rounded-sm transition-[width] duration-500 motion-reduce:transition-none"
         style={{
           width: `${pct}%`,
           background: pct > 85 ? "var(--danger)" : "var(--accent)",
@@ -561,8 +563,8 @@ export function EmptyState({
     >
       {Icon && (
         <div
-          className={`flex items-center justify-center rounded-full ${compact ? "h-9 w-9" : "mb-1 h-11 w-11"}`}
-          style={{ background: "var(--panel-2)", color: "var(--accent)" }}
+          className={`flex items-center justify-center ${compact ? "h-9 w-9" : "mb-1 h-11 w-11"}`}
+          style={{ background: "var(--panel-2)", color: "var(--accent)", borderRadius: 4 }}
         >
           <Icon size={compact ? 16 : 20} />
         </div>
